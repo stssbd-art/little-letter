@@ -1,0 +1,17 @@
+export const DAILY_QUOTES = [
+  "A tiny kindness can travel farther than a loud announcement.",
+  "Write the note you wish would arrive on a rainy Tuesday.",
+  "Soft words still leave bright footprints.",
+  "Friendship is a pocket full of shared silliness.",
+  "Love often sounds like a quiet hello at the right time.",
+  "You do not need a reason to send a smile.",
+  "The internet is better when it carries warm messages.",
+  "A letter is a little paper lantern for someone's day.",
+  "Be the unexpected sparkle in someone's inbox.",
+  "Courage can look like pressing send.",
+  "Magic is just care wearing glitter shoes.",
+  "Today is a perfect day to be gently ridiculous.",
+  "Hearts grow when they are spoken to kindly.",
+  "A thank you can feel like sunshine through curtains.",
+  "Somewhere, someone needs your particular brand of warmth.",
+];

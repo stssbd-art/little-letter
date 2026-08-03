@@ -1,26 +1,140 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ll-pink: #fda4af;
+  --ll-pink-deep: #db2777;
+  --ll-pink-soft: #fce7f3;
+  --ll-pink-glow: rgba(244, 114, 182, 0.45);
+  --ll-pink-shadow: #f9a8d4;
+  --ll-lavender: #c4b5fd;
+  --ll-lavender-deep: #7c3aed;
+  --ll-lavender-shadow: #ddd6fe;
+  --ll-mint: #86efac;
+  --ll-mint-deep: #34d399;
+  --ll-mint-shadow: #a7f3d0;
+  --ll-baby-blue: #93c5fd;
+  --ll-cream: #fff7ed;
+  --ll-yellow: #fde68a;
+  --ll-ink: #4a3f55;
+  --ll-muted: #7c6f8a;
+  --ll-window-bg: rgba(255, 250, 245, 0.92);
+  --ll-window-border: #f9a8d4;
+  --ll-window-shadow: #fbcfe8;
+  --ll-title-from: #f9a8d4;
+  --ll-title-via: #c4b5fd;
+  --ll-title-to: #86efac;
+  --background: #fff7ed;
+  --foreground: #4a3f55;
+}
+
+.dark {
+  --ll-pink: #fb7185;
+  --ll-pink-deep: #fda4af;
+  --ll-pink-soft: rgba(251, 113, 133, 0.18);
+  --ll-pink-glow: rgba(251, 113, 133, 0.35);
+  --ll-pink-shadow: #9f1239;
+  --ll-lavender: #a78bfa;
+  --ll-lavender-deep: #c4b5fd;
+  --ll-lavender-shadow: #4c1d95;
+  --ll-mint: #6ee7b7;
+  --ll-mint-deep: #34d399;
+  --ll-mint-shadow: #065f46;
+  --ll-baby-blue: #60a5fa;
+  --ll-cream: #1a1424;
+  --ll-yellow: #fcd34d;
+  --ll-ink: #f5e9ff;
+  --ll-muted: #c4b5d4;
+  --ll-window-bg: rgba(36, 27, 48, 0.92);
+  --ll-window-border: #7c3aed;
+  --ll-window-shadow: #2e1065;
+  --ll-title-from: #be185d;
+  --ll-title-via: #6d28d9;
+  --ll-title-to: #047857;
+  --background: #1a1424;
+  --foreground: #f5e9ff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-nunito);
+  --font-display: var(--font-quicksand);
+  --font-pixel: var(--font-pixel);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(253, 164, 175, 0.35), transparent 45%),
+    radial-gradient(ellipse at 90% 10%, rgba(196, 181, 253, 0.35), transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(134, 239, 172, 0.28), transparent 45%),
+    radial-gradient(ellipse at 70% 60%, rgba(147, 197, 253, 0.22), transparent 40%),
+    var(--ll-cream);
+  color: var(--ll-ink);
+  font-family: var(--font-nunito), "Trebuchet MS", sans-serif;
+  min-height: 100vh;
+}
+
+.dark body {
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(190, 24, 93, 0.35), transparent 45%),
+    radial-gradient(ellipse at 90% 10%, rgba(109, 40, 217, 0.35), transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(4, 120, 87, 0.28), transparent 45%),
+    var(--ll-cream);
+}
+
+.font-pixel {
+  font-family: var(--font-pixel), "Courier New", monospace;
+  image-rendering: pixelated;
+}
+
+.font-display {
+  font-family: var(--font-quicksand), "Trebuchet MS", sans-serif;
+}
+
+.crt-overlay {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.03),
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+.dark .crt-overlay {
+  mix-blend-mode: soft-light;
+  opacity: 0.35;
+}
+
+.pixel-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+::selection {
+  background: var(--ll-pink);
+  color: white;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ll-lavender-deep);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

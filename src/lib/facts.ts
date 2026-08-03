@@ -1,0 +1,17 @@
+export const CUTE_FACTS = [
+  "Otters hold hands while sleeping so they do not float away.",
+  "Cows have best friends and get stressed when separated.",
+  "A group of flamingos is called a flamboyance.",
+  "Penguins propose with carefully chosen pebbles.",
+  "Honey never truly spoils — ancient jars have still been edible.",
+  "Sea otters have a favourite rock they keep in a little pocket.",
+  "Baby elephants suck their trunks for comfort.",
+  "Goats have accents depending on where they grow up.",
+  "A snail can sleep for three years if the weather is too dry.",
+  "Butterflies taste with their feet.",
+  "Quokkas look like they are always smiling for a reason: they often are.",
+  "Rats giggle when tickled and seek out the tickler again.",
+  "Manatees can get sunburned and sometimes wear sunscreen.",
+  "Pigeons can recognise themselves in mirrors.",
+  "There are more possible chess games than atoms in the observable universe — and still, a handwritten note feels bigger.",
+];

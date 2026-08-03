@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Little Letter
 
-## Getting Started
+Nostalgic, whimsical site for creating and sending cute personal messages.
 
-First, run the development server:
+## Stack
+
+- Next.js 15 (App Router) + TypeScript
+- Tailwind CSS 4
+- Framer Motion
+- OpenAI API (message generation)
+- Resend (email delivery)
+
+## Setup
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Required | Description |
+|---|---|---|
+| `OPENAI_API_KEY` | For AI messages | Falls back to warm local templates if missing |
+| `OPENAI_MODEL` | No | Defaults to `gpt-4o-mini` |
+| `RESEND_API_KEY` | For real email | Simulates send if missing (demo mode) |
+| `RESEND_FROM_EMAIL` | No | Defaults to Resend onboarding sender |
+| `NEXT_PUBLIC_SITE_URL` | No | Used for SEO metadata |
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` — development server
+- `npm run build` — production build
+- `npm start` — start production server
+- `npm run lint` — ESLint
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Pages
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `/` Home
+- `/about` About
+- `/create` Message creator
+- `/preview` Letter preview + send
+- `/success` Celebration
+- `/faq` FAQ
 
-## Deploy on Vercel
+## Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Guestbook data is stored in `.data/guestbook.json` (created at runtime).

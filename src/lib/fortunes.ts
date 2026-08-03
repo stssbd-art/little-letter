@@ -1,0 +1,17 @@
+export const FORTUNES = [
+  "A pixel heart will find you before Friday.",
+  "Someone is about to smile because of something you do.",
+  "Your next message will land softer than you expect.",
+  "A tiny adventure is hiding in an ordinary hour.",
+  "The cloud outside your window has a secret compliment for you.",
+  "You will invent a new favourite snack this month.",
+  "A butterfly of good news is already in transit.",
+  "Your kindness has a return address.",
+  "Tonight: soft music, warm drink, excellent vibes.",
+  "An old friend will send something unexpected and lovely.",
+  "You are allowed to rest and still be magical.",
+  "A glittery opportunity prefers people who say hello first.",
+  "Your inbox will contain one genuine sparkle this week.",
+  "The moon approves of your current playlist.",
+  "Write it down — the universe likes receipts.",
+];

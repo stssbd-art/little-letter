@@ -1,0 +1,240 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { PixelWindow } from "@/components/ui/PixelWindow";
+import { PixelButton } from "@/components/ui/PixelButton";
+import { PixelCard } from "@/components/ui/PixelCard";
+import { Field, PixelInput, PixelSelect, PixelTextarea } from "@/components/ui/PixelInput";
+import { useLetter } from "@/components/providers/LetterProvider";
+import { useSound } from "@/components/providers/SoundProvider";
+import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
+import type { MessageStyle, Occasion } from "@/types";
+
+export function MessageForm() {
+  const router = useRouter();
+  const { form, setForm, setLetter } = useLetter();
+  const { play } = useSound();
+  const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<"form" | "closing" | "flying">("form");
+  const [error, setError] = useState("");
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    play("click");
+    setPhase("closing");
+
+    try {
+      await new Promise((r) => setTimeout(r, 700));
+      setPhase("flying");
+      play("whoosh");
+
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "Could not generate letter");
+      }
+
+      setLetter({
+        subject: data.subject,
+        message: data.message,
+        form,
+        createdAt: new Date().toISOString(),
+      });
+
+      await new Promise((r) => setTimeout(r, 900));
+      play("sparkle");
+      router.push("/preview");
+    } catch (err) {
+      setPhase("form");
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <PixelWindow title="create_message.exe" icon="✍️" liftOnHover={false}>
+      <AnimatePresence mode="wait">
+        {phase === "form" ? (
+          <motion.form
+            key="form"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            onSubmit={onSubmit}
+            className="space-y-5"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Recipient name" htmlFor="recipientName">
+                <PixelInput
+                  id="recipientName"
+                  required
+                  value={form.recipientName}
+                  onChange={(e) => setForm({ recipientName: e.target.value })}
+                  placeholder="Sam"
+                />
+              </Field>
+              <Field label="Recipient email" htmlFor="recipientEmail">
+                <PixelInput
+                  id="recipientEmail"
+                  type="email"
+                  required
+                  value={form.recipientEmail}
+                  onChange={(e) => setForm({ recipientEmail: e.target.value })}
+                  placeholder="sam@example.com"
+                />
+              </Field>
+              <Field label="Your name" htmlFor="senderName">
+                <PixelInput
+                  id="senderName"
+                  required
+                  value={form.senderName}
+                  onChange={(e) => setForm({ senderName: e.target.value })}
+                  placeholder="Alex"
+                />
+              </Field>
+              <Field label="Relationship" htmlFor="relationship">
+                <PixelSelect
+                  id="relationship"
+                  value={form.relationship}
+                  onChange={(e) =>
+                    setForm({
+                      relationship: e.target.value as typeof form.relationship,
+                    })
+                  }
+                >
+                  {RELATIONSHIPS.map((r) => (
+                    <option key={r.value} value={r.value}>
+                      {r.label}
+                    </option>
+                  ))}
+                </PixelSelect>
+              </Field>
+            </div>
+
+            <div>
+              <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
+                Occasion
+              </p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {OCCASIONS.map((o) => (
+                  <PixelCard
+                    key={o.value}
+                    as="button"
+                    selected={form.occasion === o.value}
+                    onClick={() => {
+                      play("click");
+                      setForm({ occasion: o.value as Occasion });
+                    }}
+                    className="flex flex-col items-center gap-1 py-3"
+                  >
+                    <span className="text-xl">{o.emoji}</span>
+                    <span className="text-center font-display text-xs">
+                      {o.label}
+                    </span>
+                  </PixelCard>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
+                Style
+              </p>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {STYLES.map((s) => (
+                  <PixelCard
+                    key={s.value}
+                    as="button"
+                    selected={form.style === s.value}
+                    onClick={() => {
+                      play("click");
+                      setForm({ style: s.value as MessageStyle });
+                    }}
+                  >
+                    <p className="font-display text-sm text-[var(--ll-ink)]">
+                      {s.label}
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--ll-muted)]">
+                      {s.description}
+                    </p>
+                  </PixelCard>
+                ))}
+              </div>
+            </div>
+
+            <Field
+              label="Custom notes (optional)"
+              htmlFor="customNote"
+              hint="Little details make the magic personal."
+            >
+              <PixelTextarea
+                id="customNote"
+                value={form.customNote}
+                onChange={(e) => setForm({ customNote: e.target.value })}
+                placeholder="Mention their new kitten, the rainy walk, the joke only you two get..."
+                maxLength={500}
+              />
+            </Field>
+
+            {error ? (
+              <p className="rounded-xl border-2 border-rose-300 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-950/40 dark:text-rose-200">
+                {error}
+              </p>
+            ) : null}
+
+            <PixelButton type="submit" size="lg" disabled={loading} className="w-full sm:w-auto">
+              ✨ Generate Little Letter
+            </PixelButton>
+          </motion.form>
+        ) : (
+          <motion.div
+            key="anim"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex min-h-[280px] flex-col items-center justify-center gap-4 py-8"
+          >
+            <motion.div
+              animate={
+                phase === "closing"
+                  ? { scaleY: [1, 0.2, 0.2], rotate: [0, 0, -8] }
+                  : {
+                      x: [0, 40, 180],
+                      y: [0, -30, -120],
+                      rotate: [0, -20, -45],
+                      opacity: [1, 1, 0],
+                      scale: [1, 0.9, 0.5],
+                    }
+              }
+              transition={{ duration: phase === "closing" ? 0.7 : 0.9 }}
+              className="text-6xl"
+              aria-hidden
+            >
+              💌
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex gap-2 text-xl"
+              aria-hidden
+            >
+              ✨ ⭐ ✨
+            </motion.div>
+            <p className="font-display text-[var(--ll-ink)]">
+              {phase === "closing"
+                ? "Sealing your envelope..."
+                : "Your letter is flying to the preview desk..."}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </PixelWindow>
+  );
+}
