@@ -26,11 +26,11 @@ export function PixelButton({
     primary:
       "bg-gradient-to-b from-[var(--ll-pink)] to-[var(--ll-pink-deep)] text-white border-[var(--ll-pink-deep)] shadow-[0_4px_0_var(--ll-pink-shadow)]",
     secondary:
-      "bg-gradient-to-b from-[var(--ll-mint)] to-[var(--ll-mint-deep)] text-[var(--ll-ink)] border-[var(--ll-mint-deep)] shadow-[0_4px_0_var(--ll-mint-shadow)]",
+      "bg-gradient-to-b from-[var(--ll-mint)] to-[var(--ll-mint-deep)] text-white border-[var(--ll-mint-deep)] shadow-[0_4px_0_var(--ll-mint-shadow)]",
     ghost:
       "bg-white/70 dark:bg-white/10 text-[var(--ll-ink)] border-[var(--ll-lavender)] shadow-[0_3px_0_var(--ll-lavender-shadow)]",
     danger:
-      "bg-gradient-to-b from-rose-300 to-rose-400 text-white border-rose-500 shadow-[0_4px_0_#be123c]",
+      "bg-gradient-to-b from-orange-300 to-orange-400 text-white border-orange-500 shadow-[0_4px_0_#c2410c]",
   };
 
   const sizes = {

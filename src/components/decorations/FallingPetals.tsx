@@ -20,7 +20,7 @@ export function FallingPetals() {
       id: i,
       x: Math.random() * 100,
       delay: Math.random() * 8,
-      emoji: Math.random() > 0.5 ? "🌸" : "🌺",
+      emoji: Math.random() > 0.5 ? "🍃" : "✨",
     }));
     setPetals(ambient);
   }, []);
@@ -31,7 +31,7 @@ export function FallingPetals() {
       id: 1000 + petalBurst * 100 + i,
       x: Math.random() * 100,
       delay: Math.random() * 1.2,
-      emoji: ["🌸", "🌺", "🌼", "💮"][i % 4]!,
+      emoji: ["🍃", "🌿", "✨", "⭐"][i % 4]!,
     }));
     setPetals((prev) => [...prev, ...burst]);
     const t = window.setTimeout(() => {

@@ -8,7 +8,6 @@ import { Logo } from "@/components/ui/Logo";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useSound } from "@/components/providers/SoundProvider";
-import { useEasterEggs } from "@/components/providers/EasterEggProvider";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -22,11 +21,10 @@ export function Header() {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const { muted, toggleMute, play } = useSound();
-  const { triggerEmojiRain } = useEasterEggs();
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Logo size="sm" />
 
@@ -37,7 +35,7 @@ export function Header() {
               href={link.href}
               onClick={() => play("click")}
               className={cn(
-                "rounded-lg px-3 py-1.5 font-display text-sm transition",
+                "rounded-md px-3 py-1.5 font-display text-sm transition",
                 pathname === link.href
                   ? "bg-[var(--ll-pink-soft)] text-[var(--ll-pink-deep)]"
                   : "text-[var(--ll-ink)] hover:bg-white/60 dark:hover:bg-white/10"
@@ -68,16 +66,6 @@ export function Header() {
             aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
           >
             {theme === "light" ? "🌙" : "☀️"}
-          </PixelButton>
-          <PixelButton
-            size="sm"
-            variant="ghost"
-            className="hidden sm:inline-flex"
-            onClick={triggerEmojiRain}
-            aria-label="Emoji rain easter egg"
-            title="Emoji rain!"
-          >
-            🌈
           </PixelButton>
           <Link href="/create" className="hidden sm:block">
             <PixelButton size="sm">💌 Create</PixelButton>

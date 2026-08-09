@@ -15,7 +15,7 @@ export default function CreatePage() {
           Create a Little Letter
         </h1>
         <p className="mt-2 font-display text-[var(--ll-muted)]">
-          Tell us who it&apos;s for — we&apos;ll help the words arrive soft and sparkling.
+          Tell us who it&apos;s for — first letter free, then £0.50 each.
         </p>
       </div>
       <MessageForm />

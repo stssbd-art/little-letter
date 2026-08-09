@@ -3,6 +3,9 @@ import { generateLetterMessage } from "@/lib/openai";
 import type { LetterFormData } from "@/types";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -47,7 +50,11 @@ export async function POST(request: Request) {
     };
 
     const result = await generateLetterMessage(form);
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    });
   } catch {
     return NextResponse.json(
       { error: "Could not generate your letter right now." },

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { PixelWindow } from "@/components/ui/PixelWindow";
@@ -10,13 +10,73 @@ import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS } from "@/lib/constants";
 
+type UsageInfo = {
+  freeAvailable: boolean;
+  credits: number;
+  canSend: boolean;
+  price: string;
+};
+
 export function LetterPreview() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { letter, setLetter } = useLetter();
   const { play } = useSound();
   const [open, setOpen] = useState(false);
   const [sending, setSending] = useState(false);
+  const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
+  const [usage, setUsage] = useState<UsageInfo | null>(null);
+  const [needsPayment, setNeedsPayment] = useState(false);
+
+  async function refreshUsage() {
+    const res = await fetch("/api/usage");
+    const data = (await res.json()) as UsageInfo;
+    if (res.ok) {
+      setUsage(data);
+      setNeedsPayment(!data.canSend);
+    }
+  }
+
+  useEffect(() => {
+    void refreshUsage();
+  }, []);
+
+  useEffect(() => {
+    const sessionId = searchParams.get("session_id");
+    const paid = searchParams.get("paid");
+    const cancelled = searchParams.get("cancelled");
+
+    if (cancelled) {
+      setError("Payment cancelled. Your first letter is free; extras are £0.50.");
+      return;
+    }
+
+    if (paid && sessionId && letter) {
+      void (async () => {
+        setPaying(true);
+        setError("");
+        try {
+          const verify = await fetch("/api/usage", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId }),
+          });
+          const verifyData = await verify.json();
+          if (!verify.ok) {
+            throw new Error(verifyData.error ?? "Could not verify payment");
+          }
+          await refreshUsage();
+          await sendLetter();
+          router.replace("/preview");
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Payment verify failed");
+          setPaying(false);
+        }
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run on Stripe return
+  }, [searchParams, letter]);
 
   if (!letter) {
     return (
@@ -33,7 +93,7 @@ export function LetterPreview() {
 
   const occasion = OCCASIONS.find((o) => o.value === letter.form.occasion);
 
-  async function send() {
+  async function sendLetter() {
     setSending(true);
     setError("");
     play("whoosh");
@@ -44,13 +104,20 @@ export function LetterPreview() {
         body: JSON.stringify(letter),
       });
       const data = await res.json();
+
+      if (res.status === 402) {
+        setNeedsPayment(true);
+        setError(data.error ?? "Payment required for extra letters.");
+        setSending(false);
+        return;
+      }
       if (!res.ok) throw new Error(data.error ?? "Failed to send");
 
       confetti({
         particleCount: 120,
         spread: 80,
         origin: { y: 0.65 },
-        colors: ["#fda4af", "#c4b5fd", "#86efac", "#93c5fd", "#fde68a"],
+        colors: ["#f6d58a", "#cbb892", "#c5d4a0", "#e8b86d", "#8b5e34"],
       });
       play("success");
       router.push("/success");
@@ -60,8 +127,36 @@ export function LetterPreview() {
     }
   }
 
+  async function startPayment() {
+    setPaying(true);
+    setError("");
+    play("click");
+    try {
+      const res = await fetch("/api/checkout", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not start payment");
+      window.location.href = data.url as string;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not start payment");
+      setPaying(false);
+    }
+  }
+
+  const priceLabel = usage?.price ?? "£0.50";
+  const freeLeft = usage?.freeAvailable ?? true;
+
   return (
     <div className="space-y-6">
+      <PixelWindow title="pricing.ini" icon="💷" liftOnHover={false}>
+        <p className="font-display text-sm text-[var(--ll-ink)]">
+          {freeLeft
+            ? "Your first letter is free. Extra letters are £0.50 each."
+            : usage && usage.credits > 0
+              ? `You have ${usage.credits} paid send${usage.credits === 1 ? "" : "s"} ready.`
+              : `Your free letter is used. Next send costs ${priceLabel}.`}
+        </p>
+      </PixelWindow>
+
       <PixelWindow title="letter_preview.rtf" icon="📬" liftOnHover={false}>
         <div className="flex flex-col items-center">
           <button
@@ -75,7 +170,7 @@ export function LetterPreview() {
             aria-label={open ? "Close letter" : "Open letter"}
           >
             <motion.div
-              className="mx-auto flex h-40 w-full max-w-sm items-end justify-center rounded-2xl border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#ffd6e8] to-[#ffc1d8] shadow-[6px_6px_0_var(--ll-pink-shadow)]"
+              className="mx-auto flex h-40 w-full max-w-sm items-end justify-center rounded-2xl border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f0c96a] shadow-[6px_6px_0_var(--ll-pink-shadow)]"
               animate={{ rotateX: open ? -18 : 0 }}
               style={{ transformStyle: "preserve-3d" }}
             >
@@ -163,13 +258,28 @@ export function LetterPreview() {
               setSending(false);
             }
           }}
-          disabled={sending}
+          disabled={sending || paying}
         >
           ✨ Regenerate
         </PixelButton>
-        <PixelButton size="lg" onClick={send} disabled={sending || !open}>
-          {sending ? "Sending..." : "💌 Send Little Letter"}
-        </PixelButton>
+
+        {needsPayment ? (
+          <PixelButton size="lg" onClick={startPayment} disabled={paying || !open}>
+            {paying ? "Opening checkout..." : `💳 Pay ${priceLabel} & send`}
+          </PixelButton>
+        ) : (
+          <PixelButton
+            size="lg"
+            onClick={sendLetter}
+            disabled={sending || paying || !open}
+          >
+            {sending || paying
+              ? "Sending..."
+              : freeLeft
+                ? "💌 Send free letter"
+                : "💌 Send Little Letter"}
+          </PixelButton>
+        )}
       </div>
       {!open ? (
         <p className="text-xs text-[var(--ll-muted)]">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { LetterPreview } from "@/components/features/LetterPreview";
 
 export const metadata: Metadata = {
@@ -14,10 +15,12 @@ export default function PreviewPage() {
           Preview your letter
         </h1>
         <p className="mt-2 font-display text-[var(--ll-muted)]">
-          Open the envelope, read it once with your heart, then send.
+          First letter free · then £0.50 each. Open the envelope, then send.
         </p>
       </div>
-      <LetterPreview />
+      <Suspense fallback={<p className="text-center text-sm text-[var(--ll-muted)]">Loading preview...</p>}>
+        <LetterPreview />
+      </Suspense>
     </div>
   );
 }

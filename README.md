@@ -24,11 +24,18 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable | Required | Description |
 |---|---|---|
+| `GMAIL_USER` | For free sending | Your Gmail address |
+| `GMAIL_APP_PASSWORD` | For free sending | Google App Password (not your normal password) |
+| `GMAIL_FROM_NAME` | No | Defaults to `Little Letter` |
 | `OPENAI_API_KEY` | For AI messages | Falls back to warm local templates if missing |
 | `OPENAI_MODEL` | No | Defaults to `gpt-4o-mini` |
-| `RESEND_API_KEY` | For real email | Simulates send if missing (demo mode) |
+| `RESEND_API_KEY` | Optional | Use later with a verified custom domain |
 | `RESEND_FROM_EMAIL` | No | Defaults to Resend onboarding sender |
 | `NEXT_PUBLIC_SITE_URL` | No | Used for SEO metadata |
+
+Gmail SMTP is preferred when configured — it can email any address for free (Google daily limits apply).
+
+Pricing: first send free, then £0.50 via Stripe (`STRIPE_SECRET_KEY`).
 
 ## Scripts
 

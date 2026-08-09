@@ -11,7 +11,15 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is this really free to try?",
-    a: "Yes. You can create and preview letters any time. Sending uses Resend, so you’ll need your own API keys for production email delivery.",
+    a: "Your first letter is free. After that, each extra letter costs £0.50 (paid securely with Stripe).",
+  },
+  {
+    q: "How do payments work?",
+    a: "Send one letter free. For the next ones, tap Pay £0.50 & send, complete Stripe Checkout, then your letter goes out automatically.",
+  },
+  {
+    q: "How do I send to any email for free?",
+    a: "Email delivery still uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). The £0.50 is only for extra sends after your first free letter.",
   },
   {
     q: "How are messages written?",
@@ -22,12 +30,12 @@ const FAQS = [
     a: "Recipients get a retro-styled HTML email with pastel gradients, pixel decorations, and a cosy Little Letter footer.",
   },
   {
-    q: "Can I mute the sounds?",
-    a: "Absolutely. Use the speaker button in the header. Sounds start muted by default so nothing surprises you.",
+    q: "What is the MP3 player on the home page?",
+    a: "A little Winamp-style deck for vibes. Press play/pause, skip tracks, and enjoy a daily quote on the green LCD screen while you write.",
   },
   {
-    q: "What are the easter eggs?",
-    a: "Click the moon for stars, a butterfly to follow your cursor, a flower for falling petals, or the rainbow button for emoji rain.",
+    q: "Can I mute the sounds?",
+    a: "Absolutely. Use the speaker button in the header. Sounds start muted by default so nothing surprises you.",
   },
   {
     q: "Is my data stored?",
@@ -39,10 +47,9 @@ const FAQS = [
   },
   {
     q: "Dark mode?",
-    a: "Toggle the sun/moon button in the header. Pastels become evening pastels.",
+    a: "Toggle the sun/moon button in the header for evening listening vibes.",
   },
 ];
-
 export default function FaqPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">

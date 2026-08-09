@@ -9,7 +9,7 @@ import type { GuestbookEntry } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { useSound } from "@/components/providers/SoundProvider";
 
-const EMOJI_OPTIONS = ["💌", "🌸", "⭐", "🦋", "💖", "🌈", "🍀", "✨"];
+const EMOJI_OPTIONS = ["💌", "⭐", "🦋", "☁️", "🍀", "🌈", "🎮", "✨"];
 
 export function Guestbook() {
   const { play } = useSound();

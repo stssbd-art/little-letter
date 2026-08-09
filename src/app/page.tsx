@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Logo, Mascot } from "@/components/ui/Logo";
 import { PixelButton } from "@/components/ui/PixelButton";
+import { RetroMp3Player } from "@/components/features/RetroMp3Player";
 import { DailyQuote } from "@/components/features/DailyQuote";
 import { CuteFact } from "@/components/features/CuteFact";
 import { FortuneCookie } from "@/components/features/FortuneCookie";
@@ -12,33 +13,10 @@ import { TodaysMood } from "@/components/features/TodaysMood";
 import { Guestbook } from "@/components/features/Guestbook";
 import { SITE_TAGLINE } from "@/lib/constants";
 
-const FLOATING = ["💌", "🌸", "⭐", "🦋", "💖", "☁️", "🍀", "✨"];
-
 export default function HomePage() {
   return (
     <div className="space-y-14">
       <section className="relative flex min-h-[70vh] flex-col items-center justify-center text-center">
-        {FLOATING.map((emoji, i) => (
-          <motion.span
-            key={i}
-            className="pointer-events-none absolute text-2xl opacity-70"
-            style={{
-              left: `${8 + (i % 4) * 24}%`,
-              top: `${12 + Math.floor(i / 4) * 55}%`,
-            }}
-            animate={{ y: [0, -14, 0], rotate: [0, 8, -8, 0] }}
-            transition={{
-              duration: 3 + i * 0.4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.2,
-            }}
-            aria-hidden
-          >
-            {emoji}
-          </motion.span>
-        ))}
-
         <Logo size="lg" />
         <div className="mt-8">
           <Mascot />
@@ -62,8 +40,12 @@ export default function HomePage() {
           </Link>
         </motion.div>
         <p className="mt-4 font-pixel text-[9px] leading-relaxed text-[var(--ll-muted)]">
-          Windows of wonder · since forever-ish
+          Press play · write a note · send a smile
         </p>
+
+        <div className="mt-10 w-full max-w-md">
+          <RetroMp3Player />
+        </div>
       </section>
 
       <section className="grid gap-5 md:grid-cols-2">

@@ -32,15 +32,15 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <p className="font-display text-sm text-[var(--ll-ink)]">Easter eggs</p>
+          <p className="font-display text-sm text-[var(--ll-ink)]">Player tip</p>
           <p className="mt-2 text-sm text-[var(--ll-muted)]">
-            Click the moon 🌙 for stars, a butterfly 🦋 to follow you, a flower 🌷
-            for petals, or the rainbow for emoji rain.
+            Hit play on the home-page MP3 deck, then write someone a note while
+            the equaliser blinks.
           </p>
         </div>
       </div>
       <div className="border-t border-[var(--ll-lavender)]/50 px-4 py-4 text-center text-xs text-[var(--ll-muted)]">
-        Made with pixel hearts · {new Date().getFullYear()} {SITE_NAME}
+        Made with pixel care · {new Date().getFullYear()} {SITE_NAME}
       </div>
     </footer>
   );

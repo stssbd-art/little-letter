@@ -23,7 +23,7 @@ const SEED: GuestbookEntry[] = [
     id: "seed-2",
     name: "Jules",
     message: "Sent one to my sister. She replied with seventeen heart emojis.",
-    emoji: "💖",
+    emoji: "✨",
     createdAt: "2026-07-20T15:30:00.000Z",
   },
   {

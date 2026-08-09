@@ -34,8 +34,8 @@ export default function AboutPage() {
             </p>
             <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
               Meet Pip the Envelope — our tiny mascot who believes every inbox
-              deserves a little sparkle. Click the moon, butterflies, and flowers
-              around the site for hidden surprises.
+              deserves a little sparkle. Hit play on the retro MP3 deck, then send
+              someone a note.
             </p>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default function AboutPage() {
 
       <PixelWindow title="why_we_exist.ini" icon="💫">
         <ul className="space-y-3 text-sm text-[var(--ll-ink)]">
-          <li>🌸 Because kindness travels better with personality.</li>
+          <li>🍀 Because kindness travels better with personality.</li>
           <li>💌 Because email can still feel like opening a sealed note.</li>
           <li>⭐ Because nostalgia should feel magical — not cluttered.</li>
           <li>🦋 Because the internet is better when it carries smiles.</li>

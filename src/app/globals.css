@@ -1,57 +1,58 @@
 @import "tailwindcss";
 
 :root {
-  --ll-pink: #fda4af;
-  --ll-pink-deep: #db2777;
-  --ll-pink-soft: #fce7f3;
-  --ll-pink-glow: rgba(244, 114, 182, 0.45);
-  --ll-pink-shadow: #f9a8d4;
-  --ll-lavender: #c4b5fd;
-  --ll-lavender-deep: #7c3aed;
-  --ll-lavender-shadow: #ddd6fe;
-  --ll-mint: #86efac;
-  --ll-mint-deep: #34d399;
-  --ll-mint-shadow: #a7f3d0;
-  --ll-baby-blue: #93c5fd;
-  --ll-cream: #fff7ed;
-  --ll-yellow: #fde68a;
-  --ll-ink: #4a3f55;
-  --ll-muted: #7c6f8a;
-  --ll-window-bg: rgba(255, 250, 245, 0.92);
-  --ll-window-border: #f9a8d4;
-  --ll-window-shadow: #fbcfe8;
-  --ll-title-from: #f9a8d4;
-  --ll-title-via: #c4b5fd;
-  --ll-title-to: #86efac;
-  --background: #fff7ed;
-  --foreground: #4a3f55;
+  /* Accent kept as --ll-pink* names for existing components; values are honey/amber */
+  --ll-pink: #f6d58a;
+  --ll-pink-deep: #8b5e34;
+  --ll-pink-soft: #fff6df;
+  --ll-pink-glow: rgba(214, 158, 46, 0.4);
+  --ll-pink-shadow: #d2a35a;
+  --ll-lavender: #cbb892;
+  --ll-lavender-deep: #6b4f36;
+  --ll-lavender-shadow: #e6d5b0;
+  --ll-mint: #c5d4a0;
+  --ll-mint-deep: #6f8a45;
+  --ll-mint-shadow: #d7e3b8;
+  --ll-baby-blue: #e8c98a;
+  --ll-cream: #faf4e8;
+  --ll-yellow: #ffe8a3;
+  --ll-ink: #3d2f22;
+  --ll-muted: #7a654f;
+  --ll-window-bg: rgba(255, 251, 242, 0.94);
+  --ll-window-border: #d2a35a;
+  --ll-window-shadow: #e6c98a;
+  --ll-title-from: #e8b86d;
+  --ll-title-via: #c4a574;
+  --ll-title-to: #a3b875;
+  --background: #faf4e8;
+  --foreground: #3d2f22;
 }
 
 .dark {
-  --ll-pink: #fb7185;
-  --ll-pink-deep: #fda4af;
-  --ll-pink-soft: rgba(251, 113, 133, 0.18);
-  --ll-pink-glow: rgba(251, 113, 133, 0.35);
-  --ll-pink-shadow: #9f1239;
-  --ll-lavender: #a78bfa;
-  --ll-lavender-deep: #c4b5fd;
-  --ll-lavender-shadow: #4c1d95;
-  --ll-mint: #6ee7b7;
-  --ll-mint-deep: #34d399;
-  --ll-mint-shadow: #065f46;
-  --ll-baby-blue: #60a5fa;
-  --ll-cream: #1a1424;
-  --ll-yellow: #fcd34d;
-  --ll-ink: #f5e9ff;
-  --ll-muted: #c4b5d4;
-  --ll-window-bg: rgba(36, 27, 48, 0.92);
-  --ll-window-border: #7c3aed;
-  --ll-window-shadow: #2e1065;
-  --ll-title-from: #be185d;
-  --ll-title-via: #6d28d9;
-  --ll-title-to: #047857;
-  --background: #1a1424;
-  --foreground: #f5e9ff;
+  --ll-pink: #e8b86d;
+  --ll-pink-deep: #f6d58a;
+  --ll-pink-soft: rgba(232, 184, 109, 0.16);
+  --ll-pink-glow: rgba(232, 184, 109, 0.35);
+  --ll-pink-shadow: #5c3d1e;
+  --ll-lavender: #b89a6d;
+  --ll-lavender-deep: #e6c98a;
+  --ll-lavender-shadow: #3d2f22;
+  --ll-mint: #a3b875;
+  --ll-mint-deep: #c5d4a0;
+  --ll-mint-shadow: #2f3a1e;
+  --ll-baby-blue: #d2a35a;
+  --ll-cream: #1c1610;
+  --ll-yellow: #f6d58a;
+  --ll-ink: #f5ecd9;
+  --ll-muted: #cbb892;
+  --ll-window-bg: rgba(36, 28, 20, 0.94);
+  --ll-window-border: #8b5e34;
+  --ll-window-shadow: #2a1f14;
+  --ll-title-from: #8b5e34;
+  --ll-title-via: #6b4f36;
+  --ll-title-to: #6f8a45;
+  --background: #1c1610;
+  --foreground: #f5ecd9;
 }
 
 @theme inline {
@@ -68,10 +69,10 @@ html {
 
 body {
   background:
-    radial-gradient(ellipse at 10% 0%, rgba(253, 164, 175, 0.35), transparent 45%),
-    radial-gradient(ellipse at 90% 10%, rgba(196, 181, 253, 0.35), transparent 40%),
-    radial-gradient(ellipse at 50% 100%, rgba(134, 239, 172, 0.28), transparent 45%),
-    radial-gradient(ellipse at 70% 60%, rgba(147, 197, 253, 0.22), transparent 40%),
+    radial-gradient(ellipse at 12% 0%, rgba(246, 213, 138, 0.55), transparent 45%),
+    radial-gradient(ellipse at 88% 8%, rgba(203, 184, 146, 0.4), transparent 42%),
+    radial-gradient(ellipse at 50% 100%, rgba(197, 212, 160, 0.3), transparent 45%),
+    radial-gradient(ellipse at 70% 55%, rgba(232, 184, 109, 0.22), transparent 40%),
     var(--ll-cream);
   color: var(--ll-ink);
   font-family: var(--font-nunito), "Trebuchet MS", sans-serif;
@@ -80,9 +81,9 @@ body {
 
 .dark body {
   background:
-    radial-gradient(ellipse at 10% 0%, rgba(190, 24, 93, 0.35), transparent 45%),
-    radial-gradient(ellipse at 90% 10%, rgba(109, 40, 217, 0.35), transparent 40%),
-    radial-gradient(ellipse at 50% 100%, rgba(4, 120, 87, 0.28), transparent 45%),
+    radial-gradient(ellipse at 12% 0%, rgba(139, 94, 52, 0.45), transparent 45%),
+    radial-gradient(ellipse at 88% 8%, rgba(107, 79, 54, 0.35), transparent 42%),
+    radial-gradient(ellipse at 50% 100%, rgba(111, 138, 69, 0.22), transparent 45%),
     var(--ll-cream);
 }
 
@@ -98,8 +99,8 @@ body {
 .crt-overlay {
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.03),
-    rgba(0, 0, 0, 0.03) 1px,
+    rgba(61, 47, 34, 0.04),
+    rgba(61, 47, 34, 0.04) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -118,8 +119,20 @@ body {
   background-size: 16px 16px;
 }
 
+.mp3-bezel {
+  background-image:
+    linear-gradient(90deg, rgba(61, 47, 34, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(61, 47, 34, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.lcd-screen {
+  font-family: var(--font-pixel), "Courier New", monospace;
+  text-shadow: 0 0 6px rgba(143, 239, 122, 0.35);
+}
+
 ::selection {
-  background: var(--ll-pink);
+  background: var(--ll-pink-deep);
   color: white;
 }
 

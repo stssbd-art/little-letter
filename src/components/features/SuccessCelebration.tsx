@@ -26,14 +26,14 @@ export function SuccessCelebration() {
         angle: 60,
         spread: 55,
         origin: { x: 0, y: 0.7 },
-        colors: ["#fda4af", "#c4b5fd", "#86efac", "#fde68a"],
+        colors: ["#f6d58a", "#cbb892", "#c5d4a0", "#ffe8a3"],
       });
       confetti({
         particleCount: 3,
         angle: 120,
         spread: 55,
         origin: { x: 1, y: 0.7 },
-        colors: ["#fda4af", "#93c5fd", "#86efac", "#f9a8d4"],
+        colors: ["#e8b86d", "#8b5e34", "#a3b875", "#d2a35a"],
       });
       if (Date.now() < end) requestAnimationFrame(frame);
     };
@@ -66,7 +66,7 @@ export function SuccessCelebration() {
           aria-hidden
         >
           <motion.span animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
-            🌸
+            🍃
           </motion.span>
           <motion.span animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 2.2, delay: 0.2 }}>
             🦋

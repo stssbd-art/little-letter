@@ -41,7 +41,7 @@ export function Mascot({ className = "" }: { className?: string }) {
       transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
       aria-hidden
     >
-      <div className="relative flex h-28 w-28 items-center justify-center rounded-[28px] border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#ffe4f1] to-[#ffd6e8] shadow-[6px_6px_0_var(--ll-pink-shadow)] dark:from-[#4a2c3d] dark:to-[#3a2230]">
+      <div className="relative flex h-28 w-28 items-center justify-center rounded-[28px] border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f6d58a] shadow-[6px_6px_0_var(--ll-pink-shadow)] dark:from-[#5c3d1e] dark:to-[#3d2f22]">
         <div className="absolute left-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />
         <div className="absolute right-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />
         <div className="absolute bottom-9 left-1/2 h-2 w-6 -translate-x-1/2 rounded-full bg-[var(--ll-pink-deep)]" />
@@ -57,7 +57,7 @@ export function Mascot({ className = "" }: { className?: string }) {
           animate={{ y: [0, -4, 0] }}
           transition={{ duration: 2.2, repeat: Infinity }}
         >
-          🌸
+          ⭐
         </motion.div>
       </div>
       <p className="mt-3 font-pixel text-[9px] text-[var(--ll-muted)]">

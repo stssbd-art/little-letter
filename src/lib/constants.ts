@@ -11,7 +11,7 @@ export const OCCASIONS: {
 }[] = [
   { value: "birthday", label: "Birthday", emoji: "🎂" },
   { value: "love", label: "Love", emoji: "❤️" },
-  { value: "friendship", label: "Friendship", emoji: "🌸" },
+  { value: "friendship", label: "Friendship", emoji: "🤝" },
   { value: "good-luck", label: "Good Luck", emoji: "🍀" },
   { value: "thinking-of-you", label: "Thinking of You", emoji: "🌈" },
   { value: "thank-you", label: "Thank You", emoji: "🌻" },
@@ -53,7 +53,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 export const MOODS = [
-  { emoji: "🌸", label: "Blooming" },
+  { emoji: "🍃", label: "Calm" },
   { emoji: "☁️", label: "Dreamy" },
   { emoji: "✨", label: "Sparkly" },
   { emoji: "🍀", label: "Lucky" },
