@@ -36,13 +36,20 @@ export function MixtapeRemixPlayer({ mix }: Props) {
     indexRef.current = index;
   }, [index]);
 
+  // Keep playing state honest with the element
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !tracks[0]) return;
-
-    audio.src = tracks[0].src;
-    audio.load();
-  }, [tracks]);
+    if (!audio) return;
+    const sync = () => setPlaying(!audio.paused && !audio.ended);
+    audio.addEventListener("playing", sync);
+    audio.addEventListener("pause", sync);
+    audio.addEventListener("ended", sync);
+    return () => {
+      audio.removeEventListener("playing", sync);
+      audio.removeEventListener("pause", sync);
+      audio.removeEventListener("ended", sync);
+    };
+  }, []);
 
   function formatTime(seconds: number) {
     if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
@@ -229,23 +236,6 @@ export function MixtapeRemixPlayer({ mix }: Props) {
         </p>
       ) : null}
 
-      {/* Real audio elements — required for reliable mobile/desktop playback */}
-      <audio
-        ref={audioRef}
-        preload="auto"
-        playsInline
-        onTimeUpdate={onTimeUpdate}
-        onEnded={onEnded}
-        onPlay={() => setPlaying(true)}
-        onPause={() => {
-          if (!fadingRef.current) setPlaying(false);
-        }}
-        onError={() =>
-          setError("Audio stream blocked or failed. Tap Play again.")
-        }
-        className="sr-only"
-      />
-
       <PixelWindow title="remix_deck.exe" icon="🎧" liftOnHover={false}>
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -285,13 +275,31 @@ export function MixtapeRemixPlayer({ mix }: Props) {
             <span>{formatTime(audioRef.current?.duration ?? 0)}</span>
           </div>
 
+          <div className="rounded-xl border-2 border-[var(--ll-lavender)] bg-white/70 p-3 dark:bg-white/5">
+            <p className="mb-2 font-pixel text-[8px] text-[var(--ll-muted)]">
+              Tape transport
+            </p>
+            <audio
+              ref={audioRef}
+              controls
+              playsInline
+              preload="auto"
+              onTimeUpdate={onTimeUpdate}
+              onEnded={onEnded}
+              onError={() =>
+                setError("Audio failed to load. Check your connection and tap Play again.")
+              }
+              className="w-full"
+            />
+          </div>
+
           <div className="flex flex-wrap items-center justify-center gap-2">
             <PixelButton
               variant="ghost"
               onClick={() => void playIndex(Math.max(0, index - 1))}
               disabled={index === 0 || loading}
             >
-              ⏮
+              ⏮ Prev
             </PixelButton>
             <PixelButton size="lg" onClick={() => void togglePlay()} disabled={loading}>
               {loading ? "⏳ Loading…" : playing ? "⏸ Pause mix" : "▶ Play mixtape"}
@@ -303,23 +311,8 @@ export function MixtapeRemixPlayer({ mix }: Props) {
               }
               disabled={index >= tracks.length - 1 || loading}
             >
-              ⏭
+              Next ⏭
             </PixelButton>
-          </div>
-
-          {/* Always-visible native controls as a guaranteed fallback */}
-          <div className="rounded-xl border-2 border-[var(--ll-lavender)] bg-white/70 p-3 dark:bg-white/5">
-            <p className="mb-2 font-pixel text-[8px] text-[var(--ll-muted)]">
-              Backup player (if remix deck is quiet)
-            </p>
-            <audio
-              key={current?.id ?? "none"}
-              controls
-              playsInline
-              preload="metadata"
-              src={current?.src}
-              className="w-full"
-            />
           </div>
 
           {error ? (
