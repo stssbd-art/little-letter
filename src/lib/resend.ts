@@ -5,6 +5,7 @@ import {
   buildLetterEmailHtml,
   buildMixtapeEmailHtml,
 } from "@/lib/email-template";
+import { buildMixPlayUrl } from "@/lib/mixtape-link";
 
 type SendResult = {
   id: string;
@@ -90,10 +91,18 @@ export async function sendLetterEmail(letter: GeneratedLetter): Promise<SendResu
 }
 
 export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult> {
+  const playUrl = buildMixPlayUrl({
+    title: mix.title,
+    from: mix.senderName,
+    to: mix.recipientName,
+    note: mix.dedication,
+    tracks: mix.trackIds,
+  });
+
   return deliverEmail({
     to: mix.recipientEmail,
     subject: `📼 Mixtape for you: ${mix.title}`,
-    html: buildMixtapeEmailHtml(mix),
+    html: buildMixtapeEmailHtml(mix, playUrl),
     logLabel: "mixtape",
   });
 }

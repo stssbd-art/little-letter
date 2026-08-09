@@ -9,6 +9,7 @@ import { PixelButton } from "@/components/ui/PixelButton";
 import { Field, PixelInput, PixelTextarea } from "@/components/ui/PixelInput";
 import { useSound } from "@/components/providers/SoundProvider";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { encodeMixShare } from "@/lib/mixtape-link";
 import {
   getTracksByIds,
   MAX_MIXTAPE_TRACKS,
@@ -17,6 +18,7 @@ import {
 } from "@/lib/tracks";
 import type { MixtapePayload } from "@/types";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 type UsageInfo = {
   freeAvailable: boolean;
@@ -385,6 +387,24 @@ export function MixtapeForm() {
             ) : null}
 
             <div className="flex flex-wrap gap-3 pt-1">
+              {draft.trackIds.length >= MIN_MIXTAPE_TRACKS &&
+              draft.title.trim() ? (
+                <Link
+                  href={`/mix/${encodeMixShare({
+                    title: draft.title.trim() || "Untitled Mix",
+                    from: draft.senderName.trim() || "a friend",
+                    to: draft.recipientName.trim() || "someone special",
+                    note: draft.dedication.trim(),
+                    tracks: draft.trackIds,
+                  })}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <PixelButton type="button" variant="secondary">
+                    ▶ Preview remix
+                  </PixelButton>
+                </Link>
+              ) : null}
               {needsPayment ? (
                 <PixelButton
                   type="submit"

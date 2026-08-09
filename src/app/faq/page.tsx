@@ -35,7 +35,7 @@ const FAQS = [
   },
   {
     q: "Can I send a mixtape?",
-    a: "Yes — open Mixtape, label a cassette, pick 3–6 nineties tracks, add a dedication, and email it. Your first two mixtapes are free; extras are £0.50. The email shows the tracklist (demo audio streams live on the site).",
+    a: "Yes — open Mixtape, label a cassette, pick 3–6 nineties tracks, add a dedication, and email it. Your first two mixtapes are free; extras are £0.50. The email includes a Play button that opens a remix deck where tracks crossfade into each other (demo audio streams).",
   },
   {
     q: "Can I mute the sounds?",

@@ -70,7 +70,7 @@ export function buildLetterEmailHtml(letter: GeneratedLetter): string {
 </html>`;
 }
 
-export function buildMixtapeEmailHtml(mix: MixtapePayload): string {
+export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): string {
   const tracks = getTracksByIds(mix.trackIds);
   const trackRows = tracks
     .map(
@@ -107,7 +107,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload): string {
             <td style="background:linear-gradient(90deg,#5c3d1e,#8b5e34,#6b4f36);padding:18px 22px;text-align:center;">
               <div style="font-size:26px;letter-spacing:3px;">📼</div>
               <div style="font-family:Georgia,serif;font-size:22px;color:#fff6df;margin-top:6px;">A mixtape for you</div>
-              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · Little Letter</div>
+              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · continuous remix</div>
             </td>
           </tr>
           <tr>
@@ -123,6 +123,16 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload): string {
             </td>
           </tr>
           <tr>
+            <td style="padding:18px 22px 6px;text-align:center;">
+              <a href="${escapeHtml(playUrl)}" style="display:inline-block;background:linear-gradient(180deg,#f6d58a,#e8b86d);color:#3d2f22;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:999px;border:3px solid #8b5e34;box-shadow:0 4px 0 #5c3d1e;">
+                ▶ Play this mixtape
+              </a>
+              <div style="margin-top:10px;font-size:11px;color:#cbb892;">
+                Opens a remix deck — tracks crossfade into each other
+              </div>
+            </td>
+          </tr>
+          <tr>
             <td style="padding:12px 22px 8px;">
               <div style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#e6c98a;margin-bottom:8px;">TRACKLIST</div>
               <table role="presentation" width="100%" style="background:#241c16;border:2px solid #5c4a34;border-radius:12px;overflow:hidden;">
@@ -133,8 +143,11 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload): string {
           <tr>
             <td style="padding:18px 22px 26px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#cbb892;line-height:1.6;">
-                Press play in your heart — this tape was burned just for you.<br />
-                <span style="color:#8a7a62;font-size:11px;">Titles are 90s favourites; audio streams on the site are free demos.</span>
+                Hit play and let the mix run — like a continuous remix just for you.<br />
+                <span style="color:#8a7a62;font-size:11px;">Titles are 90s favourites; playback uses free demo streams.</span>
+              </p>
+              <p style="margin:14px 0 0;font-size:11px;color:#8a7a62;word-break:break-all;">
+                ${escapeHtml(playUrl)}
               </p>
               <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;">
                 Sent with care via <strong style="color:#f6d58a;">Little Letter</strong>
