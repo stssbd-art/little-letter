@@ -3,39 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useSound } from "@/components/providers/SoundProvider";
+import { MIX_TRACKS } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
-/**
- * Classic 90s playlist labels for the retro deck.
- * Audio uses free demo streams (not the original commercial recordings).
- */
-const TRACKS = [
-  {
-    title: "Wonderwall.mp3",
-    artist: "Oasis · 1995",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-  },
-  {
-    title: "I Want It That Way.mp3",
-    artist: "Backstreet Boys · 1999",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-  },
-  {
-    title: "Wannabe.mp3",
-    artist: "Spice Girls · 1996",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-  },
-  {
-    title: "Barbie Girl.mp3",
-    artist: "Aqua · 1997",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
-  },
-  {
-    title: "MMMBop.mp3",
-    artist: "Hanson · 1997",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3",
-  },
-];
+const TRACKS = MIX_TRACKS.slice(0, 5);
 
 function formatTime(seconds: number) {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
@@ -127,10 +98,10 @@ export function RetroMp3Player({ className }: { className?: string }) {
             <div className="min-w-0">
               <p className="font-pixel text-[8px] opacity-80">NOW PLAYING · 90s MIX</p>
               <p className="mt-1 truncate font-pixel text-[10px] leading-relaxed">
-                {track.title}
+                {track.title}.mp3
               </p>
               <p className="mt-1 truncate text-[11px] text-[#8fef7a]/80">
-                {track.artist}
+                {track.artist} · {track.year}
               </p>
             </div>
             <div className="flex h-8 items-end gap-[3px]" aria-hidden>
@@ -208,7 +179,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
         <div className="mt-3 grid grid-cols-5 gap-1">
           {TRACKS.map((t, i) => (
             <button
-              key={t.title}
+              key={t.id}
               type="button"
               onClick={() => {
                 play("click");
@@ -230,7 +201,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
 
         <ul className="mt-3 max-h-28 space-y-1 overflow-y-auto rounded-md border border-[#b9a888]/70 bg-[#ebe1cd]/50 p-2 text-left dark:border-[#5c4a34] dark:bg-[#2a2218]/60">
           {TRACKS.map((t, i) => (
-            <li key={t.title}>
+            <li key={t.id}>
               <button
                 type="button"
                 onClick={() => {
@@ -246,10 +217,10 @@ export function RetroMp3Player({ className }: { className?: string }) {
               >
                 <span className="font-pixel text-[8px] opacity-70">{i + 1}.</span>
                 <span className="min-w-0 flex-1 truncate font-display text-xs">
-                  {t.title.replace(".mp3", "")}
+                  {t.title}
                 </span>
                 <span className="truncate font-pixel text-[7px] opacity-60">
-                  {t.artist.split("·")[0]?.trim()}
+                  {t.artist}
                 </span>
               </button>
             </li>

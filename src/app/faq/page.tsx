@@ -34,6 +34,10 @@ const FAQS = [
     a: "A little Winamp-style deck for vibes. Press play/pause, skip tracks, and enjoy a daily quote on the green LCD screen while you write.",
   },
   {
+    q: "Can I send a mixtape?",
+    a: "Yes — open Mixtape, label a cassette, pick 3–6 nineties tracks, add a dedication, and email it. Same free-first / £0.50 extras pricing as letters. The email shows the tracklist (demo audio streams live on the site).",
+  },
+  {
     q: "Can I mute the sounds?",
     a: "Absolutely. Use the speaker button in the header. Sounds start muted by default so nothing surprises you.",
   },

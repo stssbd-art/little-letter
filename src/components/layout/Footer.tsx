@@ -25,6 +25,11 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link className="hover:text-[var(--ll-pink-deep)]" href="/mixtape">
+                Send a mixtape
+              </Link>
+            </li>
+            <li>
               <Link className="hover:text-[var(--ll-pink-deep)]" href="/faq">
                 FAQ
               </Link>
@@ -32,10 +37,10 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <p className="font-display text-sm text-[var(--ll-ink)]">Player tip</p>
+          <p className="font-display text-sm text-[var(--ll-ink)]">Tape tip</p>
           <p className="mt-2 text-sm text-[var(--ll-muted)]">
-            Hit play on the home-page MP3 deck, then write someone a note while
-            the equaliser blinks.
+            Hit play on the home deck, then burn someone a cassette mixtape —
+            label, tracklist, dedication and all.
           </p>
         </div>
       </div>

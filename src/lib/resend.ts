@@ -1,7 +1,10 @@
 import nodemailer from "nodemailer";
 import { Resend } from "resend";
-import type { GeneratedLetter } from "@/types";
-import { buildLetterEmailHtml } from "@/lib/email-template";
+import type { GeneratedLetter, MixtapePayload } from "@/types";
+import {
+  buildLetterEmailHtml,
+  buildMixtapeEmailHtml,
+} from "@/lib/email-template";
 
 type SendResult = {
   id: string;
@@ -29,72 +32,68 @@ function getGmailTransport() {
   };
 }
 
-/** Free path: Gmail SMTP can send to any address. Prefer this when configured. */
-async function sendViaGmail(letter: GeneratedLetter): Promise<SendResult | null> {
+async function deliverEmail(opts: {
+  to: string;
+  subject: string;
+  html: string;
+  logLabel: string;
+}): Promise<SendResult> {
   const gmail = getGmailTransport();
-  if (!gmail) return null;
-
-  const html = buildLetterEmailHtml(letter);
-  const fromName = process.env.GMAIL_FROM_NAME?.trim() || "Little Letter";
-  const info = await gmail.transporter.sendMail({
-    from: `"${fromName}" <${gmail.user}>`,
-    to: letter.form.recipientEmail,
-    subject: letter.subject,
-    html,
-    replyTo: gmail.user,
-  });
-
-  return {
-    id: info.messageId || `gmail-${Date.now()}`,
-    simulated: false,
-    provider: "gmail",
-  };
-}
-
-async function sendViaResend(letter: GeneratedLetter): Promise<SendResult | null> {
-  const resend = getResend();
-  if (!resend) return null;
-
-  const from =
-    process.env.RESEND_FROM_EMAIL ?? "Little Letter <onboarding@resend.dev>";
-  const html = buildLetterEmailHtml(letter);
-
-  const { data, error } = await resend.emails.send({
-    from,
-    to: letter.form.recipientEmail,
-    subject: letter.subject,
-    html,
-  });
-
-  if (error) {
-    throw new Error(error.message);
+  if (gmail) {
+    const fromName = process.env.GMAIL_FROM_NAME?.trim() || "Little Letter";
+    const info = await gmail.transporter.sendMail({
+      from: `"${fromName}" <${gmail.user}>`,
+      to: opts.to,
+      subject: opts.subject,
+      html: opts.html,
+      replyTo: gmail.user,
+    });
+    return {
+      id: info.messageId || `gmail-${Date.now()}`,
+      simulated: false,
+      provider: "gmail",
+    };
   }
 
-  return {
-    id: data?.id ?? `sent-${Date.now()}`,
-    simulated: false,
-    provider: "resend",
-  };
+  const resend = getResend();
+  if (resend) {
+    const from =
+      process.env.RESEND_FROM_EMAIL ?? "Little Letter <onboarding@resend.dev>";
+    const { data, error } = await resend.emails.send({
+      from,
+      to: opts.to,
+      subject: opts.subject,
+      html: opts.html,
+    });
+    if (error) throw new Error(error.message);
+    return {
+      id: data?.id ?? `sent-${Date.now()}`,
+      simulated: false,
+      provider: "resend",
+    };
+  }
+
+  console.info(`[Little Letter] No email provider — simulating ${opts.logLabel}`, {
+    to: opts.to,
+    subject: opts.subject,
+  });
+  return { id: `demo-${Date.now()}`, simulated: true, provider: "demo" };
 }
 
 export async function sendLetterEmail(letter: GeneratedLetter): Promise<SendResult> {
-  // 1) Free Gmail SMTP — works for any recipient
-  const gmailResult = await sendViaGmail(letter);
-  if (gmailResult) return gmailResult;
-
-  // 2) Resend — needs verified domain to email anyone
-  try {
-    const resendResult = await sendViaResend(letter);
-    if (resendResult) return resendResult;
-  } catch (err) {
-    // If Resend fails (e.g. test-domain recipient limit) and Gmail isn't set, surface the error
-    throw err;
-  }
-
-  // 3) Demo mode
-  console.info("[Little Letter] No email provider configured — simulating send", {
+  return deliverEmail({
     to: letter.form.recipientEmail,
     subject: letter.subject,
+    html: buildLetterEmailHtml(letter),
+    logLabel: "send",
   });
-  return { id: `demo-${Date.now()}`, simulated: true, provider: "demo" };
+}
+
+export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult> {
+  return deliverEmail({
+    to: mix.recipientEmail,
+    subject: `📼 Mixtape for you: ${mix.title}`,
+    html: buildMixtapeEmailHtml(mix),
+    logLabel: "mixtape",
+  });
 }

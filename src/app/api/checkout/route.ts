@@ -4,7 +4,7 @@ import { SEND_PRICE_LABEL } from "@/lib/usage";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     if (!isStripeConfigured()) {
       return NextResponse.json(
@@ -16,8 +16,20 @@ export async function POST() {
       );
     }
 
-    // clientId kept for Stripe metadata / support, but access is cookie-based
-    const session = await createSendCheckoutSession("browser");
+    let returnPath = "/preview";
+    try {
+      const body = (await request.json()) as { returnPath?: string };
+      if (
+        body?.returnPath === "/mixtape" ||
+        body?.returnPath === "/preview"
+      ) {
+        returnPath = body.returnPath;
+      }
+    } catch {
+      /* empty body is fine */
+    }
+
+    const session = await createSendCheckoutSession("browser", returnPath);
     if (!session.url) {
       return NextResponse.json(
         { error: "Could not create checkout session." },

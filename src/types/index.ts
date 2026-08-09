@@ -48,6 +48,16 @@ export interface GuestbookEntry {
   createdAt: string;
 }
 
+export interface MixtapePayload {
+  recipientName: string;
+  recipientEmail: string;
+  senderName: string;
+  title: string;
+  dedication: string;
+  trackIds: string[];
+  createdAt: string;
+}
+
 export interface ApiError {
   error: string;
 }

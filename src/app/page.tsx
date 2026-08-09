@@ -33,14 +33,19 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="mt-8"
+          className="mt-8 flex flex-wrap items-center justify-center gap-3"
         >
           <Link href="/create">
             <PixelButton size="lg">💌 Create a Little Letter</PixelButton>
           </Link>
+          <Link href="/mixtape">
+            <PixelButton size="lg" variant="secondary">
+              📼 Send a Mixtape
+            </PixelButton>
+          </Link>
         </motion.div>
         <p className="mt-4 font-pixel text-[9px] leading-relaxed text-[var(--ll-muted)]">
-          Press play · write a note · send a smile
+          Press play · write a note · burn a tape
         </p>
 
         <div className="mt-10 w-full max-w-md">

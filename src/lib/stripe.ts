@@ -12,18 +12,22 @@ export function isStripeConfigured() {
   return Boolean(process.env.STRIPE_SECRET_KEY);
 }
 
-export async function createSendCheckoutSession(clientId: string) {
+export async function createSendCheckoutSession(
+  clientId: string,
+  returnPath = "/preview"
+) {
   const stripe = getStripe();
   if (!stripe) {
     throw new Error("Stripe is not configured yet.");
   }
 
   const base = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
+  const safePath = returnPath.startsWith("/") ? returnPath : `/${returnPath}`;
 
   return stripe.checkout.sessions.create({
     mode: "payment",
-    success_url: `${base}/preview?paid=1&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${base}/preview?cancelled=1`,
+    success_url: `${base}${safePath}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${base}${safePath}?cancelled=1`,
     line_items: [
       {
         quantity: 1,
@@ -32,7 +36,7 @@ export async function createSendCheckoutSession(clientId: string) {
           unit_amount: SEND_PRICE_PENCE,
           product_data: {
             name: "Little Letter send",
-            description: "Send one extra little letter",
+            description: "Send one extra little letter or mixtape",
           },
         },
       },

@@ -132,7 +132,11 @@ export function LetterPreview() {
     setError("");
     play("click");
     try {
-      const res = await fetch("/api/checkout", { method: "POST" });
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnPath: "/preview" }),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not start payment");
       window.location.href = data.url as string;

@@ -45,6 +45,7 @@ export const RELATIONSHIPS: {
 
 export const STORAGE_KEYS = {
   letterDraft: "little-letter-draft",
+  mixtapeDraft: "little-letter-mixtape-draft",
   guestbook: "little-letter-guestbook",
   soundMuted: "little-letter-sound-muted",
   theme: "little-letter-theme",
