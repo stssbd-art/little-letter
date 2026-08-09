@@ -9,6 +9,33 @@ export type MixShare = {
   tracks: string[];
 };
 
+/** Browser + Node safe base64url helpers (no Buffer on the client). */
+function toBase64Url(text: string): string {
+  if (typeof window === "undefined") {
+    return Buffer.from(text, "utf8").toString("base64url");
+  }
+  const bytes = new TextEncoder().encode(text);
+  let binary = "";
+  bytes.forEach((b) => {
+    binary += String.fromCharCode(b);
+  });
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function fromBase64Url(code: string): string {
+  const padded = code.replace(/-/g, "+").replace(/_/g, "/");
+  const pad = padded.length % 4 === 0 ? "" : "=".repeat(4 - (padded.length % 4));
+  const base64 = padded + pad;
+
+  if (typeof window === "undefined") {
+    return Buffer.from(base64, "base64").toString("utf8");
+  }
+
+  const binary = atob(base64);
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
 export function encodeMixShare(mix: MixShare): string {
   const payload = {
     title: mix.title.slice(0, 80),
@@ -17,12 +44,12 @@ export function encodeMixShare(mix: MixShare): string {
     note: mix.note.slice(0, 500),
     tracks: mix.tracks.filter((id) => MIX_TRACKS.some((t) => t.id === id)),
   };
-  return Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
+  return toBase64Url(JSON.stringify(payload));
 }
 
 export function decodeMixShare(code: string): MixShare | null {
   try {
-    const raw = Buffer.from(code, "base64url").toString("utf8");
+    const raw = fromBase64Url(code.trim());
     const data = JSON.parse(raw) as Partial<MixShare>;
     if (!data.title || !Array.isArray(data.tracks) || data.tracks.length < 1) {
       return null;
