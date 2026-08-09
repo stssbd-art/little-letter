@@ -8,6 +8,10 @@ import type { MixShare } from "@/lib/mixtape-link";
 import { resolveShareTracks } from "@/lib/mixtape-link";
 import { cn } from "@/lib/utils";
 
+/** DJ-style slice length per track */
+const CLIP_SEC = 30;
+const FADE_SEC = 2.4;
+
 type Props = {
   mix: MixShare;
 };
@@ -16,27 +20,22 @@ export function MixtapeRemixPlayer({ mix }: Props) {
   const tracks = resolveShareTracks(mix);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const indexRef = useRef(0);
-  const remixRef = useRef(true);
+  const clipStartRef = useRef(0);
   const fadingRef = useRef(false);
 
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [remixOn, setRemixOn] = useState(true);
+  const [clipTime, setClipTime] = useState(0);
   const [error, setError] = useState("");
 
   const current = tracks[index];
 
   useEffect(() => {
-    remixRef.current = remixOn;
-  }, [remixOn]);
-
-  useEffect(() => {
     indexRef.current = index;
   }, [index]);
 
-  // Keep playing state honest with the element
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -58,12 +57,17 @@ export function MixtapeRemixPlayer({ mix }: Props) {
     return `${m}:${String(s).padStart(2, "0")}`;
   }
 
+  function pickClipStart(duration: number) {
+    if (!Number.isFinite(duration) || duration <= CLIP_SEC + 5) return 0;
+    // Start ~20% in so the slice feels like a DJ drop, not always the intro
+    return Math.min(duration - CLIP_SEC - 1, Math.max(0, duration * 0.2));
+  }
+
   async function waitForCanPlay(el: HTMLAudioElement) {
     if (el.readyState >= 3) return;
     await new Promise<void>((resolve, reject) => {
       const timer = window.setTimeout(() => {
         cleanup();
-        // Soft-continue — play() may still work while buffering
         resolve();
       }, 8000);
       const onReady = () => {
@@ -96,18 +100,22 @@ export function MixtapeRemixPlayer({ mix }: Props) {
     setError("");
     setIndex(nextIndex);
     indexRef.current = nextIndex;
+    setClipTime(0);
+    setProgress(0);
 
     try {
-      if (audio.src !== track.src) {
+      if (audio.getAttribute("data-track") !== track.id) {
         audio.src = track.src;
+        audio.setAttribute("data-track", track.id);
       }
       audio.volume = 1;
       await waitForCanPlay(audio);
+
+      const startAt = pickClipStart(audio.duration || 0);
+      clipStartRef.current = startAt;
+      audio.currentTime = startAt;
       await audio.play();
       setPlaying(true);
-      setProgress(
-        audio.duration ? (audio.currentTime / audio.duration) * 100 : 0
-      );
     } catch (err) {
       setPlaying(false);
       setError(
@@ -120,16 +128,15 @@ export function MixtapeRemixPlayer({ mix }: Props) {
     }
   }
 
-  async function crossfadeTo(nextIndex: number) {
-    // Continuous mix: fade out current, then start next (reliable across browsers)
+  async function djAdvance(nextIndex: number) {
     const current = audioRef.current;
     if (!current || fadingRef.current) return;
     fadingRef.current = true;
     try {
       const startVol = current.volume;
-      for (let i = 1; i <= 10; i++) {
-        current.volume = Math.max(0, startVol * (1 - i / 10));
-        await new Promise((r) => setTimeout(r, 80));
+      for (let i = 1; i <= 12; i++) {
+        current.volume = Math.max(0, startVol * (1 - i / 12));
+        await new Promise((r) => setTimeout(r, (FADE_SEC * 1000) / 12));
       }
       current.pause();
       current.volume = 1;
@@ -141,22 +148,33 @@ export function MixtapeRemixPlayer({ mix }: Props) {
     }
   }
 
+  function finishMix() {
+    const audio = audioRef.current;
+    audio?.pause();
+    setPlaying(false);
+    setProgress(100);
+    setClipTime(CLIP_SEC);
+  }
+
   function onTimeUpdate() {
     const audio = audioRef.current;
-    if (!audio || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
+    if (!audio) return;
 
-    setProgress((audio.currentTime / audio.duration) * 100);
+    const elapsed = Math.max(0, audio.currentTime - clipStartRef.current);
+    setClipTime(Math.min(CLIP_SEC, elapsed));
+    setProgress(Math.min(100, (elapsed / CLIP_SEC) * 100));
 
-    const remaining = audio.duration - audio.currentTime;
+    if (fadingRef.current) return;
+
     const next = indexRef.current + 1;
-    if (
-      remixRef.current &&
-      !fadingRef.current &&
-      next < tracks.length &&
-      remaining > 0 &&
-      remaining <= 3.2
-    ) {
-      void crossfadeTo(next);
+
+    // DJ cut: after ~30s, fade into the next slice
+    if (elapsed >= CLIP_SEC - FADE_SEC) {
+      if (next < tracks.length) {
+        void djAdvance(next);
+      } else if (elapsed >= CLIP_SEC) {
+        finishMix();
+      }
     }
   }
 
@@ -166,8 +184,7 @@ export function MixtapeRemixPlayer({ mix }: Props) {
     if (next < tracks.length) {
       void playIndex(next);
     } else {
-      setPlaying(false);
-      setProgress(100);
+      finishMix();
     }
   }
 
@@ -181,7 +198,8 @@ export function MixtapeRemixPlayer({ mix }: Props) {
       return;
     }
 
-    if (!audio.src && tracks[index]) {
+    // Fresh DJ start or resume current slice
+    if (!audio.src || audio.getAttribute("data-track") !== tracks[index]?.id) {
       await playIndex(index);
       return;
     }
@@ -212,7 +230,7 @@ export function MixtapeRemixPlayer({ mix }: Props) {
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="text-center">
         <p className="font-pixel text-[9px] tracking-widest text-[var(--ll-muted)]">
-          REMIX MODE · CONTINUOUS MIX
+          DJ REMIX · 30-SEC SLICES
         </p>
         <h1 className="mt-2 font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
           {mix.title}
@@ -236,48 +254,35 @@ export function MixtapeRemixPlayer({ mix }: Props) {
         </p>
       ) : null}
 
-      <PixelWindow title="remix_deck.exe" icon="🎧" liftOnHover={false}>
+      <PixelWindow title="dj_deck.exe" icon="🎧" liftOnHover={false}>
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
-                NOW MIXING {index + 1}/{tracks.length}
-                {loading ? " · LOADING…" : playing ? " · LIVE" : ""}
-              </p>
-              <p className="truncate font-display text-base text-[var(--ll-ink)]">
-                {current?.title}
-              </p>
-              <p className="truncate text-xs text-[var(--ll-muted)]">
-                {current?.artist} · {current?.year}
-              </p>
-            </div>
-            <label className="flex cursor-pointer items-center gap-2 rounded-lg border-2 border-[var(--ll-lavender)] bg-[#fff6df]/70 px-3 py-2 font-pixel text-[8px] text-[var(--ll-pink-deep)]">
-              <input
-                type="checkbox"
-                checked={remixOn}
-                onChange={(e) => setRemixOn(e.target.checked)}
-                className="accent-[#8b5e34]"
-              />
-              Auto-remix crossfade
-            </label>
+          <div className="min-w-0">
+            <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
+              SLICE {index + 1}/{tracks.length} · 30 SEC MIX
+              {loading ? " · LOADING…" : playing ? " · LIVE" : ""}
+            </p>
+            <p className="truncate font-display text-base text-[var(--ll-ink)]">
+              {current?.title}
+            </p>
+            <p className="truncate text-xs text-[var(--ll-muted)]">
+              {current?.artist} · {current?.year}
+            </p>
           </div>
 
           <div className="h-2 overflow-hidden rounded-full bg-[#ebe1cd]">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#8b5e34] via-[#e8b86d] to-[#8b5e34] transition-[width] duration-200"
+              className="h-full rounded-full bg-gradient-to-r from-[#8b5e34] via-[#e8b86d] to-[#8b5e34] transition-[width] duration-150"
               style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
             />
           </div>
           <div className="flex justify-between font-pixel text-[7px] text-[var(--ll-muted)]">
-            <span>
-              {formatTime(audioRef.current?.currentTime ?? 0)}
-            </span>
-            <span>{formatTime(audioRef.current?.duration ?? 0)}</span>
+            <span>{formatTime(clipTime)}</span>
+            <span>0:30 slice</span>
           </div>
 
           <div className="rounded-xl border-2 border-[var(--ll-lavender)] bg-white/70 p-3 dark:bg-white/5">
             <p className="mb-2 font-pixel text-[8px] text-[var(--ll-muted)]">
-              Tape transport
+              DJ transport
             </p>
             <audio
               ref={audioRef}
@@ -287,7 +292,9 @@ export function MixtapeRemixPlayer({ mix }: Props) {
               onTimeUpdate={onTimeUpdate}
               onEnded={onEnded}
               onError={() =>
-                setError("Audio failed to load. Check your connection and tap Play again.")
+                setError(
+                  "Audio failed to load. Check your connection and tap Play again."
+                )
               }
               className="w-full"
             />
@@ -299,10 +306,18 @@ export function MixtapeRemixPlayer({ mix }: Props) {
               onClick={() => void playIndex(Math.max(0, index - 1))}
               disabled={index === 0 || loading}
             >
-              ⏮ Prev
+              ⏮ Prev slice
             </PixelButton>
-            <PixelButton size="lg" onClick={() => void togglePlay()} disabled={loading}>
-              {loading ? "⏳ Loading…" : playing ? "⏸ Pause mix" : "▶ Play mixtape"}
+            <PixelButton
+              size="lg"
+              onClick={() => void togglePlay()}
+              disabled={loading}
+            >
+              {loading
+                ? "⏳ Cueing…"
+                : playing
+                  ? "⏸ Pause mix"
+                  : "▶ Play DJ mix"}
             </PixelButton>
             <PixelButton
               variant="ghost"
@@ -311,7 +326,7 @@ export function MixtapeRemixPlayer({ mix }: Props) {
               }
               disabled={index >= tracks.length - 1 || loading}
             >
-              Next ⏭
+              Next slice ⏭
             </PixelButton>
           </div>
 
@@ -322,8 +337,8 @@ export function MixtapeRemixPlayer({ mix }: Props) {
           ) : null}
 
           <p className="text-center font-pixel text-[7px] leading-relaxed text-[var(--ll-muted)]">
-            Tracks crossfade into a continuous remix. Titles are 90s favourites —
-            audio uses free demo instrumentals (not the original radio versions).
+            Each track plays a 30-second DJ slice, then fades into the next —
+            not the full song. Demo instrumentals under 90s titles.
           </p>
         </div>
       </PixelWindow>
@@ -346,8 +361,8 @@ export function MixtapeRemixPlayer({ mix }: Props) {
                 <span className="min-w-0 flex-1 truncate font-display text-sm">
                   {t.title}
                 </span>
-                <span className="truncate font-pixel text-[7px] opacity-60">
-                  {t.artist}
+                <span className="shrink-0 font-pixel text-[7px] opacity-60">
+                  0:30
                 </span>
               </button>
             </li>

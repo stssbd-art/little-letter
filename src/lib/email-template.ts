@@ -107,7 +107,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
             <td style="background:linear-gradient(90deg,#5c3d1e,#8b5e34,#6b4f36);padding:18px 22px;text-align:center;">
               <div style="font-size:26px;letter-spacing:3px;">📼</div>
               <div style="font-family:Georgia,serif;font-size:22px;color:#fff6df;margin-top:6px;">A mixtape for you</div>
-              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · continuous remix</div>
+              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · DJ 30-sec remix</div>
             </td>
           </tr>
           <tr>
@@ -128,7 +128,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
                 ▶ Play this mixtape
               </a>
               <div style="margin-top:10px;font-size:11px;color:#cbb892;">
-                Opens a remix deck — tracks crossfade into each other
+                Opens a DJ remix deck — 30-second slices that fade into each other
               </div>
             </td>
           </tr>
@@ -143,7 +143,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
           <tr>
             <td style="padding:18px 22px 26px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#cbb892;line-height:1.6;">
-                Hit play and let the mix run — like a continuous remix just for you.<br />
+                Hit play and let the DJ mix run — 30 seconds per track, then the next drop.<br />
                 <span style="color:#8a7a62;font-size:11px;">Titles are 90s favourites; playback uses free demo streams.</span>
               </p>
               <p style="margin:14px 0 0;font-size:11px;color:#8a7a62;word-break:break-all;">
