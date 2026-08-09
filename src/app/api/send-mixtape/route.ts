@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { sendMixtapeEmail } from "@/lib/resend";
 import type { MixtapePayload } from "@/types";
 import {
-  consumeSendAccess,
-  getSendAccess,
+  consumeMixtapeSendAccess,
+  getMixtapeSendAccess,
   SEND_PRICE_LABEL,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
@@ -62,11 +62,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const access = await getSendAccess();
+    const access = await getMixtapeSendAccess();
     if (!access.allowed) {
       return NextResponse.json(
         {
-          error: `Your first send is free. Extra mixtapes are ${SEND_PRICE_LABEL} each.`,
+          error: `Your first two mixtapes are free. Extra mixtapes are ${SEND_PRICE_LABEL} each.`,
           requiresPayment: true,
           price: SEND_PRICE_LABEL,
           stripeConfigured: isStripeConfigured(),
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     };
 
     const result = await sendMixtapeEmail(mix);
-    const usage = await consumeSendAccess();
+    const usage = await consumeMixtapeSendAccess();
 
     return NextResponse.json({
       ok: true,
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       simulated: result.simulated,
       provider: result.provider,
       used: access.reason,
-      freeUsed: usage.freeUsed,
+      mixFreeUsed: usage.mixFreeUsed,
       creditsLeft: usage.credits,
     });
   } catch (err) {

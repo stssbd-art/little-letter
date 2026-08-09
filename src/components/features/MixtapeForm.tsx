@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils";
 
 type UsageInfo = {
   freeAvailable: boolean;
+  freeLeft?: number;
+  freeTotal?: number;
   credits: number;
   canSend: boolean;
   price: string;
@@ -67,7 +69,7 @@ export function MixtapeForm() {
   }, [draft, ready]);
 
   async function refreshUsage() {
-    const res = await fetch("/api/usage");
+    const res = await fetch("/api/usage?kind=mixtape");
     const data = (await res.json()) as UsageInfo;
     if (res.ok) {
       setUsage(data);
@@ -85,7 +87,7 @@ export function MixtapeForm() {
     const cancelled = searchParams.get("cancelled");
 
     if (cancelled) {
-      setError("Payment cancelled. Your first send is free; extras are £0.50.");
+      setError("Payment cancelled. Your first two mixtapes are free; extras are £0.50.");
       return;
     }
 
@@ -217,16 +219,18 @@ export function MixtapeForm() {
 
   const priceLabel = usage?.price ?? "£0.50";
   const freeLeft = usage?.freeAvailable ?? true;
+  const freeRemaining = usage?.freeLeft ?? 2;
+  const freeTotal = usage?.freeTotal ?? 2;
 
   return (
     <div className="space-y-6">
       <PixelWindow title="pricing.ini" icon="💷" liftOnHover={false}>
         <p className="font-display text-sm text-[var(--ll-ink)]">
           {freeLeft
-            ? "Your first send (letter or mixtape) is free. Extras are £0.50 each."
+            ? `Your first ${freeTotal} mixtapes are free (${freeRemaining} left). After that, extras are ${priceLabel} each.`
             : usage && usage.credits > 0
               ? `You have ${usage.credits} paid send${usage.credits === 1 ? "" : "s"} ready.`
-              : `Your free send is used. Next mixtape costs ${priceLabel}.`}
+              : `Your free mixtapes are used. Next mixtape costs ${priceLabel}.`}
         </p>
       </PixelWindow>
 
@@ -359,10 +363,12 @@ export function MixtapeForm() {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-display text-sm text-[var(--ll-ink)]">
+                            {track.mood === "romantic" ? "♥ " : ""}
                             {track.title}
                           </span>
                           <span className="block truncate font-pixel text-[7px] text-[var(--ll-muted)]">
                             {track.artist} · {track.year}
+                            {track.mood === "romantic" ? " · romantic" : ""}
                           </span>
                         </span>
                       </button>
@@ -396,7 +402,7 @@ export function MixtapeForm() {
                   {sending || paying
                     ? "Posting the tape..."
                     : freeLeft
-                      ? "📼 Send free mixtape"
+                      ? `📼 Send free mixtape (${freeRemaining} left)`
                       : "📼 Mail the mixtape"}
                 </PixelButton>
               )}

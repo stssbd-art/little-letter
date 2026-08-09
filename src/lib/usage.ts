@@ -3,8 +3,10 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 export const SEND_PRICE_LABEL = "£0.50";
 export const SEND_PRICE_PENCE = 50;
+export const FREE_MIXTAPES = 2;
 
 const FREE_COOKIE = "ll_free_used";
+const MIX_FREE_COOKIE = "ll_mix_free_count";
 const CREDITS_COOKIE = "ll_credits";
 const SESSIONS_COOKIE = "ll_paid_sessions";
 
@@ -51,6 +53,7 @@ const cookieOpts = {
 
 export type UsageSnapshot = {
   freeUsed: boolean;
+  mixFreeUsed: number;
   credits: number;
   usedSessionIds: string[];
 };
@@ -58,12 +61,17 @@ export type UsageSnapshot = {
 export async function readUsage(): Promise<UsageSnapshot> {
   const jar = await cookies();
   const freeUsed = unpack(jar.get(FREE_COOKIE)?.value) === "1";
+  const mixFreeUsed = Number(unpack(jar.get(MIX_FREE_COOKIE)?.value) || "0");
   const credits = Number(unpack(jar.get(CREDITS_COOKIE)?.value) || "0");
   const sessionsRaw = unpack(jar.get(SESSIONS_COOKIE)?.value) || "";
   const usedSessionIds = sessionsRaw ? sessionsRaw.split(",").filter(Boolean) : [];
 
   return {
     freeUsed,
+    mixFreeUsed:
+      Number.isFinite(mixFreeUsed) && mixFreeUsed > 0
+        ? Math.min(Math.floor(mixFreeUsed), FREE_MIXTAPES)
+        : 0,
     credits: Number.isFinite(credits) && credits > 0 ? credits : 0,
     usedSessionIds,
   };
@@ -72,6 +80,11 @@ export async function readUsage(): Promise<UsageSnapshot> {
 export async function writeUsage(usage: UsageSnapshot) {
   const jar = await cookies();
   jar.set(FREE_COOKIE, pack(usage.freeUsed ? "1" : "0"), cookieOpts);
+  jar.set(
+    MIX_FREE_COOKIE,
+    pack(String(Math.max(0, Math.min(usage.mixFreeUsed, FREE_MIXTAPES)))),
+    cookieOpts
+  );
   jar.set(CREDITS_COOKIE, pack(String(usage.credits)), cookieOpts);
   jar.set(
     SESSIONS_COOKIE,
@@ -99,6 +112,30 @@ export async function consumeSendAccess() {
     usage.credits -= 1;
   } else {
     throw new Error("No send credit available.");
+  }
+  await writeUsage(usage);
+  return usage;
+}
+
+export async function getMixtapeSendAccess() {
+  const usage = await readUsage();
+  if (usage.mixFreeUsed < FREE_MIXTAPES) {
+    return { allowed: true as const, reason: "free" as const, usage };
+  }
+  if (usage.credits > 0) {
+    return { allowed: true as const, reason: "credit" as const, usage };
+  }
+  return { allowed: false as const, reason: "payment_required" as const, usage };
+}
+
+export async function consumeMixtapeSendAccess() {
+  const usage = await readUsage();
+  if (usage.mixFreeUsed < FREE_MIXTAPES) {
+    usage.mixFreeUsed += 1;
+  } else if (usage.credits > 0) {
+    usage.credits -= 1;
+  } else {
+    throw new Error("No mixtape send credit available.");
   }
   await writeUsage(usage);
   return usage;

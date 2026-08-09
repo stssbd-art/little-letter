@@ -1,11 +1,34 @@
 import { NextResponse } from "next/server";
 import { verifyPaidCheckoutSession } from "@/lib/stripe";
-import { addPaidCredit, readUsage, SEND_PRICE_LABEL } from "@/lib/usage";
+import {
+  addPaidCredit,
+  FREE_MIXTAPES,
+  readUsage,
+  SEND_PRICE_LABEL,
+} from "@/lib/usage";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   const usage = await readUsage();
+  const url = new URL(request.url);
+  const kind = url.searchParams.get("kind");
+
+  if (kind === "mixtape") {
+    const mixFreeLeft = Math.max(0, FREE_MIXTAPES - usage.mixFreeUsed);
+    const freeAvailable = mixFreeLeft > 0;
+    const canSend = freeAvailable || usage.credits > 0;
+
+    return NextResponse.json({
+      freeAvailable,
+      freeLeft: mixFreeLeft,
+      freeTotal: FREE_MIXTAPES,
+      credits: usage.credits,
+      canSend,
+      price: SEND_PRICE_LABEL,
+    });
+  }
+
   const freeAvailable = !usage.freeUsed;
   const canSend = freeAvailable || usage.credits > 0;
 
