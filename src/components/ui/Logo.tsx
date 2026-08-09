@@ -42,12 +42,9 @@ export function Mascot({ className = "" }: { className?: string }) {
       aria-hidden
     >
       <div className="relative flex h-28 w-28 items-center justify-center rounded-[28px] border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f6d58a] shadow-[6px_6px_0_var(--ll-pink-shadow)] dark:from-[#5c3d1e] dark:to-[#3d2f22]">
-        <div className="absolute left-7 top-9 h-3.5 w-3.5 rounded-sm bg-[var(--ll-ink)]" />
-        <div className="absolute right-7 top-9 h-3.5 w-3.5 rounded-sm bg-[var(--ll-ink)]" />
-        <div
-          className="absolute bottom-8 left-1/2 h-5 w-10 -translate-x-1/2 rounded-b-full border-b-[3.5px] border-l-[3.5px] border-r-[3.5px] border-[var(--ll-pink-deep)]"
-          aria-hidden
-        />
+        <div className="absolute left-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />
+        <div className="absolute right-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />
+        <div className="absolute bottom-9 left-1/2 h-2 w-6 -translate-x-1/2 rounded-full bg-[var(--ll-pink-deep)]" />
         <motion.div
           className="absolute -right-2 -top-2 text-lg"
           animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
