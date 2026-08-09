@@ -4,14 +4,20 @@ import { notFound } from "next/navigation";
 import { MixtapeRemixPlayer } from "@/components/features/MixtapeRemixPlayer";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { decodeMixShare } from "@/lib/mixtape-link";
+import { loadMixShare } from "@/lib/mixtape-store";
 
 type Props = {
   params: Promise<{ code: string }>;
 };
 
+async function resolveMix(code: string) {
+  const raw = decodeURIComponent(code.trim());
+  return decodeMixShare(raw) ?? (await loadMixShare(raw));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { code } = await params;
-  const mix = decodeMixShare(code);
+  const mix = await resolveMix(code);
   return {
     title: mix ? `${mix.title} · Mixtape` : "Mixtape",
     description: mix
@@ -22,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function MixPlayPage({ params }: Props) {
   const { code } = await params;
-  const mix = decodeMixShare(code);
+  const mix = await resolveMix(code);
 
   if (!mix) {
     notFound();

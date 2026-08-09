@@ -180,5 +180,10 @@ export const MIN_MIXTAPE_TRACKS = 3;
 export function getTracksByIds(ids: string[]): MixTrack[] {
   return ids
     .map((id) => MIX_TRACKS.find((t) => t.id === id))
-    .filter((t): t is MixTrack => Boolean(t));
+    .filter((t): t is MixTrack => Boolean(t))
+    .map((t) => ({
+      ...t,
+      // Same-origin proxy — more reliable than third-party hotlinking in some browsers
+      src: `/api/audio/${t.id}`,
+    }));
 }

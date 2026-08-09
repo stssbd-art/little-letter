@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import { CassetteDeck } from "@/components/features/CassetteDeck";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PixelWindow } from "@/components/ui/PixelWindow";
@@ -9,23 +8,20 @@ import type { MixShare } from "@/lib/mixtape-link";
 import { resolveShareTracks } from "@/lib/mixtape-link";
 import { cn } from "@/lib/utils";
 
-const CROSSFADE_SEC = 4;
-
 type Props = {
   mix: MixShare;
 };
 
 export function MixtapeRemixPlayer({ mix }: Props) {
   const tracks = resolveShareTracks(mix);
-  const aRef = useRef<HTMLAudioElement | null>(null);
-  const bRef = useRef<HTMLAudioElement | null>(null);
-  const activeRef = useRef<"a" | "b">("a");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const indexRef = useRef(0);
+  const remixRef = useRef(true);
   const fadingRef = useRef(false);
-  const rafRef = useRef<number | null>(null);
 
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [remixOn, setRemixOn] = useState(true);
   const [error, setError] = useState("");
@@ -33,215 +29,174 @@ export function MixtapeRemixPlayer({ mix }: Props) {
   const current = tracks[index];
 
   useEffect(() => {
-    const a = new Audio();
-    const b = new Audio();
-    a.preload = "auto";
-    b.preload = "auto";
-    aRef.current = a;
-    bRef.current = b;
-
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      a.pause();
-      b.pause();
-      a.src = "";
-      b.src = "";
-      aRef.current = null;
-      bRef.current = null;
-    };
-  }, []);
+    remixRef.current = remixOn;
+  }, [remixOn]);
 
   useEffect(() => {
     indexRef.current = index;
   }, [index]);
 
-  function activeAudio() {
-    return activeRef.current === "a" ? aRef.current : bRef.current;
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !tracks[0]) return;
+
+    audio.src = tracks[0].src;
+    audio.load();
+  }, [tracks]);
+
+  function formatTime(seconds: number) {
+    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${String(s).padStart(2, "0")}`;
   }
 
-  function inactiveAudio() {
-    return activeRef.current === "a" ? bRef.current : aRef.current;
-  }
-
-  function stopLoop() {
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-  }
-
-  function tick() {
-    const audio = activeAudio();
-    if (!audio || !Number.isFinite(audio.duration) || audio.duration <= 0) {
-      rafRef.current = requestAnimationFrame(tick);
-      return;
-    }
-
-    setProgress((audio.currentTime / audio.duration) * 100);
-
-    const remaining = audio.duration - audio.currentTime;
-    const nextIndex = indexRef.current + 1;
-
-    if (
-      remixOn &&
-      !fadingRef.current &&
-      nextIndex < tracks.length &&
-      remaining <= CROSSFADE_SEC &&
-      remaining > 0
-    ) {
-      void startCrossfade(nextIndex);
-    }
-
-    rafRef.current = requestAnimationFrame(tick);
-  }
-
-  async function loadInto(el: HTMLAudioElement, trackIndex: number) {
-    const track = tracks[trackIndex];
-    if (!track) return;
-    el.src = track.src;
-    el.currentTime = 0;
-    el.volume = 1;
-    el.load();
+  async function waitForCanPlay(el: HTMLAudioElement) {
+    if (el.readyState >= 3) return;
     await new Promise<void>((resolve, reject) => {
+      const timer = window.setTimeout(() => {
+        cleanup();
+        // Soft-continue — play() may still work while buffering
+        resolve();
+      }, 8000);
       const onReady = () => {
         cleanup();
         resolve();
       };
       const onErr = () => {
         cleanup();
-        reject(new Error("Could not load track audio."));
+        reject(new Error("Track failed to load."));
       };
       const cleanup = () => {
+        window.clearTimeout(timer);
         el.removeEventListener("canplay", onReady);
+        el.removeEventListener("loadeddata", onReady);
         el.removeEventListener("error", onErr);
       };
-      if (el.readyState >= 2) {
-        resolve();
-        return;
-      }
       el.addEventListener("canplay", onReady);
+      el.addEventListener("loadeddata", onReady);
       el.addEventListener("error", onErr);
     });
   }
 
-  async function startCrossfade(nextIndex: number) {
-    const from = activeAudio();
-    const to = inactiveAudio();
-    if (!from || !to) return;
+  async function playIndex(nextIndex: number) {
+    const audio = audioRef.current;
+    const track = tracks[nextIndex];
+    if (!audio || !track) return;
 
-    fadingRef.current = true;
+    fadingRef.current = false;
+    setLoading(true);
+    setError("");
+    setIndex(nextIndex);
+    indexRef.current = nextIndex;
+
     try {
-      await loadInto(to, nextIndex);
-      to.volume = 0;
-      await to.play();
-
-      const start = performance.now();
-      const durationMs = Math.min(CROSSFADE_SEC, Math.max(1, from.duration - from.currentTime)) * 1000;
-
-      await new Promise<void>((resolve) => {
-        const step = (now: number) => {
-          const t = Math.min(1, (now - start) / durationMs);
-          from.volume = Math.max(0, 1 - t);
-          to.volume = Math.min(1, t);
-          if (t < 1) {
-            requestAnimationFrame(step);
-          } else {
-            resolve();
-          }
-        };
-        requestAnimationFrame(step);
-      });
-
-      from.pause();
-      from.volume = 1;
-      activeRef.current = activeRef.current === "a" ? "b" : "a";
-      setIndex(nextIndex);
-      indexRef.current = nextIndex;
-      to.onended = () => {
-        void onTrackEnded();
-      };
-    } catch {
-      setError("Remix crossfade hiccup — skipping to next track.");
-      setIndex(nextIndex);
-      indexRef.current = nextIndex;
-      void playAt(nextIndex, true);
+      if (audio.src !== track.src) {
+        audio.src = track.src;
+      }
+      audio.volume = 1;
+      await waitForCanPlay(audio);
+      await audio.play();
+      setPlaying(true);
+      setProgress(
+        audio.duration ? (audio.currentTime / audio.duration) * 100 : 0
+      );
+    } catch (err) {
+      setPlaying(false);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not play — tap Play again (browser may block autoplay)."
+      );
     } finally {
-      fadingRef.current = false;
+      setLoading(false);
     }
   }
 
-  async function onTrackEnded() {
+  async function crossfadeTo(nextIndex: number) {
+    // Continuous mix: fade out current, then start next (reliable across browsers)
+    const current = audioRef.current;
+    if (!current || fadingRef.current) return;
+    fadingRef.current = true;
+    try {
+      const startVol = current.volume;
+      for (let i = 1; i <= 10; i++) {
+        current.volume = Math.max(0, startVol * (1 - i / 10));
+        await new Promise((r) => setTimeout(r, 80));
+      }
+      current.pause();
+      current.volume = 1;
+      fadingRef.current = false;
+      await playIndex(nextIndex);
+    } catch {
+      fadingRef.current = false;
+      await playIndex(nextIndex);
+    }
+  }
+
+  function onTimeUpdate() {
+    const audio = audioRef.current;
+    if (!audio || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
+
+    setProgress((audio.currentTime / audio.duration) * 100);
+
+    const remaining = audio.duration - audio.currentTime;
+    const next = indexRef.current + 1;
+    if (
+      remixRef.current &&
+      !fadingRef.current &&
+      next < tracks.length &&
+      remaining > 0 &&
+      remaining <= 3.2
+    ) {
+      void crossfadeTo(next);
+    }
+  }
+
+  function onEnded() {
     if (fadingRef.current) return;
     const next = indexRef.current + 1;
     if (next < tracks.length) {
-      await playAt(next, true);
+      void playIndex(next);
     } else {
       setPlaying(false);
       setProgress(100);
-      stopLoop();
-    }
-  }
-
-  async function playAt(trackIndex: number, autoplay: boolean) {
-    const audio = activeAudio();
-    const other = inactiveAudio();
-    if (!audio || !tracks[trackIndex]) return;
-
-    setError("");
-    other?.pause();
-    fadingRef.current = false;
-
-    try {
-      await loadInto(audio, trackIndex);
-      setIndex(trackIndex);
-      indexRef.current = trackIndex;
-      setProgress(0);
-      audio.onended = () => {
-        void onTrackEnded();
-      };
-      if (autoplay) {
-        await audio.play();
-        setPlaying(true);
-        stopLoop();
-        rafRef.current = requestAnimationFrame(tick);
-      }
-    } catch {
-      setError("Could not play this track. Try another, or unmute browser audio.");
-      setPlaying(false);
     }
   }
 
   async function togglePlay() {
-    const audio = activeAudio();
+    const audio = audioRef.current;
     if (!audio) return;
 
-    if (playing) {
+    if (playing && !audio.paused) {
       audio.pause();
-      inactiveAudio()?.pause();
       setPlaying(false);
-      stopLoop();
       return;
     }
 
-    if (!audio.src) {
-      await playAt(index, true);
+    if (!audio.src && tracks[index]) {
+      await playIndex(index);
       return;
     }
 
     try {
+      setLoading(true);
       await audio.play();
       setPlaying(true);
-      stopLoop();
-      rafRef.current = requestAnimationFrame(tick);
+      setError("");
     } catch {
-      await playAt(index, true);
+      await playIndex(index);
+    } finally {
+      setLoading(false);
     }
   }
 
   if (!tracks.length) {
     return (
       <PixelWindow title="empty_tape.err" icon="⚠️">
-        <p className="text-sm text-[var(--ll-ink)]">This mixtape has no playable tracks.</p>
+        <p className="text-sm text-[var(--ll-ink)]">
+          This mixtape has no playable tracks.
+        </p>
       </PixelWindow>
     );
   }
@@ -274,12 +229,30 @@ export function MixtapeRemixPlayer({ mix }: Props) {
         </p>
       ) : null}
 
+      {/* Real audio elements — required for reliable mobile/desktop playback */}
+      <audio
+        ref={audioRef}
+        preload="auto"
+        playsInline
+        onTimeUpdate={onTimeUpdate}
+        onEnded={onEnded}
+        onPlay={() => setPlaying(true)}
+        onPause={() => {
+          if (!fadingRef.current) setPlaying(false);
+        }}
+        onError={() =>
+          setError("Audio stream blocked or failed. Tap Play again.")
+        }
+        className="sr-only"
+      />
+
       <PixelWindow title="remix_deck.exe" icon="🎧" liftOnHover={false}>
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
                 NOW MIXING {index + 1}/{tracks.length}
+                {loading ? " · LOADING…" : playing ? " · LIVE" : ""}
               </p>
               <p className="truncate font-display text-base text-[var(--ll-ink)]">
                 {current?.title}
@@ -300,32 +273,53 @@ export function MixtapeRemixPlayer({ mix }: Props) {
           </div>
 
           <div className="h-2 overflow-hidden rounded-full bg-[#ebe1cd]">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[#8b5e34] via-[#e8b86d] to-[#8b5e34]"
-              style={{ width: `${progress}%` }}
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#8b5e34] via-[#e8b86d] to-[#8b5e34] transition-[width] duration-200"
+              style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
             />
+          </div>
+          <div className="flex justify-between font-pixel text-[7px] text-[var(--ll-muted)]">
+            <span>
+              {formatTime(audioRef.current?.currentTime ?? 0)}
+            </span>
+            <span>{formatTime(audioRef.current?.duration ?? 0)}</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2">
             <PixelButton
               variant="ghost"
-              onClick={() => void playAt(Math.max(0, index - 1), true)}
-              disabled={index === 0}
+              onClick={() => void playIndex(Math.max(0, index - 1))}
+              disabled={index === 0 || loading}
             >
               ⏮
             </PixelButton>
-            <PixelButton size="lg" onClick={() => void togglePlay()}>
-              {playing ? "⏸ Pause mix" : "▶ Play mixtape"}
+            <PixelButton size="lg" onClick={() => void togglePlay()} disabled={loading}>
+              {loading ? "⏳ Loading…" : playing ? "⏸ Pause mix" : "▶ Play mixtape"}
             </PixelButton>
             <PixelButton
               variant="ghost"
               onClick={() =>
-                void playAt(Math.min(tracks.length - 1, index + 1), true)
+                void playIndex(Math.min(tracks.length - 1, index + 1))
               }
-              disabled={index >= tracks.length - 1}
+              disabled={index >= tracks.length - 1 || loading}
             >
               ⏭
             </PixelButton>
+          </div>
+
+          {/* Always-visible native controls as a guaranteed fallback */}
+          <div className="rounded-xl border-2 border-[var(--ll-lavender)] bg-white/70 p-3 dark:bg-white/5">
+            <p className="mb-2 font-pixel text-[8px] text-[var(--ll-muted)]">
+              Backup player (if remix deck is quiet)
+            </p>
+            <audio
+              key={current?.id ?? "none"}
+              controls
+              playsInline
+              preload="metadata"
+              src={current?.src}
+              className="w-full"
+            />
           </div>
 
           {error ? (
@@ -335,8 +329,8 @@ export function MixtapeRemixPlayer({ mix }: Props) {
           ) : null}
 
           <p className="text-center font-pixel text-[7px] leading-relaxed text-[var(--ll-muted)]">
-            Tracks blend into each other like a continuous remix. Demo audio streams —
-            titles are 90s favourites.
+            Tracks crossfade into a continuous remix. Titles are 90s favourites —
+            audio uses free demo instrumentals (not the original radio versions).
           </p>
         </div>
       </PixelWindow>
@@ -347,7 +341,7 @@ export function MixtapeRemixPlayer({ mix }: Props) {
             <li key={`${t.id}-${i}`}>
               <button
                 type="button"
-                onClick={() => void playAt(i, true)}
+                onClick={() => void playIndex(i)}
                 className={cn(
                   "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left",
                   i === index
