@@ -51,13 +51,10 @@ export function decodeMixShare(code: string): MixShare | null {
   try {
     const raw = fromBase64Url(code.trim());
     const data = JSON.parse(raw) as Partial<MixShare>;
-    if (!data.title || !Array.isArray(data.tracks) || data.tracks.length < 1) {
-      return null;
-    }
-    const tracks = data.tracks.filter((id) =>
-      MIX_TRACKS.some((t) => t.id === id)
-    );
-    if (!tracks.length) return null;
+    if (!data.title) return null;
+    const tracks = Array.isArray(data.tracks)
+      ? data.tracks.filter((id) => MIX_TRACKS.some((t) => t.id === id))
+      : [];
     return {
       title: String(data.title).slice(0, 80),
       from: String(data.from ?? "").slice(0, 60),

@@ -13,7 +13,6 @@ import { encodeMixShare } from "@/lib/mixtape-link";
 import {
   getTracksByIds,
   MAX_MIXTAPE_TRACKS,
-  MIN_MIXTAPE_TRACKS,
   MIX_TRACKS,
 } from "@/lib/tracks";
 import type { MixtapePayload } from "@/types";
@@ -137,8 +136,8 @@ export function MixtapeForm() {
     }
     if (!draft.senderName.trim()) return "Add your name on the cassette label.";
     if (!draft.title.trim()) return "Give the mixtape a title.";
-    if (draft.trackIds.length < MIN_MIXTAPE_TRACKS) {
-      return `Pick at least ${MIN_MIXTAPE_TRACKS} tracks.`;
+    if (draft.trackIds.length === 0 && !draft.dedication.trim()) {
+      return "Add a dedication, or optionally pick some songs.";
     }
     return null;
   }
@@ -246,7 +245,7 @@ export function MixtapeForm() {
             spinning={!muted && selected.length > 0}
           />
           <p className="text-center font-pixel text-[8px] leading-relaxed text-[var(--ll-muted)]">
-            Hand-labelled · Side A forever · demo audio in email note
+            Hand-labelled · Side A forever · songs optional
           </p>
         </div>
 
@@ -311,9 +310,9 @@ export function MixtapeForm() {
             </Field>
 
             <Field
-              label="Dedication (optional)"
+              label="Dedication"
               htmlFor="mix-note"
-              hint="A short note on the J-card"
+              hint="Your note on the J-card — songs are optional"
             >
               <PixelTextarea
                 id="mix-note"
@@ -321,7 +320,7 @@ export function MixtapeForm() {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, dedication: e.target.value }))
                 }
-                placeholder="These songs remind me of that summer…"
+                placeholder="Thinking of you today…"
                 maxLength={400}
               />
             </Field>
@@ -329,13 +328,16 @@ export function MixtapeForm() {
             <div>
               <div className="mb-2 flex items-end justify-between gap-2">
                 <p className="font-display text-sm text-[var(--ll-ink)]">
-                  Tracklist
+                  Songs{" "}
+                  <span className="text-[var(--ll-muted)]">(optional)</span>
                 </p>
                 <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
-                  {draft.trackIds.length}/{MAX_MIXTAPE_TRACKS} · min{" "}
-                  {MIN_MIXTAPE_TRACKS}
+                  {draft.trackIds.length}/{MAX_MIXTAPE_TRACKS}
                 </p>
               </div>
+              <p className="mb-2 text-xs text-[var(--ll-muted)]">
+                Skip this if you only want a cassette note — no music required.
+              </p>
               <ul className="max-h-64 space-y-1.5 overflow-y-auto rounded-xl border-2 border-[var(--ll-lavender)] bg-[#fffbf2]/70 p-2 dark:bg-white/5">
                 {MIX_TRACKS.map((track) => {
                   const on = draft.trackIds.includes(track.id);
@@ -387,8 +389,8 @@ export function MixtapeForm() {
             ) : null}
 
             <div className="flex flex-wrap gap-3 pt-1">
-              {draft.trackIds.length >= MIN_MIXTAPE_TRACKS &&
-              draft.title.trim() ? (
+              {draft.title.trim() &&
+              (draft.trackIds.length > 0 || draft.dedication.trim()) ? (
                 <Link
                   href={`/mix/${encodeMixShare({
                     title: draft.title.trim() || "Untitled Mix",
@@ -401,7 +403,9 @@ export function MixtapeForm() {
                   rel="noreferrer"
                 >
                   <PixelButton type="button" variant="secondary">
-                    ▶ Preview DJ mix
+                    {draft.trackIds.length > 0
+                      ? "▶ Preview DJ mix"
+                      : "👁 Preview cassette"}
                   </PixelButton>
                 </Link>
               ) : null}

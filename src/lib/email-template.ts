@@ -72,6 +72,8 @@ export function buildLetterEmailHtml(letter: GeneratedLetter): string {
 
 export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): string {
   const tracks = getTracksByIds(mix.trackIds);
+  const hasMusic = tracks.length > 0;
+
   const trackRows = tracks
     .map(
       (t, i) =>
@@ -91,6 +93,41 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
       </div>`
     : "";
 
+  const playBlock = hasMusic
+    ? `<tr>
+            <td style="padding:18px 22px 6px;text-align:center;">
+              <a href="${escapeHtml(playUrl)}" style="display:inline-block;background:linear-gradient(180deg,#f6d58a,#e8b86d);color:#3d2f22;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:999px;border:3px solid #8b5e34;box-shadow:0 4px 0 #5c3d1e;">
+                ▶ Play this mixtape
+              </a>
+              <div style="margin-top:10px;font-size:11px;color:#cbb892;">
+                DJ remix — 30-second slices that fade into each other
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:12px 22px 8px;">
+              <div style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#e6c98a;margin-bottom:8px;">TRACKLIST</div>
+              <table role="presentation" width="100%" style="background:#241c16;border:2px solid #5c4a34;border-radius:12px;overflow:hidden;">
+                ${trackRows}
+              </table>
+            </td>
+          </tr>`
+    : `<tr>
+            <td style="padding:18px 22px 6px;text-align:center;">
+              <a href="${escapeHtml(playUrl)}" style="display:inline-block;background:linear-gradient(180deg,#f6d58a,#e8b86d);color:#3d2f22;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:999px;border:3px solid #8b5e34;box-shadow:0 4px 0 #5c3d1e;">
+                📼 Open the cassette
+              </a>
+              <div style="margin-top:10px;font-size:11px;color:#cbb892;">
+                A labelled note — no playlist this time
+              </div>
+            </td>
+          </tr>`;
+
+  const footerCopy = hasMusic
+    ? `Hit play and let the DJ mix run — 30 seconds per track, then the next drop.<br />
+                <span style="color:#8a7a62;font-size:11px;">Titles are 90s favourites; playback uses free demo streams.</span>`
+    : `Someone burned you a blank-side cassette with a note written on the label.`;
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,7 +144,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
             <td style="background:linear-gradient(90deg,#5c3d1e,#8b5e34,#6b4f36);padding:18px 22px;text-align:center;">
               <div style="font-size:26px;letter-spacing:3px;">📼</div>
               <div style="font-family:Georgia,serif;font-size:22px;color:#fff6df;margin-top:6px;">A mixtape for you</div>
-              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · DJ 30-sec remix</div>
+              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · ${hasMusic ? "DJ 30-sec remix" : "note only"}</div>
             </td>
           </tr>
           <tr>
@@ -122,29 +159,11 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
               ${dedication}
             </td>
           </tr>
-          <tr>
-            <td style="padding:18px 22px 6px;text-align:center;">
-              <a href="${escapeHtml(playUrl)}" style="display:inline-block;background:linear-gradient(180deg,#f6d58a,#e8b86d);color:#3d2f22;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:999px;border:3px solid #8b5e34;box-shadow:0 4px 0 #5c3d1e;">
-                ▶ Play this mixtape
-              </a>
-              <div style="margin-top:10px;font-size:11px;color:#cbb892;">
-                Opens a DJ remix deck — 30-second slices that fade into each other
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:12px 22px 8px;">
-              <div style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#e6c98a;margin-bottom:8px;">TRACKLIST</div>
-              <table role="presentation" width="100%" style="background:#241c16;border:2px solid #5c4a34;border-radius:12px;overflow:hidden;">
-                ${trackRows}
-              </table>
-            </td>
-          </tr>
+          ${playBlock}
           <tr>
             <td style="padding:18px 22px 26px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#cbb892;line-height:1.6;">
-                Hit play and let the DJ mix run — 30 seconds per track, then the next drop.<br />
-                <span style="color:#8a7a62;font-size:11px;">Titles are 90s favourites; playback uses free demo streams.</span>
+                ${footerCopy}
               </p>
               <p style="margin:14px 0 0;font-size:11px;color:#8a7a62;word-break:break-all;">
                 ${escapeHtml(playUrl)}

@@ -10,7 +10,6 @@ import { isStripeConfigured } from "@/lib/stripe";
 import {
   getTracksByIds,
   MAX_MIXTAPE_TRACKS,
-  MIN_MIXTAPE_TRACKS,
 } from "@/lib/tracks";
 
 export const dynamic = "force-dynamic";
@@ -41,23 +40,26 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    if (!Array.isArray(body.trackIds) || body.trackIds.length < MIN_MIXTAPE_TRACKS) {
-      return NextResponse.json(
-        { error: `Pick at least ${MIN_MIXTAPE_TRACKS} tracks.` },
-        { status: 400 }
-      );
-    }
-    if (body.trackIds.length > MAX_MIXTAPE_TRACKS) {
+
+    const trackIds = Array.isArray(body.trackIds) ? body.trackIds : [];
+    if (trackIds.length > MAX_MIXTAPE_TRACKS) {
       return NextResponse.json(
         { error: `Maximum ${MAX_MIXTAPE_TRACKS} tracks.` },
         { status: 400 }
       );
     }
 
-    const tracks = getTracksByIds(body.trackIds);
-    if (tracks.length !== body.trackIds.length) {
+    const tracks = getTracksByIds(trackIds);
+    if (tracks.length !== trackIds.length) {
       return NextResponse.json(
         { error: "One or more tracks are invalid." },
+        { status: 400 }
+      );
+    }
+
+    if (trackIds.length === 0 && !(body.dedication ?? "").trim()) {
+      return NextResponse.json(
+        { error: "Add a dedication, or pick at least one song." },
         { status: 400 }
       );
     }
@@ -81,7 +83,7 @@ export async function POST(request: Request) {
       senderName: body.senderName.trim(),
       title: body.title.trim().slice(0, 80),
       dedication: (body.dedication ?? "").trim().slice(0, 500),
-      trackIds: body.trackIds,
+      trackIds,
       createdAt: body.createdAt || new Date().toISOString(),
     };
 
