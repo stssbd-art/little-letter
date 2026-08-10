@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MixtapeRemixPlayer } from "@/components/features/MixtapeRemixPlayer";
+import { MixtapePlayer } from "@/components/features/MixtapePlayer";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { decodeMixShare } from "@/lib/mixtape-link";
 import { loadMixShare } from "@/lib/mixtape-store";
@@ -36,7 +36,7 @@ export default async function MixPlayPage({ params }: Props) {
 
   return (
     <div className="space-y-8">
-      <MixtapeRemixPlayer mix={mix} />
+      <MixtapePlayer mix={mix} />
       <div className="flex justify-center gap-3">
         <Link href="/mixtape">
           <PixelButton variant="secondary">Burn your own tape</PixelButton>

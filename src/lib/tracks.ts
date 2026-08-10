@@ -1,10 +1,10 @@
-/** Romantic playlist labels. Audio uses free demo streams (not original masters). */
+/** Romantic favourites — original recordings via official YouTube embeds. */
 export type MixTrack = {
   id: string;
   title: string;
   artist: string;
   year: string;
-  src: string;
+  youtubeId: string;
   mood?: "romantic" | "upbeat" | "soft";
 };
 
@@ -15,7 +15,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "Whitney Houston",
     year: "1992",
     mood: "romantic",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    youtubeId: "3JWTaaS7LdU",
   },
   {
     id: "unchained",
@@ -23,7 +23,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "The Righteous Brothers",
     year: "1965",
     mood: "romantic",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    youtubeId: "qiiyRv0mrcA",
   },
   {
     id: "everything-i-do",
@@ -31,7 +31,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "Bryan Adams",
     year: "1991",
     mood: "romantic",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    youtubeId: "Y0pdQU81-Iw",
   },
   {
     id: "your-song",
@@ -39,7 +39,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "Elton John",
     year: "1970",
     mood: "romantic",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+    youtubeId: "GlPyT-GLcww",
   },
   {
     id: "all-of-me",
@@ -47,7 +47,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "John Legend",
     year: "2013",
     mood: "romantic",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+    youtubeId: "450p7goxZqg",
   },
   {
     id: "thinking-out-loud",
@@ -55,7 +55,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "Ed Sheeran",
     year: "2014",
     mood: "romantic",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+    youtubeId: "lp-EO5I60KA",
   },
   {
     id: "thousand-years",
@@ -63,7 +63,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "Christina Perri",
     year: "2011",
     mood: "romantic",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+    youtubeId: "rtOvBOTyX00",
   },
   {
     id: "just-the-way",
@@ -71,7 +71,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "Bruno Mars",
     year: "2010",
     mood: "romantic",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+    youtubeId: "LjhCEhWiKXk",
   },
 ];
 
@@ -82,4 +82,8 @@ export function getTracksByIds(ids: string[]): MixTrack[] {
   return ids
     .map((id) => MIX_TRACKS.find((t) => t.id === id))
     .filter((t): t is MixTrack => Boolean(t));
+}
+
+export function youtubeWatchUrl(youtubeId: string) {
+  return `https://www.youtube.com/watch?v=${youtubeId}`;
 }

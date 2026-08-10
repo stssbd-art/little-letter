@@ -404,7 +404,7 @@ export function MixtapeForm() {
                   rel="noreferrer"
                 >
                   <PixelButton type="button" variant="secondary">
-                    ▶ Preview DJ mix
+                    ▶ Preview mix
                   </PixelButton>
                 </Link>
               ) : null}
