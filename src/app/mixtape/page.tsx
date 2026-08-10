@@ -20,8 +20,8 @@ export default function MixtapePage() {
           Send a Mixtape
         </h1>
         <p className="mx-auto mt-3 max-w-xl font-display text-[var(--ll-muted)]">
-          Label a cassette and write a tiny dedication — songs are optional.
-          Mail it across the internet.
+          Label a cassette, pick at least 3 songs, add a tiny dedication —
+          then mail the mix across the internet.
         </p>
       </div>
 

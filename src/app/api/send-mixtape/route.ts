@@ -10,6 +10,7 @@ import { isStripeConfigured } from "@/lib/stripe";
 import {
   getTracksByIds,
   MAX_MIXTAPE_TRACKS,
+  MIN_MIXTAPE_TRACKS,
 } from "@/lib/tracks";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +43,12 @@ export async function POST(request: Request) {
     }
 
     const trackIds = Array.isArray(body.trackIds) ? body.trackIds : [];
+    if (trackIds.length < MIN_MIXTAPE_TRACKS) {
+      return NextResponse.json(
+        { error: `Pick at least ${MIN_MIXTAPE_TRACKS} songs.` },
+        { status: 400 }
+      );
+    }
     if (trackIds.length > MAX_MIXTAPE_TRACKS) {
       return NextResponse.json(
         { error: `Maximum ${MAX_MIXTAPE_TRACKS} tracks.` },
@@ -53,13 +60,6 @@ export async function POST(request: Request) {
     if (tracks.length !== trackIds.length) {
       return NextResponse.json(
         { error: "One or more tracks are invalid." },
-        { status: 400 }
-      );
-    }
-
-    if (trackIds.length === 0 && !(body.dedication ?? "").trim()) {
-      return NextResponse.json(
-        { error: "Add a dedication, or pick at least one song." },
         { status: 400 }
       );
     }

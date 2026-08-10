@@ -23,11 +23,8 @@ function cleanShare(mix: MixShare): MixShare {
 
 export async function saveMixShare(mix: MixShare): Promise<string> {
   const payload = cleanShare(mix);
-  if (!payload.title.trim()) {
-    throw new Error("Mixtape needs a title.");
-  }
-  if (!payload.tracks.length && !payload.note.trim()) {
-    throw new Error("Mixtape needs a note or tracks.");
+  if (!payload.tracks.length) {
+    throw new Error("Mixtape needs playable tracks.");
   }
 
   await ensureDir();
