@@ -65,7 +65,7 @@ export function CassetteDeck({
               </p>
             </div>
             <span className="shrink-0 rounded-sm border border-[#8b5e34]/50 bg-[#fff6df] px-1.5 py-1 font-pixel text-[7px] text-[#8b5e34]">
-              90s
+              ♡
             </span>
           </div>
           <div className="mt-2 space-y-0.5 border-t border-dashed border-[#8b5e34]/35 pt-2">

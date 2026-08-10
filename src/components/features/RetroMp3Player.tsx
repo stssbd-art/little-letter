@@ -85,7 +85,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
     >
       <div className="flex items-center justify-between border-b border-[#b9a888]/70 px-3 py-2 dark:border-[#5c4a34]">
         <p className="font-pixel text-[9px] tracking-wide text-[#5c4a34] dark:text-[#e6c98a]">
-          LL-PLAYER 90s
+          LL-PLAYER LOVE
         </p>
         <p className="font-pixel text-[8px] text-[#8a7a62]">
           {muted ? "MUTE" : playing ? "STEREO" : "READY"}
@@ -96,7 +96,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
         <div className="lcd-screen rounded-md border-2 border-[#3d2f22] bg-[#1a2e1a] px-3 py-3 text-[#8fef7a] shadow-[inset_0_0_18px_rgba(0,0,0,0.55)]">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="font-pixel text-[8px] opacity-80">NOW PLAYING · 90s MIX</p>
+              <p className="font-pixel text-[8px] opacity-80">NOW PLAYING · LOVE MIX</p>
               <p className="mt-1 truncate font-pixel text-[10px] leading-relaxed">
                 {track.title}.mp3
               </p>
@@ -141,7 +141,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           </div>
 
           <p className="mt-3 border-t border-[#8fef7a]/20 pt-2 font-pixel text-[7px] leading-relaxed text-[#8fef7a]/80">
-            90s classics on the dial · demo audio stream (unmute site sound to hear)
+            Romantic favourites on the dial · demo audio stream (unmute site sound to hear)
           </p>
         </div>
 

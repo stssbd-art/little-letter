@@ -125,7 +125,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
 
   const footerCopy = hasMusic
     ? `Hit play and let the DJ mix run — 30 seconds per track, then the next drop.<br />
-                <span style="color:#8a7a62;font-size:11px;">Titles are 90s favourites; playback uses free demo streams.</span>`
+                <span style="color:#8a7a62;font-size:11px;">Titles are romantic favourites; playback uses free demo streams.</span>`
     : `Someone burned you a blank-side cassette with a note written on the label.`;
 
   return `<!DOCTYPE html>

@@ -338,7 +338,7 @@ export function MixtapeRemixPlayer({ mix }: Props) {
 
           <p className="text-center font-pixel text-[7px] leading-relaxed text-[var(--ll-muted)]">
             Each track plays a 30-second DJ slice, then fades into the next —
-            not the full song. Demo instrumentals under 90s titles.
+            not the full song. Demo instrumentals under romantic titles.
           </p>
         </div>
       </PixelWindow>

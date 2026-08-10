@@ -6,7 +6,7 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 export const metadata: Metadata = {
   title: "Send a Mixtape",
   description:
-    "Burn a nostalgic 90s cassette mixtape and email it to someone you miss.",
+    "Burn a romantic cassette mixtape and email it to someone you miss.",
 };
 
 export default function MixtapePage() {
