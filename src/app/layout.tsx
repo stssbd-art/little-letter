@@ -71,6 +71,13 @@ export const metadata: Metadata = {
     },
   },
   category: "lifestyle",
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: process.env.GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
 };
 
 export const viewport: Viewport = {
