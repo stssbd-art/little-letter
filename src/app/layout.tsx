@@ -4,7 +4,13 @@ import { AppProviders } from "@/components/providers/AppProviders";
 import { AnimatedBackground } from "@/components/decorations/AnimatedBackground";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/constants";
+import {
+  SEO_KEYWORDS,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+} from "@/lib/constants";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -29,30 +35,42 @@ const pressStart = Press_Start_2P({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Cosy notes for cosy people`,
+    default: `${SITE_NAME} — Send a Letter or Mixtape Online`,
     template: `%s · ${SITE_NAME}`,
   },
-  description: SITE_TAGLINE,
-  keywords: [
-    "little letter",
-    "send cute messages",
-    "nostalgic email",
-    "pixel art letters",
-    "friendship notes",
-  ],
+  description: SITE_DESCRIPTION,
+  keywords: SEO_KEYWORDS,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
-    title: SITE_NAME,
-    description: SITE_TAGLINE,
+    title: `${SITE_NAME} — Send a Letter or Mixtape Online`,
+    description: SITE_DESCRIPTION,
     type: "website",
     url: SITE_URL,
     siteName: SITE_NAME,
+    locale: "en_GB",
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
+    title: `${SITE_NAME} — Send a Letter or Mixtape Online`,
     description: SITE_TAGLINE,
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  category: "lifestyle",
 };
 
 export const viewport: Viewport = {
@@ -62,6 +80,29 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+  applicationCategory: "LifestyleApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0.50",
+    priceCurrency: "GBP",
+    description:
+      "First letter free; first two mixtapes free; then £0.50 per extra send.",
+  },
+  featureList: [
+    "Send a personal letter by email",
+    "Send a romantic mixtape by email",
+    "Cute retro letter design",
+    "Cassette-style mixtape player",
+  ],
 };
 
 export default function RootLayout({
@@ -74,6 +115,10 @@ export default function RootLayout({
       <body
         className={`${nunito.variable} ${quicksand.variable} ${pressStart.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <AppProviders>
           <AnimatedBackground>
             <Header />

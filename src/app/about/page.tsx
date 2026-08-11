@@ -5,9 +5,10 @@ import { PixelButton } from "@/components/ui/PixelButton";
 import { Mascot } from "@/components/ui/Logo";
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About — Send Letters & Mixtapes Online",
   description:
-    "Little Letter is a nostalgic, whimsical place to send warm messages that feel like digital stationery.",
+    "Little Letter is a nostalgic place to send warm email letters and romantic mixtapes that feel handmade.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {
@@ -30,7 +31,9 @@ export default function AboutPage() {
               Write to friends, family, partners, or colleagues. Choose an
               occasion and a style, add a personal note, and we&apos;ll help craft
               a warm message that never sounds like a factory greeting card.
-              Then we send it as a beautiful retro HTML email.
+              Then we send it as a beautiful retro HTML email. Or burn a
+              romantic mixtape — pick songs, label a cassette, and email a
+              playable mix.
             </p>
             <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
               Meet Pip the Envelope — our tiny mascot who believes every inbox

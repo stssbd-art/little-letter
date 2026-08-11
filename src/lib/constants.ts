@@ -1,8 +1,27 @@
 import type { MessageStyle, Occasion, Relationship } from "@/types";
 
 export const SITE_NAME = "Little Letter";
-export const SITE_TAGLINE = "Send a little happiness to someone today.";
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://little-letter.vercel.app";
+export const SITE_TAGLINE =
+  "Send a cute letter or romantic mixtape by email — cosy notes for someone you miss.";
+export const SITE_DESCRIPTION =
+  "Little Letter helps you send a personal letter or romantic mixtape online. Write a warm message or burn a cassette-style mix, then email it to a friend, partner, or family member. First letter free · first two mixtapes free.";
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://little-letter-sage.vercel.app";
+
+export const SEO_KEYWORDS = [
+  "send a letter online",
+  "send a letter by email",
+  "send mixtape online",
+  "email a mixtape",
+  "romantic mixtape email",
+  "send cute message",
+  "send love letter online",
+  "digital mixtape for someone",
+  "personal email letter",
+  "little letter",
+  "nostalgic email letter",
+  "cassette mixtape gift",
+];
 
 export const OCCASIONS: {
   value: Occasion;

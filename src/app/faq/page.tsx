@@ -4,8 +4,10 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 
 export const metadata: Metadata = {
-  title: "FAQ",
-  description: "Frequently asked questions about Little Letter.",
+  title: "FAQ — Sending Letters & Mixtapes",
+  description:
+    "How to send a letter or mixtape online with Little Letter, pricing, email delivery, and more.",
+  alternates: { canonical: "/faq" },
 };
 
 const FAQS = [

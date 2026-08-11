@@ -2,9 +2,16 @@ import type { Metadata } from "next";
 import { MessageForm } from "@/components/features/MessageForm";
 
 export const metadata: Metadata = {
-  title: "Create Message",
+  title: "Create & Send a Letter Online",
   description:
-    "Create a cute, personal Little Letter for someone you care about.",
+    "Create a cute personal letter online and email it to someone you care about. First letter free, then £0.50.",
+  alternates: { canonical: "/create" },
+  keywords: [
+    "send a letter online",
+    "email a love letter",
+    "send cute message by email",
+    "personal letter generator",
+  ],
 };
 
 export default function CreatePage() {

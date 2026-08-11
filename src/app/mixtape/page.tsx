@@ -4,9 +4,17 @@ import { MixtapeForm } from "@/components/features/MixtapeForm";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 
 export const metadata: Metadata = {
-  title: "Send a Mixtape",
+  title: "Send a Romantic Mixtape Online",
   description:
-    "Burn a romantic cassette mixtape and email it to someone you miss.",
+    "Burn a romantic mixtape online and email it to someone you miss. Pick songs, label a cassette, add a dedication — first two mixtapes free.",
+  alternates: { canonical: "/mixtape" },
+  keywords: [
+    "send mixtape online",
+    "email a mixtape",
+    "romantic mixtape",
+    "digital cassette mixtape",
+    "send love songs by email",
+  ],
 };
 
 export default function MixtapePage() {
