@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Demo mode is on — sends are free. Turn on payments later with PAYMENTS_ENABLED=true.",
+            "Demo mode is on — sends are free. Unset DEMO_MODE for public paid sends.",
         },
         { status: 503 }
       );

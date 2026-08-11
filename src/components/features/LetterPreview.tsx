@@ -148,7 +148,7 @@ export function LetterPreview() {
   }
 
   const priceLabel = usage?.price ?? "£0.50";
-  const demo = usage?.demo ?? true;
+  const demo = usage?.demo ?? false;
   const freeLeft = usage?.freeAvailable ?? true;
 
   return (

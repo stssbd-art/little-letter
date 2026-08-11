@@ -221,7 +221,7 @@ export function MixtapeForm() {
   }
 
   const priceLabel = usage?.price ?? "£0.50";
-  const demo = usage?.demo ?? true;
+  const demo = usage?.demo ?? false;
   const freeLeft = usage?.freeAvailable ?? true;
   const freeRemaining = usage?.freeLeft ?? 2;
   const freeTotal = usage?.freeTotal ?? 2;

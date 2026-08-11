@@ -5,13 +5,16 @@ export const SEND_PRICE_LABEL = "£0.50";
 export const SEND_PRICE_PENCE = 50;
 export const FREE_MIXTAPES = 2;
 
-/** Payments off until you set PAYMENTS_ENABLED=true — free demo testing. */
-export function paymentsEnabled() {
-  return process.env.PAYMENTS_ENABLED === "true";
+/**
+ * Public launch: payments are ON by default.
+ * Set DEMO_MODE=true only for free testing (no charges).
+ */
+export function isDemoMode() {
+  return process.env.DEMO_MODE === "true";
 }
 
-export function isDemoMode() {
-  return !paymentsEnabled();
+export function paymentsEnabled() {
+  return !isDemoMode();
 }
 
 const FREE_COOKIE = "ll_free_used";

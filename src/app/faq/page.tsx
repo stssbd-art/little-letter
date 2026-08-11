@@ -11,15 +11,15 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is this really free to try?",
-    a: "Yes — right now Little Letter is in demo mode, so letters and mixtapes send without payment. Paid extras can be turned on later.",
+    a: "Your first letter is free. After that, each extra letter costs £0.50 (paid securely with Stripe). Your first two mixtapes are free; extras are £0.50 too.",
   },
   {
     q: "How do payments work?",
-    a: "Payments are off for now while we test. When they are enabled, the first letter is free and extras are £0.50 via Stripe Checkout.",
+    a: "Send one letter free (and two mixtapes free). For the next ones, tap Pay £0.50 & send, complete Stripe Checkout, then your message goes out automatically.",
   },
   {
     q: "How do I send to any email?",
-    a: "Email delivery uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). Recipients can be any address once Gmail is configured.",
+    a: "Email delivery uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). Recipients can be any address. The £0.50 is only for extra sends after your free allowance.",
   },
   {
     q: "How are messages written?",
@@ -35,7 +35,7 @@ const FAQS = [
   },
   {
     q: "Can I send a mixtape?",
-    a: "Yes — open Mixtape, label a cassette, pick at least 3 romantic tracks, add an optional dedication, and email it. The Play link opens a mix of the original songs (via YouTube) — about 30 seconds per track, then the next. Demo mode: free to send while testing.",
+    a: "Yes — open Mixtape, label a cassette, pick at least 3 romantic tracks, add an optional dedication, and email it. The Play link opens a mix of the original songs (via YouTube) — about 30 seconds per track, then the next. Your first two mixtapes are free; extras are £0.50.",
   },
   {
     q: "Can I mute the sounds?",
@@ -43,7 +43,7 @@ const FAQS = [
   },
   {
     q: "Is my data stored?",
-    a: "Letter drafts live in your browser session. Guestbook entries are saved on the server in a simple local file for this demo. Never put secrets in the guestbook.",
+    a: "Letter drafts live in your browser session. Guestbook entries are saved on the server in a simple local file. Never put secrets in the guestbook.",
   },
   {
     q: "Does it work on mobile?",
