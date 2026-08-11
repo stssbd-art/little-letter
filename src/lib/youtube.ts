@@ -1,8 +1,12 @@
 type YtPlayer = {
   destroy: () => void;
   loadVideoById: (id: string) => void;
+  cueVideoById: (id: string) => void;
   playVideo: () => void;
   pauseVideo: () => void;
+  seekTo: (seconds: number, allowSeekAhead: boolean) => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
   getPlayerState: () => number;
 };
 

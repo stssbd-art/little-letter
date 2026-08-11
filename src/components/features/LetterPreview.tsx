@@ -11,6 +11,7 @@ import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS } from "@/lib/constants";
 
 type UsageInfo = {
+  demo?: boolean;
   freeAvailable: boolean;
   credits: number;
   canSend: boolean;
@@ -147,17 +148,20 @@ export function LetterPreview() {
   }
 
   const priceLabel = usage?.price ?? "£0.50";
+  const demo = usage?.demo ?? true;
   const freeLeft = usage?.freeAvailable ?? true;
 
   return (
     <div className="space-y-6">
-      <PixelWindow title="pricing.ini" icon="💷" liftOnHover={false}>
+      <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
         <p className="font-display text-sm text-[var(--ll-ink)]">
-          {freeLeft
-            ? "Your first letter is free. Extra letters are £0.50 each."
-            : usage && usage.credits > 0
-              ? `You have ${usage.credits} paid send${usage.credits === 1 ? "" : "s"} ready.`
-              : `Your free letter is used. Next send costs ${priceLabel}.`}
+          {demo
+            ? "Demo mode — sends are free for testing. No payment asked right now."
+            : freeLeft
+              ? "Your first letter is free. Extra letters are £0.50 each."
+              : usage && usage.credits > 0
+                ? `You have ${usage.credits} paid send${usage.credits === 1 ? "" : "s"} ready.`
+                : `Your free letter is used. Next send costs ${priceLabel}.`}
         </p>
       </PixelWindow>
 
@@ -279,9 +283,11 @@ export function LetterPreview() {
           >
             {sending || paying
               ? "Sending..."
-              : freeLeft
-                ? "💌 Send free letter"
-                : "💌 Send Little Letter"}
+              : demo
+                ? "💌 Send letter (demo)"
+                : freeLeft
+                  ? "💌 Send free letter"
+                  : "💌 Send Little Letter"}
           </PixelButton>
         )}
       </div>

@@ -3,6 +3,7 @@ import { verifyPaidCheckoutSession } from "@/lib/stripe";
 import {
   addPaidCredit,
   FREE_MIXTAPES,
+  isDemoMode,
   readUsage,
   SEND_PRICE_LABEL,
 } from "@/lib/usage";
@@ -13,13 +14,17 @@ export async function GET(request: Request) {
   const usage = await readUsage();
   const url = new URL(request.url);
   const kind = url.searchParams.get("kind");
+  const demo = isDemoMode();
 
   if (kind === "mixtape") {
-    const mixFreeLeft = Math.max(0, FREE_MIXTAPES - usage.mixFreeUsed);
-    const freeAvailable = mixFreeLeft > 0;
-    const canSend = freeAvailable || usage.credits > 0;
+    const mixFreeLeft = demo
+      ? FREE_MIXTAPES
+      : Math.max(0, FREE_MIXTAPES - usage.mixFreeUsed);
+    const freeAvailable = demo || mixFreeLeft > 0;
+    const canSend = demo || freeAvailable || usage.credits > 0;
 
     return NextResponse.json({
+      demo,
       freeAvailable,
       freeLeft: mixFreeLeft,
       freeTotal: FREE_MIXTAPES,
@@ -29,10 +34,11 @@ export async function GET(request: Request) {
     });
   }
 
-  const freeAvailable = !usage.freeUsed;
-  const canSend = freeAvailable || usage.credits > 0;
+  const freeAvailable = demo || !usage.freeUsed;
+  const canSend = demo || freeAvailable || usage.credits > 0;
 
   return NextResponse.json({
+    demo,
     freeAvailable,
     credits: usage.credits,
     canSend,
@@ -42,6 +48,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    if (isDemoMode()) {
+      return NextResponse.json(
+        { error: "Payments are off while demo mode is on." },
+        { status: 400 }
+      );
+    }
+
     const body = (await request.json()) as { sessionId?: string };
     const sessionId = body.sessionId?.trim();
 

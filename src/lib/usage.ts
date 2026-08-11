@@ -5,6 +5,15 @@ export const SEND_PRICE_LABEL = "£0.50";
 export const SEND_PRICE_PENCE = 50;
 export const FREE_MIXTAPES = 2;
 
+/** Payments off until you set PAYMENTS_ENABLED=true — free demo testing. */
+export function paymentsEnabled() {
+  return process.env.PAYMENTS_ENABLED === "true";
+}
+
+export function isDemoMode() {
+  return !paymentsEnabled();
+}
+
 const FREE_COOKIE = "ll_free_used";
 const MIX_FREE_COOKIE = "ll_mix_free_count";
 const CREDITS_COOKIE = "ll_credits";
@@ -95,6 +104,9 @@ export async function writeUsage(usage: UsageSnapshot) {
 
 export async function getSendAccess() {
   const usage = await readUsage();
+  if (isDemoMode()) {
+    return { allowed: true as const, reason: "demo" as const, usage };
+  }
   if (!usage.freeUsed) {
     return { allowed: true as const, reason: "free" as const, usage };
   }
@@ -106,6 +118,9 @@ export async function getSendAccess() {
 
 export async function consumeSendAccess() {
   const usage = await readUsage();
+  if (isDemoMode()) {
+    return usage;
+  }
   if (!usage.freeUsed) {
     usage.freeUsed = true;
   } else if (usage.credits > 0) {
@@ -119,6 +134,9 @@ export async function consumeSendAccess() {
 
 export async function getMixtapeSendAccess() {
   const usage = await readUsage();
+  if (isDemoMode()) {
+    return { allowed: true as const, reason: "demo" as const, usage };
+  }
   if (usage.mixFreeUsed < FREE_MIXTAPES) {
     return { allowed: true as const, reason: "free" as const, usage };
   }
@@ -130,6 +148,9 @@ export async function getMixtapeSendAccess() {
 
 export async function consumeMixtapeSendAccess() {
   const usage = await readUsage();
+  if (isDemoMode()) {
+    return usage;
+  }
   if (usage.mixFreeUsed < FREE_MIXTAPES) {
     usage.mixFreeUsed += 1;
   } else if (usage.credits > 0) {

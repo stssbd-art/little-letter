@@ -100,7 +100,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
                 ▶ Play this mixtape
               </a>
               <div style="margin-top:10px;font-size:11px;color:#cbb892;">
-                Full romantic mix — original songs, one after another
+                Romantic mix — ~30 seconds of each original song
               </div>
             </td>
           </tr>
@@ -124,7 +124,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
           </tr>`;
 
   const footerCopy = hasMusic
-    ? `Hit play and listen to the full mix — each original song plays through, then the next starts.<br />
+    ? `Hit play and listen to the mix — about 30 seconds of each original song, then the next drop.<br />
                 <span style="color:#8a7a62;font-size:11px;">Music streams from official YouTube videos.</span>`
     : `Someone burned you a blank-side cassette with a note written on the label.`;
 
@@ -144,7 +144,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
             <td style="background:linear-gradient(90deg,#5c3d1e,#8b5e34,#6b4f36);padding:18px 22px;text-align:center;">
               <div style="font-size:26px;letter-spacing:3px;">📼</div>
               <div style="font-family:Georgia,serif;font-size:22px;color:#fff6df;margin-top:6px;">A mixtape for you</div>
-              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · ${hasMusic ? "full romantic mix" : "note only"}</div>
+              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · ${hasMusic ? "30-sec romantic mix" : "note only"}</div>
             </td>
           </tr>
           <tr>

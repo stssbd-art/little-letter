@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 type UsageInfo = {
+  demo?: boolean;
   freeAvailable: boolean;
   freeLeft?: number;
   freeTotal?: number;
@@ -220,19 +221,22 @@ export function MixtapeForm() {
   }
 
   const priceLabel = usage?.price ?? "£0.50";
+  const demo = usage?.demo ?? true;
   const freeLeft = usage?.freeAvailable ?? true;
   const freeRemaining = usage?.freeLeft ?? 2;
   const freeTotal = usage?.freeTotal ?? 2;
 
   return (
     <div className="space-y-6">
-      <PixelWindow title="pricing.ini" icon="💷" liftOnHover={false}>
+      <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
         <p className="font-display text-sm text-[var(--ll-ink)]">
-          {freeLeft
-            ? `Your first ${freeTotal} mixtapes are free (${freeRemaining} left). After that, extras are ${priceLabel} each.`
-            : usage && usage.credits > 0
-              ? `You have ${usage.credits} paid send${usage.credits === 1 ? "" : "s"} ready.`
-              : `Your free mixtapes are used. Next mixtape costs ${priceLabel}.`}
+          {demo
+            ? "Demo mode — sends are free for testing. No payment asked right now."
+            : freeLeft
+              ? `Your first ${freeTotal} mixtapes are free (${freeRemaining} left). After that, extras are ${priceLabel} each.`
+              : usage && usage.credits > 0
+                ? `You have ${usage.credits} paid send${usage.credits === 1 ? "" : "s"} ready.`
+                : `Your free mixtapes are used. Next mixtape costs ${priceLabel}.`}
         </p>
       </PixelWindow>
 
@@ -424,9 +428,11 @@ export function MixtapeForm() {
                 >
                   {sending || paying
                     ? "Posting the tape..."
-                    : freeLeft
-                      ? `📼 Send free mixtape (${freeRemaining} left)`
-                      : "📼 Mail the mixtape"}
+                    : demo
+                      ? "📼 Send mixtape (demo)"
+                      : freeLeft
+                        ? `📼 Send free mixtape (${freeRemaining} left)`
+                        : "📼 Mail the mixtape"}
                 </PixelButton>
               )}
             </div>

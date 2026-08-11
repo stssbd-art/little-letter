@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
 import { createSendCheckoutSession, isStripeConfigured } from "@/lib/stripe";
-import { SEND_PRICE_LABEL } from "@/lib/usage";
+import { isDemoMode, SEND_PRICE_LABEL } from "@/lib/usage";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
+    if (isDemoMode()) {
+      return NextResponse.json(
+        {
+          error:
+            "Demo mode is on — sends are free. Turn on payments later with PAYMENTS_ENABLED=true.",
+        },
+        { status: 503 }
+      );
+    }
+
     if (!isStripeConfigured()) {
       return NextResponse.json(
         {
