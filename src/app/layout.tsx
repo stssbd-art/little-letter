@@ -97,7 +97,7 @@ const jsonLd = {
   operatingSystem: "Web",
   offers: {
     "@type": "Offer",
-    price: "0.50",
+    price: "0.00",
     priceCurrency: "GBP",
     description:
       "First two letters free, then £0.99. Mixtapes £1.25 for 1 song or £1.55 for 2+ songs.",
