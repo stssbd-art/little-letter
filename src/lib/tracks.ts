@@ -1,4 +1,4 @@
-/** Romantic favourites — original recordings via official YouTube embeds. */
+/** Romantic favourites — only verified playable YouTube embeds. */
 export type MixTrack = {
   id: string;
   title: string;
@@ -16,30 +16,6 @@ export const MIX_TRACKS: MixTrack[] = [
     year: "1992",
     mood: "romantic",
     youtubeId: "3JWTaaS7LdU",
-  },
-  {
-    id: "unchained",
-    title: "Unchained Melody",
-    artist: "The Righteous Brothers",
-    year: "1965",
-    mood: "romantic",
-    youtubeId: "Zv8czIoAw5w",
-  },
-  {
-    id: "everything-i-do",
-    title: "(Everything I Do) I Do It for You",
-    artist: "Bryan Adams",
-    year: "1991",
-    mood: "romantic",
-    youtubeId: "Y0pdQU87dc8",
-  },
-  {
-    id: "your-song",
-    title: "Your Song",
-    artist: "Elton John",
-    year: "1970",
-    mood: "romantic",
-    youtubeId: "GlPlfCy1urI",
   },
   {
     id: "all-of-me",
@@ -75,7 +51,7 @@ export const MIX_TRACKS: MixTrack[] = [
   },
 ];
 
-export const MAX_MIXTAPE_TRACKS = 6;
+export const MAX_MIXTAPE_TRACKS = 5;
 export const MIN_MIXTAPE_TRACKS = 3;
 
 export function getTracksByIds(ids: string[]): MixTrack[] {
