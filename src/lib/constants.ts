@@ -6,7 +6,7 @@ export const SITE_TAGLINE =
 export const SITE_DESCRIPTION =
   "Little Letter helps you send a personal letter or romantic mixtape online. Write a warm message or burn a cassette-style mix, then email it to a friend, partner, or family member. First letter free · first two mixtapes free.";
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://little-letter-sage.vercel.app";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://littleletterapp.vercel.app";
 
 export const SEO_KEYWORDS = [
   "send a letter online",

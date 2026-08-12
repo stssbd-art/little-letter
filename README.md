@@ -2,7 +2,7 @@
 
 Nostalgic, whimsical site for creating and sending cute personal messages and romantic mixtapes.
 
-**Live:** https://little-letter-sage.vercel.app
+**Live:** https://littleletterapp.vercel.app
 
 ## Stack
 
