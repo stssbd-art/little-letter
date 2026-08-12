@@ -120,12 +120,12 @@ export function CassetteDeck({
               disabled={controlsDisabled || spinning}
               onClick={onPlay}
               className={cn(
-                "rounded-md border-2 border-[#1a1510] bg-gradient-to-b from-[#f6d58a] to-[#e0b45a] px-4 py-2 font-pixel text-[8px] text-[#3d2f22]",
+                "flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#1a1510] bg-gradient-to-b from-[#f6d58a] to-[#e0b45a] text-base text-[#3d2f22]",
                 "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
                 "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
               )}
             >
-              ▶ PLAY
+              ▶
             </button>
             <button
               type="button"
@@ -133,12 +133,12 @@ export function CassetteDeck({
               disabled={controlsDisabled || !spinning}
               onClick={onStop}
               className={cn(
-                "rounded-md border-2 border-[#1a1510] bg-gradient-to-b from-[#d8cdb6] to-[#b9a888] px-4 py-2 font-pixel text-[8px] text-[#3d2f22]",
+                "flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#1a1510] bg-gradient-to-b from-[#d8cdb6] to-[#b9a888] text-base text-[#3d2f22]",
                 "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
                 "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
               )}
             >
-              ■ STOP
+              ■
             </button>
           </div>
         ) : (

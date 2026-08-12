@@ -185,7 +185,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           <button
             type="button"
             aria-label="Previous track"
-            className="rounded-lg border-2 border-[#8a7a62] bg-[#fff6df] px-3 py-2 font-pixel text-[10px] text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-sm text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={() =>
               selectTrack((index - 1 + TRACKS.length) % TRACKS.length)
             }
@@ -196,25 +196,25 @@ export function RetroMp3Player({ className }: { className?: string }) {
           <button
             type="button"
             aria-label="Play"
-            className="rounded-lg border-2 border-[#8a7a62] bg-[#f6d58a] px-4 py-2 font-pixel text-[10px] text-[#3d2f22] disabled:opacity-50"
+            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#f6d58a] text-base text-[#3d2f22] disabled:opacity-50"
             onClick={playMix}
             disabled={!ready || playing}
           >
-            ▶ PLAY
+            ▶
           </button>
           <button
             type="button"
             aria-label="Stop"
-            className="rounded-lg border-2 border-[#8a7a62] bg-[#fff6df] px-4 py-2 font-pixel text-[10px] text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
+            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-base text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={stopMix}
             disabled={!ready || !playing}
           >
-            ■ STOP
+            ■
           </button>
           <button
             type="button"
             aria-label="Next track"
-            className="rounded-lg border-2 border-[#8a7a62] bg-[#fff6df] px-3 py-2 font-pixel text-[10px] text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-sm text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={() => selectTrack((index + 1) % TRACKS.length)}
             disabled={!ready}
           >

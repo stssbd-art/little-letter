@@ -303,19 +303,26 @@ export function MixtapePlayer({ mix }: Props) {
               variant="ghost"
               onClick={() => void playIndex(Math.max(0, index - 1))}
               disabled={index === 0 || !ready}
+              aria-label="Previous track"
             >
-              ⏮ Prev
+              ⏮
             </PixelButton>
-            <PixelButton size="lg" onClick={playMix} disabled={!ready || playing}>
-              ▶ Play mix
+            <PixelButton
+              size="lg"
+              onClick={playMix}
+              disabled={!ready || playing}
+              aria-label="Play"
+            >
+              ▶
             </PixelButton>
             <PixelButton
               variant="ghost"
               size="lg"
               onClick={stopMix}
               disabled={!ready || !playing}
+              aria-label="Stop"
             >
-              ■ Stop
+              ■
             </PixelButton>
             <PixelButton
               variant="ghost"
@@ -323,8 +330,9 @@ export function MixtapePlayer({ mix }: Props) {
                 void playIndex(Math.min(tracks.length - 1, index + 1))
               }
               disabled={index >= tracks.length - 1 || !ready}
+              aria-label="Next track"
             >
-              Next ⏭
+              ⏭
             </PixelButton>
           </div>
 
