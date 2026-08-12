@@ -74,7 +74,7 @@ export const metadata: Metadata = {
   verification: {
     google:
       process.env.GOOGLE_SITE_VERIFICATION ??
-      "ER00dJhLE7EbUp-JCTeu4NLsq0m9SfaErb4P6fx2RJc",
+      "HUX-yvyyic4hnUXuMcr8_z-SDzlxSHFNOchsSeRACNQ",
   },
 };
 
@@ -115,18 +115,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const googleVerification =
-    process.env.GOOGLE_SITE_VERIFICATION ??
-    "ER00dJhLE7EbUp-JCTeu4NLsq0m9SfaErb4P6fx2RJc";
-
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <meta
-          name="google-site-verification"
-          content={googleVerification}
-        />
-      </head>
       <body
         className={`${nunito.variable} ${quicksand.variable} ${pressStart.variable} antialiased`}
       >
