@@ -1,4 +1,4 @@
-/** Romantic favourites — only verified playable YouTube embeds. */
+/** Romantic favourites — verified playable YouTube embeds. */
 export type MixTrack = {
   id: string;
   title: string;
@@ -49,9 +49,81 @@ export const MIX_TRACKS: MixTrack[] = [
     mood: "romantic",
     youtubeId: "LjhCEhWiKXk",
   },
+  {
+    id: "alice",
+    title: "Alice",
+    artist: "Calema",
+    year: "2017",
+    mood: "romantic",
+    youtubeId: "Fzl5kg8kV3c",
+  },
+  {
+    id: "know-love",
+    title: "I Want to Know What Love Is",
+    artist: "Foreigner",
+    year: "1984",
+    mood: "romantic",
+    youtubeId: "r3Pr1_v7hsw",
+  },
+  {
+    id: "because-loved",
+    title: "Because You Loved Me",
+    artist: "Céline Dion",
+    year: "1996",
+    mood: "romantic",
+    youtubeId: "fpl4if07ics",
+  },
+  {
+    id: "chasing-cars",
+    title: "Chasing Cars",
+    artist: "Snow Patrol",
+    year: "2006",
+    mood: "soft",
+    youtubeId: "GemKqzILV4w",
+  },
+  {
+    id: "how-long",
+    title: "How Long Will I Love You",
+    artist: "Ellie Goulding",
+    year: "2013",
+    mood: "romantic",
+    youtubeId: "an4ySOlsUMY",
+  },
+  {
+    id: "truly-madly",
+    title: "Truly Madly Deeply",
+    artist: "Savage Garden",
+    year: "1997",
+    mood: "romantic",
+    youtubeId: "WQnAxOQxQIU",
+  },
+  {
+    id: "everything-buble",
+    title: "Everything",
+    artist: "Michael Bublé",
+    year: "2007",
+    mood: "romantic",
+    youtubeId: "SPUJIbXN0WY",
+  },
+  {
+    id: "stand-by-me",
+    title: "Stand By Me",
+    artist: "Ben E. King",
+    year: "1961",
+    mood: "romantic",
+    youtubeId: "z5i9vT8wGY8",
+  },
+  {
+    id: "my-hero",
+    title: "My Hero",
+    artist: "Foo Fighters",
+    year: "1998",
+    mood: "soft",
+    youtubeId: "EqWRaAF6_WY",
+  },
 ];
 
-export const MAX_MIXTAPE_TRACKS = 5;
+export const MAX_MIXTAPE_TRACKS = 6;
 export const MIN_MIXTAPE_TRACKS = 3;
 
 export function getTracksByIds(ids: string[]): MixTrack[] {
