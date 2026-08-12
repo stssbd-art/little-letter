@@ -4,7 +4,7 @@ import { MessageForm } from "@/components/features/MessageForm";
 export const metadata: Metadata = {
   title: "Create & Send a Letter Online",
   description:
-    "Create a cute personal letter online and email it to someone you care about. First letter free, then £0.50.",
+    "Create a cute personal letter online and email it to someone you care about. First two letters free, then £0.99.",
   alternates: { canonical: "/create" },
   keywords: [
     "send a letter online",
@@ -22,7 +22,7 @@ export default function CreatePage() {
           Create a Little Letter
         </h1>
         <p className="mt-2 font-display text-[var(--ll-muted)]">
-          Tell us who it&apos;s for — first letter free, then £0.50 each.
+          Tell us who it&apos;s for — first two letters free, then £0.99 each.
         </p>
       </div>
       <MessageForm />

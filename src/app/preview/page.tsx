@@ -15,7 +15,7 @@ export default function PreviewPage() {
           Preview your letter
         </h1>
         <p className="mt-2 font-display text-[var(--ll-muted)]">
-          First letter free · then £0.50 each. Open the envelope, then send.
+          First two letters free · then £0.99 each. Open the envelope, then send.
         </p>
       </div>
       <Suspense fallback={<p className="text-center text-sm text-[var(--ll-muted)]">Loading preview...</p>}>

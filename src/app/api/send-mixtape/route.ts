@@ -4,7 +4,7 @@ import type { MixtapePayload } from "@/types";
 import {
   consumeMixtapeSendAccess,
   getMixtapeSendAccess,
-  SEND_PRICE_LABEL,
+  mixtapePrice,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
 import {
@@ -66,11 +66,12 @@ export async function POST(request: Request) {
 
     const access = await getMixtapeSendAccess();
     if (!access.allowed) {
+      const price = mixtapePrice(trackIds.length);
       return NextResponse.json(
         {
-          error: `Your first two mixtapes are free. Extra mixtapes are ${SEND_PRICE_LABEL} each.`,
+          error: `Mixtapes are ${price.label} (${trackIds.length === 1 ? "1 song" : "2+ songs"}). Pay to send.`,
           requiresPayment: true,
-          price: SEND_PRICE_LABEL,
+          price: price.label,
           stripeConfigured: isStripeConfigured(),
         },
         { status: 402 }

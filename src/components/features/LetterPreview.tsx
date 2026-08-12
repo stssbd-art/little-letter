@@ -13,6 +13,8 @@ import { OCCASIONS } from "@/lib/constants";
 type UsageInfo = {
   demo?: boolean;
   freeAvailable: boolean;
+  freeLeft?: number;
+  freeTotal?: number;
   credits: number;
   canSend: boolean;
   price: string;
@@ -49,7 +51,7 @@ export function LetterPreview() {
     const cancelled = searchParams.get("cancelled");
 
     if (cancelled) {
-      setError("Payment cancelled. Your first letter is free; extras are £0.50.");
+      setError("Payment cancelled. Your first two letters are free; extras are £0.99.");
       return;
     }
 
@@ -136,7 +138,7 @@ export function LetterPreview() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnPath: "/preview" }),
+        body: JSON.stringify({ returnPath: "/preview", kind: "letter" }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not start payment");
@@ -147,9 +149,11 @@ export function LetterPreview() {
     }
   }
 
-  const priceLabel = usage?.price ?? "£0.50";
+  const priceLabel = usage?.price ?? "£0.99";
   const demo = usage?.demo ?? false;
   const freeLeft = usage?.freeAvailable ?? true;
+  const freeRemaining = usage?.freeLeft ?? 2;
+  const freeTotal = usage?.freeTotal ?? 2;
 
   return (
     <div className="space-y-6">
@@ -158,10 +162,10 @@ export function LetterPreview() {
           {demo
             ? "Demo mode — sends are free for testing. No payment asked right now."
             : freeLeft
-              ? "Your first letter is free. Extra letters are £0.50 each."
+              ? `Your first ${freeTotal} letters are free (${freeRemaining} left). Extra letters are ${priceLabel} each.`
               : usage && usage.credits > 0
-                ? `You have ${usage.credits} paid send${usage.credits === 1 ? "" : "s"} ready.`
-                : `Your free letter is used. Next send costs ${priceLabel}.`}
+                ? `You have ${usage.credits} paid letter credit${usage.credits === 1 ? "" : "s"} ready.`
+                : `Your free letters are used. Next letter costs ${priceLabel}.`}
         </p>
       </PixelWindow>
 
@@ -309,7 +313,7 @@ export function LetterPreview() {
               : demo
                 ? "💌 Send letter (demo)"
                 : freeLeft
-                  ? "💌 Send free letter"
+                  ? `💌 Send free letter (${freeRemaining} left)`
                   : "💌 Send Little Letter"}
           </PixelButton>
         )}

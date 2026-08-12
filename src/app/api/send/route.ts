@@ -3,8 +3,9 @@ import { sendLetterEmail } from "@/lib/resend";
 import type { GeneratedLetter } from "@/types";
 import {
   consumeSendAccess,
+  FREE_LETTERS,
   getSendAccess,
-  SEND_PRICE_LABEL,
+  LETTER_PRICE_LABEL,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
 
@@ -35,9 +36,9 @@ export async function POST(request: Request) {
     if (!access.allowed) {
       return NextResponse.json(
         {
-          error: `Your first letter is free. Extra letters are ${SEND_PRICE_LABEL} each.`,
+          error: `Your first ${FREE_LETTERS} letters are free. Extra letters are ${LETTER_PRICE_LABEL} each.`,
           requiresPayment: true,
-          price: SEND_PRICE_LABEL,
+          price: LETTER_PRICE_LABEL,
           stripeConfigured: isStripeConfigured(),
         },
         { status: 402 }

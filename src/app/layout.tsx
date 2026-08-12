@@ -100,7 +100,7 @@ const jsonLd = {
     price: "0.50",
     priceCurrency: "GBP",
     description:
-      "First letter free; first two mixtapes free; then £0.50 per extra send.",
+      "First two letters free, then £0.99. Mixtapes £1.25 for 1 song or £1.55 for 2+ songs.",
   },
   featureList: [
     "Send a personal letter by email",

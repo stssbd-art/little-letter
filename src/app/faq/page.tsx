@@ -13,15 +13,15 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is this really free to try?",
-    a: "Your first letter is free. After that, each extra letter costs £0.50 (paid securely with Stripe). Your first two mixtapes are free; extras are £0.50 too.",
+    a: "Your first two letters are free. After that, each extra letter costs £0.99 (paid securely with Stripe). Mixtapes are £1.25 for 1 song, or £1.55 for 2 or more songs.",
   },
   {
     q: "How do payments work?",
-    a: "Send one letter free (and two mixtapes free). For the next ones, tap Pay £0.50 & send, complete Stripe Checkout, then your message goes out automatically.",
+    a: "Send two letters free. For the next ones, tap Pay £0.99 & send, complete Stripe Checkout, then your message goes out automatically. Mixtapes use Stripe too (£1.25 / £1.55).",
   },
   {
     q: "How do I send to any email?",
-    a: "Email delivery uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). Recipients can be any address. The £0.50 is only for extra sends after your free allowance.",
+    a: "Email delivery uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). Recipients can be any address. Stripe charges apply only after your free letter allowance, and for every mixtape.",
   },
   {
     q: "How are messages written?",
@@ -37,7 +37,7 @@ const FAQS = [
   },
   {
     q: "Can I send a mixtape?",
-    a: "Yes — open Mixtape, label a cassette, pick at least 3 romantic tracks, add an optional dedication, and email it. The Play link opens a mix of the original songs (via YouTube) — about 30 seconds per track, then the next. Your first two mixtapes are free; extras are £0.50.",
+    a: "Yes — open Mixtape, label a cassette, pick one or more romantic tracks, add an optional dedication, and email it. The Play link opens a mix of the original songs (via YouTube) — about 30 seconds per track, then the next. Pricing: £1.25 for 1 song, £1.55 for 2 or more.",
   },
   {
     q: "Can I mute the sounds?",

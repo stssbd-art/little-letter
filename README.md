@@ -42,7 +42,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Gmail SMTP is preferred when configured — it can email any address (Google daily limits apply).
 
-**Pricing (public):** first letter free · first two mixtapes free · then £0.50 per extra send via Stripe.
+**Pricing (public):** first two letters free · then £0.99 · mixtapes £1.25 (1 song) / £1.55 (2+ songs).
 
 ## Scripts
 

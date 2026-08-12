@@ -28,6 +28,8 @@ type UsageInfo = {
   credits: number;
   canSend: boolean;
   price: string;
+  priceOneSong?: string;
+  priceMultiSong?: string;
 };
 
 const emptyDraft = {
@@ -72,7 +74,8 @@ export function MixtapeForm() {
   }, [draft, ready]);
 
   async function refreshUsage() {
-    const res = await fetch("/api/usage?kind=mixtape");
+    const count = Math.max(1, draft.trackIds.length || 1);
+    const res = await fetch(`/api/usage?kind=mixtape&trackCount=${count}`);
     const data = (await res.json()) as UsageInfo;
     if (res.ok) {
       setUsage(data);
@@ -82,7 +85,8 @@ export function MixtapeForm() {
 
   useEffect(() => {
     void refreshUsage();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft.trackIds.length]);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
@@ -90,7 +94,7 @@ export function MixtapeForm() {
     const cancelled = searchParams.get("cancelled");
 
     if (cancelled) {
-      setError("Payment cancelled. Your first two mixtapes are free; extras are £0.50.");
+      setError("Payment cancelled. Mixtapes are £1.25 for 1 song, or £1.55 for 2+ songs.");
       return;
     }
 
@@ -139,7 +143,7 @@ export function MixtapeForm() {
     if (!draft.senderName.trim()) return "Add your name on the cassette label.";
     if (!draft.title.trim()) return "Give the mixtape a title.";
     if (draft.trackIds.length < MIN_MIXTAPE_TRACKS) {
-      return `Pick at least ${MIN_MIXTAPE_TRACKS} songs for the mix.`;
+      return `Pick at least ${MIN_MIXTAPE_TRACKS} song${MIN_MIXTAPE_TRACKS === 1 ? "" : "s"} for the mix.`;
     }
     return null;
   }
@@ -209,7 +213,11 @@ export function MixtapeForm() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnPath: "/mixtape" }),
+        body: JSON.stringify({
+          returnPath: "/mixtape",
+          kind: "mixtape",
+          trackCount: Math.max(1, draft.trackIds.length),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not start payment");
@@ -220,11 +228,14 @@ export function MixtapeForm() {
     }
   }
 
-  const priceLabel = usage?.price ?? "£0.50";
+  const songCount = Math.max(1, draft.trackIds.length || 1);
+  const priceLabel =
+    usage?.price ??
+    (songCount <= 1
+      ? usage?.priceOneSong ?? "£1.25"
+      : usage?.priceMultiSong ?? "£1.55");
   const demo = usage?.demo ?? false;
-  const freeLeft = usage?.freeAvailable ?? true;
-  const freeRemaining = usage?.freeLeft ?? 2;
-  const freeTotal = usage?.freeTotal ?? 2;
+  const paidReady = (usage?.credits ?? 0) > 0;
 
   return (
     <div className="space-y-6">
@@ -232,11 +243,9 @@ export function MixtapeForm() {
         <p className="font-display text-sm text-[var(--ll-ink)]">
           {demo
             ? "Demo mode — sends are free for testing. No payment asked right now."
-            : freeLeft
-              ? `Your first ${freeTotal} mixtapes are free (${freeRemaining} left). After that, extras are ${priceLabel} each.`
-              : usage && usage.credits > 0
-                ? `You have ${usage.credits} paid send${usage.credits === 1 ? "" : "s"} ready.`
-                : `Your free mixtapes are used. Next mixtape costs ${priceLabel}.`}
+            : paidReady
+              ? `You have ${usage?.credits} paid mixtape credit${usage?.credits === 1 ? "" : "s"} ready.`
+              : `Mixtapes: £1.25 for 1 song · £1.55 for 2 or more songs. Current pick (${songCount} song${songCount === 1 ? "" : "s"}): ${priceLabel}.`}
         </p>
       </PixelWindow>
 
@@ -250,7 +259,8 @@ export function MixtapeForm() {
             spinning={!muted && selected.length > 0}
           />
           <p className="text-center font-pixel text-[8px] leading-relaxed text-[var(--ll-muted)]">
-            Hand-labelled · Side A forever · pick at least 3 songs
+            Hand-labelled · Side A forever · pick at least {MIN_MIXTAPE_TRACKS}{" "}
+            song{MIN_MIXTAPE_TRACKS === 1 ? "" : "s"}
           </p>
         </div>
 
@@ -341,7 +351,9 @@ export function MixtapeForm() {
                 </p>
               </div>
               <p className="mb-2 text-xs text-[var(--ll-muted)]">
-                Pick at least {MIN_MIXTAPE_TRACKS} songs — the mix won’t send without them.
+                Pick at least {MIN_MIXTAPE_TRACKS} song
+                {MIN_MIXTAPE_TRACKS === 1 ? "" : "s"} — the mix won’t send without
+                them.
               </p>
               <ul className="max-h-64 space-y-1.5 overflow-y-auto rounded-xl border-2 border-[var(--ll-lavender)] bg-[#fffbf2]/70 p-2 dark:bg-white/5">
                 {MIX_TRACKS.map((track) => {
@@ -430,9 +442,7 @@ export function MixtapeForm() {
                     ? "Posting the tape..."
                     : demo
                       ? "📼 Send mixtape (demo)"
-                      : freeLeft
-                        ? `📼 Send free mixtape (${freeRemaining} left)`
-                        : "📼 Mail the mixtape"}
+                      : "📼 Mail the mixtape"}
                 </PixelButton>
               )}
             </div>

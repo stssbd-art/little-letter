@@ -1,9 +1,41 @@
 import { cookies } from "next/headers";
 import { createHmac, timingSafeEqual } from "crypto";
 
-export const SEND_PRICE_LABEL = "£0.50";
-export const SEND_PRICE_PENCE = 50;
-export const FREE_MIXTAPES = 2;
+/** Letters: first 2 free, then £0.99 each */
+export const FREE_LETTERS = 2;
+export const LETTER_PRICE_PENCE = 99;
+export const LETTER_PRICE_LABEL = "£0.99";
+
+/** Mixtapes: £1.25 for 1 song, £1.55 for 2+ songs (no free mixtapes) */
+export const MIX_ONE_SONG_PENCE = 125;
+export const MIX_ONE_SONG_LABEL = "£1.25";
+export const MIX_MULTI_SONG_PENCE = 155;
+export const MIX_MULTI_SONG_LABEL = "£1.55";
+
+/** @deprecated use LETTER_PRICE_* — kept for older imports during transition */
+export const SEND_PRICE_LABEL = LETTER_PRICE_LABEL;
+export const SEND_PRICE_PENCE = LETTER_PRICE_PENCE;
+export const FREE_MIXTAPES = 0;
+
+export type CheckoutKind = "letter" | "mixtape";
+
+export function mixtapePrice(trackCount: number) {
+  const count = Math.max(0, Math.floor(trackCount));
+  if (count <= 1) {
+    return {
+      pence: MIX_ONE_SONG_PENCE,
+      label: MIX_ONE_SONG_LABEL,
+      name: "Little Letter mixtape (1 song)",
+      description: "Send a one-song mixtape by email",
+    };
+  }
+  return {
+    pence: MIX_MULTI_SONG_PENCE,
+    label: MIX_MULTI_SONG_LABEL,
+    name: "Little Letter mixtape (multi-song)",
+    description: "Send a multi-song mixtape by email",
+  };
+}
 
 /**
  * Public launch: payments are ON by default.
@@ -17,9 +49,11 @@ export function paymentsEnabled() {
   return !isDemoMode();
 }
 
-const FREE_COOKIE = "ll_free_used";
-const MIX_FREE_COOKIE = "ll_mix_free_count";
-const CREDITS_COOKIE = "ll_credits";
+const LETTER_FREE_COOKIE = "ll_letter_free_count";
+const LEGACY_FREE_COOKIE = "ll_free_used";
+const LETTER_CREDITS_COOKIE = "ll_letter_credits";
+const MIX_CREDITS_COOKIE = "ll_mix_credits";
+const LEGACY_CREDITS_COOKIE = "ll_credits";
 const SESSIONS_COOKIE = "ll_paid_sessions";
 
 function secret() {
@@ -55,6 +89,13 @@ function unpack(raw: string | undefined) {
   return value;
 }
 
+function parseCount(raw: string | null, max?: number) {
+  const n = Number(raw || "0");
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  const v = Math.floor(n);
+  return typeof max === "number" ? Math.min(v, max) : v;
+}
+
 const cookieOpts = {
   httpOnly: true,
   sameSite: "lax" as const,
@@ -64,40 +105,73 @@ const cookieOpts = {
 };
 
 export type UsageSnapshot = {
+  letterFreeUsed: number;
+  letterCredits: number;
+  mixCredits: number;
+  usedSessionIds: string[];
+  /** legacy mirrors for older callers */
   freeUsed: boolean;
   mixFreeUsed: number;
   credits: number;
-  usedSessionIds: string[];
 };
 
 export async function readUsage(): Promise<UsageSnapshot> {
   const jar = await cookies();
-  const freeUsed = unpack(jar.get(FREE_COOKIE)?.value) === "1";
-  const mixFreeUsed = Number(unpack(jar.get(MIX_FREE_COOKIE)?.value) || "0");
-  const credits = Number(unpack(jar.get(CREDITS_COOKIE)?.value) || "0");
+
+  let letterFreeUsed = parseCount(
+    unpack(jar.get(LETTER_FREE_COOKIE)?.value),
+    FREE_LETTERS
+  );
+  // migrate old single free-letter flag
+  if (
+    letterFreeUsed === 0 &&
+    unpack(jar.get(LEGACY_FREE_COOKIE)?.value) === "1"
+  ) {
+    letterFreeUsed = 1;
+  }
+
+  let letterCredits = parseCount(unpack(jar.get(LETTER_CREDITS_COOKIE)?.value));
+  const legacyCredits = parseCount(
+    unpack(jar.get(LEGACY_CREDITS_COOKIE)?.value)
+  );
+  if (letterCredits === 0 && legacyCredits > 0) {
+    letterCredits = legacyCredits;
+  }
+
+  const mixCredits = parseCount(unpack(jar.get(MIX_CREDITS_COOKIE)?.value));
   const sessionsRaw = unpack(jar.get(SESSIONS_COOKIE)?.value) || "";
-  const usedSessionIds = sessionsRaw ? sessionsRaw.split(",").filter(Boolean) : [];
+  const usedSessionIds = sessionsRaw
+    ? sessionsRaw.split(",").filter(Boolean)
+    : [];
 
   return {
-    freeUsed,
-    mixFreeUsed:
-      Number.isFinite(mixFreeUsed) && mixFreeUsed > 0
-        ? Math.min(Math.floor(mixFreeUsed), FREE_MIXTAPES)
-        : 0,
-    credits: Number.isFinite(credits) && credits > 0 ? credits : 0,
+    letterFreeUsed,
+    letterCredits,
+    mixCredits,
     usedSessionIds,
+    freeUsed: letterFreeUsed >= FREE_LETTERS,
+    mixFreeUsed: 0,
+    credits: letterCredits + mixCredits,
   };
 }
 
 export async function writeUsage(usage: UsageSnapshot) {
   const jar = await cookies();
-  jar.set(FREE_COOKIE, pack(usage.freeUsed ? "1" : "0"), cookieOpts);
   jar.set(
-    MIX_FREE_COOKIE,
-    pack(String(Math.max(0, Math.min(usage.mixFreeUsed, FREE_MIXTAPES)))),
+    LETTER_FREE_COOKIE,
+    pack(String(Math.max(0, Math.min(usage.letterFreeUsed, FREE_LETTERS)))),
     cookieOpts
   );
-  jar.set(CREDITS_COOKIE, pack(String(usage.credits)), cookieOpts);
+  jar.set(
+    LETTER_CREDITS_COOKIE,
+    pack(String(Math.max(0, usage.letterCredits))),
+    cookieOpts
+  );
+  jar.set(
+    MIX_CREDITS_COOKIE,
+    pack(String(Math.max(0, usage.mixCredits))),
+    cookieOpts
+  );
   jar.set(
     SESSIONS_COOKIE,
     pack(usage.usedSessionIds.slice(-30).join(",")),
@@ -110,10 +184,10 @@ export async function getSendAccess() {
   if (isDemoMode()) {
     return { allowed: true as const, reason: "demo" as const, usage };
   }
-  if (!usage.freeUsed) {
+  if (usage.letterFreeUsed < FREE_LETTERS) {
     return { allowed: true as const, reason: "free" as const, usage };
   }
-  if (usage.credits > 0) {
+  if (usage.letterCredits > 0) {
     return { allowed: true as const, reason: "credit" as const, usage };
   }
   return { allowed: false as const, reason: "payment_required" as const, usage };
@@ -124,13 +198,15 @@ export async function consumeSendAccess() {
   if (isDemoMode()) {
     return usage;
   }
-  if (!usage.freeUsed) {
-    usage.freeUsed = true;
-  } else if (usage.credits > 0) {
-    usage.credits -= 1;
+  if (usage.letterFreeUsed < FREE_LETTERS) {
+    usage.letterFreeUsed += 1;
+  } else if (usage.letterCredits > 0) {
+    usage.letterCredits -= 1;
   } else {
     throw new Error("No send credit available.");
   }
+  usage.freeUsed = usage.letterFreeUsed >= FREE_LETTERS;
+  usage.credits = usage.letterCredits + usage.mixCredits;
   await writeUsage(usage);
   return usage;
 }
@@ -140,10 +216,7 @@ export async function getMixtapeSendAccess() {
   if (isDemoMode()) {
     return { allowed: true as const, reason: "demo" as const, usage };
   }
-  if (usage.mixFreeUsed < FREE_MIXTAPES) {
-    return { allowed: true as const, reason: "free" as const, usage };
-  }
-  if (usage.credits > 0) {
+  if (usage.mixCredits > 0) {
     return { allowed: true as const, reason: "credit" as const, usage };
   }
   return { allowed: false as const, reason: "payment_required" as const, usage };
@@ -154,24 +227,31 @@ export async function consumeMixtapeSendAccess() {
   if (isDemoMode()) {
     return usage;
   }
-  if (usage.mixFreeUsed < FREE_MIXTAPES) {
-    usage.mixFreeUsed += 1;
-  } else if (usage.credits > 0) {
-    usage.credits -= 1;
+  if (usage.mixCredits > 0) {
+    usage.mixCredits -= 1;
   } else {
     throw new Error("No mixtape send credit available.");
   }
+  usage.credits = usage.letterCredits + usage.mixCredits;
   await writeUsage(usage);
   return usage;
 }
 
-export async function addPaidCredit(sessionId: string) {
+export async function addPaidCredit(
+  sessionId: string,
+  kind: CheckoutKind = "letter"
+) {
   const usage = await readUsage();
   if (usage.usedSessionIds.includes(sessionId)) {
     return { usage, alreadyApplied: true as const };
   }
-  usage.credits += 1;
+  if (kind === "mixtape") {
+    usage.mixCredits += 1;
+  } else {
+    usage.letterCredits += 1;
+  }
   usage.usedSessionIds = [...usage.usedSessionIds, sessionId].slice(-30);
+  usage.credits = usage.letterCredits + usage.mixCredits;
   await writeUsage(usage);
   return { usage, alreadyApplied: false as const };
 }

@@ -64,8 +64,8 @@ export function HomePage() {
           pick romantic songs, and send a playable mix.
         </p>
         <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
-          Your first letter is free. Your first two mixtapes are free. Extra
-          sends are £0.50.
+          Your first two letters are free, then £0.99 each. Mixtapes are £1.25
+          for 1 song, or £1.55 for 2 or more.
         </p>
       </section>
 

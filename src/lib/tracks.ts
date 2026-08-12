@@ -124,7 +124,7 @@ export const MIX_TRACKS: MixTrack[] = [
 ];
 
 export const MAX_MIXTAPE_TRACKS = 6;
-export const MIN_MIXTAPE_TRACKS = 3;
+export const MIN_MIXTAPE_TRACKS = 1;
 
 export function getTracksByIds(ids: string[]): MixTrack[] {
   return ids
