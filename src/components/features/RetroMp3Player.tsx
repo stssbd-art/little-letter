@@ -7,7 +7,8 @@ import { MIX_TRACKS, youtubeWatchUrl } from "@/lib/tracks";
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
 import { cn } from "@/lib/utils";
 
-const TRACKS = MIX_TRACKS.slice(0, 8);
+/** Home deck shows the full romantic catalog (same as mixtape picks). */
+const TRACKS = MIX_TRACKS;
 
 export function RetroMp3Player({ className }: { className?: string }) {
   const { play } = useSound();

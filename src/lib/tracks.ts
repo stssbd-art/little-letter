@@ -10,20 +10,20 @@ export type MixTrack = {
 
 export const MIX_TRACKS: MixTrack[] = [
   {
+    id: "alice",
+    title: "Alice",
+    artist: "Calema",
+    year: "2024",
+    mood: "romantic",
+    youtubeId: "Fzl5kg8kV3c",
+  },
+  {
     id: "always-love-you",
     title: "I Will Always Love You",
     artist: "Whitney Houston",
     year: "1992",
     mood: "romantic",
     youtubeId: "3JWTaaS7LdU",
-  },
-  {
-    id: "unchained-melody",
-    title: "Unchained Melody",
-    artist: "The Righteous Brothers",
-    year: "1965",
-    mood: "romantic",
-    youtubeId: "GjRLwYs-FXE",
   },
   {
     id: "everything-i-do",
@@ -72,14 +72,6 @@ export const MIX_TRACKS: MixTrack[] = [
     year: "2010",
     mood: "romantic",
     youtubeId: "LjhCEhWiKXk",
-  },
-  {
-    id: "alice",
-    title: "Alice",
-    artist: "Calema",
-    year: "2017",
-    mood: "romantic",
-    youtubeId: "Fzl5kg8kV3c",
   },
   {
     id: "know-love",
