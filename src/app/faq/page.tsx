@@ -24,12 +24,16 @@ const FAQS = [
     a: "Email delivery uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). Recipients can be any address. Stripe charges apply only after your free letter allowance, and for every mixtape.",
   },
   {
+    q: "Why did my letter go to spam?",
+    a: "Some inboxes are strict with new senders. Ask the recipient to move it to Primary/Inbox and mark “Not spam”, or add your Little Letter Gmail address to their contacts. That usually fixes future deliveries. Using a well-known Gmail account (not a brand-new one) also helps.",
+  },
+  {
     q: "How are messages written?",
     a: "We use the OpenAI API to craft unique, personal notes based on the occasion, style, and details you provide — with a warm local fallback if the API is unavailable.",
   },
   {
     q: "Will my letter look cute in the inbox?",
-    a: "Recipients get a retro-styled HTML email with pastel gradients, pixel decorations, and a cosy Little Letter footer.",
+    a: "Recipients get a warm HTML email with a clear plain-text version too — designed to look personal, not like a marketing blast.",
   },
   {
     q: "What is the MP3 player on the home page?",

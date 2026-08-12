@@ -1,5 +1,5 @@
 import type { GeneratedLetter, MixtapePayload } from "@/types";
-import { OCCASIONS } from "@/lib/constants";
+import { OCCASIONS, SITE_URL } from "@/lib/constants";
 import { getTracksByIds } from "@/lib/tracks";
 
 function escapeHtml(text: string) {
@@ -9,10 +9,52 @@ function escapeHtml(text: string) {
     .replace(/>/g, "&gt;");
 }
 
+function whyFooter(senderName: string) {
+  return `<p style="margin:18px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
+    You received this because <strong>${escapeHtml(senderName)}</strong> sent you a personal note with
+    <a href="${escapeHtml(SITE_URL)}" style="color:#8b5e34;">Little Letter</a>.
+    This is a one-off message, not a mailing list.
+  </p>`;
+}
+
+export function buildLetterEmailText(letter: GeneratedLetter): string {
+  return [
+    `Little Letter for ${letter.form.recipientName}`,
+    "",
+    letter.message,
+    "",
+    `— ${letter.form.senderName}`,
+    "",
+    `Sent with Little Letter (${SITE_URL})`,
+    "This is a personal one-off message, not a newsletter.",
+  ].join("\n");
+}
+
+export function buildMixtapeEmailText(mix: MixtapePayload, playUrl: string): string {
+  const tracks = getTracksByIds(mix.trackIds);
+  const list = tracks
+    .map((t, i) => `${i + 1}. ${t.title} — ${t.artist} (${t.year})`)
+    .join("\n");
+
+  return [
+    `A mixtape for ${mix.recipientName}: ${mix.title}`,
+    `From: ${mix.senderName}`,
+    mix.dedication.trim() ? `\n“${mix.dedication.trim()}”\n` : "",
+    list ? `Tracklist:\n${list}\n` : "",
+    `Play your mixtape:\n${playUrl}`,
+    "",
+    `Sent with Little Letter (${SITE_URL})`,
+    "This is a personal one-off message, not a newsletter.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 export function buildLetterEmailHtml(letter: GeneratedLetter): string {
   const occasion =
     OCCASIONS.find((o) => o.value === letter.form.occasion)?.emoji ?? "💌";
   const safeMessage = escapeHtml(letter.message).replace(/\n/g, "<br />");
+  const preheader = `${letter.form.senderName} sent you a personal letter on Little Letter.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -21,48 +63,40 @@ export function buildLetterEmailHtml(letter: GeneratedLetter): string {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(letter.subject)}</title>
 </head>
-<body style="margin:0;padding:0;background:#faf4e8;font-family:'Trebuchet MS',Verdana,sans-serif;color:#3d2f22;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:linear-gradient(180deg,#fff6df 0%,#faf4e8 50%,#eef2e0 100%);padding:32px 12px;">
+<body style="margin:0;padding:0;background:#faf4e8;font-family:Georgia,'Times New Roman',serif;color:#3d2f22;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
+    ${escapeHtml(preheader)}
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#faf4e8;padding:32px 12px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width:560px;background:#fffbf2;border:4px solid #d2a35a;border-radius:18px;overflow:hidden;box-shadow:0 8px 0 #e6c98a;">
+        <table role="presentation" width="100%" style="max-width:560px;background:#fffbf2;border:2px solid #d2a35a;border-radius:12px;overflow:hidden;">
           <tr>
-            <td style="background:linear-gradient(90deg,#e8b86d,#c4a574,#a3b875);padding:18px 22px;text-align:center;">
-              <div style="font-size:28px;letter-spacing:2px;">✨ ${occasion} ✨</div>
+            <td style="background:#f0d9a0;padding:18px 22px;text-align:center;">
+              <div style="font-size:22px;">${occasion}</div>
               <div style="font-family:Georgia,serif;font-size:22px;color:#3d2f22;margin-top:6px;">Little Letter</div>
-              <div style="font-size:12px;color:#5c3d1e;margin-top:4px;">a tiny note flew across the internet for you</div>
+              <div style="font-size:12px;color:#5c3d1e;margin-top:4px;">A personal note for you</div>
             </td>
           </tr>
           <tr>
-            <td style="padding:28px 26px 10px;text-align:center;">
-              <div style="display:inline-block;background:#fff6df;border:2px dashed #d2a35a;border-radius:12px;padding:8px 14px;font-size:13px;color:#8b5e34;">
-                ⭐ pixel warmth included ⭐
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:12px 28px 8px;">
+            <td style="padding:22px 28px 8px;">
               <h1 style="margin:0 0 14px;font-size:20px;color:#8b5e34;font-family:Georgia,serif;">
                 For ${escapeHtml(letter.form.recipientName)}
               </h1>
-              <div style="font-size:15px;line-height:1.7;color:#3d2f22;background:#fff;border:2px solid #e6c98a;border-radius:14px;padding:20px;">
+              <div style="font-size:15px;line-height:1.7;color:#3d2f22;background:#fff;border:1px solid #e6c98a;border-radius:10px;padding:20px;">
                 ${safeMessage}
               </div>
             </td>
           </tr>
           <tr>
             <td style="padding:18px 28px 28px;text-align:center;">
-              <div style="font-size:22px;letter-spacing:6px;">🦋 💌 ⭐ 🍀 ☁️</div>
-              <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
-                Sent with care from <strong style="color:#8b5e34;">${escapeHtml(letter.form.senderName)}</strong><br />
-                via Little Letter — cosy notes for cosy people
+              <p style="margin:0;font-size:13px;color:#7a654f;line-height:1.5;">
+                Sent with care from <strong style="color:#8b5e34;">${escapeHtml(letter.form.senderName)}</strong>
               </p>
             </td>
           </tr>
         </table>
-        <p style="margin:18px 0 0;font-size:11px;color:#9ca3af;">
-          ✉️ If this made you smile, the mission succeeded.
-        </p>
+        ${whyFooter(letter.form.senderName)}
       </td>
     </tr>
   </table>
@@ -73,13 +107,14 @@ export function buildLetterEmailHtml(letter: GeneratedLetter): string {
 export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): string {
   const tracks = getTracksByIds(mix.trackIds);
   const hasMusic = tracks.length > 0;
+  const preheader = `${mix.senderName} made you a mixtape: ${mix.title}`;
 
   const trackRows = tracks
     .map(
       (t, i) =>
         `<tr>
-          <td style="padding:8px 10px;border-bottom:1px dashed #cbb892;font-family:monospace;font-size:12px;color:#8b5e34;width:28px;">${i + 1}.</td>
-          <td style="padding:8px 10px;border-bottom:1px dashed #cbb892;">
+          <td style="padding:8px 10px;border-bottom:1px solid #cbb892;font-family:Georgia,serif;font-size:12px;color:#8b5e34;width:28px;">${i + 1}.</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #cbb892;">
             <div style="font-size:14px;color:#3d2f22;font-weight:bold;">${escapeHtml(t.title)}</div>
             <div style="font-size:11px;color:#7a654f;margin-top:2px;">${escapeHtml(t.artist)} · ${escapeHtml(t.year)}</div>
           </td>
@@ -88,7 +123,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
     .join("");
 
   const dedication = mix.dedication.trim()
-    ? `<div style="margin-top:16px;padding:14px 16px;background:#fff6df;border:2px dashed #d2a35a;border-radius:12px;font-size:14px;line-height:1.6;color:#3d2f22;font-style:italic;">
+    ? `<div style="margin-top:16px;padding:14px 16px;background:#fff6df;border:1px dashed #d2a35a;border-radius:10px;font-size:14px;line-height:1.6;color:#3d2f22;font-style:italic;">
         “${escapeHtml(mix.dedication).replace(/\n/g, "<br />")}”
       </div>`
     : "";
@@ -96,37 +131,29 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
   const playBlock = hasMusic
     ? `<tr>
             <td style="padding:18px 22px 6px;text-align:center;">
-              <a href="${escapeHtml(playUrl)}" style="display:inline-block;background:linear-gradient(180deg,#f6d58a,#e8b86d);color:#3d2f22;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:999px;border:3px solid #8b5e34;box-shadow:0 4px 0 #5c3d1e;">
-                ▶ Play this mixtape
+              <a href="${escapeHtml(playUrl)}" style="display:inline-block;background:#e8b86d;color:#3d2f22;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:8px;border:2px solid #8b5e34;">
+                Play this mixtape
               </a>
-              <div style="margin-top:10px;font-size:11px;color:#cbb892;">
-                Romantic mix — ~30 seconds of each original song
+              <div style="margin-top:10px;font-size:11px;color:#7a654f;">
+                About 30 seconds of each song, then the next track
               </div>
             </td>
           </tr>
           <tr>
             <td style="padding:12px 22px 8px;">
-              <div style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#e6c98a;margin-bottom:8px;">TRACKLIST</div>
-              <table role="presentation" width="100%" style="background:#241c16;border:2px solid #5c4a34;border-radius:12px;overflow:hidden;">
+              <div style="font-size:11px;letter-spacing:1px;color:#8b5e34;margin-bottom:8px;">TRACKLIST</div>
+              <table role="presentation" width="100%" style="background:#fffbf2;border:1px solid #d2a35a;border-radius:10px;overflow:hidden;">
                 ${trackRows}
               </table>
             </td>
           </tr>`
     : `<tr>
             <td style="padding:18px 22px 6px;text-align:center;">
-              <a href="${escapeHtml(playUrl)}" style="display:inline-block;background:linear-gradient(180deg,#f6d58a,#e8b86d);color:#3d2f22;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:999px;border:3px solid #8b5e34;box-shadow:0 4px 0 #5c3d1e;">
-                📼 Open the cassette
+              <a href="${escapeHtml(playUrl)}" style="display:inline-block;background:#e8b86d;color:#3d2f22;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:8px;border:2px solid #8b5e34;">
+                Open the cassette
               </a>
-              <div style="margin-top:10px;font-size:11px;color:#cbb892;">
-                A labelled note — no playlist this time
-              </div>
             </td>
           </tr>`;
-
-  const footerCopy = hasMusic
-    ? `Hit play and listen to the mix — about 30 seconds of each original song, then the next drop.<br />
-                <span style="color:#8a7a62;font-size:11px;">Music streams from official YouTube videos.</span>`
-    : `Someone burned you a blank-side cassette with a note written on the label.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -135,22 +162,24 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(mix.title)}</title>
 </head>
-<body style="margin:0;padding:0;background:#1c1610;font-family:'Trebuchet MS',Verdana,sans-serif;color:#f5ecd9;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:linear-gradient(180deg,#2a2218 0%,#1c1610 55%,#241c14 100%);padding:32px 12px;">
+<body style="margin:0;padding:0;background:#faf4e8;font-family:Georgia,'Times New Roman',serif;color:#3d2f22;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
+    ${escapeHtml(preheader)}
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#faf4e8;padding:32px 12px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width:560px;background:#322a22;border:4px solid #8b5e34;border-radius:18px;overflow:hidden;box-shadow:0 10px 0 #1a1510;">
+        <table role="presentation" width="100%" style="max-width:560px;background:#fffbf2;border:2px solid #8b5e34;border-radius:12px;overflow:hidden;">
           <tr>
-            <td style="background:linear-gradient(90deg,#5c3d1e,#8b5e34,#6b4f36);padding:18px 22px;text-align:center;">
-              <div style="font-size:26px;letter-spacing:3px;">📼</div>
-              <div style="font-family:Georgia,serif;font-size:22px;color:#fff6df;margin-top:6px;">A mixtape for you</div>
-              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · ${hasMusic ? "30-sec romantic mix" : "note only"}</div>
+            <td style="background:#e8b86d;padding:18px 22px;text-align:center;">
+              <div style="font-family:Georgia,serif;font-size:22px;color:#3d2f22;">A mixtape for you</div>
+              <div style="font-size:12px;color:#5c3d1e;margin-top:4px;">Hand-labelled · Side A</div>
             </td>
           </tr>
           <tr>
             <td style="padding:22px 22px 8px;">
-              <div style="background:linear-gradient(135deg,#f7ecd4,#e4c078);border:3px solid #8b5e34;border-radius:12px;padding:16px 18px;color:#3d2f22;">
-                <div style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#8b5e34;">CASSETTE LABEL</div>
+              <div style="background:#fff6df;border:2px solid #d2a35a;border-radius:10px;padding:16px 18px;color:#3d2f22;">
+                <div style="font-size:10px;letter-spacing:1px;color:#8b5e34;">CASSETTE LABEL</div>
                 <div style="font-family:Georgia,serif;font-size:22px;margin-top:6px;">${escapeHtml(mix.title)}</div>
                 <div style="font-size:12px;margin-top:6px;color:#5c3d1e;">
                   for <strong>${escapeHtml(mix.recipientName)}</strong> · from <strong>${escapeHtml(mix.senderName)}</strong>
@@ -162,18 +191,16 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
           ${playBlock}
           <tr>
             <td style="padding:18px 22px 26px;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#cbb892;line-height:1.6;">
-                ${footerCopy}
-              </p>
-              <p style="margin:14px 0 0;font-size:11px;color:#8a7a62;word-break:break-all;">
+              <p style="margin:0;font-size:12px;color:#7a654f;line-height:1.6;word-break:break-all;">
                 ${escapeHtml(playUrl)}
               </p>
-              <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;">
-                Sent with care via <strong style="color:#f6d58a;">Little Letter</strong>
+              <p style="margin:14px 0 0;font-size:12px;color:#7a654f;">
+                Sent with care via Little Letter
               </p>
             </td>
           </tr>
         </table>
+        ${whyFooter(mix.senderName)}
       </td>
     </tr>
   </table>
