@@ -70,8 +70,8 @@ export function LetterPreview() {
             throw new Error(verifyData.error ?? "Could not verify payment");
           }
           await refreshUsage();
+          // sendLetter navigates to /success — stay there
           await sendLetter();
-          router.replace("/preview");
         } catch (err) {
           setError(err instanceof Error ? err.message : "Payment verify failed");
           setPaying(false);

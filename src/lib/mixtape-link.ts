@@ -36,18 +36,53 @@ function fromBase64Url(code: string): string {
   return new TextDecoder().decode(bytes);
 }
 
+/**
+ * Compact share codes keep email / SMS links short so clients don't truncate
+ * them (which made mixtapes look like they "disappeared").
+ * Format: 1.<base64url(title\x1ffrom\x1fto\x1fnote\x1f0.3.5)>
+ */
 export function encodeMixShare(mix: MixShare): string {
-  const payload = {
-    title: mix.title.slice(0, 80),
-    from: mix.from.slice(0, 60),
-    to: mix.to.slice(0, 60),
-    note: mix.note.slice(0, 500),
-    tracks: mix.tracks.filter((id) => MIX_TRACKS.some((t) => t.id === id)),
-  };
-  return toBase64Url(JSON.stringify(payload));
+  const indices = mix.tracks
+    .map((id) => MIX_TRACKS.findIndex((t) => t.id === id))
+    .filter((i) => i >= 0);
+  if (!indices.length) {
+    throw new Error("Mixtape needs playable tracks.");
+  }
+  const payload = [
+    mix.title.slice(0, 80),
+    mix.from.slice(0, 60),
+    mix.to.slice(0, 60),
+    mix.note.slice(0, 500),
+    indices.join("."),
+  ].join("\u001f");
+  return `1.${toBase64Url(payload)}`;
 }
 
-export function decodeMixShare(code: string): MixShare | null {
+function decodeCompact(code: string): MixShare | null {
+  if (!code.startsWith("1.")) return null;
+  try {
+    const raw = fromBase64Url(code.slice(2));
+    const [title, from, to, note, indexPart] = raw.split("\u001f");
+    if (!title || !indexPart) return null;
+    const tracks = indexPart
+      .split(".")
+      .map((s) => Number(s))
+      .filter((n) => Number.isInteger(n) && n >= 0 && n < MIX_TRACKS.length)
+      .map((n) => MIX_TRACKS[n]!.id);
+    if (!tracks.length) return null;
+    return {
+      title: title.slice(0, 80),
+      from: (from ?? "").slice(0, 60),
+      to: (to ?? "").slice(0, 60),
+      note: (note ?? "").slice(0, 500),
+      tracks,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function decodeLegacyJson(code: string): MixShare | null {
   try {
     const raw = fromBase64Url(code.trim());
     const data = JSON.parse(raw) as Partial<MixShare>;
@@ -68,6 +103,11 @@ export function decodeMixShare(code: string): MixShare | null {
   } catch {
     return null;
   }
+}
+
+export function decodeMixShare(code: string): MixShare | null {
+  const trimmed = code.trim();
+  return decodeCompact(trimmed) ?? decodeLegacyJson(trimmed);
 }
 
 export function buildMixPlayUrl(mix: MixShare): string {

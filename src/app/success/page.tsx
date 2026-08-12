@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SuccessCelebration } from "@/components/features/SuccessCelebration";
 
 export const metadata: Metadata = {
   title: "Success",
-  description: "Your little letter has been sent!",
+  description: "Your little letter or mixtape has been sent!",
 };
 
 export default function SuccessPage() {
   return (
     <div className="mx-auto max-w-2xl">
-      <SuccessCelebration />
+      <Suspense fallback={<p className="text-center text-sm">Almost there…</p>}>
+        <SuccessCelebration />
+      </Suspense>
     </div>
   );
 }

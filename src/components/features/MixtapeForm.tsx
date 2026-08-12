@@ -113,8 +113,8 @@ export function MixtapeForm() {
             throw new Error(verifyData.error ?? "Could not verify payment");
           }
           await refreshUsage();
+          // sendMixtape navigates to /success — do not bounce back to empty form
           await sendMixtape();
-          router.replace("/mixtape");
         } catch (err) {
           setError(err instanceof Error ? err.message : "Payment verify failed");
           setPaying(false);
@@ -192,8 +192,20 @@ export function MixtapeForm() {
         colors: ["#f6d58a", "#8b5e34", "#3d2f22", "#cbb892", "#e8b86d"],
       });
       play("success");
+      try {
+        sessionStorage.setItem(
+          "little-letter-last-mix",
+          JSON.stringify({
+            title: payload.title,
+            to: payload.recipientName,
+            from: payload.senderName,
+          })
+        );
+      } catch {
+        /* ignore */
+      }
       sessionStorage.removeItem(STORAGE_KEYS.mixtapeDraft);
-      router.push("/success");
+      router.push("/success?kind=mixtape");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send mixtape");
       setSending(false);
@@ -409,13 +421,15 @@ export function MixtapeForm() {
               {draft.trackIds.length >= MIN_MIXTAPE_TRACKS &&
               draft.title.trim() ? (
                 <Link
-                  href={`/mix/${encodeMixShare({
-                    title: draft.title.trim() || "Untitled Mix",
-                    from: draft.senderName.trim() || "a friend",
-                    to: draft.recipientName.trim() || "someone special",
-                    note: draft.dedication.trim(),
-                    tracks: draft.trackIds,
-                  })}`}
+                  href={`/mix/${encodeURIComponent(
+                    encodeMixShare({
+                      title: draft.title.trim() || "Untitled Mix",
+                      from: draft.senderName.trim() || "a friend",
+                      to: draft.recipientName.trim() || "someone special",
+                      note: draft.dedication.trim(),
+                      tracks: draft.trackIds,
+                    })
+                  )}`}
                   target="_blank"
                   rel="noreferrer"
                 >

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { PixelWindow } from "@/components/ui/PixelWindow";
@@ -11,9 +12,27 @@ import { useSound } from "@/components/providers/SoundProvider";
 import { useEasterEggs } from "@/components/providers/EasterEggProvider";
 
 export function SuccessCelebration() {
+  const searchParams = useSearchParams();
+  const kind = searchParams.get("kind");
+  const isMixtape = kind === "mixtape";
   const { letter, resetForm } = useLetter();
   const { play } = useSound();
   const { triggerPetals, triggerStars } = useEasterEggs();
+  const [mixMeta, setMixMeta] = useState<{
+    title: string;
+    to: string;
+    from: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!isMixtape) return;
+    try {
+      const raw = sessionStorage.getItem("little-letter-last-mix");
+      if (raw) setMixMeta(JSON.parse(raw) as { title: string; to: string; from: string });
+    } catch {
+      /* ignore */
+    }
+  }, [isMixtape]);
 
   useEffect(() => {
     play("success");
@@ -54,7 +73,7 @@ export function SuccessCelebration() {
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
             className="inline-block"
           >
-            💌
+            {isMixtape ? "📼" : "💌"}
           </motion.span>
         </motion.div>
 
@@ -83,29 +102,42 @@ export function SuccessCelebration() {
           ✨ Success!
         </h1>
         <p className="mt-3 font-display text-xl text-[var(--ll-ink)]">
-          Your little letter has been sent.
+          {isMixtape
+            ? "Your mixtape is on its way."
+            : "Your little letter has been sent."}
         </p>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-[var(--ll-muted)]">
-          💌 Your little message is flying through the internet...
-          <br />
-          Hopefully it lands with a smile.
+          {isMixtape
+            ? "They’ll get an email with a Play link for your cassette mix."
+            : "Your little message is flying through the internet... Hopefully it lands with a smile."}
         </p>
-        {letter ? (
+        {isMixtape && mixMeta ? (
+          <p className="mt-3 text-xs text-[var(--ll-muted)]">
+            “{mixMeta.title}” · for {mixMeta.to}
+          </p>
+        ) : null}
+        {!isMixtape && letter ? (
           <p className="mt-3 text-xs text-[var(--ll-muted)]">
             On its way to {letter.form.recipientName}
           </p>
         ) : null}
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/create">
-            <PixelButton
-              onClick={() => {
-                resetForm();
-              }}
-            >
-              Send another 💌
-            </PixelButton>
-          </Link>
+          {isMixtape ? (
+            <Link href="/mixtape">
+              <PixelButton>Burn another tape 📼</PixelButton>
+            </Link>
+          ) : (
+            <Link href="/create">
+              <PixelButton
+                onClick={() => {
+                  resetForm();
+                }}
+              >
+                Send another 💌
+              </PixelButton>
+            </Link>
+          )}
           <Link href="/">
             <PixelButton variant="ghost">Back home</PixelButton>
           </Link>
