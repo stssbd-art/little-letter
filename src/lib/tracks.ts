@@ -82,14 +82,6 @@ export const MIX_TRACKS: MixTrack[] = [
     youtubeId: "r3Pr1_v7hsw",
   },
   {
-    id: "because-loved",
-    title: "Because You Loved Me",
-    artist: "Céline Dion",
-    year: "1996",
-    mood: "romantic",
-    youtubeId: "fpl4if07ics",
-  },
-  {
     id: "chasing-cars",
     title: "Chasing Cars",
     artist: "Snow Patrol",
