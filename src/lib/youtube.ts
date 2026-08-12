@@ -55,11 +55,15 @@ export function loadYouTubeApi(): Promise<YtNamespace> {
   if (apiPromise) return apiPromise;
 
   apiPromise = new Promise((resolve, reject) => {
+    const finish = () => {
+      if (window.YT?.Player) resolve(window.YT);
+      else reject(new Error("YouTube API failed to load."));
+    };
+
     const previous = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
       previous?.();
-      if (window.YT?.Player) resolve(window.YT);
-      else reject(new Error("YouTube API failed to load."));
+      finish();
     };
 
     if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
@@ -68,6 +72,22 @@ export function loadYouTubeApi(): Promise<YtNamespace> {
       tag.async = true;
       tag.onerror = () => reject(new Error("Could not load YouTube."));
       document.body.appendChild(tag);
+    } else if (window.YT?.Player) {
+      // Script already loaded and ready before our callback was set
+      finish();
+    } else {
+      // Script present but not ready yet — poll briefly as a fallback
+      let tries = 0;
+      const poll = window.setInterval(() => {
+        tries += 1;
+        if (window.YT?.Player) {
+          window.clearInterval(poll);
+          finish();
+        } else if (tries > 40) {
+          window.clearInterval(poll);
+          reject(new Error("YouTube API timed out."));
+        }
+      }, 100);
     }
   });
 

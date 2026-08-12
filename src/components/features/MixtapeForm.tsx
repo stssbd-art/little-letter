@@ -44,7 +44,7 @@ const emptyDraft = {
 export function MixtapeForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { play, muted } = useSound();
+  const { play } = useSound();
   const [draft, setDraft] = useState(emptyDraft);
   const [ready, setReady] = useState(false);
   const [sending, setSending] = useState(false);
@@ -256,7 +256,7 @@ export function MixtapeForm() {
             fromName={draft.senderName}
             toName={draft.recipientName}
             tracks={selected}
-            spinning={!muted && selected.length > 0}
+            spinning={selected.length > 0}
           />
           <p className="text-center font-pixel text-[8px] leading-relaxed text-[var(--ll-muted)]">
             Hand-labelled · Side A forever · pick at least {MIN_MIXTAPE_TRACKS}{" "}

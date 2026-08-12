@@ -7,10 +7,10 @@ import { MIX_TRACKS, youtubeWatchUrl } from "@/lib/tracks";
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
 import { cn } from "@/lib/utils";
 
-const TRACKS = MIX_TRACKS.slice(0, 5);
+const TRACKS = MIX_TRACKS.slice(0, 8);
 
 export function RetroMp3Player({ className }: { className?: string }) {
-  const { play, muted } = useSound();
+  const { play } = useSound();
   const hostRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YtPlayer | null>(null);
   const indexRef = useRef(0);
@@ -18,6 +18,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [ready, setReady] = useState(false);
+  const [error, setError] = useState("");
   const track = TRACKS[index % TRACKS.length]!;
 
   useEffect(() => {
@@ -43,11 +44,15 @@ export function RetroMp3Player({ className }: { className?: string }) {
             rel: 0,
             modestbranding: 1,
             playsinline: 1,
+            controls: 1,
             origin: window.location.origin,
           },
           events: {
             onReady: () => {
-              if (!cancelled) setReady(true);
+              if (!cancelled) {
+                setReady(true);
+                setError("");
+              }
             },
             onStateChange: (event) => {
               if (cancelled) return;
@@ -61,10 +66,17 @@ export function RetroMp3Player({ className }: { className?: string }) {
                 event.target.loadVideoById(TRACKS[next]!.youtubeId);
               }
             },
+            onError: () => {
+              if (cancelled) return;
+              setError("This track couldn’t play — try Next.");
+              setPlaying(false);
+            },
           },
         });
       } catch {
-        /* keep UI usable with YouTube links */
+        if (!cancelled) {
+          setError("Could not load the music player. Check your connection.");
+        }
       }
     })();
 
@@ -76,15 +88,6 @@ export function RetroMp3Player({ className }: { className?: string }) {
     };
   }, []);
 
-  useEffect(() => {
-    const player = playerRef.current;
-    if (!player || !ready) return;
-    if (muted) {
-      player.pauseVideo();
-      setPlaying(false);
-    }
-  }, [muted, ready]);
-
   function selectTrack(next: number) {
     const player = playerRef.current;
     const nextTrack = TRACKS[next];
@@ -92,30 +95,39 @@ export function RetroMp3Player({ className }: { className?: string }) {
     play("click");
     setIndex(next);
     indexRef.current = next;
+    setError("");
     if (player && ready) {
-      player.loadVideoById(nextTrack.youtubeId);
-      if (!muted) {
+      try {
+        player.loadVideoById(nextTrack.youtubeId);
         player.playVideo();
         setPlaying(true);
+      } catch {
+        setError("Couldn’t switch track — try Play again.");
       }
     }
   }
 
-  function togglePlay() {
+  function playMix() {
     const player = playerRef.current;
     if (!player || !ready) return;
     play("click");
-    if (muted) return;
     try {
-      if (player.getPlayerState() === 1) {
-        player.pauseVideo();
-        setPlaying(false);
-      } else {
-        player.playVideo();
-        setPlaying(true);
-      }
+      player.playVideo();
+      setPlaying(true);
     } catch {
       selectTrack(index);
+    }
+  }
+
+  function stopMix() {
+    const player = playerRef.current;
+    if (!player || !ready) return;
+    play("click");
+    try {
+      player.pauseVideo();
+      setPlaying(false);
+    } catch {
+      setPlaying(false);
     }
   }
 
@@ -133,7 +145,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           LL-PLAYER LOVE
         </p>
         <p className="font-pixel text-[8px] text-[#8a7a62]">
-          {muted ? "MUTE" : playing ? "STEREO" : "READY"}
+          {!ready ? "LOAD" : playing ? "STEREO" : "READY"}
         </p>
       </div>
 
@@ -161,7 +173,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           </div>
 
           <p className="mt-3 border-t border-[#8fef7a]/20 pt-2 font-pixel text-[7px] leading-relaxed text-[#8fef7a]/80">
-            Original romantic hits via YouTube · unmute site sound to hear
+            Original romantic hits via YouTube
           </p>
         </div>
 
@@ -177,27 +189,44 @@ export function RetroMp3Player({ className }: { className?: string }) {
             onClick={() =>
               selectTrack((index - 1 + TRACKS.length) % TRACKS.length)
             }
+            disabled={!ready}
           >
             ⏮
           </button>
           <button
             type="button"
-            aria-label={playing ? "Pause" : "Play"}
-            className="rounded-lg border-2 border-[#8a7a62] bg-[#f6d58a] px-5 py-2 font-pixel text-[10px] text-[#3d2f22]"
-            onClick={togglePlay}
-            disabled={!ready || muted}
+            aria-label="Play"
+            className="rounded-lg border-2 border-[#8a7a62] bg-[#f6d58a] px-4 py-2 font-pixel text-[10px] text-[#3d2f22] disabled:opacity-50"
+            onClick={playMix}
+            disabled={!ready || playing}
           >
-            {playing ? "⏸" : "▶"}
+            ▶ PLAY
+          </button>
+          <button
+            type="button"
+            aria-label="Stop"
+            className="rounded-lg border-2 border-[#8a7a62] bg-[#fff6df] px-4 py-2 font-pixel text-[10px] text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
+            onClick={stopMix}
+            disabled={!ready || !playing}
+          >
+            ■ STOP
           </button>
           <button
             type="button"
             aria-label="Next track"
             className="rounded-lg border-2 border-[#8a7a62] bg-[#fff6df] px-3 py-2 font-pixel text-[10px] text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a]"
             onClick={() => selectTrack((index + 1) % TRACKS.length)}
+            disabled={!ready}
           >
             ⏭
           </button>
         </div>
+
+        {error ? (
+          <p className="rounded-lg border border-rose-300 bg-rose-50 px-2 py-1.5 text-center text-xs text-rose-700">
+            {error}
+          </p>
+        ) : null}
 
         <ul className="max-h-36 space-y-1 overflow-y-auto rounded-lg border border-[#b9a888]/60 bg-white/40 p-2 dark:bg-black/20">
           {TRACKS.map((t, i) => (

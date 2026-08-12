@@ -11,6 +11,10 @@ type CassetteDeckProps = {
   tracks: MixTrack[];
   spinning?: boolean;
   className?: string;
+  /** When set, shows working Play / Stop controls on the deck */
+  onPlay?: () => void;
+  onStop?: () => void;
+  controlsDisabled?: boolean;
 };
 
 export function CassetteDeck({
@@ -20,13 +24,17 @@ export function CassetteDeck({
   tracks,
   spinning = false,
   className,
+  onPlay,
+  onStop,
+  controlsDisabled = false,
 }: CassetteDeckProps) {
   const labelTitle = title.trim() || "Untitled Mix";
   const forLine = toName.trim() || "someone special";
   const fromLine = fromName.trim() || "a friend";
+  const hasControls = Boolean(onPlay || onStop);
 
   return (
-    <div className={cn("mx-auto w-full max-w-md", className)} aria-hidden={!title}>
+    <div className={cn("mx-auto w-full max-w-md", className)}>
       <div
         className={cn(
           "relative overflow-hidden rounded-[18px] border-[3px] border-[#2a2218]",
@@ -69,15 +77,20 @@ export function CassetteDeck({
             </span>
           </div>
           <div className="mt-2 space-y-0.5 border-t border-dashed border-[#8b5e34]/35 pt-2">
-            {(tracks.length ? tracks : [{ id: "empty", title: "— pick tracks —", artist: "", year: "" }]).slice(0, 4).map((t, i) => (
-              <p
-                key={t.id}
-                className="truncate font-pixel text-[7px] leading-relaxed text-[#5c4a34]"
-              >
-                {i + 1}. {t.title}
-                {t.artist ? ` · ${t.artist}` : ""}
-              </p>
-            ))}
+            {(tracks.length
+              ? tracks
+              : [{ id: "empty", title: "— pick tracks —", artist: "", year: "" }]
+            )
+              .slice(0, 4)
+              .map((t, i) => (
+                <p
+                  key={t.id}
+                  className="truncate font-pixel text-[7px] leading-relaxed text-[#5c4a34]"
+                >
+                  {i + 1}. {t.title}
+                  {t.artist ? ` · ${t.artist}` : ""}
+                </p>
+              ))}
             {tracks.length > 4 ? (
               <p className="font-pixel text-[7px] text-[#8b5e34]/70">
                 +{tracks.length - 4} more on the B-side…
@@ -87,7 +100,7 @@ export function CassetteDeck({
         </div>
 
         {/* Reel window */}
-        <div className="mx-4 mb-4 flex items-center justify-between gap-3 rounded-lg border-2 border-[#1a1510] bg-[#0f0c09] px-4 py-3 shadow-[inset_0_0_20px_rgba(0,0,0,0.65)]">
+        <div className="mx-4 mb-3 flex items-center justify-between gap-3 rounded-lg border-2 border-[#1a1510] bg-[#0f0c09] px-4 py-3 shadow-[inset_0_0_20px_rgba(0,0,0,0.65)]">
           <Reel spinning={spinning} />
           <div className="flex flex-1 flex-col items-center gap-1">
             <div className="h-1.5 w-full rounded-full bg-gradient-to-r from-[#2a2218] via-[#6b5a44] to-[#2a2218]" />
@@ -99,15 +112,45 @@ export function CassetteDeck({
           <Reel spinning={spinning} reverse />
         </div>
 
-        {/* Bottom ridges */}
-        <div className="flex justify-center gap-1 pb-3">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <span
-              key={i}
-              className="h-2 w-2 rounded-[2px] bg-[#1a1510]/80"
-            />
-          ))}
-        </div>
+        {hasControls ? (
+          <div className="mx-4 mb-4 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              aria-label="Play"
+              disabled={controlsDisabled || spinning}
+              onClick={onPlay}
+              className={cn(
+                "rounded-md border-2 border-[#1a1510] bg-gradient-to-b from-[#f6d58a] to-[#e0b45a] px-4 py-2 font-pixel text-[8px] text-[#3d2f22]",
+                "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
+                "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
+              )}
+            >
+              ▶ PLAY
+            </button>
+            <button
+              type="button"
+              aria-label="Stop"
+              disabled={controlsDisabled || !spinning}
+              onClick={onStop}
+              className={cn(
+                "rounded-md border-2 border-[#1a1510] bg-gradient-to-b from-[#d8cdb6] to-[#b9a888] px-4 py-2 font-pixel text-[8px] text-[#3d2f22]",
+                "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
+                "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
+              )}
+            >
+              ■ STOP
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center gap-1 pb-3">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <span
+                key={i}
+                className="h-2 w-2 rounded-[2px] bg-[#1a1510]/80"
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

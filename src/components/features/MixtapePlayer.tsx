@@ -205,20 +205,25 @@ export function MixtapePlayer({ mix }: Props) {
     }
   }
 
-  function togglePlay() {
+  function playMix() {
     const player = playerRef.current;
     if (!player || !ready) return;
     try {
-      const state = player.getPlayerState();
-      if (state === 1) {
-        player.pauseVideo();
-        setPlaying(false);
-      } else {
-        player.playVideo();
-        setPlaying(true);
-      }
+      player.playVideo();
+      setPlaying(true);
     } catch {
       void playIndex(index);
+    }
+  }
+
+  function stopMix() {
+    const player = playerRef.current;
+    if (!player || !ready) return;
+    try {
+      player.pauseVideo();
+      setPlaying(false);
+    } catch {
+      setPlaying(false);
     }
   }
 
@@ -252,6 +257,9 @@ export function MixtapePlayer({ mix }: Props) {
         toName={mix.to}
         tracks={tracks}
         spinning={playing}
+        onPlay={playMix}
+        onStop={stopMix}
+        controlsDisabled={!ready}
       />
 
       {mix.note ? (
@@ -298,8 +306,16 @@ export function MixtapePlayer({ mix }: Props) {
             >
               ⏮ Prev
             </PixelButton>
-            <PixelButton size="lg" onClick={togglePlay} disabled={!ready}>
-              {playing ? "⏸ Pause mix" : "▶ Play mix"}
+            <PixelButton size="lg" onClick={playMix} disabled={!ready || playing}>
+              ▶ Play mix
+            </PixelButton>
+            <PixelButton
+              variant="ghost"
+              size="lg"
+              onClick={stopMix}
+              disabled={!ready || !playing}
+            >
+              ■ Stop
             </PixelButton>
             <PixelButton
               variant="ghost"
