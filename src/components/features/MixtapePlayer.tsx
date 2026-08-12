@@ -105,11 +105,14 @@ export function MixtapePlayer({ mix }: Props) {
               }
             },
             onError: () => {
-              if (!cancelled) {
-                setError(
-                  "This video couldn’t play here. Open it on YouTube instead."
-                );
-                setPlaying(false);
+              if (cancelled) return;
+              setError(
+                "One video couldn’t play here — skipping to the next track."
+              );
+              setPlaying(false);
+              const next = indexRef.current + 1;
+              if (next < tracks.length) {
+                void playIndex(next);
               }
             },
           },
@@ -184,9 +187,12 @@ export function MixtapePlayer({ mix }: Props) {
     setProgress(0);
     clipStartRef.current = 0;
 
-    player.loadVideoById(track.youtubeId);
+    player.loadVideoById({
+      videoId: track.youtubeId,
+      startSeconds: 0,
+    });
     // Brief wait so duration metadata can arrive, then seek into the slice
-    await new Promise((r) => setTimeout(r, 400));
+    await new Promise((r) => setTimeout(r, 600));
     try {
       const startAt = pickClipStart(player.getDuration() || 0);
       clipStartRef.current = startAt;

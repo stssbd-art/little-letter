@@ -23,7 +23,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "The Righteous Brothers",
     year: "1965",
     mood: "romantic",
-    youtubeId: "qiiyRv0mrcA",
+    youtubeId: "Zv8czIoAw5w",
   },
   {
     id: "everything-i-do",
@@ -31,7 +31,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "Bryan Adams",
     year: "1991",
     mood: "romantic",
-    youtubeId: "Y0pdQU81-Iw",
+    youtubeId: "Y0pdQU87dc8",
   },
   {
     id: "your-song",
@@ -39,7 +39,7 @@ export const MIX_TRACKS: MixTrack[] = [
     artist: "Elton John",
     year: "1970",
     mood: "romantic",
-    youtubeId: "GlPyT-GLcww",
+    youtubeId: "GlPlfCy1urI",
   },
   {
     id: "all-of-me",
