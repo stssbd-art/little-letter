@@ -178,21 +178,44 @@ export function LetterPreview() {
             aria-label={open ? "Close letter" : "Open letter"}
           >
             <motion.div
-              className="mx-auto flex h-40 w-full max-w-sm items-end justify-center rounded-2xl border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f0c96a] shadow-[6px_6px_0_var(--ll-pink-shadow)]"
+              className="relative mx-auto flex h-44 w-full max-w-sm items-end justify-center overflow-hidden rounded-2xl border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f0c96a] shadow-[6px_6px_0_var(--ll-pink-shadow)]"
               animate={{ rotateX: open ? -18 : 0 }}
               style={{ transformStyle: "preserve-3d" }}
             >
+              {/* Envelope flap */}
               <motion.div
-                className="absolute left-1/2 top-0 h-0 w-0 -translate-x-1/2 border-l-[140px] border-r-[140px] border-t-[70px] border-l-transparent border-r-transparent border-t-[var(--ll-pink)] origin-top"
+                className="absolute left-1/2 top-0 z-20 h-0 w-0 -translate-x-1/2 border-l-[150px] border-r-[150px] border-t-[78px] border-l-transparent border-r-transparent border-t-[#f6c97a] origin-top drop-shadow-sm sm:border-l-[170px] sm:border-r-[170px]"
                 animate={{ rotateX: open ? 160 : 0 }}
                 transition={{ type: "spring", stiffness: 120, damping: 14 }}
               />
-              <span className="relative z-10 mb-6 text-4xl">
-                {occasion?.emoji ?? "💌"}
+
+              {/* Red love seal — closes the envelope when folded */}
+              <motion.div
+                className="absolute left-1/2 top-[42%] z-30 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+                animate={{
+                  scale: open ? 0.55 : 1,
+                  y: open ? 28 : 0,
+                  opacity: open ? 0.45 : 1,
+                }}
+                transition={{ type: "spring", stiffness: 160, damping: 16 }}
+              >
+                <span
+                  className="select-none text-5xl leading-none drop-shadow-[0_3px_0_rgba(120,20,40,0.35)] sm:text-6xl"
+                  aria-hidden
+                >
+                  ❤️
+                </span>
+                <span className="pointer-events-none absolute inset-0 rounded-full bg-[#e11d48]/15 blur-md" />
+              </motion.div>
+
+              <span className="relative z-10 mb-5 text-sm text-[var(--ll-muted)]">
+                {open ? (occasion?.emoji ?? "💌") : ""}
               </span>
             </motion.div>
             <p className="mt-3 text-center text-sm text-[var(--ll-muted)]">
-              {open ? "Tap to fold closed" : "Tap the envelope to open"}
+              {open
+                ? "Tap to seal with love"
+                : "Tap the red heart to open the envelope"}
             </p>
           </button>
 

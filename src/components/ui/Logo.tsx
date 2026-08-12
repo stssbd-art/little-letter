@@ -45,6 +45,9 @@ export function Mascot({ className = "" }: { className?: string }) {
         <div className="absolute left-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />
         <div className="absolute right-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />
         <div className="absolute bottom-9 left-1/2 h-2 w-6 -translate-x-1/2 rounded-full bg-[var(--ll-pink-deep)]" />
+        <span className="absolute bottom-3 left-1/2 -translate-x-1/2 text-xl leading-none drop-shadow-sm">
+          ❤️
+        </span>
         <motion.div
           className="absolute -right-2 -top-2 text-lg"
           animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
