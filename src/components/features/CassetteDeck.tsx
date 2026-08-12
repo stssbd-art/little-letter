@@ -109,7 +109,7 @@ export function CassetteDeck({
             </p>
             <div className="h-1.5 w-full rounded-full bg-gradient-to-r from-[#2a2218] via-[#6b5a44] to-[#2a2218]" />
           </div>
-          <Reel spinning={spinning} reverse />
+          <Reel spinning={spinning} />
         </div>
 
         {hasControls ? (
@@ -156,11 +156,11 @@ export function CassetteDeck({
   );
 }
 
-function Reel({ spinning, reverse }: { spinning: boolean; reverse?: boolean }) {
+function Reel({ spinning }: { spinning: boolean }) {
   return (
     <motion.div
-      className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#5c4a34] bg-gradient-to-br from-[#3d3228] to-[#1a1510]"
-      animate={spinning ? { rotate: reverse ? -360 : 360 } : { rotate: 0 }}
+      className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-[#5c4a34] bg-gradient-to-br from-[#3d3228] to-[#1a1510]"
+      animate={spinning ? { rotate: 360 } : { rotate: 0 }}
       transition={
         spinning
           ? { duration: 2.4, repeat: Infinity, ease: "linear" }
@@ -168,14 +168,17 @@ function Reel({ spinning, reverse }: { spinning: boolean; reverse?: boolean }) {
       }
     >
       <div className="absolute inset-2 rounded-full border border-[#6b5a44]/50" />
-      {[0, 60, 120, 180, 240, 300].map((deg) => (
+      {/* Three diameters through the hub = six even spokes */}
+      {[0, 60, 120].map((deg) => (
         <span
           key={deg}
-          className="absolute h-[2px] w-4 origin-left bg-[#8a7a62]/70"
-          style={{ transform: `rotate(${deg}deg) translateX(6px)` }}
+          className="absolute left-1/2 top-1/2 h-[2px] w-10 bg-[#8a7a62]/85"
+          style={{
+            transform: `translate(-50%, -50%) rotate(${deg}deg)`,
+          }}
         />
       ))}
-      <span className="relative z-10 h-3 w-3 rounded-full bg-[#0f0c09] ring-2 ring-[#8a7a62]" />
+      <span className="absolute left-1/2 top-1/2 z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0f0c09] ring-2 ring-[#8a7a62]" />
     </motion.div>
   );
 }
