@@ -4,6 +4,8 @@ import type { MixtapePayload } from "@/types";
 import {
   consumeMixtapeSendAccess,
   getMixtapeSendAccess,
+  MIX_MULTI_SONG_LABEL,
+  MIX_ONE_SONG_LABEL,
   mixtapePrice,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
@@ -11,6 +13,7 @@ import {
   getTracksByIds,
   MAX_MIXTAPE_TRACKS,
   MIN_MIXTAPE_TRACKS,
+  youtubeTrackId,
 } from "@/lib/tracks";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +59,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const tracks = getTracksByIds(trackIds);
+    const customTracks = Array.isArray(body.customTracks) ? body.customTracks : [];
+    const tracks = getTracksByIds(trackIds, customTracks);
     if (tracks.length !== trackIds.length) {
       return NextResponse.json(
         { error: "One or more tracks are invalid." },
@@ -69,7 +73,7 @@ export async function POST(request: Request) {
       const price = mixtapePrice(trackIds.length);
       return NextResponse.json(
         {
-          error: `Mixtapes are ${price.label} (${trackIds.length === 1 ? "1 song" : "2+ songs"}). Pay to send.`,
+          error: `Your first mixtape is free. Extra mixtapes are ${MIX_ONE_SONG_LABEL} for 1 song, or ${MIX_MULTI_SONG_LABEL} for 2 or more. This mix is ${price.label} — pay to send.`,
           requiresPayment: true,
           price: price.label,
           stripeConfigured: isStripeConfigured(),
@@ -85,6 +89,9 @@ export async function POST(request: Request) {
       title: body.title.trim().slice(0, 80),
       dedication: (body.dedication ?? "").trim().slice(0, 500),
       trackIds,
+      customTracks: customTracks.filter((t) =>
+        trackIds.includes(t.id) || trackIds.includes(youtubeTrackId(t.youtubeId))
+      ),
       createdAt: body.createdAt || new Date().toISOString(),
     };
 

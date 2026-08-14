@@ -55,6 +55,13 @@ export interface MixtapePayload {
   title: string;
   dedication: string;
   trackIds: string[];
+  customTracks?: Array<{
+    id: string;
+    title: string;
+    artist: string;
+    year: string;
+    youtubeId: string;
+  }>;
   createdAt: string;
 }
 

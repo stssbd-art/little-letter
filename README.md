@@ -28,19 +28,19 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable | Required | Description |
 |---|---|---|
-| `GMAIL_USER` | For sending | Your Gmail address |
-| `GMAIL_APP_PASSWORD` | For sending | Google App Password (not your normal password) |
-| `GMAIL_FROM_NAME` | No | Defaults to `Little Letter` |
+| `RESEND_API_KEY` | Recommended | Resend API key (best with a verified domain) |
+| `RESEND_FROM_EMAIL` | With Resend | Must be on a **verified** domain — never `@resend.dev` |
+| `GMAIL_USER` | Alternative | Gmail address (App Password SMTP) |
+| `GMAIL_APP_PASSWORD` | With Gmail | Google App Password (not your normal password) |
+| `GMAIL_FROM_NAME` | No | Your real name (as in Gmail). Leave blank or never set to `Little Letter` |
 | `OPENAI_API_KEY` | For AI messages | Falls back to warm local templates if missing |
 | `OPENAI_MODEL` | No | Defaults to `gpt-4o-mini` |
 | `STRIPE_SECRET_KEY` | For paid sends | Stripe secret key |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | For paid sends | Stripe publishable key |
-| `RESEND_API_KEY` | Optional | Use later with a verified custom domain |
-| `RESEND_FROM_EMAIL` | No | Defaults to Resend onboarding sender |
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Production URL for SEO + Stripe returns |
 | `DEMO_MODE` | No | Set `true` only for free testing (disables charges) |
 
-Gmail SMTP is preferred when configured — it can email any address (Google daily limits apply).
+**Inbox placement:** Prefer Resend + a verified custom domain (SPF, DKIM, DMARC). Shared senders like `onboarding@resend.dev` are blocked because they land in spam. Gmail SMTP is the fallback and can email any address (Google daily limits apply).
 
 **Pricing (public):** first two letters free · then £0.99 · mixtapes £1.25 (1 song) / £1.55 (2+ songs).
 

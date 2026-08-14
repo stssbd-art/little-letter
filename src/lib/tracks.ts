@@ -134,9 +134,55 @@ export const MIX_TRACKS: MixTrack[] = [
 export const MAX_MIXTAPE_TRACKS = 6;
 export const MIN_MIXTAPE_TRACKS = 1;
 
-export function getTracksByIds(ids: string[]): MixTrack[] {
+export function youtubeTrackId(youtubeId: string) {
+  return `yt:${youtubeId}`;
+}
+
+export function isCustomTrackId(id: string) {
+  return id.startsWith("yt:");
+}
+
+export function parseYoutubeIdFromTrackId(id: string) {
+  return id.startsWith("yt:") ? id.slice(3) : null;
+}
+
+export function isValidYoutubeId(id: string) {
+  return /^[\w-]{6,20}$/.test(id);
+}
+
+export function getTracksByIds(ids: string[], extras?: MixTrack[]): MixTrack[] {
+  const extraTracks = extras ?? [];
   return ids
-    .map((id) => MIX_TRACKS.find((t) => t.id === id))
+    .map((id) => {
+      const catalog = MIX_TRACKS.find((t) => t.id === id);
+      if (catalog) return catalog;
+
+      const extra = extraTracks.find(
+        (t) => t.id === id || youtubeTrackId(t.youtubeId) === id
+      );
+      if (extra && isValidYoutubeId(extra.youtubeId)) {
+        return {
+          id: extra.id.startsWith("yt:") ? extra.id : youtubeTrackId(extra.youtubeId),
+          title: extra.title,
+          artist: extra.artist,
+          year: extra.year || "",
+          youtubeId: extra.youtubeId,
+        };
+      }
+
+      const youtubeId = parseYoutubeIdFromTrackId(id);
+      if (youtubeId && isValidYoutubeId(youtubeId)) {
+        return {
+          id,
+          title: "YouTube song",
+          artist: "YouTube",
+          year: "",
+          youtubeId,
+        };
+      }
+
+      return undefined;
+    })
     .filter((t): t is MixTrack => Boolean(t));
 }
 

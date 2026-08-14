@@ -8,12 +8,12 @@ import {
   buildMixtapeEmailText,
 } from "@/lib/email-template";
 import { buildMixPlayUrl } from "@/lib/mixtape-link";
-import { SITE_URL } from "@/lib/constants";
+import { isGmailApiConfigured, sendViaGmailApi } from "@/lib/gmail-api";
 
 type SendResult = {
   id: string;
   simulated: boolean;
-  provider: "gmail" | "resend" | "demo";
+  provider: "gmail-api" | "gmail" | "resend" | "demo";
 };
 
 function getResend() {
@@ -30,49 +30,69 @@ function getGmailTransport() {
   return {
     user,
     transporter: nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      requireTLS: true,
       auth: { user, pass },
     }),
   };
 }
 
-/** Personal From line helps inboxes treat the mail as a one-to-one note. */
-function fromHeader(accountEmail: string, senderName?: string) {
-  const brand = process.env.GMAIL_FROM_NAME?.trim() || "Little Letter";
-  const who = senderName?.trim();
-  const display = who ? `${who} via ${brand}` : brand;
-  // Escape quotes in display names
-  const safe = display.replace(/"/g, "");
-  return `"${safe}" <${accountEmail}>`;
+function extractEmail(from: string): string {
+  const match = from.match(/<([^>]+)>/);
+  return (match?.[1] ?? from).trim().toLowerCase();
 }
 
-function deliverabilityHeaders(fromEmail: string) {
-  return {
-    "X-Mailer": "Little Letter",
-    "X-Entity-Ref-ID": `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-    "List-Unsubscribe": `<mailto:${fromEmail}?subject=unsubscribe>, <${SITE_URL}>`,
-    "List-Id": `<little-letter.${fromEmail.split("@")[1] ?? "mail"}>`,
-  };
+function isSandboxSender(from: string): boolean {
+  return extractEmail(from).endsWith("@resend.dev");
+}
+
+function getVerifiedResendFrom(): { replyTo: string } | null {
+  const raw = process.env.RESEND_FROM_EMAIL?.trim();
+  if (!raw || isSandboxSender(raw)) return null;
+  const email = extractEmail(raw);
+  if (!email.includes("@")) return null;
+  return { replyTo: email };
+}
+
+/** Boring personal subjects inbox filters trust — like a normal email to a friend. */
+function letterSubject(recipientName: string) {
+  return `Hi ${recipientName}`.slice(0, 78);
+}
+
+function mixtapeSubject(recipientName: string) {
+  return `Hi ${recipientName}`.slice(0, 78);
+}
+
+function hasGmailConfigured() {
+  return isGmailApiConfigured() || Boolean(getGmailTransport());
 }
 
 async function deliverEmail(opts: {
   to: string;
   subject: string;
-  html: string;
   text: string;
+  html: string;
   senderName?: string;
   logLabel: string;
 }): Promise<SendResult> {
-  const gmail = getGmailTransport();
-  if (gmail) {
-    const info = await gmail.transporter.sendMail({
-      from: fromHeader(gmail.user, opts.senderName),
+  if (isGmailApiConfigured()) {
+    const id = await sendViaGmailApi({
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
-      html: opts.html,
-      replyTo: gmail.user,
-      headers: deliverabilityHeaders(gmail.user),
+    });
+    return { id, simulated: false, provider: "gmail-api" };
+  }
+
+  const gmail = getGmailTransport();
+  if (gmail) {
+    const info = await gmail.transporter.sendMail({
+      from: gmail.user,
+      to: opts.to,
+      subject: opts.subject,
+      text: opts.text,
     });
     return {
       id: info.messageId || `gmail-${Date.now()}`,
@@ -81,19 +101,16 @@ async function deliverEmail(opts: {
     };
   }
 
-  const resend = getResend();
-  if (resend) {
-    const from =
-      process.env.RESEND_FROM_EMAIL ?? "Little Letter <onboarding@resend.dev>";
+  const verified = getVerifiedResendFrom();
+  const resend = verified ? getResend() : null;
+  if (resend && verified) {
     const { data, error } = await resend.emails.send({
-      from,
+      from: verified.replyTo,
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
       html: opts.html,
-      headers: {
-        "X-Entity-Ref-ID": `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-      },
+      replyTo: verified.replyTo,
     });
     if (error) throw new Error(error.message);
     return {
@@ -101,6 +118,18 @@ async function deliverEmail(opts: {
       simulated: false,
       provider: "resend",
     };
+  }
+
+  if (process.env.RESEND_FROM_EMAIL && isSandboxSender(process.env.RESEND_FROM_EMAIL)) {
+    throw new Error(
+      "Email blocked: onboarding@resend.dev lands in spam. Finish Gmail setup or use a verified domain."
+    );
+  }
+
+  if (process.env.NODE_ENV === "production" && !hasGmailConfigured()) {
+    throw new Error(
+      "Email is not configured. Finish Gmail setup at /api/gmail-setup or add GMAIL_APP_PASSWORD."
+    );
   }
 
   console.info(`[Little Letter] No email provider — simulating ${opts.logLabel}`, {
@@ -111,11 +140,12 @@ async function deliverEmail(opts: {
 }
 
 export async function sendLetterEmail(letter: GeneratedLetter): Promise<SendResult> {
+  const { recipientName } = letter.form;
   return deliverEmail({
     to: letter.form.recipientEmail,
-    subject: letter.subject.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim() || "A letter for you",
-    html: buildLetterEmailHtml(letter),
+    subject: letterSubject(recipientName),
     text: buildLetterEmailText(letter),
+    html: buildLetterEmailHtml(letter),
     senderName: letter.form.senderName,
     logLabel: "send",
   });
@@ -128,13 +158,14 @@ export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult>
     to: mix.recipientName,
     note: mix.dedication,
     tracks: mix.trackIds,
+    extras: mix.customTracks,
   });
 
   return deliverEmail({
     to: mix.recipientEmail,
-    subject: `Mixtape for you: ${mix.title}`.slice(0, 120),
-    html: buildMixtapeEmailHtml(mix, playUrl),
+    subject: mixtapeSubject(mix.recipientName),
     text: buildMixtapeEmailText(mix, playUrl),
+    html: buildMixtapeEmailHtml(mix, playUrl),
     senderName: mix.senderName,
     logLabel: "mixtape",
   });

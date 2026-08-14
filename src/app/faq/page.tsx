@@ -25,7 +25,7 @@ const FAQS = [
   },
   {
     q: "Why did my letter go to spam?",
-    a: "Some inboxes are strict with new senders. Ask the recipient to move it to Primary/Inbox and mark “Not spam”, or add your Little Letter Gmail address to their contacts. That usually fixes future deliveries. Using a well-known Gmail account (not a brand-new one) also helps.",
+    a: "Finish one-time Gmail setup: add GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, and GMAIL_SETUP_SECRET on Vercel, redeploy, then open /api/gmail-setup?key=YOUR_SECRET. That connects Gmail API (same send path as the Gmail app). Letters go out as plain text with subject “Hi [name]”.",
   },
   {
     q: "How are messages written?",
@@ -41,7 +41,7 @@ const FAQS = [
   },
   {
     q: "Can I send a mixtape?",
-    a: "Yes — open Mixtape, label a cassette, pick one or more romantic tracks, add an optional dedication, and email it. The Play link opens a mix of the original songs (via YouTube) — about 30 seconds per track, then the next. Pricing: £1.25 for 1 song, £1.55 for 2 or more.",
+    a: "Yes — open Mixtape, label a cassette, pick songs from the crate or search YouTube, add an optional dedication, and email it. The Play link opens the mix (via YouTube) — about 30 seconds per track, then the next. Pricing: £1.25 for 1 song, £1.55 for 2 or more.",
   },
   {
     q: "Can I mute the sounds?",

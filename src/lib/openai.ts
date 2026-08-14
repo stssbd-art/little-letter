@@ -320,15 +320,13 @@ Creative angle for THIS draft only: ${angle}
 Variation seed: ${spice}
 
 Rules:
-- Make this draft feel NEW — different wording, rhythm, and imagery than a generic template
-- Warm, magical, personal — never generic Hallmark clichés
-- Avoid stock phrases and avoid repeating prior drafts' openings
-- 120–180 words
-- Sound like a thoughtful human with a soft sense of wonder
-- Include a gentle sign-off from ${form.senderName}
-- No hashtags, no emojis in the body except optionally one at the end
+- Sound like a real person emailing a friend — casual, specific, short
+- 80–140 words
+- No marketing language, no “Little Letter”, no slogans, no hashtags
+- No emojis
+- Include a simple sign-off from ${form.senderName}
 - Return JSON with keys: subject, message
-- Subject should also feel fresh, not identical every time`;
+- Subject should be a normal personal email subject (not promotional)`;
 
   try {
     const completion = await client.chat.completions.create({
@@ -341,7 +339,7 @@ Rules:
         {
           role: "system",
           content:
-            "You write unique, heartfelt micro-letters for Little Letter. Every response must differ in imagery, sentence openings, and subject line. Never reuse the same stock phrases across drafts.",
+            "You write short personal emails that sound like a human friend, not an app or a greeting card.",
         },
         { role: "user", content: prompt },
       ],

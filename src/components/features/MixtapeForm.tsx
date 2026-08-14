@@ -15,7 +15,9 @@ import {
   MAX_MIXTAPE_TRACKS,
   MIN_MIXTAPE_TRACKS,
   MIX_TRACKS,
+  type MixTrack,
 } from "@/lib/tracks";
+import { YouTubeSongSearch } from "@/components/features/YouTubeSongSearch";
 import type { MixtapePayload } from "@/types";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -39,6 +41,7 @@ const emptyDraft = {
   title: "",
   dedication: "",
   trackIds: [] as string[],
+  customTracks: [] as MixTrack[],
 };
 
 export function MixtapeForm() {
@@ -53,14 +56,21 @@ export function MixtapeForm() {
   const [usage, setUsage] = useState<UsageInfo | null>(null);
   const [needsPayment, setNeedsPayment] = useState(false);
 
-  const selected = getTracksByIds(draft.trackIds);
+  const selected = getTracksByIds(draft.trackIds, draft.customTracks);
 
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEYS.mixtapeDraft);
       if (raw) {
-        const parsed = JSON.parse(raw) as typeof emptyDraft;
-        setDraft({ ...emptyDraft, ...parsed });
+        const parsed = JSON.parse(raw) as Partial<typeof emptyDraft>;
+        setDraft({
+          ...emptyDraft,
+          ...parsed,
+          trackIds: Array.isArray(parsed.trackIds) ? parsed.trackIds : [],
+          customTracks: Array.isArray(parsed.customTracks)
+            ? parsed.customTracks
+            : [],
+        });
       }
     } catch {
       /* ignore */
@@ -128,10 +138,31 @@ export function MixtapeForm() {
     play("click");
     setDraft((prev) => {
       if (prev.trackIds.includes(id)) {
-        return { ...prev, trackIds: prev.trackIds.filter((t) => t !== id) };
+        return {
+          ...prev,
+          trackIds: prev.trackIds.filter((t) => t !== id),
+          customTracks: prev.customTracks.filter((t) => t.id !== id),
+        };
       }
       if (prev.trackIds.length >= MAX_MIXTAPE_TRACKS) return prev;
       return { ...prev, trackIds: [...prev.trackIds, id] };
+    });
+  }
+
+  function addTrack(track: MixTrack) {
+    play("click");
+    setDraft((prev) => {
+      if (prev.trackIds.includes(track.id) || prev.trackIds.length >= MAX_MIXTAPE_TRACKS) {
+        return prev;
+      }
+      const customTracks = track.id.startsWith("yt:")
+        ? [...prev.customTracks.filter((t) => t.id !== track.id), track]
+        : prev.customTracks;
+      return {
+        ...prev,
+        trackIds: [...prev.trackIds, track.id],
+        customTracks,
+      };
     });
   }
 
@@ -166,6 +197,7 @@ export function MixtapeForm() {
       title: draft.title.trim(),
       dedication: draft.dedication.trim(),
       trackIds: draft.trackIds,
+      customTracks: draft.customTracks,
       createdAt: new Date().toISOString(),
     };
 
@@ -363,9 +395,47 @@ export function MixtapeForm() {
                 </p>
               </div>
               <p className="mb-2 text-xs text-[var(--ll-muted)]">
-                Pick at least {MIN_MIXTAPE_TRACKS} song
-                {MIN_MIXTAPE_TRACKS === 1 ? "" : "s"} — the mix won’t send without
-                them.
+                Pick from the crate, or search YouTube and add a song.
+              </p>
+
+              {selected.length ? (
+                <ul className="mb-3 space-y-1 rounded-xl border-2 border-[#d2a35a] bg-[#fff6df]/80 p-2">
+                  {selected.map((track, i) => (
+                    <li
+                      key={track.id}
+                      className="flex items-center gap-2 px-1 py-1"
+                    >
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-[#8b5e34] font-pixel text-[8px] text-[#fff6df]">
+                        {i + 1}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-display text-sm text-[var(--ll-ink)]">
+                          {track.title}
+                        </span>
+                        <span className="block truncate font-pixel text-[7px] text-[var(--ll-muted)]">
+                          {track.artist}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => toggleTrack(track.id)}
+                        className="font-pixel text-[8px] text-[var(--ll-muted)] hover:text-[var(--ll-ink)]"
+                      >
+                        remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+
+              <YouTubeSongSearch
+                selectedIds={draft.trackIds}
+                full={draft.trackIds.length >= MAX_MIXTAPE_TRACKS}
+                onAdd={addTrack}
+              />
+
+              <p className="mb-1 mt-3 font-pixel text-[8px] text-[var(--ll-muted)]">
+                From our crate
               </p>
               <ul className="max-h-64 space-y-1.5 overflow-y-auto rounded-xl border-2 border-[var(--ll-lavender)] bg-[#fffbf2]/70 p-2 dark:bg-white/5">
                 {MIX_TRACKS.map((track) => {
@@ -428,6 +498,7 @@ export function MixtapeForm() {
                       to: draft.recipientName.trim() || "someone special",
                       note: draft.dedication.trim(),
                       tracks: draft.trackIds,
+                      extras: draft.customTracks,
                     })
                   )}`}
                   target="_blank"
