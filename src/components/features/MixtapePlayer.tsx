@@ -259,7 +259,13 @@ export function MixtapePlayer({ mix }: Props) {
         spinning={playing}
         onPlay={playMix}
         onStop={stopMix}
+        onPrev={() => void playIndex(Math.max(0, index - 1))}
+        onNext={() =>
+          void playIndex(Math.min(tracks.length - 1, index + 1))
+        }
         controlsDisabled={!ready}
+        prevDisabled={index === 0}
+        nextDisabled={index >= tracks.length - 1}
       />
 
       {mix.note ? (

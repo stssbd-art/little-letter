@@ -11,10 +11,14 @@ type CassetteDeckProps = {
   tracks: MixTrack[];
   spinning?: boolean;
   className?: string;
-  /** When set, shows working Play / Stop controls on the deck */
+  /** When set, shows working Play / Stop / Prev / Next controls on the deck */
   onPlay?: () => void;
   onStop?: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
   controlsDisabled?: boolean;
+  prevDisabled?: boolean;
+  nextDisabled?: boolean;
 };
 
 export function CassetteDeck({
@@ -26,12 +30,16 @@ export function CassetteDeck({
   className,
   onPlay,
   onStop,
+  onPrev,
+  onNext,
   controlsDisabled = false,
+  prevDisabled = false,
+  nextDisabled = false,
 }: CassetteDeckProps) {
   const labelTitle = title.trim() || "Untitled Mix";
   const forLine = toName.trim() || "someone special";
   const fromLine = fromName.trim() || "a friend";
-  const hasControls = Boolean(onPlay || onStop);
+  const hasControls = Boolean(onPlay || onStop || onPrev || onNext);
 
   return (
     <div className={cn("mx-auto w-full max-w-md", className)}>
@@ -114,6 +122,21 @@ export function CassetteDeck({
 
         {hasControls ? (
           <div className="mx-4 mb-4 flex items-center justify-center gap-2">
+            {onPrev ? (
+              <button
+                type="button"
+                aria-label="Previous track"
+                disabled={controlsDisabled || prevDisabled}
+                onClick={onPrev}
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#1a1510] bg-gradient-to-b from-[#d8cdb6] to-[#b9a888] text-base text-[#3d2f22]",
+                  "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
+                  "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
+                )}
+              >
+                ⏮
+              </button>
+            ) : null}
             <button
               type="button"
               aria-label="Play"
@@ -140,6 +163,21 @@ export function CassetteDeck({
             >
               ■
             </button>
+            {onNext ? (
+              <button
+                type="button"
+                aria-label="Next track"
+                disabled={controlsDisabled || nextDisabled}
+                onClick={onNext}
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#1a1510] bg-gradient-to-b from-[#d8cdb6] to-[#b9a888] text-base text-[#3d2f22]",
+                  "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
+                  "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
+                )}
+              >
+                ⏭
+              </button>
+            ) : null}
           </div>
         ) : (
           <div className="flex justify-center gap-1 pb-3">

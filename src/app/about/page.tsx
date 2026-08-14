@@ -44,6 +44,34 @@ export default function AboutPage() {
         </div>
       </PixelWindow>
 
+      <PixelWindow title="a_little_about_me.txt" icon="💌">
+        <div className="space-y-4 text-[var(--ll-ink)]">
+          <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
+            A Little About Me 💌
+          </h2>
+          <p className="font-display text-base leading-relaxed">
+            I&apos;m just a simple girl, dreaming, creating, and trying little
+            things along the way. I&apos;m not really good at any one thing —
+            but I&apos;ve always believed that trying never hurts. ✨
+          </p>
+          <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+            With a little inspiration and influence from someone special, one of
+            those little ideas became{" "}
+            <span className="font-semibold text-[var(--ll-ink)]">
+              Little Letter
+            </span>{" "}
+            — a whimsical place for old-school feelings.
+          </p>
+          <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+            So, write something you mean. Send a little letter. Make a mixtape.{" "}
+            <span className="font-semibold text-[var(--ll-pink-deep)]">
+              Send someone a little piece of you.
+            </span>{" "}
+            💌
+          </p>
+        </div>
+      </PixelWindow>
+
       <PixelWindow title="why_we_exist.ini" icon="💫">
         <ul className="space-y-3 text-sm text-[var(--ll-ink)]">
           <li>🍀 Because kindness travels better with personality.</li>
