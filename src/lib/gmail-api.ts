@@ -5,6 +5,7 @@ type GmailApiSendOpts = {
   from: string;
   subject: string;
   text: string;
+  html: string;
 };
 
 function getGmailUser() {
@@ -31,19 +32,35 @@ function buildRawMessage(opts: {
   from: string;
   subject: string;
   text: string;
+  html: string;
 }) {
-  const body = opts.text.replace(/\r?\n/g, "\r\n");
+  const boundary = `ll_alt_${Date.now()}`;
+  const text = opts.text.replace(/\r?\n/g, "\r\n");
+  const html = opts.html.replace(/\r?\n/g, "\r\n");
+
   const lines = [
     `From: ${encodeFrom(opts.from)}`,
     `To: ${opts.to}`,
     `Subject: ${encodeSubject(opts.subject)}`,
     `Date: ${new Date().toUTCString()}`,
     "MIME-Version: 1.0",
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    "",
+    `--${boundary}`,
     "Content-Type: text/plain; charset=UTF-8",
     "Content-Transfer-Encoding: 8bit",
     "",
-    body,
+    text,
+    "",
+    `--${boundary}`,
+    "Content-Type: text/html; charset=UTF-8",
+    "Content-Transfer-Encoding: 8bit",
+    "",
+    html,
+    "",
+    `--${boundary}--`,
   ];
+
   return Buffer.from(lines.join("\r\n"), "utf8").toString("base64url");
 }
 
@@ -57,7 +74,7 @@ export function isGmailApiConfigured() {
   );
 }
 
-/** Send through Gmail API — plain text, branded From. */
+/** Send through Gmail API — styled HTML + plain text fallback. */
 export async function sendViaGmailApi(opts: GmailApiSendOpts): Promise<string> {
   if (!isGmailApiConfigured()) {
     throw new Error("Gmail API is not configured.");
@@ -72,12 +89,7 @@ export async function sendViaGmailApi(opts: GmailApiSendOpts): Promise<string> {
   });
 
   const gmail = google.gmail({ version: "v1", auth: oauth2 });
-  const raw = buildRawMessage({
-    to: opts.to,
-    from: opts.from,
-    subject: opts.subject,
-    text: opts.text,
-  });
+  const raw = buildRawMessage(opts);
 
   const { data } = await gmail.users.messages.send({
     userId: "me",

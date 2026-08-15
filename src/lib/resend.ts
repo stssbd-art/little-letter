@@ -95,6 +95,7 @@ async function deliverEmail(opts: {
       from,
       subject: opts.subject,
       text: opts.text,
+      html: opts.html,
     });
     return { id, simulated: false, provider: "gmail-api" };
   }
@@ -106,6 +107,7 @@ async function deliverEmail(opts: {
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
+      html: opts.html,
       replyTo: gmail.user,
     });
     return {
