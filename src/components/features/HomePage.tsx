@@ -60,8 +60,9 @@ export function HomePage() {
         </h2>
         <p className="font-display text-base leading-relaxed text-[var(--ll-muted)]">
           Little Letter lets you email a personal letter or a romantic mixtape
-          to someone you care about. Write a cute note for birthdays, love,
-          friendship, or &ldquo;thinking of you&rdquo; — or label a cassette,
+          to someone you care about. Write a cute note for birthdays, weddings,
+          Valentine&apos;s, Mother&apos;s or Father&apos;s Day, love, friendship,
+          or &ldquo;thinking of you&rdquo; — or label a cassette,
           pick romantic songs, and send a playable mix.
         </p>
         <p className="text-sm leading-relaxed text-[var(--ll-muted)]">

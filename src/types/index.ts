@@ -6,7 +6,13 @@ export type Occasion =
   | "thinking-of-you"
   | "thank-you"
   | "congratulations"
-  | "sorry";
+  | "sorry"
+  | "wedding"
+  | "graduation"
+  | "promotion"
+  | "valentines-day"
+  | "mothers-day"
+  | "fathers-day";
 
 export type MessageStyle =
   | "cute"

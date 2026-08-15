@@ -37,6 +37,12 @@ export const OCCASIONS: {
   { value: "thank-you", label: "Thank You", emoji: "🌻" },
   { value: "congratulations", label: "Congratulations", emoji: "🎉" },
   { value: "sorry", label: "Sorry", emoji: "💙" },
+  { value: "wedding", label: "Wedding", emoji: "💒" },
+  { value: "graduation", label: "Graduation", emoji: "🎓" },
+  { value: "promotion", label: "Promotion", emoji: "🚀" },
+  { value: "valentines-day", label: "Valentine's Day", emoji: "💝" },
+  { value: "mothers-day", label: "Mother's Day", emoji: "🌷" },
+  { value: "fathers-day", label: "Father's Day", emoji: "👔" },
 ];
 
 export const STYLES: {
