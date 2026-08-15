@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ShareBar } from "@/components/features/ShareBar";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/constants";
 
+const YEAR = new Date().getFullYear();
+
 export function Footer() {
   return (
     <footer className="relative z-10 mt-16 border-t-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]/80">
@@ -11,6 +13,10 @@ export function Footer() {
             {SITE_NAME}
           </p>
           <p className="mt-2 text-sm text-[var(--ll-muted)]">{SITE_TAGLINE}</p>
+          <p className="mt-3 text-xs leading-relaxed text-[var(--ll-muted)]">
+            © {YEAR} {SITE_NAME}. All rights reserved. Design, code, and
+            branding may not be copied without permission.
+          </p>
         </div>
         <div>
           <p className="font-display text-sm text-[var(--ll-ink)]">Explore</p>
@@ -35,6 +41,16 @@ export function Footer() {
                 FAQ
               </Link>
             </li>
+            <li>
+              <Link className="hover:text-[var(--ll-pink-deep)]" href="/terms">
+                Terms &amp; Copyright
+              </Link>
+            </li>
+            <li>
+              <Link className="hover:text-[var(--ll-pink-deep)]" href="/privacy">
+                Privacy
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
@@ -47,7 +63,20 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-[var(--ll-lavender)]/50 px-4 py-4 text-center text-xs text-[var(--ll-muted)]">
-        Made with pixel care · {new Date().getFullYear()} {SITE_NAME}
+        © {YEAR} {SITE_NAME} · All rights reserved ·{" "}
+        <Link
+          href="/terms"
+          className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
+        >
+          Terms
+        </Link>{" "}
+        ·{" "}
+        <Link
+          href="/privacy"
+          className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
+        >
+          Privacy
+        </Link>
       </div>
     </footer>
   );

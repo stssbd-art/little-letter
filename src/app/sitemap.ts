@@ -9,6 +9,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/mixtape", priority: 0.95, changeFrequency: "weekly" },
     { path: "/about", priority: 0.8, changeFrequency: "monthly" },
     { path: "/faq", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/terms", priority: 0.4, changeFrequency: "monthly" },
+    { path: "/privacy", priority: 0.4, changeFrequency: "monthly" },
   ];
 
   return pages.map(({ path, priority, changeFrequency }) => ({
