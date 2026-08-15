@@ -550,6 +550,37 @@ export function MixtapeForm() {
   const freeRemaining = usage?.freeLeft ?? 1;
   const paidReady = (usage?.credits ?? 0) > 0;
 
+  function previewMixHref(): string | null {
+    if (!draft.trackIds.length) return null;
+    try {
+      const code = encodeMixShare({
+        title: draft.title.trim() || "Untitled Mix",
+        from: draft.senderName.trim() || "a friend",
+        to: draft.recipientName.trim() || "someone special",
+        note: draft.dedication.trim(),
+        tracks: draft.trackIds,
+        extras: draft.customTracks,
+      });
+      return `/mix/${encodeURIComponent(code)}`;
+    } catch {
+      return null;
+    }
+  }
+
+  const previewHref = previewMixHref();
+
+  const previewMixButton = previewHref ? (
+    <Link href={previewHref} target="_blank" rel="noreferrer">
+      <PixelButton type="button" variant="secondary">
+        ▶ Preview mix
+      </PixelButton>
+    </Link>
+  ) : (
+    <PixelButton type="button" variant="secondary" disabled>
+      ▶ Preview mix
+    </PixelButton>
+  );
+
   return (
     <div className="space-y-6">
       <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
@@ -594,28 +625,7 @@ export function MixtapeForm() {
                 : `Hand-labelled · Side A forever · pick at least ${MIN_MIXTAPE_TRACKS} song${MIN_MIXTAPE_TRACKS === 1 ? "" : "s"}`}
             </p>
           )}
-          {draft.trackIds.length > 0 ? (
-            <div className="flex justify-center">
-              <Link
-                href={`/mix/${encodeURIComponent(
-                  encodeMixShare({
-                    title: draft.title.trim() || "Untitled Mix",
-                    from: draft.senderName.trim() || "a friend",
-                    to: draft.recipientName.trim() || "someone special",
-                    note: draft.dedication.trim(),
-                    tracks: draft.trackIds,
-                    extras: draft.customTracks,
-                  })
-                )}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <PixelButton type="button" variant="secondary">
-                  ▶ Preview mix
-                </PixelButton>
-              </Link>
-            </div>
-          ) : null}
+          <div className="flex justify-center">{previewMixButton}</div>
         </div>
 
         <PixelWindow title="make_a_mix.bat" icon="📼" liftOnHover={false}>
@@ -836,30 +846,7 @@ export function MixtapeForm() {
             />
 
             <div className="flex flex-wrap gap-3 pt-1">
-              {draft.trackIds.length > 0 ? (
-                <Link
-                  href={`/mix/${encodeURIComponent(
-                    encodeMixShare({
-                      title: draft.title.trim() || "Untitled Mix",
-                      from: draft.senderName.trim() || "a friend",
-                      to: draft.recipientName.trim() || "someone special",
-                      note: draft.dedication.trim(),
-                      tracks: draft.trackIds,
-                      extras: draft.customTracks,
-                    })
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <PixelButton type="button" variant="secondary">
-                    ▶ Preview mix
-                  </PixelButton>
-                </Link>
-              ) : (
-                <PixelButton type="button" variant="secondary" disabled>
-                  ▶ Preview mix
-                </PixelButton>
-              )}
+              {previewMixButton}
               {needsPayment && !demo ? (
                 <PixelButton
                   type="submit"
@@ -882,7 +869,7 @@ export function MixtapeForm() {
                 </PixelButton>
               )}
             </div>
-            {draft.trackIds.length === 0 ? (
+            {!previewHref ? (
               <p className="text-xs text-[var(--ll-muted)]">
                 Add at least one song to unlock Preview mix.
               </p>
