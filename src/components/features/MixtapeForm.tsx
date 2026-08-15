@@ -594,6 +594,28 @@ export function MixtapeForm() {
                 : `Hand-labelled · Side A forever · pick at least ${MIN_MIXTAPE_TRACKS} song${MIN_MIXTAPE_TRACKS === 1 ? "" : "s"}`}
             </p>
           )}
+          {draft.trackIds.length > 0 ? (
+            <div className="flex justify-center">
+              <Link
+                href={`/mix/${encodeURIComponent(
+                  encodeMixShare({
+                    title: draft.title.trim() || "Untitled Mix",
+                    from: draft.senderName.trim() || "a friend",
+                    to: draft.recipientName.trim() || "someone special",
+                    note: draft.dedication.trim(),
+                    tracks: draft.trackIds,
+                    extras: draft.customTracks,
+                  })
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <PixelButton type="button" variant="secondary">
+                  ▶ Preview mix
+                </PixelButton>
+              </Link>
+            </div>
+          ) : null}
         </div>
 
         <PixelWindow title="make_a_mix.bat" icon="📼" liftOnHover={false}>
@@ -814,8 +836,7 @@ export function MixtapeForm() {
             />
 
             <div className="flex flex-wrap gap-3 pt-1">
-              {draft.trackIds.length >= MIN_MIXTAPE_TRACKS &&
-              draft.title.trim() ? (
+              {draft.trackIds.length > 0 ? (
                 <Link
                   href={`/mix/${encodeURIComponent(
                     encodeMixShare({
@@ -834,7 +855,11 @@ export function MixtapeForm() {
                     ▶ Preview mix
                   </PixelButton>
                 </Link>
-              ) : null}
+              ) : (
+                <PixelButton type="button" variant="secondary" disabled>
+                  ▶ Preview mix
+                </PixelButton>
+              )}
               {needsPayment && !demo ? (
                 <PixelButton
                   type="submit"
@@ -857,6 +882,11 @@ export function MixtapeForm() {
                 </PixelButton>
               )}
             </div>
+            {draft.trackIds.length === 0 ? (
+              <p className="text-xs text-[var(--ll-muted)]">
+                Add at least one song to unlock Preview mix.
+              </p>
+            ) : null}
           </form>
         </PixelWindow>
       </div>
