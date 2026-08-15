@@ -38,11 +38,11 @@ export function mixtapePrice(trackCount: number) {
 }
 
 /**
- * Free testing locked ON — no Stripe charges.
- * Flip this to `return false` (or wire DEMO_MODE again) when ready for paid launch.
+ * Public launch: payments ON by default.
+ * Set DEMO_MODE=true on Vercel only for temporary free testing.
  */
 export function isDemoMode() {
-  return true;
+  return process.env.DEMO_MODE === "true";
 }
 
 export function paymentsEnabled() {

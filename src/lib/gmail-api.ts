@@ -2,8 +2,8 @@ import { google } from "googleapis";
 
 type GmailApiSendOpts = {
   to: string;
-  /** Optional — omit so Gmail stamps the signed-in account (profile name + avatar). */
-  from?: string;
+  /** Always set — branded "Little Letter" From for consistent inbox display. */
+  from: string;
   subject: string;
   text: string;
   html: string;
@@ -30,7 +30,7 @@ function encodeFrom(from: string) {
 
 function buildRawMessage(opts: {
   to: string;
-  from?: string;
+  from: string;
   subject: string;
   text: string;
   html: string;
@@ -40,8 +40,7 @@ function buildRawMessage(opts: {
   const html = opts.html.replace(/\r?\n/g, "\r\n");
 
   const lines = [
-    // No From header → Gmail uses the OAuth account’s real name + Google avatar
-    ...(opts.from ? [`From: ${encodeFrom(opts.from)}`] : []),
+    `From: ${encodeFrom(opts.from)}`,
     `To: ${opts.to}`,
     `Subject: ${encodeSubject(opts.subject)}`,
     `Date: ${new Date().toUTCString()}`,
