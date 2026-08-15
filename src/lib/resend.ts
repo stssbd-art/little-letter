@@ -83,6 +83,28 @@ function hasGmailConfigured() {
   return isGmailApiConfigured() || Boolean(getGmailTransport());
 }
 
+function friendlyMailError(err: unknown): Error {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/535|BadCredentials|Username and Password not accepted/i.test(msg)) {
+    return new Error(
+      "Gmail rejected the login. On Vercel, update GMAIL_APP_PASSWORD with a new Google App Password (Google Account → Security → 2-Step Verification → App passwords) for the same GMAIL_USER, then redeploy. Or finish Gmail API setup at /api/gmail-setup."
+    );
+  }
+  return err instanceof Error ? err : new Error(msg);
+}
+
+/** Verify SMTP credentials (used by /api/gmail-setup?check=1). */
+export async function verifyGmailSmtp(): Promise<{ ok: boolean; error?: string }> {
+  const gmail = getGmailTransport();
+  if (!gmail) return { ok: false, error: "GMAIL_USER or GMAIL_APP_PASSWORD not set." };
+  try {
+    await gmail.transporter.verify();
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: friendlyMailError(err).message };
+  }
+}
+
 async function deliverEmail(opts: {
   to: string;
   subject: string;
@@ -92,30 +114,38 @@ async function deliverEmail(opts: {
 }): Promise<SendResult> {
   if (isGmailApiConfigured()) {
     // Omit From so Gmail stamps the signed-in account (name + Google avatar).
-    const id = await sendViaGmailApi({
-      to: opts.to,
-      subject: opts.subject,
-      text: opts.text,
-      html: opts.html,
-    });
-    return { id, simulated: false, provider: "gmail-api" };
+    try {
+      const id = await sendViaGmailApi({
+        to: opts.to,
+        subject: opts.subject,
+        text: opts.text,
+        html: opts.html,
+      });
+      return { id, simulated: false, provider: "gmail-api" };
+    } catch (err) {
+      throw friendlyMailError(err);
+    }
   }
 
   const gmail = getGmailTransport();
   if (gmail) {
-    const info = await gmail.transporter.sendMail({
-      from: personalFrom(gmail.user),
-      to: opts.to,
-      subject: opts.subject,
-      text: opts.text,
-      html: opts.html,
-      replyTo: gmail.user,
-    });
-    return {
-      id: info.messageId || `gmail-${Date.now()}`,
-      simulated: false,
-      provider: "gmail",
-    };
+    try {
+      const info = await gmail.transporter.sendMail({
+        from: personalFrom(gmail.user),
+        to: opts.to,
+        subject: opts.subject,
+        text: opts.text,
+        html: opts.html,
+        replyTo: gmail.user,
+      });
+      return {
+        id: info.messageId || `gmail-${Date.now()}`,
+        simulated: false,
+        provider: "gmail",
+      };
+    } catch (err) {
+      throw friendlyMailError(err);
+    }
   }
 
   const verified = getVerifiedResendFrom();

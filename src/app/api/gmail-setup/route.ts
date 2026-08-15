@@ -5,6 +5,7 @@ import {
   verifyGmailSetupSecret,
 } from "@/lib/gmail-oauth";
 import { isGmailApiConfigured } from "@/lib/gmail-api";
+import { verifyGmailSmtp } from "@/lib/resend";
 
 export const dynamic = "force-dynamic";
 
@@ -26,14 +27,17 @@ export async function GET(request: Request) {
   if (url.searchParams.get("check") === "1") {
     const from = process.env.GMAIL_USER?.trim() || "";
     const gmailApi = isGmailApiConfigured();
-    const smtp = Boolean(
+    const smtpConfigured = Boolean(
       process.env.GMAIL_USER?.trim() && process.env.GMAIL_APP_PASSWORD?.replace(/\s+/g, "")
     );
+    const smtp = smtpConfigured && !gmailApi ? await verifyGmailSmtp() : null;
     return NextResponse.json({
       gmailApi,
-      smtpFallback: smtp && !gmailApi,
+      smtpFallback: smtpConfigured && !gmailApi,
+      smtpOk: gmailApi ? true : smtp?.ok ?? false,
+      smtpError: smtp && !smtp.ok ? smtp.error : undefined,
       from: from ? maskEmail(from) : "(not set)",
-      ready: gmailApi,
+      ready: gmailApi || Boolean(smtp?.ok),
     });
   }
 
