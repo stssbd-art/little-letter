@@ -2,10 +2,12 @@ import nodemailer from "nodemailer";
 import { Resend } from "resend";
 import type { GeneratedLetter, MixtapePayload } from "@/types";
 import {
+  EMAIL_LOGO_CID,
   buildLetterEmailHtml,
   buildLetterEmailText,
   buildMixtapeEmailHtml,
   buildMixtapeEmailText,
+  getEmailLogoBuffer,
 } from "@/lib/email-template";
 import { buildMixPlayUrl } from "@/lib/mixtape-link";
 import { isGmailApiConfigured, sendViaGmailApi } from "@/lib/gmail-api";
@@ -69,11 +71,21 @@ function hasGmailConfigured() {
   return isGmailApiConfigured() || Boolean(getGmailTransport());
 }
 
+function logoAttachment() {
+  return {
+    filename: "email-logo.jpg",
+    content: getEmailLogoBuffer(),
+    cid: EMAIL_LOGO_CID,
+    contentType: "image/jpeg",
+  };
+}
+
 async function deliverEmail(opts: {
   to: string;
   subject: string;
   text: string;
-  html: string;
+  htmlCid: string;
+  htmlRemote: string;
   senderName?: string;
   logLabel: string;
 }): Promise<SendResult> {
@@ -82,6 +94,7 @@ async function deliverEmail(opts: {
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
+      html: opts.htmlCid,
     });
     return { id, simulated: false, provider: "gmail-api" };
   }
@@ -93,6 +106,8 @@ async function deliverEmail(opts: {
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
+      html: opts.htmlCid,
+      attachments: [logoAttachment()],
     });
     return {
       id: info.messageId || `gmail-${Date.now()}`,
@@ -109,7 +124,7 @@ async function deliverEmail(opts: {
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
-      html: opts.html,
+      html: opts.htmlRemote,
       replyTo: verified.replyTo,
     });
     if (error) throw new Error(error.message);
@@ -145,7 +160,8 @@ export async function sendLetterEmail(letter: GeneratedLetter): Promise<SendResu
     to: letter.form.recipientEmail,
     subject: letterSubject(recipientName),
     text: buildLetterEmailText(letter),
-    html: buildLetterEmailHtml(letter),
+    htmlCid: buildLetterEmailHtml(letter, { useCid: true }),
+    htmlRemote: buildLetterEmailHtml(letter, { useCid: false }),
     senderName: letter.form.senderName,
     logLabel: "send",
   });
@@ -165,7 +181,8 @@ export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult>
     to: mix.recipientEmail,
     subject: mixtapeSubject(mix.recipientName),
     text: buildMixtapeEmailText(mix, playUrl),
-    html: buildMixtapeEmailHtml(mix, playUrl),
+    htmlCid: buildMixtapeEmailHtml(mix, playUrl, { useCid: true }),
+    htmlRemote: buildMixtapeEmailHtml(mix, playUrl, { useCid: false }),
     senderName: mix.senderName,
     logLabel: "mixtape",
   });

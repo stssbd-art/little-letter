@@ -1,9 +1,14 @@
 import { google } from "googleapis";
+import {
+  EMAIL_LOGO_CID,
+  getEmailLogoBuffer,
+} from "@/lib/email-template";
 
 type GmailApiSendOpts = {
   to: string;
   subject: string;
   text: string;
+  html: string;
 };
 
 function getGmailUser() {
@@ -15,19 +20,55 @@ function encodeSubject(subject: string) {
   return `=?UTF-8?B?${Buffer.from(subject, "utf8").toString("base64")}?=`;
 }
 
-/** Let Gmail stamp From — matching the signed-in account (same as the Gmail app). */
-function buildRawMessage(opts: { to: string; subject: string; text: string }) {
-  const body = opts.text.replace(/\r?\n/g, "\r\n");
+function buildRawMessage(opts: {
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+}) {
+  const boundaryAlt = `ll_alt_${Date.now()}`;
+  const boundaryRel = `ll_rel_${Date.now()}`;
+  const text = opts.text.replace(/\r?\n/g, "\r\n");
+  const html = opts.html.replace(/\r?\n/g, "\r\n");
+  const logoB64 = getEmailLogoBuffer().toString("base64");
+  // Fold base64 to 76-char lines for SMTP-ish compatibility
+  const logoFolded = logoB64.replace(/.{1,76}/g, "$&\r\n").trimEnd();
+
   const lines = [
     `To: ${opts.to}`,
     `Subject: ${encodeSubject(opts.subject)}`,
     `Date: ${new Date().toUTCString()}`,
     "MIME-Version: 1.0",
+    `Content-Type: multipart/related; boundary="${boundaryRel}"`,
+    "",
+    `--${boundaryRel}`,
+    `Content-Type: multipart/alternative; boundary="${boundaryAlt}"`,
+    "",
+    `--${boundaryAlt}`,
     "Content-Type: text/plain; charset=UTF-8",
     "Content-Transfer-Encoding: 8bit",
     "",
-    body,
+    text,
+    "",
+    `--${boundaryAlt}`,
+    "Content-Type: text/html; charset=UTF-8",
+    "Content-Transfer-Encoding: 8bit",
+    "",
+    html,
+    "",
+    `--${boundaryAlt}--`,
+    "",
+    `--${boundaryRel}`,
+    "Content-Type: image/jpeg; name=\"email-logo.jpg\"",
+    "Content-Transfer-Encoding: base64",
+    `Content-ID: <${EMAIL_LOGO_CID}>`,
+    'Content-Disposition: inline; filename="email-logo.jpg"',
+    "",
+    logoFolded,
+    "",
+    `--${boundaryRel}--`,
   ];
+
   return Buffer.from(lines.join("\r\n"), "utf8").toString("base64url");
 }
 
@@ -41,7 +82,7 @@ export function isGmailApiConfigured() {
   );
 }
 
-/** Send through Gmail API — same pipeline as the Gmail app. */
+/** Send through Gmail API — HTML + embedded logo (CID). */
 export async function sendViaGmailApi(opts: GmailApiSendOpts): Promise<string> {
   const user = getGmailUser();
   if (!isGmailApiConfigured()) {
@@ -61,6 +102,7 @@ export async function sendViaGmailApi(opts: GmailApiSendOpts): Promise<string> {
     to: opts.to,
     subject: opts.subject,
     text: opts.text,
+    html: opts.html,
   });
 
   const { data } = await gmail.users.messages.send({
