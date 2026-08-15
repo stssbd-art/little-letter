@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import confetti from "canvas-confetti";
 import { CassetteDeck } from "@/components/features/CassetteDeck";
@@ -17,10 +17,14 @@ import {
   MIX_TRACKS,
   type MixTrack,
 } from "@/lib/tracks";
+import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
 import { YouTubeSongSearch } from "@/components/features/YouTubeSongSearch";
+import { TermsAcceptance } from "@/components/features/TermsAcceptance";
 import type { MixtapePayload } from "@/types";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+
+const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
 type UsageInfo = {
   demo?: boolean;
@@ -56,8 +60,209 @@ export function MixtapeForm() {
   const [usage, setUsage] = useState<UsageInfo | null>(null);
   const [needsPayment, setNeedsPayment] = useState(false);
   const [shareExample, setShareExample] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const playerRef = useRef<YtPlayer | null>(null);
+  const indexRef = useRef(0);
+  const tracksRef = useRef<MixTrack[]>([]);
+  const pendingPlayIdRef = useRef<string | null>(null);
+  const [playIndex, setPlayIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [playerReady, setPlayerReady] = useState(false);
+  const [playerError, setPlayerError] = useState("");
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(TERMS_STORAGE_KEY) === "1") {
+        setAcceptedTerms(true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  function updateAcceptedTerms(next: boolean) {
+    setAcceptedTerms(next);
+    try {
+      sessionStorage.setItem(TERMS_STORAGE_KEY, next ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function hasAcceptedTerms() {
+    if (acceptedTerms) return true;
+    try {
+      return sessionStorage.getItem(TERMS_STORAGE_KEY) === "1";
+    } catch {
+      return false;
+    }
+  }
 
   const selected = getTracksByIds(draft.trackIds, draft.customTracks);
+
+  useEffect(() => {
+    tracksRef.current = selected;
+    if (!selected.length) {
+      setPlaying(false);
+      setPlayIndex(0);
+      indexRef.current = 0;
+      try {
+        playerRef.current?.pauseVideo();
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
+    if (playIndex >= selected.length) {
+      const next = selected.length - 1;
+      setPlayIndex(next);
+      indexRef.current = next;
+    }
+  }, [selected, playIndex]);
+
+  useEffect(() => {
+    indexRef.current = playIndex;
+  }, [playIndex]);
+
+  useEffect(() => {
+    if (!hostRef.current) return;
+    let cancelled = false;
+    const mount = hostRef.current;
+    const seedId =
+      MIX_TRACKS[0]?.youtubeId ||
+      selected[0]?.youtubeId ||
+      "dQw4w9WgXcQ";
+
+    void (async () => {
+      try {
+        const YT = await loadYouTubeApi();
+        if (cancelled || !mount) return;
+
+        playerRef.current?.destroy();
+        playerRef.current = new YT.Player(mount, {
+          videoId: seedId,
+          width: "100%",
+          height: "100%",
+          playerVars: {
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+            controls: 1,
+            origin: window.location.origin,
+          },
+          events: {
+            onReady: () => {
+              if (cancelled) return;
+              setPlayerReady(true);
+              setPlayerError("");
+              const pending = pendingPlayIdRef.current;
+              if (pending) {
+                pendingPlayIdRef.current = null;
+                try {
+                  playerRef.current?.loadVideoById(pending);
+                  playerRef.current?.playVideo();
+                  setPlaying(true);
+                } catch {
+                  setPlayerError("Couldn’t start playback — tap Play on the deck.");
+                }
+              }
+            },
+            onStateChange: (event) => {
+              if (cancelled) return;
+              const { ENDED, PLAYING, PAUSED } = YT.PlayerState;
+              if (event.data === PLAYING) setPlaying(true);
+              if (event.data === PAUSED) setPlaying(false);
+              if (event.data === ENDED) {
+                const list = tracksRef.current;
+                if (list.length < 2) {
+                  setPlaying(false);
+                  return;
+                }
+                const next = (indexRef.current + 1) % list.length;
+                setPlayIndex(next);
+                indexRef.current = next;
+                event.target.loadVideoById(list[next]!.youtubeId);
+              }
+            },
+            onError: () => {
+              if (cancelled) return;
+              setPlayerError("This track couldn’t play — try another song.");
+              setPlaying(false);
+            },
+          },
+        });
+      } catch {
+        if (!cancelled) {
+          setPlayerError("Could not load the music player. Check your connection.");
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      playerRef.current?.destroy();
+      playerRef.current = null;
+      setPlayerReady(false);
+    };
+    // Mount once for the form session
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function playTrackAt(list: MixTrack[], next: number) {
+    const nextTrack = list[next];
+    if (!nextTrack) return;
+    setPlayIndex(next);
+    indexRef.current = next;
+    setPlayerError("");
+    const player = playerRef.current;
+    if (player && playerReady) {
+      try {
+        player.loadVideoById(nextTrack.youtubeId);
+        player.playVideo();
+        setPlaying(true);
+      } catch {
+        setPlayerError("Couldn’t switch track — tap Play on the deck.");
+      }
+    } else {
+      pendingPlayIdRef.current = nextTrack.youtubeId;
+    }
+  }
+
+  function playSelected() {
+    const list = tracksRef.current;
+    if (!list.length) return;
+    play("click");
+    playTrackAt(list, Math.min(indexRef.current, list.length - 1));
+  }
+
+  function stopSelected() {
+    const player = playerRef.current;
+    play("click");
+    try {
+      player?.pauseVideo();
+    } catch {
+      /* ignore */
+    }
+    setPlaying(false);
+  }
+
+  function prevSelected() {
+    const list = tracksRef.current;
+    if (list.length < 2) return;
+    play("click");
+    const next = (indexRef.current - 1 + list.length) % list.length;
+    playTrackAt(list, next);
+  }
+
+  function nextSelected() {
+    const list = tracksRef.current;
+    if (list.length < 2) return;
+    play("click");
+    const next = (indexRef.current + 1) % list.length;
+    playTrackAt(list, next);
+  }
 
   useEffect(() => {
     try {
@@ -140,33 +345,75 @@ export function MixtapeForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Stripe return
   }, [searchParams, ready]);
 
+  function removeTrack(id: string) {
+    play("click");
+    setDraft((prev) => {
+      const nextIds = prev.trackIds.filter((t) => t !== id);
+      const nextCustoms = prev.customTracks.filter((t) => t.id !== id);
+      const nextList = getTracksByIds(nextIds, nextCustoms);
+      window.setTimeout(() => {
+        if (!nextList.length) {
+          try {
+            playerRef.current?.pauseVideo();
+          } catch {
+            /* ignore */
+          }
+          setPlaying(false);
+          return;
+        }
+        const currentId = tracksRef.current[indexRef.current]?.id;
+        const stillHere = nextList.findIndex((t) => t.id === currentId);
+        playTrackAt(nextList, stillHere >= 0 ? stillHere : 0);
+      }, 0);
+      return {
+        ...prev,
+        trackIds: nextIds,
+        customTracks: nextCustoms,
+      };
+    });
+  }
+
   function toggleTrack(id: string) {
     play("click");
     setDraft((prev) => {
       if (prev.trackIds.includes(id)) {
-        return {
-          ...prev,
-          trackIds: prev.trackIds.filter((t) => t !== id),
-          customTracks: prev.customTracks.filter((t) => t.id !== id),
-        };
+        // Already on the tape — audition it (use Remove to drop it)
+        const list = getTracksByIds(prev.trackIds, prev.customTracks);
+        const idx = list.findIndex((t) => t.id === id);
+        window.setTimeout(() => playTrackAt(list, idx >= 0 ? idx : 0), 0);
+        return prev;
       }
       if (prev.trackIds.length >= MAX_MIXTAPE_TRACKS) return prev;
-      return { ...prev, trackIds: [...prev.trackIds, id] };
+      const nextIds = [...prev.trackIds, id];
+      const nextList = getTracksByIds(nextIds, prev.customTracks);
+      const addedAt = nextList.findIndex((t) => t.id === id);
+      window.setTimeout(
+        () => playTrackAt(nextList, addedAt >= 0 ? addedAt : nextList.length - 1),
+        0
+      );
+      return { ...prev, trackIds: nextIds };
     });
   }
 
   function addTrack(track: MixTrack) {
     play("click");
     setDraft((prev) => {
-      if (prev.trackIds.includes(track.id) || prev.trackIds.length >= MAX_MIXTAPE_TRACKS) {
+      if (prev.trackIds.includes(track.id)) {
+        const list = getTracksByIds(prev.trackIds, prev.customTracks);
+        const existing = list.findIndex((t) => t.id === track.id);
+        window.setTimeout(() => playTrackAt(list, existing >= 0 ? existing : 0), 0);
         return prev;
       }
+      if (prev.trackIds.length >= MAX_MIXTAPE_TRACKS) return prev;
       const customTracks = track.id.startsWith("yt:")
         ? [...prev.customTracks.filter((t) => t.id !== track.id), track]
         : prev.customTracks;
+      const nextIds = [...prev.trackIds, track.id];
+      const nextList = getTracksByIds(nextIds, customTracks);
+      window.setTimeout(() => playTrackAt(nextList, nextList.length - 1), 0);
       return {
         ...prev,
-        trackIds: [...prev.trackIds, track.id],
+        trackIds: nextIds,
         customTracks,
       };
     });
@@ -181,6 +428,9 @@ export function MixtapeForm() {
     if (!draft.title.trim()) return "Give the mixtape a title.";
     if (draft.trackIds.length < MIN_MIXTAPE_TRACKS) {
       return `Pick at least ${MIN_MIXTAPE_TRACKS} song${MIN_MIXTAPE_TRACKS === 1 ? "" : "s"} for the mix.`;
+    }
+    if (!hasAcceptedTerms()) {
+      return "Please agree to the Terms, Privacy Policy, and Refund Policy before sending.";
     }
     return null;
   }
@@ -321,12 +571,29 @@ export function MixtapeForm() {
             fromName={draft.senderName}
             toName={draft.recipientName}
             tracks={selected}
-            spinning={selected.length > 0}
+            spinning={playing}
+            onPlay={playSelected}
+            onStop={stopSelected}
+            onPrev={prevSelected}
+            onNext={nextSelected}
+            controlsDisabled={!playerReady || selected.length === 0}
+            prevDisabled={selected.length < 2}
+            nextDisabled={selected.length < 2}
           />
-          <p className="text-center font-pixel text-[8px] leading-relaxed text-[var(--ll-muted)]">
-            Hand-labelled · Side A forever · pick at least {MIN_MIXTAPE_TRACKS}{" "}
-            song{MIN_MIXTAPE_TRACKS === 1 ? "" : "s"}
-          </p>
+          <div className="aspect-video overflow-hidden rounded-xl border-[3px] border-[#2a2218] bg-black shadow-[6px_6px_0_rgba(61,47,34,0.18)]">
+            <div ref={hostRef} className="h-full w-full" />
+          </div>
+          {playerError ? (
+            <p className="text-center text-xs text-[var(--ll-pink-deep)]">{playerError}</p>
+          ) : (
+            <p className="text-center font-pixel text-[8px] leading-relaxed text-[var(--ll-muted)]">
+              {selected.length
+                ? playing
+                  ? `Now playing · ${selected[playIndex]?.title ?? "your mix"}`
+                  : "Tap a song to audition it on the deck"
+                : `Hand-labelled · Side A forever · pick at least ${MIN_MIXTAPE_TRACKS} song${MIN_MIXTAPE_TRACKS === 1 ? "" : "s"}`}
+            </p>
+          )}
         </div>
 
         <PixelWindow title="make_a_mix.bat" icon="📼" liftOnHover={false}>
@@ -424,22 +691,36 @@ export function MixtapeForm() {
                   {selected.map((track, i) => (
                     <li
                       key={track.id}
-                      className="flex items-center gap-2 px-1 py-1"
+                      className={cn(
+                        "flex items-center gap-2 rounded-lg px-1 py-1",
+                        i === playIndex && playing
+                          ? "bg-[#f6d58a]/50"
+                          : "hover:bg-[#f6d58a]/25"
+                      )}
                     >
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-[#8b5e34] font-pixel text-[8px] text-[#fff6df]">
-                        {i + 1}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-display text-sm text-[var(--ll-ink)]">
-                          {track.title}
-                        </span>
-                        <span className="block truncate font-pixel text-[7px] text-[var(--ll-muted)]">
-                          {track.artist}
-                        </span>
-                      </span>
                       <button
                         type="button"
-                        onClick={() => toggleTrack(track.id)}
+                        className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                        onClick={() => {
+                          play("click");
+                          playTrackAt(selected, i);
+                        }}
+                      >
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-[#8b5e34] font-pixel text-[8px] text-[#fff6df]">
+                          {i + 1}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-display text-sm text-[var(--ll-ink)]">
+                            {track.title}
+                          </span>
+                          <span className="block truncate font-pixel text-[7px] text-[var(--ll-muted)]">
+                            {track.artist}
+                          </span>
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeTrack(track.id)}
                         className="font-pixel text-[8px] text-[var(--ll-muted)] hover:text-[var(--ll-ink)]"
                       >
                         remove
@@ -526,6 +807,12 @@ export function MixtapeForm() {
               </span>
             </label>
 
+            <TermsAcceptance
+              checked={acceptedTerms}
+              onChange={updateAcceptedTerms}
+              id="mixtape-accept-terms"
+            />
+
             <div className="flex flex-wrap gap-3 pt-1">
               {draft.trackIds.length >= MIN_MIXTAPE_TRACKS &&
               draft.title.trim() ? (
@@ -552,7 +839,7 @@ export function MixtapeForm() {
                 <PixelButton
                   type="submit"
                   size="lg"
-                  disabled={paying || sending}
+                  disabled={paying || sending || !acceptedTerms}
                 >
                   {paying ? "Opening checkout..." : `💳 Pay ${priceLabel} & send mix`}
                 </PixelButton>
@@ -560,7 +847,7 @@ export function MixtapeForm() {
                 <PixelButton
                   type="submit"
                   size="lg"
-                  disabled={sending || paying}
+                  disabled={sending || paying || !acceptedTerms}
                 >
                   {sending || paying
                     ? "Posting the tape..."
