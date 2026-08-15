@@ -48,6 +48,18 @@ export interface GuestbookEntry {
   createdAt: string;
 }
 
+/** Opt-in homepage example — short preview only, never emails. */
+export interface SharedExample {
+  id: string;
+  kind: "letter" | "mixtape";
+  fromName: string;
+  toName: string;
+  /** Occasion label (letter) or mixtape title */
+  label: string;
+  snippet: string;
+  createdAt: string;
+}
+
 export interface MixtapePayload {
   recipientName: string;
   recipientEmail: string;

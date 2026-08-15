@@ -15,6 +15,7 @@ import {
   MIN_MIXTAPE_TRACKS,
   youtubeTrackId,
 } from "@/lib/tracks";
+import { addMixtapeExample } from "@/lib/shared-examples";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,9 @@ function isValidEmail(email: string) {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as Partial<MixtapePayload>;
+    const body = (await request.json()) as Partial<MixtapePayload> & {
+      shareExample?: boolean;
+    };
 
     if (!body.recipientEmail || !isValidEmail(body.recipientEmail)) {
       return NextResponse.json(
@@ -89,14 +92,24 @@ export async function POST(request: Request) {
       title: body.title.trim().slice(0, 80),
       dedication: (body.dedication ?? "").trim().slice(0, 500),
       trackIds,
-      customTracks: customTracks.filter((t) =>
-        trackIds.includes(t.id) || trackIds.includes(youtubeTrackId(t.youtubeId))
+      customTracks: customTracks.filter(
+        (t) =>
+          trackIds.includes(t.id) ||
+          trackIds.includes(youtubeTrackId(t.youtubeId))
       ),
       createdAt: body.createdAt || new Date().toISOString(),
     };
 
     const result = await sendMixtapeEmail(mix);
     const usage = await consumeMixtapeSendAccess();
+
+    if (body.shareExample) {
+      try {
+        await addMixtapeExample(mix);
+      } catch {
+        /* optional — never fail the send */
+      }
+    }
 
     return NextResponse.json({
       ok: true,

@@ -8,6 +8,7 @@ import {
   LETTER_PRICE_LABEL,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
+import { addLetterExample } from "@/lib/shared-examples";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,9 @@ function isValidEmail(email: string) {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as GeneratedLetter;
+    const body = (await request.json()) as GeneratedLetter & {
+      shareExample?: boolean;
+    };
 
     if (!body?.form?.recipientEmail || !isValidEmail(body.form.recipientEmail)) {
       return NextResponse.json(
@@ -54,6 +57,14 @@ export async function POST(request: Request) {
 
     const result = await sendLetterEmail(letter);
     const usage = await consumeSendAccess();
+
+    if (body.shareExample) {
+      try {
+        await addLetterExample(letter);
+      } catch {
+        /* optional — never fail the send */
+      }
+    }
 
     return NextResponse.json({
       ok: true,

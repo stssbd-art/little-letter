@@ -11,6 +11,7 @@ import { FortuneCookie } from "@/components/features/FortuneCookie";
 import { VisitorCounter } from "@/components/features/VisitorCounter";
 import { TodaysMood } from "@/components/features/TodaysMood";
 import { Guestbook } from "@/components/features/Guestbook";
+import { SharedExamples } from "@/components/features/SharedExamples";
 import { SITE_TAGLINE } from "@/lib/constants";
 
 export function HomePage() {
@@ -77,6 +78,7 @@ export function HomePage() {
       </section>
 
       <TodaysMood />
+      <SharedExamples />
       <Guestbook />
     </div>
   );

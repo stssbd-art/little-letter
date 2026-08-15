@@ -31,6 +31,7 @@ export function LetterPreview() {
   const [error, setError] = useState("");
   const [usage, setUsage] = useState<UsageInfo | null>(null);
   const [needsPayment, setNeedsPayment] = useState(false);
+  const [shareExample, setShareExample] = useState(false);
 
   async function refreshUsage() {
     const res = await fetch("/api/usage");
@@ -104,7 +105,7 @@ export function LetterPreview() {
       const res = await fetch("/api/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(letter),
+        body: JSON.stringify({ ...letter, shareExample }),
       });
       const data = await res.json();
 
@@ -253,6 +254,24 @@ export function LetterPreview() {
           {error}
         </p>
       ) : null}
+
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">
+        <input
+          type="checkbox"
+          className="mt-1 h-4 w-4 accent-[#8b5e34]"
+          checked={shareExample}
+          onChange={(e) => setShareExample(e.target.checked)}
+        />
+        <span>
+          <span className="block font-display text-sm text-[var(--ll-ink)]">
+            Share a short preview on the homepage
+          </span>
+          <span className="mt-0.5 block text-xs text-[var(--ll-muted)]">
+            Optional example for others — names, occasion, and a short line.
+            Never the email or full letter.
+          </span>
+        </span>
+      </label>
 
       <div className="flex flex-wrap gap-3">
         <PixelButton
