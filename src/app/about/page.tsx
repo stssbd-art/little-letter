@@ -11,16 +11,46 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
 };
 
+const REASONS = [
+  {
+    icon: "🍀",
+    text: "Because kindness travels better with personality.",
+  },
+  {
+    icon: "💌",
+    text: "Because email can still feel like opening a sealed note.",
+  },
+  {
+    icon: "⭐",
+    text: "Because nostalgia should feel magical — not cluttered.",
+  },
+  {
+    icon: "🦋",
+    text: "Because the internet is better when it carries smiles.",
+  },
+];
+
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div className="text-center">
+        <h1 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
+          About
+        </h1>
+        <p className="mt-2 font-display text-[var(--ll-muted)]">
+          Soft notes, mixtapes, and a little pixel magic.
+        </p>
+      </div>
+
       <PixelWindow title="about_little_letter.txt" icon="📖">
-        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-          <Mascot />
-          <div className="space-y-4 text-[var(--ll-ink)]">
-            <h1 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
+        <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:gap-8 sm:text-left">
+          <div className="shrink-0">
+            <Mascot />
+          </div>
+          <div className="min-w-0 flex-1 space-y-3 text-[var(--ll-ink)]">
+            <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
               About Little Letter
-            </h1>
+            </h2>
             <p className="font-display text-base leading-relaxed">
               Once upon a dial-up connection, the internet was full of glitter
               GIFs, guestbook signatures, and notes that felt handmade. Little
@@ -37,22 +67,22 @@ export default function AboutPage() {
             </p>
             <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
               Meet Pip the Envelope — our tiny mascot who believes every inbox
-              deserves a little sparkle. Hit play on the retro MP3 deck, then send
-              someone a note.
+              deserves a little sparkle. Hit play on the retro MP3 deck, then
+              send someone a note.
             </p>
           </div>
         </div>
       </PixelWindow>
 
       <PixelWindow title="a_little_about_me.txt" icon="💌">
-        <div className="space-y-4 text-[var(--ll-ink)]">
+        <div className="mx-auto max-w-2xl space-y-3 text-center text-[var(--ll-ink)] sm:text-left">
           <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-            A Little About Me 💌
+            A Little About Me
           </h2>
           <p className="font-display text-base leading-relaxed">
             I&apos;m just a simple girl, dreaming, creating, and trying little
             things along the way. I&apos;m not really good at any one thing —
-            but I&apos;ve always believed that trying never hurts. ✨
+            but I&apos;ve always believed that trying never hurts.
           </p>
           <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
             With a little inspiration and influence from someone special, one of
@@ -66,23 +96,37 @@ export default function AboutPage() {
             So, write something you mean. Send a little letter. Make a mixtape.{" "}
             <span className="font-semibold text-[var(--ll-pink-deep)]">
               Send someone a little piece of you.
-            </span>{" "}
-            💌
+            </span>
           </p>
         </div>
       </PixelWindow>
 
       <PixelWindow title="why_we_exist.ini" icon="💫">
-        <ul className="space-y-3 text-sm text-[var(--ll-ink)]">
-          <li>🍀 Because kindness travels better with personality.</li>
-          <li>💌 Because email can still feel like opening a sealed note.</li>
-          <li>⭐ Because nostalgia should feel magical — not cluttered.</li>
-          <li>🦋 Because the internet is better when it carries smiles.</li>
-        </ul>
-        <div className="mt-6">
-          <Link href="/create">
-            <PixelButton>Create your first letter</PixelButton>
-          </Link>
+        <div className="mx-auto max-w-2xl space-y-5">
+          <h2 className="text-center font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-left sm:text-base">
+            Why we exist
+          </h2>
+          <ul className="space-y-3">
+            {REASONS.map((item) => (
+              <li
+                key={item.text}
+                className="flex items-start gap-3 text-left text-sm leading-relaxed text-[var(--ll-ink)]"
+              >
+                <span
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--ll-lavender)] bg-[#fff6df]/80 text-base dark:bg-white/5"
+                  aria-hidden
+                >
+                  {item.icon}
+                </span>
+                <span className="pt-1.5">{item.text}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="flex justify-center pt-1 sm:justify-start">
+            <Link href="/create">
+              <PixelButton>Create your first letter</PixelButton>
+            </Link>
+          </div>
         </div>
       </PixelWindow>
     </div>

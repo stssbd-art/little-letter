@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
+import { ShareBar } from "@/components/features/ShareBar";
+import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/constants";
 
 export function Footer() {
   return (
@@ -37,11 +38,12 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <p className="font-display text-sm text-[var(--ll-ink)]">Tape tip</p>
-          <p className="mt-2 text-sm text-[var(--ll-muted)]">
-            Hit play on the home deck, then burn someone a cassette mixtape —
-            label, tracklist, dedication and all.
-          </p>
+          <ShareBar
+            compact
+            url={SITE_URL}
+            title={SITE_NAME}
+            text={SITE_TAGLINE}
+          />
         </div>
       </div>
       <div className="border-t border-[var(--ll-lavender)]/50 px-4 py-4 text-center text-xs text-[var(--ll-muted)]">

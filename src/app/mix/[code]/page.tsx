@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MixtapePlayer } from "@/components/features/MixtapePlayer";
+import { ShareBar } from "@/components/features/ShareBar";
 import { PixelButton } from "@/components/ui/PixelButton";
+import { PixelWindow } from "@/components/ui/PixelWindow";
 import { decodeMixShare } from "@/lib/mixtape-link";
 import { loadMixShare } from "@/lib/mixtape-store";
+import { SITE_URL } from "@/lib/constants";
 
 type Props = {
   params: Promise<{ code: string }>;
@@ -34,9 +37,19 @@ export default async function MixPlayPage({ params }: Props) {
     notFound();
   }
 
+  const shareUrl = `${SITE_URL}/mix/${encodeURIComponent(code.trim())}`;
+  const shareText = `${mix.from} made a mixtape for ${mix.to}: “${mix.title}”`;
+
   return (
     <div className="space-y-8">
       <MixtapePlayer mix={mix} />
+      <PixelWindow title="share_this_mix.lnk" icon="📣" liftOnHover={false}>
+        <ShareBar
+          url={shareUrl}
+          title={`${mix.title} · Little Letter mixtape`}
+          text={shareText}
+        />
+      </PixelWindow>
       <div className="flex justify-center gap-3">
         <Link href="/mixtape">
           <PixelButton variant="secondary">Burn your own tape</PixelButton>

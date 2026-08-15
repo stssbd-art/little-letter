@@ -7,9 +7,11 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
+import { ShareBar } from "@/components/features/ShareBar";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { useEasterEggs } from "@/components/providers/EasterEggProvider";
+import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/constants";
 
 export function SuccessCelebration() {
   const searchParams = useSearchParams();
@@ -121,6 +123,18 @@ export function SuccessCelebration() {
             On its way to {letter.form.recipientName}
           </p>
         ) : null}
+
+        <div className="mt-8 w-full max-w-md rounded-xl border-2 border-[var(--ll-lavender)] bg-[#fffbf2]/60 px-4 py-3 text-left dark:bg-white/5">
+          <ShareBar
+            url={SITE_URL}
+            title={SITE_NAME}
+            text={
+              isMixtape
+                ? `I just sent a mixtape with ${SITE_NAME} — send someone a cassette mix too.`
+                : `I just sent a little letter with ${SITE_NAME}. ${SITE_TAGLINE}`
+            }
+          />
+        </div>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {isMixtape ? (
