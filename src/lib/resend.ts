@@ -58,15 +58,12 @@ function getVerifiedResendFrom(): { from: string; replyTo: string } | null {
   return { from, replyTo: email };
 }
 
-/**
- * Personal From line so Gmail shows the account’s Google profile photo.
- * Do not brand as “Little Letter” here — that breaks the avatar match.
- * Set GMAIL_FROM_NAME to your real Google profile name only (optional).
- */
-function personalFrom(accountEmail: string) {
-  const name = process.env.GMAIL_FROM_NAME?.trim().replace(/"/g, "");
-  if (!name || /^little letter$/i.test(name)) return accountEmail;
-  return `"${name}" <${accountEmail}>`;
+/** From line shown in the inbox — always branded as Little Letter. */
+function brandedFrom(accountEmail: string, senderName?: string) {
+  const brand = process.env.GMAIL_FROM_NAME?.trim() || SITE_NAME;
+  const who = senderName?.trim().replace(/"/g, "");
+  const display = who ? `${who} via ${brand}` : brand;
+  return `"${display.replace(/"/g, "")}" <${accountEmail}>`;
 }
 
 function letterSubject(letter: GeneratedLetter) {
@@ -110,13 +107,14 @@ async function deliverEmail(opts: {
   subject: string;
   text: string;
   html: string;
+  senderName?: string;
   logLabel: string;
 }): Promise<SendResult> {
   if (isGmailApiConfigured()) {
-    // Omit From so Gmail stamps the signed-in account (name + Google avatar).
     try {
       const id = await sendViaGmailApi({
         to: opts.to,
+        from: brandedFrom(process.env.GMAIL_USER!.trim(), opts.senderName),
         subject: opts.subject,
         text: opts.text,
         html: opts.html,
@@ -131,7 +129,7 @@ async function deliverEmail(opts: {
   if (gmail) {
     try {
       const info = await gmail.transporter.sendMail({
-        from: personalFrom(gmail.user),
+        from: brandedFrom(gmail.user, opts.senderName),
         to: opts.to,
         subject: opts.subject,
         text: opts.text,
@@ -192,6 +190,7 @@ export async function sendLetterEmail(letter: GeneratedLetter): Promise<SendResu
     subject: letterSubject(letter),
     text: buildLetterEmailText(letter),
     html: buildLetterEmailHtml(letter),
+    senderName: letter.form.senderName,
     logLabel: "send",
   });
 }
@@ -211,6 +210,7 @@ export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult>
     subject: mixtapeSubject(mix),
     text: buildMixtapeEmailText(mix, playUrl),
     html: buildMixtapeEmailHtml(mix, playUrl),
+    senderName: mix.senderName,
     logLabel: "mixtape",
   });
 }
