@@ -5,9 +5,23 @@ export const SITE_TAGLINE =
   "Send a cute letter or romantic mixtape by email — cosy notes for someone you miss.";
 export const SITE_DESCRIPTION =
   "Little Letter helps you send a personal letter or romantic mixtape online. Write a warm message or burn a cassette-style mix, then email it to a friend, partner, or family member. First two letters free · then £0.99. First mixtape free · then from £1.25.";
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://sendlittleletter.vercel.app"
-).replace(/\/+$/, "");
+const DEFAULT_SITE_URL = "https://sendlittleletter.vercel.app";
+
+function resolveSiteUrl() {
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/+$/, "");
+  if (!raw) return DEFAULT_SITE_URL;
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return DEFAULT_SITE_URL;
+    }
+    return url.origin;
+  } catch {
+    return DEFAULT_SITE_URL;
+  }
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 export const SEO_KEYWORDS = [
   "send a letter online",
