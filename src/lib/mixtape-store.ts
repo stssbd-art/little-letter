@@ -69,6 +69,6 @@ export async function loadMixShare(id: string): Promise<MixShare | null> {
 }
 
 export function buildShortMixPlayUrl(id: string): string {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
+  const base = SITE_URL;
   return `${base}/mix/${id}`;
 }

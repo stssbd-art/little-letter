@@ -194,7 +194,7 @@ export function decodeMixShare(code: string): MixShare | null {
 }
 
 export function buildMixPlayUrl(mix: MixShare): string {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
+  const base = SITE_URL;
   return `${base}/mix/${encodeMixShare(mix)}`;
 }
 

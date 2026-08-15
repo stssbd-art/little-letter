@@ -30,7 +30,7 @@ export async function createSendCheckoutSession(opts: {
 
   const kind: CheckoutKind = opts.kind === "mixtape" ? "mixtape" : "letter";
   const returnPath = opts.returnPath ?? "/preview";
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
+  const base = SITE_URL;
   const safePath = returnPath.startsWith("/") ? returnPath : `/${returnPath}`;
 
   const trackCount = Math.max(1, Math.floor(opts.trackCount ?? 1));
