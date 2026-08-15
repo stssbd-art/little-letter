@@ -4,56 +4,51 @@ import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/constants";
 
 const YEAR = new Date().getFullYear();
 
+const EXPLORE = [
+  { href: "/about", label: "About" },
+  { href: "/create", label: "Create a letter" },
+  { href: "/mixtape", label: "Send a mixtape" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/terms", label: "Terms & Copyright" },
+  { href: "/privacy", label: "Privacy" },
+] as const;
+
 export function Footer() {
   return (
     <footer className="relative z-10 mt-16 border-t-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]/80">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
-        <div>
-          <p className="font-pixel text-[11px] text-[var(--ll-pink-deep)]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:grid-cols-3 sm:items-start sm:gap-8">
+        <div className="space-y-2.5">
+          <p className="font-pixel text-[11px] leading-relaxed text-[var(--ll-pink-deep)]">
             {SITE_NAME}
           </p>
-          <p className="mt-2 text-sm text-[var(--ll-muted)]">{SITE_TAGLINE}</p>
-          <p className="mt-3 text-xs leading-relaxed text-[var(--ll-muted)]">
+          <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+            {SITE_TAGLINE}
+          </p>
+          <p className="text-xs leading-relaxed text-[var(--ll-muted)]">
             © {YEAR} {SITE_NAME}. All rights reserved. Design, code, and
             branding may not be copied without permission.
           </p>
         </div>
-        <div>
-          <p className="font-display text-sm text-[var(--ll-ink)]">Explore</p>
-          <ul className="mt-2 space-y-1 text-sm text-[var(--ll-muted)]">
-            <li>
-              <Link className="hover:text-[var(--ll-pink-deep)]" href="/about">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-[var(--ll-pink-deep)]" href="/create">
-                Create a letter
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-[var(--ll-pink-deep)]" href="/mixtape">
-                Send a mixtape
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-[var(--ll-pink-deep)]" href="/faq">
-                FAQ
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-[var(--ll-pink-deep)]" href="/terms">
-                Terms &amp; Copyright
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-[var(--ll-pink-deep)]" href="/privacy">
-                Privacy
-              </Link>
-            </li>
+
+        <div className="space-y-2.5">
+          <p className="font-display text-sm leading-snug text-[var(--ll-ink)]">
+            Explore
+          </p>
+          <ul className="space-y-1.5 text-sm leading-relaxed text-[var(--ll-muted)]">
+            {EXPLORE.map((item) => (
+              <li key={item.href}>
+                <Link
+                  className="hover:text-[var(--ll-pink-deep)]"
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
-        <div>
+
+        <div className="space-y-2.5 sm:justify-self-start">
           <ShareBar
             compact
             url={SITE_URL}
@@ -62,21 +57,29 @@ export function Footer() {
           />
         </div>
       </div>
-      <div className="border-t border-[var(--ll-lavender)]/50 px-4 py-4 text-center text-xs text-[var(--ll-muted)]">
-        © {YEAR} {SITE_NAME} · All rights reserved ·{" "}
-        <Link
-          href="/terms"
-          className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
-        >
-          Terms
-        </Link>{" "}
-        ·{" "}
-        <Link
-          href="/privacy"
-          className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
-        >
-          Privacy
-        </Link>
+
+      <div className="border-t border-[var(--ll-lavender)]/50 px-4 py-4">
+        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs leading-relaxed text-[var(--ll-muted)]">
+          <span>
+            © {YEAR} {SITE_NAME}
+          </span>
+          <span aria-hidden>·</span>
+          <span>All rights reserved</span>
+          <span aria-hidden>·</span>
+          <Link
+            href="/terms"
+            className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
+          >
+            Terms
+          </Link>
+          <span aria-hidden>·</span>
+          <Link
+            href="/privacy"
+            className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
+          >
+            Privacy
+          </Link>
+        </p>
       </div>
     </footer>
   );

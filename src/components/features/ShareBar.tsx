@@ -251,8 +251,8 @@ export function ShareBar({
   );
 
   return (
-    <div className={cn(compact ? "space-y-2" : "space-y-3", className)}>
-      <p className="font-display text-sm text-[var(--ll-ink)]">
+    <div className={cn(compact ? "space-y-2.5" : "space-y-3", className)}>
+      <p className="font-display text-sm leading-snug text-[var(--ll-ink)]">
         {compact ? "Share Little Letter" : "Share"}
       </p>
       <div className="flex flex-wrap gap-2">
