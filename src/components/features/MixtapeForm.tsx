@@ -86,11 +86,14 @@ export function MixtapeForm() {
 
   async function refreshUsage() {
     const count = Math.max(1, draft.trackIds.length || 1);
-    const res = await fetch(`/api/usage?kind=mixtape&trackCount=${count}`);
+    const res = await fetch(
+      `/api/usage?kind=mixtape&trackCount=${count}&t=${Date.now()}`,
+      { cache: "no-store" }
+    );
     const data = (await res.json()) as UsageInfo;
     if (res.ok) {
       setUsage(data);
-      setNeedsPayment(!data.canSend);
+      setNeedsPayment(!(data.demo || data.canSend));
     }
   }
 
@@ -213,8 +216,19 @@ export function MixtapeForm() {
       const data = await res.json();
 
       if (res.status === 402) {
-        setNeedsPayment(true);
-        setError(data.error ?? "Payment required for extra sends.");
+        const count = Math.max(1, draft.trackIds.length || 1);
+        const latest = await fetch(
+          `/api/usage?kind=mixtape&trackCount=${count}&t=${Date.now()}`,
+          { cache: "no-store" }
+        ).then((r) => r.json() as Promise<UsageInfo>);
+        if (latest?.demo || latest?.canSend) {
+          setUsage(latest);
+          setNeedsPayment(false);
+          setError("Demo mode is on — try Send again (no payment).");
+        } else {
+          setNeedsPayment(true);
+          setError(data.error ?? "Payment required for extra sends.");
+        }
         setSending(false);
         return;
       }
@@ -320,7 +334,7 @@ export function MixtapeForm() {
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              if (needsPayment) void startPayment();
+              if (needsPayment && !demo) void startPayment();
               else void sendMixtape();
             }}
           >
@@ -534,7 +548,7 @@ export function MixtapeForm() {
                   </PixelButton>
                 </Link>
               ) : null}
-              {needsPayment ? (
+              {needsPayment && !demo ? (
                 <PixelButton
                   type="submit"
                   size="lg"

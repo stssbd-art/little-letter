@@ -38,12 +38,10 @@ export function mixtapePrice(trackCount: number) {
 }
 
 /**
- * Free testing: DEMO_MODE defaults ON so you can send without Stripe.
- * Set DEMO_MODE=false on Vercel when you want paid sends again.
+ * Free testing locked ON — no Stripe charges.
+ * Flip this to `return false` (or wire DEMO_MODE again) when ready for paid launch.
  */
 export function isDemoMode() {
-  const raw = process.env.DEMO_MODE?.trim().toLowerCase();
-  if (raw === "false" || raw === "0" || raw === "off") return false;
   return true;
 }
 

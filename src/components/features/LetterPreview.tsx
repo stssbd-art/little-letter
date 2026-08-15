@@ -34,11 +34,12 @@ export function LetterPreview() {
   const [shareExample, setShareExample] = useState(false);
 
   async function refreshUsage() {
-    const res = await fetch("/api/usage");
+    const res = await fetch(`/api/usage?t=${Date.now()}`, { cache: "no-store" });
     const data = (await res.json()) as UsageInfo;
     if (res.ok) {
       setUsage(data);
-      setNeedsPayment(!data.canSend);
+      // Never ask for payment while demo mode is on
+      setNeedsPayment(!(data.demo || data.canSend));
     }
   }
 
@@ -110,8 +111,17 @@ export function LetterPreview() {
       const data = await res.json();
 
       if (res.status === 402) {
-        setNeedsPayment(true);
-        setError(data.error ?? "Payment required for extra letters.");
+        const latest = await fetch(`/api/usage?t=${Date.now()}`, {
+          cache: "no-store",
+        }).then((r) => r.json() as Promise<UsageInfo>);
+        if (latest?.demo || latest?.canSend) {
+          setUsage(latest);
+          setNeedsPayment(false);
+          setError("Demo mode is on — try Send again (no payment).");
+        } else {
+          setNeedsPayment(true);
+          setError(data.error ?? "Payment required for extra letters.");
+        }
         setSending(false);
         return;
       }
@@ -317,7 +327,7 @@ export function LetterPreview() {
           ✨ Regenerate
         </PixelButton>
 
-        {needsPayment ? (
+        {needsPayment && !demo ? (
           <PixelButton size="lg" onClick={startPayment} disabled={paying || !open}>
             {paying ? "Opening checkout..." : `💳 Pay ${priceLabel} & send`}
           </PixelButton>
