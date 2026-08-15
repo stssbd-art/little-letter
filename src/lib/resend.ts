@@ -11,6 +11,7 @@ import {
 } from "@/lib/email-template";
 import { buildMixPlayUrl } from "@/lib/mixtape-link";
 import { isGmailApiConfigured, sendViaGmailApi } from "@/lib/gmail-api";
+import { SITE_NAME } from "@/lib/constants";
 
 type SendResult = {
   id: string;
@@ -50,21 +51,31 @@ function isSandboxSender(from: string): boolean {
   return extractEmail(from).endsWith("@resend.dev");
 }
 
-function getVerifiedResendFrom(): { replyTo: string } | null {
+function getVerifiedResendFrom(): { from: string; replyTo: string } | null {
   const raw = process.env.RESEND_FROM_EMAIL?.trim();
   if (!raw || isSandboxSender(raw)) return null;
   const email = extractEmail(raw);
   if (!email.includes("@")) return null;
-  return { replyTo: email };
+  const from = raw.includes("<") ? raw : `"${SITE_NAME}" <${email}>`;
+  return { from, replyTo: email };
 }
 
-/** Boring personal subjects inbox filters trust — like a normal email to a friend. */
-function letterSubject(recipientName: string) {
-  return `Hi ${recipientName}`.slice(0, 78);
+/** From line shown in the inbox — Little Letter branding. */
+function brandedFrom(accountEmail: string, senderName?: string) {
+  const brand = process.env.GMAIL_FROM_NAME?.trim() || SITE_NAME;
+  const who = senderName?.trim().replace(/"/g, "");
+  const display = who ? `${who} via ${brand}` : brand;
+  return `"${display.replace(/"/g, "")}" <${accountEmail}>`;
 }
 
-function mixtapeSubject(recipientName: string) {
-  return `Hi ${recipientName}`.slice(0, 78);
+function letterSubject(letter: GeneratedLetter) {
+  const custom = letter.subject?.trim();
+  if (custom) return custom.slice(0, 120);
+  return `A little letter for ${letter.form.recipientName}`.slice(0, 120);
+}
+
+function mixtapeSubject(mix: MixtapePayload) {
+  return `Mixtape for you: ${mix.title}`.slice(0, 120);
 }
 
 function hasGmailConfigured() {
@@ -90,8 +101,10 @@ async function deliverEmail(opts: {
   logLabel: string;
 }): Promise<SendResult> {
   if (isGmailApiConfigured()) {
+    const from = brandedFrom(process.env.GMAIL_USER!.trim(), opts.senderName);
     const id = await sendViaGmailApi({
       to: opts.to,
+      from,
       subject: opts.subject,
       text: opts.text,
       html: opts.htmlCid,
@@ -102,11 +115,12 @@ async function deliverEmail(opts: {
   const gmail = getGmailTransport();
   if (gmail) {
     const info = await gmail.transporter.sendMail({
-      from: gmail.user,
+      from: brandedFrom(gmail.user, opts.senderName),
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
       html: opts.htmlCid,
+      replyTo: gmail.user,
       attachments: [logoAttachment()],
     });
     return {
@@ -120,7 +134,7 @@ async function deliverEmail(opts: {
   const resend = verified ? getResend() : null;
   if (resend && verified) {
     const { data, error } = await resend.emails.send({
-      from: verified.replyTo,
+      from: verified.from,
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
@@ -155,10 +169,9 @@ async function deliverEmail(opts: {
 }
 
 export async function sendLetterEmail(letter: GeneratedLetter): Promise<SendResult> {
-  const { recipientName } = letter.form;
   return deliverEmail({
     to: letter.form.recipientEmail,
-    subject: letterSubject(recipientName),
+    subject: letterSubject(letter),
     text: buildLetterEmailText(letter),
     htmlCid: buildLetterEmailHtml(letter, { useCid: true }),
     htmlRemote: buildLetterEmailHtml(letter, { useCid: false }),
@@ -179,7 +192,7 @@ export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult>
 
   return deliverEmail({
     to: mix.recipientEmail,
-    subject: mixtapeSubject(mix.recipientName),
+    subject: mixtapeSubject(mix),
     text: buildMixtapeEmailText(mix, playUrl),
     htmlCid: buildMixtapeEmailHtml(mix, playUrl, { useCid: true }),
     htmlRemote: buildMixtapeEmailHtml(mix, playUrl, { useCid: false }),

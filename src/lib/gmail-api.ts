@@ -6,6 +6,7 @@ import {
 
 type GmailApiSendOpts = {
   to: string;
+  from: string;
   subject: string;
   text: string;
   html: string;
@@ -20,8 +21,20 @@ function encodeSubject(subject: string) {
   return `=?UTF-8?B?${Buffer.from(subject, "utf8").toString("base64")}?=`;
 }
 
+function encodeFrom(from: string) {
+  // Keep ASCII display names plain; encode non-ASCII ones
+  const match = from.match(/^"([^"]*)"\s*<([^>]+)>$/);
+  if (!match) return from;
+  const [, name, email] = match;
+  if (/^[\x20-\x7E]*$/.test(name!)) {
+    return `"${name}" <${email}>`;
+  }
+  return `=?UTF-8?B?${Buffer.from(name!, "utf8").toString("base64")}?= <${email}>`;
+}
+
 function buildRawMessage(opts: {
   to: string;
+  from: string;
   subject: string;
   text: string;
   html: string;
@@ -31,10 +44,10 @@ function buildRawMessage(opts: {
   const text = opts.text.replace(/\r?\n/g, "\r\n");
   const html = opts.html.replace(/\r?\n/g, "\r\n");
   const logoB64 = getEmailLogoBuffer().toString("base64");
-  // Fold base64 to 76-char lines for SMTP-ish compatibility
   const logoFolded = logoB64.replace(/.{1,76}/g, "$&\r\n").trimEnd();
 
   const lines = [
+    `From: ${encodeFrom(opts.from)}`,
     `To: ${opts.to}`,
     `Subject: ${encodeSubject(opts.subject)}`,
     `Date: ${new Date().toUTCString()}`,
@@ -59,7 +72,7 @@ function buildRawMessage(opts: {
     `--${boundaryAlt}--`,
     "",
     `--${boundaryRel}`,
-    "Content-Type: image/jpeg; name=\"email-logo.jpg\"",
+    'Content-Type: image/jpeg; name="email-logo.jpg"',
     "Content-Transfer-Encoding: base64",
     `Content-ID: <${EMAIL_LOGO_CID}>`,
     'Content-Disposition: inline; filename="email-logo.jpg"',
@@ -84,7 +97,6 @@ export function isGmailApiConfigured() {
 
 /** Send through Gmail API — HTML + embedded logo (CID). */
 export async function sendViaGmailApi(opts: GmailApiSendOpts): Promise<string> {
-  const user = getGmailUser();
   if (!isGmailApiConfigured()) {
     throw new Error("Gmail API is not configured.");
   }
@@ -100,6 +112,7 @@ export async function sendViaGmailApi(opts: GmailApiSendOpts): Promise<string> {
   const gmail = google.gmail({ version: "v1", auth: oauth2 });
   const raw = buildRawMessage({
     to: opts.to,
+    from: opts.from,
     subject: opts.subject,
     text: opts.text,
     html: opts.html,
