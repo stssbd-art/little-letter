@@ -38,7 +38,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `STRIPE_SECRET_KEY` | For paid sends | Stripe secret key |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | For paid sends | Stripe publishable key |
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Production URL for SEO + Stripe returns |
-| `DEMO_MODE` | No | Set `true` only for free testing (disables charges) |
+| `DEMO_MODE` | No | Free testing is **on by default**. Set `false` on Vercel to restore paid Stripe sends. |
 
 **Inbox placement:** Prefer Resend + a verified custom domain (SPF, DKIM, DMARC). Shared senders like `onboarding@resend.dev` are blocked because they land in spam. Gmail SMTP is the fallback and can email any address (Google daily limits apply).
 
