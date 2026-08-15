@@ -48,7 +48,7 @@ export function HomePage() {
           Press play · write a note · burn a tape
         </p>
 
-        <div className="mt-10 w-full max-w-md">
+        <div className="mt-10 w-full max-w-lg">
           <RetroMp3Player />
         </div>
       </section>
@@ -64,8 +64,8 @@ export function HomePage() {
           pick romantic songs, and send a playable mix.
         </p>
         <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
-          Your first two letters are free, then £0.99 each. Mixtapes are £1.25
-          for 1 song, or £1.55 for 2 or more.
+          Your first two letters are free, then £0.99 each. Your first mixtape
+          is free; extra mixes are £1.25 for 1 song, or £1.55 for 2 or more.
         </p>
       </section>
 

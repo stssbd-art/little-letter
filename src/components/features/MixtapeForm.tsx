@@ -104,7 +104,9 @@ export function MixtapeForm() {
     const cancelled = searchParams.get("cancelled");
 
     if (cancelled) {
-      setError("Payment cancelled. Mixtapes are £1.25 for 1 song, or £1.55 for 2+ songs.");
+      setError(
+        "Payment cancelled. Your first mixtape is free; extra mixes are £1.25 for 1 song, or £1.55 for 2+ songs."
+      );
       return;
     }
 
@@ -279,6 +281,8 @@ export function MixtapeForm() {
       ? usage?.priceOneSong ?? "£1.25"
       : usage?.priceMultiSong ?? "£1.55");
   const demo = usage?.demo ?? false;
+  const freeLeft = usage?.freeAvailable ?? true;
+  const freeRemaining = usage?.freeLeft ?? 1;
   const paidReady = (usage?.credits ?? 0) > 0;
 
   return (
@@ -287,9 +291,11 @@ export function MixtapeForm() {
         <p className="font-display text-sm text-[var(--ll-ink)]">
           {demo
             ? "Demo mode — sends are free for testing. No payment asked right now."
-            : paidReady
-              ? `You have ${usage?.credits} paid mixtape credit${usage?.credits === 1 ? "" : "s"} ready.`
-              : `Mixtapes: £1.25 for 1 song · £1.55 for 2 or more songs. Current pick (${songCount} song${songCount === 1 ? "" : "s"}): ${priceLabel}.`}
+            : freeLeft
+              ? `Your first mixtape is free (${freeRemaining} left). After that: £1.25 for 1 song · £1.55 for 2 or more. Current pick (${songCount} song${songCount === 1 ? "" : "s"}): ${priceLabel}.`
+              : paidReady
+                ? `You have ${usage?.credits} paid mixtape credit${usage?.credits === 1 ? "" : "s"} ready.`
+                : `Your free mixtape is used. Extra mixes are £1.25 for 1 song · £1.55 for 2 or more. Current pick (${songCount} song${songCount === 1 ? "" : "s"}): ${priceLabel}.`}
         </p>
       </PixelWindow>
 

@@ -3,6 +3,7 @@ import { verifyPaidCheckoutSession } from "@/lib/stripe";
 import {
   addPaidCredit,
   FREE_LETTERS,
+  FREE_MIXTAPES,
   isDemoMode,
   LETTER_PRICE_LABEL,
   MIX_MULTI_SONG_LABEL,
@@ -23,13 +24,17 @@ export async function GET(request: Request) {
 
   if (kind === "mixtape") {
     const priceInfo = mixtapePrice(Number.isFinite(trackCount) ? trackCount : 1);
-    const canSend = demo || usage.mixCredits > 0;
+    const freeLeft = demo
+      ? FREE_MIXTAPES
+      : Math.max(0, FREE_MIXTAPES - usage.mixFreeUsed);
+    const freeAvailable = demo || freeLeft > 0;
+    const canSend = demo || freeAvailable || usage.mixCredits > 0;
 
     return NextResponse.json({
       demo,
-      freeAvailable: false,
-      freeLeft: 0,
-      freeTotal: 0,
+      freeAvailable,
+      freeLeft,
+      freeTotal: FREE_MIXTAPES,
       credits: usage.mixCredits,
       canSend,
       price: priceInfo.label,

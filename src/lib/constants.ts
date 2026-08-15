@@ -4,7 +4,7 @@ export const SITE_NAME = "Little Letter";
 export const SITE_TAGLINE =
   "Send a cute letter or romantic mixtape by email — cosy notes for someone you miss.";
 export const SITE_DESCRIPTION =
-  "Little Letter helps you send a personal letter or romantic mixtape online. Write a warm message or burn a cassette-style mix, then email it to a friend, partner, or family member. First two letters free · then £0.99. Mixtapes from £1.25.";
+  "Little Letter helps you send a personal letter or romantic mixtape online. Write a warm message or burn a cassette-style mix, then email it to a friend, partner, or family member. First two letters free · then £0.99. First mixtape free · then from £1.25.";
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://sendlittleletter.vercel.app"
 ).replace(/\/+$/, "");

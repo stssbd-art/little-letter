@@ -13,15 +13,15 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is this really free to try?",
-    a: "Your first two letters are free. After that, each extra letter costs £0.99 (paid securely with Stripe). Mixtapes are £1.25 for 1 song, or £1.55 for 2 or more songs.",
+    a: "Your first two letters are free. After that, each extra letter costs £0.99 (paid securely with Stripe). Your first mixtape is free; extra mixes are £1.25 for 1 song, or £1.55 for 2 or more songs.",
   },
   {
     q: "How do payments work?",
-    a: "Send two letters free. For the next ones, tap Pay £0.99 & send, complete Stripe Checkout, then your message goes out automatically. Mixtapes use Stripe too (£1.25 / £1.55).",
+    a: "Send two letters free. For the next ones, tap Pay £0.99 & send, complete Stripe Checkout, then your message goes out automatically. Your first mixtape is free; extra mixes use Stripe too (£1.25 / £1.55).",
   },
   {
     q: "How do I send to any email?",
-    a: "Email delivery uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). Recipients can be any address. Stripe charges apply only after your free letter allowance, and for every mixtape.",
+    a: "Email delivery uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). Recipients can be any address. Stripe charges apply only after your free letter allowance, and after your first free mixtape.",
   },
   {
     q: "Why did my letter go to spam?",
@@ -41,7 +41,7 @@ const FAQS = [
   },
   {
     q: "Can I send a mixtape?",
-    a: "Yes — open Mixtape, label a cassette, pick songs from the crate or search YouTube, add an optional dedication, and email it. The Play link opens the mix (via YouTube) — about 30 seconds per track, then the next. Pricing: £1.25 for 1 song, £1.55 for 2 or more.",
+    a: "Yes — open Mixtape, label a cassette, pick songs from the crate or search YouTube, add an optional dedication, and email it. The Play link opens the mix (via YouTube) — about 30 seconds per track, then the next. Your first mixtape is free; extra mixes are £1.25 for 1 song, £1.55 for 2 or more.",
   },
   {
     q: "Can I mute the sounds?",

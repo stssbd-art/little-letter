@@ -18,9 +18,24 @@ type Props = {
   selectedIds: string[];
   full: boolean;
   onAdd: (track: MixTrack) => void;
+  /** Button / status labels for different pages */
+  addLabel?: string;
+  selectedLabel?: string;
+  fullLabel?: string;
+  inputId?: string;
+  className?: string;
 };
 
-export function YouTubeSongSearch({ selectedIds, full, onAdd }: Props) {
+export function YouTubeSongSearch({
+  selectedIds,
+  full,
+  onAdd,
+  addLabel = "add",
+  selectedLabel = "on tape",
+  fullLabel = "full",
+  inputId = "yt-search",
+  className,
+}: Props) {
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
   const [hint, setHint] = useState("");
@@ -99,10 +114,10 @@ export function YouTubeSongSearch({ selectedIds, full, onAdd }: Props) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className={cn("space-y-2", className)}>
       <div className="flex flex-wrap gap-2">
         <PixelInput
-          id="yt-search"
+          id={inputId}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search YouTube or paste a link"
@@ -166,7 +181,7 @@ export function YouTubeSongSearch({ selectedIds, full, onAdd }: Props) {
                       </span>
                     </span>
                     <span className="shrink-0 font-pixel text-[8px] text-[var(--ll-muted)]">
-                      {on ? "on tape" : full ? "full" : "add"}
+                      {on ? selectedLabel : full ? fullLabel : addLabel}
                     </span>
                   </button>
                 </li>

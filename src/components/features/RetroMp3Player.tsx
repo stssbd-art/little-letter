@@ -1,30 +1,43 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { YouTubeSongSearch } from "@/components/features/YouTubeSongSearch";
 import { useSound } from "@/components/providers/SoundProvider";
-import { MIX_TRACKS, youtubeWatchUrl } from "@/lib/tracks";
+import { STORAGE_KEYS } from "@/lib/constants";
+import {
+  MAX_MIXTAPE_TRACKS,
+  MIX_TRACKS,
+  youtubeWatchUrl,
+  type MixTrack,
+} from "@/lib/tracks";
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
 import { cn } from "@/lib/utils";
 
-/** Home deck shows the full romantic catalog (same as mixtape picks). */
-const TRACKS = MIX_TRACKS;
+const MAX_HOME_TRACKS = MIX_TRACKS.length + 12;
 
 export function RetroMp3Player({ className }: { className?: string }) {
   const { play } = useSound();
   const hostRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YtPlayer | null>(null);
   const indexRef = useRef(0);
+  const tracksRef = useRef<MixTrack[]>(MIX_TRACKS);
 
+  const [tracks, setTracks] = useState<MixTrack[]>(MIX_TRACKS);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
-  const track = TRACKS[index % TRACKS.length]!;
+  const track = tracks[index % tracks.length] ?? tracks[0]!;
 
   useEffect(() => {
     indexRef.current = index;
   }, [index]);
+
+  useEffect(() => {
+    tracksRef.current = tracks;
+  }, [tracks]);
 
   useEffect(() => {
     if (!hostRef.current) return;
@@ -38,7 +51,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
 
         playerRef.current?.destroy();
         playerRef.current = new YT.Player(mount, {
-          videoId: TRACKS[0]!.youtubeId,
+          videoId: MIX_TRACKS[0]!.youtubeId,
           width: "100%",
           height: "100%",
           playerVars: {
@@ -61,10 +74,12 @@ export function RetroMp3Player({ className }: { className?: string }) {
               if (event.data === PLAYING) setPlaying(true);
               if (event.data === PAUSED) setPlaying(false);
               if (event.data === ENDED) {
-                const next = (indexRef.current + 1) % TRACKS.length;
+                const list = tracksRef.current;
+                if (!list.length) return;
+                const next = (indexRef.current + 1) % list.length;
                 setIndex(next);
                 indexRef.current = next;
-                event.target.loadVideoById(TRACKS[next]!.youtubeId);
+                event.target.loadVideoById(list[next]!.youtubeId);
               }
             },
             onError: () => {
@@ -89,14 +104,14 @@ export function RetroMp3Player({ className }: { className?: string }) {
     };
   }, []);
 
-  function selectTrack(next: number) {
-    const player = playerRef.current;
-    const nextTrack = TRACKS[next];
+  function playTrackAt(list: MixTrack[], next: number) {
+    const nextTrack = list[next];
     if (!nextTrack) return;
     play("click");
     setIndex(next);
     indexRef.current = next;
     setError("");
+    const player = playerRef.current;
     if (player && ready) {
       try {
         player.loadVideoById(nextTrack.youtubeId);
@@ -105,6 +120,67 @@ export function RetroMp3Player({ className }: { className?: string }) {
       } catch {
         setError("Couldn’t switch track — try Play again.");
       }
+    }
+  }
+
+  function selectTrack(next: number) {
+    playTrackAt(tracks, next);
+  }
+
+  function addFromSearch(song: MixTrack) {
+    setTracks((prev) => {
+      const existing = prev.findIndex(
+        (t) => t.id === song.id || t.youtubeId === song.youtubeId
+      );
+      if (existing >= 0) {
+        window.setTimeout(() => playTrackAt(prev, existing), 0);
+        return prev;
+      }
+      if (prev.length >= MAX_HOME_TRACKS) {
+        setError("Playlist is full — remove some songs from the mixtape page.");
+        return prev;
+      }
+      const next = [...prev, song];
+      window.setTimeout(() => playTrackAt(next, next.length - 1), 0);
+      return next;
+    });
+  }
+
+  function seedMixtapeAndGo() {
+    play("click");
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEYS.mixtapeDraft);
+      const base = {
+        recipientName: "",
+        recipientEmail: "",
+        senderName: "",
+        title: "",
+        dedication: "",
+        trackIds: [] as string[],
+        customTracks: [] as MixTrack[],
+      };
+      const parsed = raw ? (JSON.parse(raw) as Partial<typeof base>) : {};
+      const draft = { ...base, ...parsed };
+      const trackIds = draft.trackIds.includes(track.id)
+        ? draft.trackIds
+        : [...draft.trackIds, track.id].slice(0, MAX_MIXTAPE_TRACKS);
+      const customTracks = track.id.startsWith("yt:")
+        ? [
+            ...(draft.customTracks ?? []).filter((t) => t.id !== track.id),
+            track,
+          ]
+        : draft.customTracks ?? [];
+      sessionStorage.setItem(
+        STORAGE_KEYS.mixtapeDraft,
+        JSON.stringify({
+          ...draft,
+          trackIds,
+          customTracks,
+          title: draft.title || `${track.title} mix`,
+        })
+      );
+    } catch {
+      /* ignore */
     }
   }
 
@@ -159,7 +235,8 @@ export function RetroMp3Player({ className }: { className?: string }) {
                 {track.title}
               </p>
               <p className="mt-1 truncate font-pixel text-[8px] opacity-80">
-                {track.artist} · {track.year}
+                {track.artist}
+                {track.year ? ` · ${track.year}` : ""}
               </p>
             </div>
             <motion.div
@@ -174,9 +251,20 @@ export function RetroMp3Player({ className }: { className?: string }) {
           </div>
 
           <p className="mt-3 border-t border-[#8fef7a]/20 pt-2 font-pixel text-[7px] leading-relaxed text-[#8fef7a]/80">
-            Original romantic hits via YouTube
+            Search YouTube · play · send a mixtape
           </p>
         </div>
+
+        <YouTubeSongSearch
+          inputId="home-yt-search"
+          selectedIds={tracks.map((t) => t.id)}
+          full={tracks.length >= MAX_HOME_TRACKS}
+          onAdd={addFromSearch}
+          addLabel="play"
+          selectedLabel="playing"
+          fullLabel="full"
+          className="rounded-lg border border-[#b9a888]/60 bg-white/35 p-2 dark:bg-black/20"
+        />
 
         <div className="aspect-video overflow-hidden rounded-lg border-2 border-[#3d2f22] bg-black">
           <div ref={hostRef} className="h-full w-full" />
@@ -188,9 +276,9 @@ export function RetroMp3Player({ className }: { className?: string }) {
             aria-label="Previous track"
             className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-sm text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={() =>
-              selectTrack((index - 1 + TRACKS.length) % TRACKS.length)
+              selectTrack((index - 1 + tracks.length) % tracks.length)
             }
-            disabled={!ready}
+            disabled={!ready || tracks.length < 2}
           >
             ⏮
           </button>
@@ -216,11 +304,21 @@ export function RetroMp3Player({ className }: { className?: string }) {
             type="button"
             aria-label="Next track"
             className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-sm text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
-            onClick={() => selectTrack((index + 1) % TRACKS.length)}
-            disabled={!ready}
+            onClick={() => selectTrack((index + 1) % tracks.length)}
+            disabled={!ready || tracks.length < 2}
           >
             ⏭
           </button>
+        </div>
+
+        <div className="text-center">
+          <Link
+            href="/mixtape"
+            onClick={seedMixtapeAndGo}
+            className="font-pixel text-[8px] text-[#5c4a34] underline decoration-[#8a7a62]/60 underline-offset-2 hover:text-[#8b5e34] dark:text-[#e6c98a]"
+          >
+            Send “{track.title}” as a mixtape →
+          </Link>
         </div>
 
         {error ? (
@@ -230,7 +328,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
         ) : null}
 
         <ul className="max-h-36 space-y-1 overflow-y-auto rounded-lg border border-[#b9a888]/60 bg-white/40 p-2 dark:bg-black/20">
-          {TRACKS.map((t, i) => (
+          {tracks.map((t, i) => (
             <li key={t.id}>
               <button
                 type="button"

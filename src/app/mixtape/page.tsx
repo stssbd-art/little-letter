@@ -6,7 +6,7 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 export const metadata: Metadata = {
   title: "Send a Romantic Mixtape Online",
   description:
-    "Burn a romantic mixtape online and email it to someone you miss. Pick songs, label a cassette, add a dedication — £1.25 for 1 song, £1.55 for 2+.",
+    "Burn a romantic mixtape online and email it to someone you miss. Pick songs, label a cassette, add a dedication — first mixtape free, then £1.25 for 1 song, £1.55 for 2+.",
   alternates: { canonical: "/mixtape" },
   keywords: [
     "send mixtape online",
@@ -29,8 +29,8 @@ export default function MixtapePage() {
         </h1>
         <p className="mx-auto mt-3 max-w-xl font-display text-[var(--ll-muted)]">
           Label a cassette, pick one or more songs, add a tiny dedication —
-          £1.25 for 1 song, £1.55 for 2+.
-          then mail the mix across the internet.
+          first mixtape free, then £1.25 for 1 song or £1.55 for 2+ — then
+          mail the mix across the internet.
         </p>
       </div>
 

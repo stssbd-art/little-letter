@@ -6,7 +6,8 @@ export const FREE_LETTERS = 2;
 export const LETTER_PRICE_PENCE = 99;
 export const LETTER_PRICE_LABEL = "£0.99";
 
-/** Mixtapes: £1.25 for 1 song, £1.55 for 2+ songs (no free mixtapes) */
+/** Mixtapes: first one free, then £1.25 for 1 song, £1.55 for 2+ songs */
+export const FREE_MIXTAPES = 1;
 export const MIX_ONE_SONG_PENCE = 125;
 export const MIX_ONE_SONG_LABEL = "£1.25";
 export const MIX_MULTI_SONG_PENCE = 155;
@@ -15,7 +16,6 @@ export const MIX_MULTI_SONG_LABEL = "£1.55";
 /** @deprecated use LETTER_PRICE_* — kept for older imports during transition */
 export const SEND_PRICE_LABEL = LETTER_PRICE_LABEL;
 export const SEND_PRICE_PENCE = LETTER_PRICE_PENCE;
-export const FREE_MIXTAPES = 0;
 
 export type CheckoutKind = "letter" | "mixtape";
 
@@ -52,6 +52,7 @@ export function paymentsEnabled() {
 const LETTER_FREE_COOKIE = "ll_letter_free_count";
 const LEGACY_FREE_COOKIE = "ll_free_used";
 const LETTER_CREDITS_COOKIE = "ll_letter_credits";
+const MIX_FREE_COOKIE = "ll_mix_free_count";
 const MIX_CREDITS_COOKIE = "ll_mix_credits";
 const LEGACY_CREDITS_COOKIE = "ll_credits";
 const SESSIONS_COOKIE = "ll_paid_sessions";
@@ -138,6 +139,10 @@ export async function readUsage(): Promise<UsageSnapshot> {
     letterCredits = legacyCredits;
   }
 
+  const mixFreeUsed = parseCount(
+    unpack(jar.get(MIX_FREE_COOKIE)?.value),
+    FREE_MIXTAPES
+  );
   const mixCredits = parseCount(unpack(jar.get(MIX_CREDITS_COOKIE)?.value));
   const sessionsRaw = unpack(jar.get(SESSIONS_COOKIE)?.value) || "";
   const usedSessionIds = sessionsRaw
@@ -150,7 +155,7 @@ export async function readUsage(): Promise<UsageSnapshot> {
     mixCredits,
     usedSessionIds,
     freeUsed: letterFreeUsed >= FREE_LETTERS,
-    mixFreeUsed: 0,
+    mixFreeUsed,
     credits: letterCredits + mixCredits,
   };
 }
@@ -165,6 +170,11 @@ export async function writeUsage(usage: UsageSnapshot) {
   jar.set(
     LETTER_CREDITS_COOKIE,
     pack(String(Math.max(0, usage.letterCredits))),
+    cookieOpts
+  );
+  jar.set(
+    MIX_FREE_COOKIE,
+    pack(String(Math.max(0, Math.min(usage.mixFreeUsed, FREE_MIXTAPES)))),
     cookieOpts
   );
   jar.set(
@@ -216,6 +226,9 @@ export async function getMixtapeSendAccess() {
   if (isDemoMode()) {
     return { allowed: true as const, reason: "demo" as const, usage };
   }
+  if (usage.mixFreeUsed < FREE_MIXTAPES) {
+    return { allowed: true as const, reason: "free" as const, usage };
+  }
   if (usage.mixCredits > 0) {
     return { allowed: true as const, reason: "credit" as const, usage };
   }
@@ -227,7 +240,9 @@ export async function consumeMixtapeSendAccess() {
   if (isDemoMode()) {
     return usage;
   }
-  if (usage.mixCredits > 0) {
+  if (usage.mixFreeUsed < FREE_MIXTAPES) {
+    usage.mixFreeUsed += 1;
+  } else if (usage.mixCredits > 0) {
     usage.mixCredits -= 1;
   } else {
     throw new Error("No mixtape send credit available.");
