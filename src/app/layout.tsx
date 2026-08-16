@@ -4,6 +4,8 @@ import { AppProviders } from "@/components/providers/AppProviders";
 import { AnimatedBackground } from "@/components/decorations/AnimatedBackground";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { AdSenseLoader } from "@/components/ads/AdSenseLoader";
+import { EndPageAd } from "@/components/ads/EndPageAd";
 import {
   SEO_KEYWORDS,
   SITE_DESCRIPTION,
@@ -130,9 +132,11 @@ export default function RootLayout({
             <main className="mx-auto min-h-[70vh] max-w-6xl px-4 py-8 sm:py-12">
               {children}
             </main>
+            <EndPageAd />
             <Footer />
           </AnimatedBackground>
         </AppProviders>
+        <AdSenseLoader />
       </body>
     </html>
   );
