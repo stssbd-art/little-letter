@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { getAdsenseClientId, getAdsenseEndSlot } from "@/lib/adsense";
 import { cn } from "@/lib/utils";
 
 declare global {
@@ -11,16 +10,16 @@ declare global {
 }
 
 type EndPageAdProps = {
+  client: string;
+  slot: string;
   className?: string;
 };
 
 /**
  * One quiet display ad at the end of the page.
- * Needs NEXT_PUBLIC_ADSENSE_CLIENT_ID + NEXT_PUBLIC_ADSENSE_SLOT_END at build time.
+ * Client/slot are passed from the server so Sensitive Vercel env vars still work.
  */
-export function EndPageAd({ className }: EndPageAdProps) {
-  const client = getAdsenseClientId();
-  const slot = getAdsenseEndSlot();
+export function EndPageAd({ client, slot, className }: EndPageAdProps) {
   const pushed = useRef(false);
 
   useEffect(() => {
