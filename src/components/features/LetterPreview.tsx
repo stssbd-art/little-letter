@@ -262,21 +262,55 @@ export function LetterPreview() {
             aria-label={open ? "Close letter" : "Open letter"}
           >
             <div
-              className="relative mx-auto w-full max-w-sm pt-10"
-              style={{ perspective: 1000 }}
+              className="relative mx-auto w-full max-w-sm overflow-visible pt-14"
+              style={{ perspective: 1100 }}
             >
-              <div className="relative h-48 w-full">
-                {/* Envelope back */}
-                <div className="absolute inset-x-0 bottom-0 h-40 rounded-2xl border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#ffe8b0] to-[#f0c96a] shadow-[6px_6px_0_var(--ll-pink-shadow)]" />
+              {/*
+                Shared 320×200 viewBox on every layer.
+                Lip tip + pocket peak both sit at (160, 100).
+                One outer border; lip is clipped to the same rounded face.
+              */}
+              <div
+                className="relative aspect-[8/5] w-full overflow-visible"
+                style={{ filter: "drop-shadow(6px 6px 0 var(--ll-pink-shadow))" }}
+              >
+                {/* Back + outer silhouette */}
+                <svg
+                  className="absolute inset-0 z-10 h-full w-full"
+                  viewBox="0 0 320 200"
+                  preserveAspectRatio="none"
+                  aria-hidden
+                >
+                  <defs>
+                    <linearGradient id="ll-env-back" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#fff0c2" />
+                      <stop offset="45%" stopColor="#f6d58a" />
+                      <stop offset="100%" stopColor="#e8b86d" />
+                    </linearGradient>
+                    <clipPath id="ll-env-face">
+                      <rect x="5" y="5" width="310" height="190" rx="16" />
+                    </clipPath>
+                  </defs>
+                  <rect
+                    x="2.5"
+                    y="2.5"
+                    width="315"
+                    height="195"
+                    rx="18"
+                    fill="url(#ll-env-back)"
+                    stroke="var(--ll-pink-deep)"
+                    strokeWidth="5"
+                  />
+                </svg>
 
-                {/* Letter sliding out of the envelope */}
+                {/* Letter sliding out (between back and front) */}
                 <motion.div
-                  className="absolute left-1/2 z-[15] w-[86%] -translate-x-1/2 overflow-hidden rounded-md border-2 border-[#d4b896] bg-[#fffdf6] px-3 py-2 shadow-[3px_3px_0_rgba(61,47,34,0.12)]"
+                  className="absolute left-1/2 z-[15] w-[82%] -translate-x-1/2 overflow-hidden rounded-md border-2 border-[#d4b896] bg-[#fffdf6] px-3 py-2 shadow-[3px_3px_0_rgba(61,47,34,0.12)]"
                   initial={false}
                   animate={
                     open
-                      ? { y: -8, opacity: 1, scale: 1 }
-                      : { y: 78, opacity: 0.92, scale: 0.98 }
+                      ? { top: "8%", opacity: 1, scale: 1 }
+                      : { top: "38%", opacity: 0.95, scale: 0.98 }
                   }
                   transition={
                     open
@@ -288,7 +322,7 @@ export function LetterPreview() {
                         }
                       : { duration: 0.28, ease: "easeIn" }
                   }
-                  style={{ bottom: "3.25rem" }}
+                  style={{ height: "54%" }}
                 >
                   <p className="truncate font-pixel text-[8px] text-[var(--ll-pink-deep)]">
                     {currentLetter.subject}
@@ -301,21 +335,41 @@ export function LetterPreview() {
                   </p>
                 </motion.div>
 
-                {/* Envelope front pocket (covers the tucked letter) */}
-                <div
-                  className="absolute inset-x-0 bottom-0 z-20 h-[5.75rem] overflow-hidden rounded-b-2xl border-4 border-t-0 border-[var(--ll-pink-deep)]"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #f6d58a 0%, #e8b86d 55%, #d9a45a 100%)",
-                    clipPath: "polygon(0 38%, 50% 0, 100% 38%, 100% 100%, 0 100%)",
-                  }}
-                />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-10 rounded-b-2xl border-x-4 border-b-4 border-[var(--ll-pink-deep)] bg-[#e8b86d]" />
+                {/* Front pocket — V peak at (160, 100) */}
+                <svg
+                  className="pointer-events-none absolute inset-0 z-20 h-full w-full"
+                  viewBox="0 0 320 200"
+                  preserveAspectRatio="none"
+                  aria-hidden
+                >
+                  <defs>
+                    <linearGradient id="ll-env-front" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f0c96a" />
+                      <stop offset="100%" stopColor="#d9a45a" />
+                    </linearGradient>
+                    <clipPath id="ll-env-front-face">
+                      <rect x="5" y="5" width="310" height="190" rx="16" />
+                    </clipPath>
+                  </defs>
+                  <g clipPath="url(#ll-env-front-face)">
+                    <path
+                      d="M5 118 L160 100 L315 118 L315 195 L5 195 Z"
+                      fill="url(#ll-env-front)"
+                    />
+                    <path
+                      d="M18 120 L160 155 L302 120"
+                      fill="none"
+                      stroke="rgba(120,70,20,0.2)"
+                      strokeWidth="1.25"
+                    />
+                  </g>
+                </svg>
 
-                {/* Opening lip / flap */}
+                {/* Lip — same tip (160,100); clipped to face when closed */}
                 <motion.div
-                  className="absolute left-0 right-0 top-[0.35rem] z-30 h-[4.6rem] origin-top"
+                  className="absolute inset-0 z-30"
                   style={{
+                    transformOrigin: "50% 2.5%",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
                   }}
@@ -327,20 +381,38 @@ export function LetterPreview() {
                       : { duration: 0.35, ease: "easeIn" }
                   }
                 >
-                  <div
-                    className="h-full w-full border-x-4 border-t-4 border-[var(--ll-pink-deep)]"
-                    style={{
-                      background:
-                        "linear-gradient(180deg, #ffe6a8 0%, #f6c97a 70%, #e8b05a 100%)",
-                      clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                      boxShadow: "0 4px 0 rgba(120, 60, 20, 0.12)",
-                    }}
-                  />
-                  {/* Heart seal rides on the flap tip */}
+                  <svg
+                    className="h-full w-full"
+                    viewBox="0 0 320 200"
+                    preserveAspectRatio="none"
+                    aria-hidden
+                  >
+                    <defs>
+                      <linearGradient id="ll-env-flap" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#fff0c2" />
+                        <stop offset="100%" stopColor="#f0c96a" />
+                      </linearGradient>
+                      <clipPath id="ll-env-flap-face">
+                        <rect x="5" y="5" width="310" height="190" rx="16" />
+                      </clipPath>
+                    </defs>
+                    <g clipPath={open ? undefined : "url(#ll-env-flap-face)"}>
+                      <path d="M5 5 H315 L160 100 Z" fill="url(#ll-env-flap)" />
+                      <path
+                        d="M5 5 L160 100 L315 5"
+                        fill="none"
+                        stroke="var(--ll-pink-deep)"
+                        strokeWidth="5"
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                      />
+                    </g>
+                  </svg>
                   <motion.div
-                    className="absolute left-1/2 top-[58%] z-40 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+                    className="absolute left-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+                    style={{ top: "36%" }}
                     animate={{
-                      scale: open ? 0.4 : 1,
+                      scale: open ? 0.35 : 1,
                       opacity: open ? 0 : 1,
                     }}
                     transition={{ duration: 0.25 }}

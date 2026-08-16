@@ -39,36 +39,40 @@ const LetterContext = createContext<LetterContextValue | null>(null);
 export function LetterProvider({ children }: { children: ReactNode }) {
   const [form, setFormState] = useState<LetterFormData>(defaultForm);
   const [letter, setLetter] = useState<GeneratedLetter | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEYS.letterDraft);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as {
-        form?: LetterFormData;
-        letter?: GeneratedLetter | null;
-      };
-      if (parsed.form)
-        setFormState({
-          ...defaultForm,
-          ...parsed.form,
-          senderEmail: parsed.form.senderEmail ?? "",
-          writeMode: parsed.form.writeMode === "own" ? "own" : "ai",
-          ownSubject: parsed.form.ownSubject ?? "",
-          ownMessage: parsed.form.ownMessage ?? "",
-        });
-      if (parsed.letter) setLetter(parsed.letter);
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          form?: LetterFormData;
+          letter?: GeneratedLetter | null;
+        };
+        if (parsed.form)
+          setFormState({
+            ...defaultForm,
+            ...parsed.form,
+            senderEmail: parsed.form.senderEmail ?? "",
+            writeMode: parsed.form.writeMode === "own" ? "own" : "ai",
+            ownSubject: parsed.form.ownSubject ?? "",
+            ownMessage: parsed.form.ownMessage ?? "",
+          });
+        if (parsed.letter) setLetter(parsed.letter);
+      }
     } catch {
       // ignore corrupt draft
     }
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     sessionStorage.setItem(
       STORAGE_KEYS.letterDraft,
       JSON.stringify({ form, letter })
     );
-  }, [form, letter]);
+  }, [form, letter, hydrated]);
 
   const setForm = useCallback((patch: Partial<LetterFormData>) => {
     setFormState((prev) => ({ ...prev, ...patch }));
