@@ -1,5 +1,16 @@
 import { cookies } from "next/headers";
 import { createHmac, timingSafeEqual } from "crypto";
+import {
+  addPaidCreditForEmail,
+  consumeLetterForEmail,
+  consumeMixtapeForEmail,
+  hasUsageDatabase,
+  isValidSenderEmail,
+  mergeSenderIntoCookieUsage,
+  normalizeSenderEmail,
+  readSenderUsage,
+  writeSenderUsage,
+} from "@/lib/sender-usage";
 
 /** Letters: first 2 free, then £0.99 each */
 export const FREE_LETTERS = 2;
@@ -116,14 +127,23 @@ export type UsageSnapshot = {
   credits: number;
 };
 
-export async function readUsage(): Promise<UsageSnapshot> {
+function finalize(
+  usage: Omit<UsageSnapshot, "freeUsed" | "credits">
+): UsageSnapshot {
+  return {
+    ...usage,
+    freeUsed: usage.letterFreeUsed >= FREE_LETTERS,
+    credits: usage.letterCredits + usage.mixCredits,
+  };
+}
+
+async function readCookieUsage(): Promise<UsageSnapshot> {
   const jar = await cookies();
 
   let letterFreeUsed = parseCount(
     unpack(jar.get(LETTER_FREE_COOKIE)?.value),
     FREE_LETTERS
   );
-  // migrate old single free-letter flag
   if (
     letterFreeUsed === 0 &&
     unpack(jar.get(LEGACY_FREE_COOKIE)?.value) === "1"
@@ -149,48 +169,74 @@ export async function readUsage(): Promise<UsageSnapshot> {
     ? sessionsRaw.split(",").filter(Boolean)
     : [];
 
-  return {
+  return finalize({
     letterFreeUsed,
     letterCredits,
     mixCredits,
     usedSessionIds,
-    freeUsed: letterFreeUsed >= FREE_LETTERS,
     mixFreeUsed,
-    credits: letterCredits + mixCredits,
-  };
+  });
 }
 
-export async function writeUsage(usage: UsageSnapshot) {
+export async function readUsage(senderEmail?: string): Promise<UsageSnapshot> {
+  const cookie = await readCookieUsage();
+  if (!senderEmail || !isValidSenderEmail(senderEmail)) {
+    return cookie;
+  }
+  try {
+    const emailUsage = await readSenderUsage(senderEmail);
+    return finalize(mergeSenderIntoCookieUsage(cookie, emailUsage));
+  } catch {
+    return cookie;
+  }
+}
+
+export async function writeUsage(usage: UsageSnapshot, senderEmail?: string) {
   const jar = await cookies();
+  const next = finalize(usage);
   jar.set(
     LETTER_FREE_COOKIE,
-    pack(String(Math.max(0, Math.min(usage.letterFreeUsed, FREE_LETTERS)))),
+    pack(String(Math.max(0, Math.min(next.letterFreeUsed, FREE_LETTERS)))),
     cookieOpts
   );
   jar.set(
     LETTER_CREDITS_COOKIE,
-    pack(String(Math.max(0, usage.letterCredits))),
+    pack(String(Math.max(0, next.letterCredits))),
     cookieOpts
   );
   jar.set(
     MIX_FREE_COOKIE,
-    pack(String(Math.max(0, Math.min(usage.mixFreeUsed, FREE_MIXTAPES)))),
+    pack(String(Math.max(0, Math.min(next.mixFreeUsed, FREE_MIXTAPES)))),
     cookieOpts
   );
   jar.set(
     MIX_CREDITS_COOKIE,
-    pack(String(Math.max(0, usage.mixCredits))),
+    pack(String(Math.max(0, next.mixCredits))),
     cookieOpts
   );
   jar.set(
     SESSIONS_COOKIE,
-    pack(usage.usedSessionIds.slice(-30).join(",")),
+    pack(next.usedSessionIds.slice(-30).join(",")),
     cookieOpts
   );
+
+  if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
+    try {
+      await writeSenderUsage(senderEmail, {
+        letterFreeUsed: next.letterFreeUsed,
+        letterCredits: next.letterCredits,
+        mixFreeUsed: next.mixFreeUsed,
+        mixCredits: next.mixCredits,
+        usedSessionIds: next.usedSessionIds,
+      });
+    } catch {
+      /* cookie write still succeeded */
+    }
+  }
 }
 
-export async function getSendAccess() {
-  const usage = await readUsage();
+export async function getSendAccess(senderEmail?: string) {
+  const usage = await readUsage(senderEmail);
   if (isDemoMode()) {
     return { allowed: true as const, reason: "demo" as const, usage };
   }
@@ -203,11 +249,36 @@ export async function getSendAccess() {
   return { allowed: false as const, reason: "payment_required" as const, usage };
 }
 
-export async function consumeSendAccess() {
-  const usage = await readUsage();
+export async function consumeSendAccess(senderEmail?: string) {
+  const usage = await readUsage(senderEmail);
   if (isDemoMode()) {
     return usage;
   }
+
+  if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
+    try {
+      const emailUsage = await consumeLetterForEmail(senderEmail);
+      const next = finalize({
+        letterFreeUsed: emailUsage.letterFreeUsed,
+        letterCredits: emailUsage.letterCredits,
+        mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
+        mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
+        usedSessionIds: Array.from(
+          new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
+        ).slice(-30),
+      });
+      await writeUsage(next, senderEmail);
+      return next;
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        err.message.includes("No send credit available")
+      ) {
+        throw err;
+      }
+    }
+  }
+
   if (usage.letterFreeUsed < FREE_LETTERS) {
     usage.letterFreeUsed += 1;
   } else if (usage.letterCredits > 0) {
@@ -215,14 +286,13 @@ export async function consumeSendAccess() {
   } else {
     throw new Error("No send credit available.");
   }
-  usage.freeUsed = usage.letterFreeUsed >= FREE_LETTERS;
-  usage.credits = usage.letterCredits + usage.mixCredits;
-  await writeUsage(usage);
-  return usage;
+  const next = finalize(usage);
+  await writeUsage(next, senderEmail);
+  return next;
 }
 
-export async function getMixtapeSendAccess() {
-  const usage = await readUsage();
+export async function getMixtapeSendAccess(senderEmail?: string) {
+  const usage = await readUsage(senderEmail);
   if (isDemoMode()) {
     return { allowed: true as const, reason: "demo" as const, usage };
   }
@@ -235,11 +305,39 @@ export async function getMixtapeSendAccess() {
   return { allowed: false as const, reason: "payment_required" as const, usage };
 }
 
-export async function consumeMixtapeSendAccess() {
-  const usage = await readUsage();
+export async function consumeMixtapeSendAccess(senderEmail?: string) {
+  const usage = await readUsage(senderEmail);
   if (isDemoMode()) {
     return usage;
   }
+
+  if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
+    try {
+      const emailUsage = await consumeMixtapeForEmail(senderEmail);
+      const next = finalize({
+        letterFreeUsed: Math.max(
+          usage.letterFreeUsed,
+          emailUsage.letterFreeUsed
+        ),
+        letterCredits: Math.max(usage.letterCredits, emailUsage.letterCredits),
+        mixFreeUsed: emailUsage.mixFreeUsed,
+        mixCredits: emailUsage.mixCredits,
+        usedSessionIds: Array.from(
+          new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
+        ).slice(-30),
+      });
+      await writeUsage(next, senderEmail);
+      return next;
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        err.message.includes("No mixtape send credit available")
+      ) {
+        throw err;
+      }
+    }
+  }
+
   if (usage.mixFreeUsed < FREE_MIXTAPES) {
     usage.mixFreeUsed += 1;
   } else if (usage.mixCredits > 0) {
@@ -247,26 +345,53 @@ export async function consumeMixtapeSendAccess() {
   } else {
     throw new Error("No mixtape send credit available.");
   }
-  usage.credits = usage.letterCredits + usage.mixCredits;
-  await writeUsage(usage);
-  return usage;
+  const next = finalize(usage);
+  await writeUsage(next, senderEmail);
+  return next;
 }
 
 export async function addPaidCredit(
   sessionId: string,
-  kind: CheckoutKind = "letter"
+  kind: CheckoutKind = "letter",
+  senderEmail?: string
 ) {
-  const usage = await readUsage();
+  const usage = await readUsage(senderEmail);
   if (usage.usedSessionIds.includes(sessionId)) {
     return { usage, alreadyApplied: true as const };
   }
+
+  if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
+    try {
+      const emailResult = await addPaidCreditForEmail(
+        senderEmail,
+        sessionId,
+        kind
+      );
+      const next = finalize(
+        mergeSenderIntoCookieUsage(usage, emailResult.usage)
+      );
+      if (!next.usedSessionIds.includes(sessionId)) {
+        next.usedSessionIds = [...next.usedSessionIds, sessionId].slice(-30);
+      }
+      await writeUsage(next, senderEmail);
+      return {
+        usage: next,
+        alreadyApplied: emailResult.alreadyApplied,
+      };
+    } catch {
+      /* fall through */
+    }
+  }
+
   if (kind === "mixtape") {
     usage.mixCredits += 1;
   } else {
     usage.letterCredits += 1;
   }
   usage.usedSessionIds = [...usage.usedSessionIds, sessionId].slice(-30);
-  usage.credits = usage.letterCredits + usage.mixCredits;
-  await writeUsage(usage);
-  return { usage, alreadyApplied: false as const };
+  const next = finalize(usage);
+  await writeUsage(next, senderEmail);
+  return { usage: next, alreadyApplied: false as const };
 }
+
+export { normalizeSenderEmail, isValidSenderEmail, hasUsageDatabase };

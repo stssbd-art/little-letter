@@ -100,6 +100,20 @@ export function MessageForm() {
                   placeholder="Alex"
                 />
               </Field>
+              <Field
+                label="Your email"
+                htmlFor="senderEmail"
+                hint="Tracks your free sends — not shown to the recipient"
+              >
+                <PixelInput
+                  id="senderEmail"
+                  type="email"
+                  required
+                  value={form.senderEmail}
+                  onChange={(e) => setForm({ senderEmail: e.target.value })}
+                  placeholder="you@email.com"
+                />
+              </Field>
               <Field label="Relationship" htmlFor="relationship">
                 <PixelSelect
                   id="relationship"

@@ -5,10 +5,12 @@ import {
   FREE_LETTERS,
   FREE_MIXTAPES,
   isDemoMode,
+  isValidSenderEmail,
   LETTER_PRICE_LABEL,
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
   mixtapePrice,
+  normalizeSenderEmail,
   readUsage,
   type CheckoutKind,
 } from "@/lib/usage";
@@ -16,11 +18,15 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const usage = await readUsage();
   const url = new URL(request.url);
   const kind = url.searchParams.get("kind");
   const demo = isDemoMode();
   const trackCount = Number(url.searchParams.get("trackCount") || "1");
+  const emailRaw = url.searchParams.get("email")?.trim() || "";
+  const senderEmail = isValidSenderEmail(emailRaw)
+    ? normalizeSenderEmail(emailRaw)
+    : undefined;
+  const usage = await readUsage(senderEmail);
 
   if (kind === "mixtape") {
     const priceInfo = mixtapePrice(Number.isFinite(trackCount) ? trackCount : 1);
@@ -40,6 +46,7 @@ export async function GET(request: Request) {
       price: priceInfo.label,
       priceOneSong: MIX_ONE_SONG_LABEL,
       priceMultiSong: MIX_MULTI_SONG_LABEL,
+      trackedByEmail: Boolean(senderEmail),
     });
   }
 
@@ -57,6 +64,7 @@ export async function GET(request: Request) {
     credits: usage.letterCredits,
     canSend,
     price: LETTER_PRICE_LABEL,
+    trackedByEmail: Boolean(senderEmail),
   });
 }
 
@@ -69,7 +77,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as { sessionId?: string };
+    const body = (await request.json()) as {
+      sessionId?: string;
+      senderEmail?: string;
+    };
     const sessionId = body.sessionId?.trim();
 
     if (!sessionId) {
@@ -80,7 +91,15 @@ export async function POST(request: Request) {
     const kind = (session.metadata?.kind === "mixtape"
       ? "mixtape"
       : "letter") as CheckoutKind;
-    const result = await addPaidCredit(sessionId, kind);
+    const metaEmail = session.metadata?.senderEmail?.trim() || "";
+    const bodyEmail = body.senderEmail?.trim() || "";
+    const senderEmail = isValidSenderEmail(metaEmail)
+      ? normalizeSenderEmail(metaEmail)
+      : isValidSenderEmail(bodyEmail)
+        ? normalizeSenderEmail(bodyEmail)
+        : undefined;
+
+    const result = await addPaidCredit(sessionId, kind, senderEmail);
     return NextResponse.json({
       ok: true,
       alreadyApplied: result.alreadyApplied,
@@ -93,6 +112,7 @@ export async function POST(request: Request) {
         kind === "mixtape"
           ? session.metadata?.priceLabel ?? MIX_MULTI_SONG_LABEL
           : LETTER_PRICE_LABEL,
+      trackedByEmail: Boolean(senderEmail),
     });
   } catch (err) {
     const message =

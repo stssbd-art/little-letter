@@ -22,6 +22,7 @@ export async function createSendCheckoutSession(opts: {
   returnPath?: string;
   kind?: CheckoutKind;
   trackCount?: number;
+  senderEmail?: string;
 }) {
   const stripe = getStripe();
   if (!stripe) {
@@ -35,6 +36,7 @@ export async function createSendCheckoutSession(opts: {
 
   const trackCount = Math.max(1, Math.floor(opts.trackCount ?? 1));
   const mix = mixtapePrice(trackCount);
+  const senderEmail = (opts.senderEmail || "").trim().toLowerCase();
 
   const product =
     kind === "mixtape"
@@ -53,6 +55,7 @@ export async function createSendCheckoutSession(opts: {
 
   return stripe.checkout.sessions.create({
     mode: "payment",
+    customer_email: senderEmail || undefined,
     success_url: `${base}${safePath}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}${safePath}?cancelled=1`,
     line_items: [
@@ -74,6 +77,7 @@ export async function createSendCheckoutSession(opts: {
       kind,
       trackCount: String(kind === "mixtape" ? trackCount : 0),
       priceLabel: product.label,
+      senderEmail: senderEmail || "",
     },
   });
 }

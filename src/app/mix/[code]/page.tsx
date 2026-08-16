@@ -51,8 +51,10 @@ export default async function MixPlayPage({ params }: Props) {
         />
       </PixelWindow>
       <div className="flex justify-center gap-3">
-        <Link href="/mixtape">
-          <PixelButton variant="secondary">Burn your own tape</PixelButton>
+        <Link
+          href={`/mixtape?restore=${encodeURIComponent(code.trim())}`}
+        >
+          <PixelButton variant="secondary">Continue editing &amp; send</PixelButton>
         </Link>
         <Link href="/">
           <PixelButton variant="ghost">Home</PixelButton>

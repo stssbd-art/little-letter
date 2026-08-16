@@ -4,9 +4,11 @@ import type { MixtapePayload } from "@/types";
 import {
   consumeMixtapeSendAccess,
   getMixtapeSendAccess,
+  isValidSenderEmail,
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
   mixtapePrice,
+  normalizeSenderEmail,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
 import {
@@ -41,6 +43,12 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    if (!body.senderEmail || !isValidSenderEmail(body.senderEmail)) {
+      return NextResponse.json(
+        { error: "Your email is required to track free mixtape sends." },
+        { status: 400 }
+      );
+    }
     if (!body.title?.trim()) {
       return NextResponse.json(
         { error: "Mixtape title is required." },
@@ -71,7 +79,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const access = await getMixtapeSendAccess();
+    const senderEmail = normalizeSenderEmail(body.senderEmail);
+    const access = await getMixtapeSendAccess(senderEmail);
     if (!access.allowed) {
       const price = mixtapePrice(trackIds.length);
       return NextResponse.json(
@@ -89,6 +98,7 @@ export async function POST(request: Request) {
       recipientName: body.recipientName.trim(),
       recipientEmail: body.recipientEmail.trim(),
       senderName: body.senderName.trim(),
+      senderEmail,
       title: body.title.trim().slice(0, 80),
       dedication: (body.dedication ?? "").trim().slice(0, 500),
       trackIds,
@@ -101,7 +111,7 @@ export async function POST(request: Request) {
     };
 
     const result = await sendMixtapeEmail(mix);
-    const usage = await consumeMixtapeSendAccess();
+    const usage = await consumeMixtapeSendAccess(senderEmail);
 
     if (body.shareExample) {
       try {

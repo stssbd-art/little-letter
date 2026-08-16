@@ -28,6 +28,14 @@ const FAQS = [
     a: "Finish one-time Gmail setup: add GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, and GMAIL_SETUP_SECRET on Vercel, redeploy, then open /api/gmail-setup?key=YOUR_SECRET. That connects Gmail API (same send path as the Gmail app). Letters go out as plain text with subject “Hi [name]”.",
   },
   {
+    q: "How do free sends work without an account?",
+    a: "You enter your email when creating a letter or mixtape. We track free/paid usage against that email (and browser cookies). Clearing cookies alone won’t reset your free allowance if you use the same email again. After free sends are used, Stripe charges apply.",
+  },
+  {
+    q: "Can I get a refund?",
+    a: "Once the email has been sent to your recipient, payments are non-refundable. If a charge went through but our system clearly failed to send the email, contact us and we’ll help with a credit or resend where reasonable. Landing in spam is not a refund reason after a successful send.",
+  },
+  {
     q: "How are messages written?",
     a: "We use the OpenAI API to craft unique, personal notes based on the occasion, style, and details you provide — with a warm local fallback if the API is unavailable.",
   },

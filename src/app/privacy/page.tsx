@@ -10,16 +10,16 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-const UPDATED = "15 August 2026";
+const UPDATED = "16 August 2026";
 
 const SECTIONS = [
   {
     title: "Information you provide",
-    body: `When you send a letter or mixtape, you may enter names, email addresses, message text, dedications, and song choices. We use that information to generate and deliver your message to the recipient you choose.`,
+    body: `When you send a letter or mixtape, you may enter names, email addresses (including your own sender email), message text, dedications, and song choices. We use recipient details to deliver your message. We use your sender email to track free-send limits and paid credits so clearing browser cookies cannot reset those limits.`,
   },
   {
     title: "Technical & payment data",
-    body: `We may use cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Payments are processed by Stripe; we do not store your full card details.`,
+    body: `We may use cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts are also stored on our database. Payments are processed by Stripe; we do not store your full card details.`,
   },
   {
     title: "Third-party services",

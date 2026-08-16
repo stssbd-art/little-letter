@@ -79,7 +79,26 @@ const SECTIONS = [
     ),
   },
   {
-    title: "6. No warranties",
+    title: "6. Payments & refunds",
+    body: (
+      <>
+        Free allowances may apply. Paid letters and mixtapes are charged through
+        Stripe.{" "}
+        <strong className="font-semibold text-[var(--ll-ink)]">
+          Once an email has been sent to your chosen recipient, the payment is
+          non-refundable
+        </strong>
+        . Digital delivery begins when we attempt to send the message, so we
+        cannot reverse or refund a completed send. If a payment is taken but the
+        email clearly failed to send because of our systems, contact us and we
+        will help (credit or resend where reasonable). Inbox placement (including
+        spam folders) is outside our control and is not grounds for a refund
+        after a successful send.
+      </>
+    ),
+  },
+  {
+    title: "7. No warranties",
     body: (
       <>
         The site is provided “as is.” Delivery of email depends on email
@@ -89,7 +108,7 @@ const SECTIONS = [
     ),
   },
   {
-    title: "7. Limitation of liability",
+    title: "8. Limitation of liability",
     body: (
       <>
         To the fullest extent allowed by law, {SITE_NAME} and its creator are
@@ -99,7 +118,7 @@ const SECTIONS = [
     ),
   },
   {
-    title: "8. Changes",
+    title: "9. Changes",
     body: (
       <>
         These Terms may be updated from time to time. Continued use after
@@ -154,16 +173,23 @@ export default function TermsPage() {
             Terms of use
           </h2>
           <div className="space-y-5">
-            {SECTIONS.map((section) => (
-              <section key={section.title} className="space-y-1.5">
-                <h3 className="font-display text-base leading-snug text-[var(--ll-ink)]">
-                  {section.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
-                  {section.body}
-                </p>
-              </section>
-            ))}
+            {SECTIONS.map((section) => {
+              const isRefund = section.title.startsWith("6.");
+              return (
+                <section
+                  key={section.title}
+                  id={isRefund ? "refunds" : undefined}
+                  className="scroll-mt-24 space-y-1.5"
+                >
+                  <h3 className="font-display text-base leading-snug text-[var(--ll-ink)]">
+                    {section.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+                    {section.body}
+                  </p>
+                </section>
+              );
+            })}
           </div>
         </div>
       </PixelWindow>

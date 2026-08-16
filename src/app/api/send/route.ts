@@ -5,7 +5,9 @@ import {
   consumeSendAccess,
   FREE_LETTERS,
   getSendAccess,
+  isValidSenderEmail,
   LETTER_PRICE_LABEL,
+  normalizeSenderEmail,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
 import { addLetterExample } from "@/lib/shared-examples";
@@ -28,6 +30,12 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    if (!body.form.senderEmail || !isValidSenderEmail(body.form.senderEmail)) {
+      return NextResponse.json(
+        { error: "Your email is required to track free sends." },
+        { status: 400 }
+      );
+    }
     if (!body.subject?.trim() || !body.message?.trim()) {
       return NextResponse.json(
         { error: "Letter content is missing." },
@@ -35,7 +43,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const access = await getSendAccess();
+    const senderEmail = normalizeSenderEmail(body.form.senderEmail);
+    const access = await getSendAccess(senderEmail);
     if (!access.allowed) {
       return NextResponse.json(
         {
@@ -51,12 +60,15 @@ export async function POST(request: Request) {
     const letter: GeneratedLetter = {
       subject: body.subject,
       message: body.message,
-      form: body.form,
+      form: {
+        ...body.form,
+        senderEmail,
+      },
       createdAt: body.createdAt || new Date().toISOString(),
     };
 
     const result = await sendLetterEmail(letter);
-    const usage = await consumeSendAccess();
+    const usage = await consumeSendAccess(senderEmail);
 
     if (body.shareExample) {
       try {

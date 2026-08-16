@@ -26,6 +26,12 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    if (!body.senderEmail || !isValidEmail(body.senderEmail)) {
+      return NextResponse.json(
+        { error: "Your email is required to track free sends." },
+        { status: 400 }
+      );
+    }
     if (!OCCASIONS.some((o) => o.value === body.occasion)) {
       return NextResponse.json({ error: "Invalid occasion." }, { status: 400 });
     }
@@ -43,6 +49,7 @@ export async function POST(request: Request) {
       recipientName: body.recipientName.trim(),
       recipientEmail: body.recipientEmail.trim(),
       senderName: body.senderName.trim(),
+      senderEmail: body.senderEmail.trim().toLowerCase(),
       relationship: body.relationship!,
       occasion: body.occasion!,
       style: body.style!,

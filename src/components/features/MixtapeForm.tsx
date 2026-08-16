@@ -8,8 +8,15 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { Field, PixelInput, PixelTextarea } from "@/components/ui/PixelInput";
 import { useSound } from "@/components/providers/SoundProvider";
-import { STORAGE_KEYS } from "@/lib/constants";
-import { encodeMixShare } from "@/lib/mixtape-link";
+import { encodeMixShare, decodeMixShare } from "@/lib/mixtape-link";
+import {
+  clearMixtapeDraft,
+  draftHasSongs,
+  EMPTY_MIXTAPE_DRAFT,
+  loadMixtapeDraft,
+  saveMixtapeDraft,
+  type MixtapeDraft,
+} from "@/lib/mixtape-draft";
 import {
   getTracksByIds,
   MAX_MIXTAPE_TRACKS,
@@ -38,21 +45,13 @@ type UsageInfo = {
   priceMultiSong?: string;
 };
 
-const emptyDraft = {
-  recipientName: "",
-  recipientEmail: "",
-  senderName: "",
-  title: "",
-  dedication: "",
-  trackIds: [] as string[],
-  customTracks: [] as MixTrack[],
-};
+const emptyDraft = EMPTY_MIXTAPE_DRAFT;
 
 export function MixtapeForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { play } = useSound();
-  const [draft, setDraft] = useState(emptyDraft);
+  const [draft, setDraft] = useState<MixtapeDraft>(emptyDraft);
   const [ready, setReady] = useState(false);
   const [sending, setSending] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -61,6 +60,7 @@ export function MixtapeForm() {
   const [needsPayment, setNeedsPayment] = useState(false);
   const [shareExample, setShareExample] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const hydratedRef = useRef(false);
 
   const hostRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YtPlayer | null>(null);
@@ -265,36 +265,70 @@ export function MixtapeForm() {
   }
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(STORAGE_KEYS.mixtapeDraft);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<typeof emptyDraft>;
-        setDraft({
-          ...emptyDraft,
-          ...parsed,
-          trackIds: Array.isArray(parsed.trackIds) ? parsed.trackIds : [],
-          customTracks: Array.isArray(parsed.customTracks)
-            ? parsed.customTracks
-            : [],
-        });
+    let next = loadMixtapeDraft() ?? emptyDraft;
+
+    // Restore from Preview mix link (?restore=code) so a new tab keeps songs
+    const restoreCode = searchParams.get("restore");
+    if (restoreCode) {
+      try {
+        const mix = decodeMixShare(decodeURIComponent(restoreCode.trim()));
+        if (mix?.tracks?.length) {
+          next = {
+            ...next,
+            title: next.title || mix.title || "",
+            senderName: next.senderName || mix.from || "",
+            recipientName: next.recipientName || mix.to || "",
+            dedication: next.dedication || mix.note || "",
+            trackIds: mix.tracks,
+            customTracks: mix.extras ?? [],
+          };
+          saveMixtapeDraft(next);
+        }
+      } catch {
+        /* ignore bad restore codes */
       }
-    } catch {
-      /* ignore */
     }
+
+    setDraft(next);
+    hydratedRef.current = true;
     setReady(true);
+
+    // Drop ?restore= so refresh doesn't fight Stripe return params
+    if (restoreCode && typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("restore") && !url.searchParams.has("paid")) {
+        url.searchParams.delete("restore");
+        window.history.replaceState({}, "", `${url.pathname}${url.search}`);
+      }
+    }
+    // Only hydrate once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
-    sessionStorage.setItem(STORAGE_KEYS.mixtapeDraft, JSON.stringify(draft));
+    if (!ready || !hydratedRef.current) return;
+    saveMixtapeDraft(draft);
   }, [draft, ready]);
+
+  function resolveDraft(): MixtapeDraft {
+    if (draftHasSongs(draft) && draft.recipientEmail.trim()) return draft;
+    const stored = loadMixtapeDraft();
+    if (stored && draftHasSongs(stored)) return stored;
+    return draft;
+  }
 
   async function refreshUsage() {
     const count = Math.max(1, draft.trackIds.length || 1);
-    const res = await fetch(
-      `/api/usage?kind=mixtape&trackCount=${count}&t=${Date.now()}`,
-      { cache: "no-store" }
-    );
+    const email = draft.senderEmail.trim();
+    const qs = new URLSearchParams({
+      kind: "mixtape",
+      trackCount: String(count),
+      t: String(Date.now()),
+    });
+    if (email) qs.set("email", email);
+    const res = await fetch(`/api/usage?${qs.toString()}`, {
+      cache: "no-store",
+    });
     const data = (await res.json()) as UsageInfo;
     if (res.ok) {
       setUsage(data);
@@ -305,7 +339,7 @@ export function MixtapeForm() {
   useEffect(() => {
     void refreshUsage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [draft.trackIds.length]);
+  }, [draft.trackIds.length, draft.senderEmail]);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
@@ -327,7 +361,10 @@ export function MixtapeForm() {
           const verify = await fetch("/api/usage", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ sessionId }),
+            body: JSON.stringify({
+              sessionId,
+              senderEmail: resolveDraft().senderEmail.trim(),
+            }),
           });
           const verifyData = await verify.json();
           if (!verify.ok) {
@@ -419,14 +456,20 @@ export function MixtapeForm() {
     });
   }
 
-  function validate(): string | null {
-    if (!draft.recipientName.trim()) return "Who is this mix for?";
-    if (!draft.recipientEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.recipientEmail)) {
+  function validate(d: MixtapeDraft = resolveDraft()): string | null {
+    if (!d.recipientName.trim()) return "Who is this mix for?";
+    if (!d.recipientEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.recipientEmail)) {
       return "Need a valid recipient email.";
     }
-    if (!draft.senderName.trim()) return "Add your name on the cassette label.";
-    if (!draft.title.trim()) return "Give the mixtape a title.";
-    if (draft.trackIds.length < MIN_MIXTAPE_TRACKS) {
+    if (!d.senderName.trim()) return "Add your name on the cassette label.";
+    if (
+      !d.senderEmail.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.senderEmail.trim())
+    ) {
+      return "Add your email so we can track free sends (not shown to them).";
+    }
+    if (!d.title.trim()) return "Give the mixtape a title.";
+    if (d.trackIds.length < MIN_MIXTAPE_TRACKS) {
       return `Pick at least ${MIN_MIXTAPE_TRACKS} song${MIN_MIXTAPE_TRACKS === 1 ? "" : "s"} for the mix.`;
     }
     if (!hasAcceptedTerms()) {
@@ -436,24 +479,32 @@ export function MixtapeForm() {
   }
 
   async function sendMixtape() {
-    const problem = validate();
+    const current = resolveDraft();
+    if (current !== draft && draftHasSongs(current)) {
+      setDraft(current);
+    }
+    const problem = validate(current);
     if (problem) {
       setError(problem);
+      setPaying(false);
+      setSending(false);
       return;
     }
 
     setSending(true);
     setError("");
     play("whoosh");
+    saveMixtapeDraft(current);
 
     const payload: MixtapePayload = {
-      recipientName: draft.recipientName.trim(),
-      recipientEmail: draft.recipientEmail.trim(),
-      senderName: draft.senderName.trim(),
-      title: draft.title.trim(),
-      dedication: draft.dedication.trim(),
-      trackIds: draft.trackIds,
-      customTracks: draft.customTracks,
+      recipientName: current.recipientName.trim(),
+      recipientEmail: current.recipientEmail.trim(),
+      senderName: current.senderName.trim(),
+      senderEmail: current.senderEmail.trim(),
+      title: current.title.trim(),
+      dedication: current.dedication.trim(),
+      trackIds: current.trackIds,
+      customTracks: current.customTracks,
       createdAt: new Date().toISOString(),
     };
 
@@ -466,11 +517,18 @@ export function MixtapeForm() {
       const data = await res.json();
 
       if (res.status === 402) {
-        const count = Math.max(1, draft.trackIds.length || 1);
-        const latest = await fetch(
-          `/api/usage?kind=mixtape&trackCount=${count}&t=${Date.now()}`,
-          { cache: "no-store" }
-        ).then((r) => r.json() as Promise<UsageInfo>);
+        const count = Math.max(1, current.trackIds.length || 1);
+        const qs = new URLSearchParams({
+          kind: "mixtape",
+          trackCount: String(count),
+          t: String(Date.now()),
+        });
+        if (current.senderEmail.trim()) {
+          qs.set("email", current.senderEmail.trim());
+        }
+        const latest = await fetch(`/api/usage?${qs.toString()}`, {
+          cache: "no-store",
+        }).then((r) => r.json() as Promise<UsageInfo>);
         if (latest?.demo || latest?.canSend) {
           setUsage(latest);
           setNeedsPayment(false);
@@ -503,7 +561,7 @@ export function MixtapeForm() {
       } catch {
         /* ignore */
       }
-      sessionStorage.removeItem(STORAGE_KEYS.mixtapeDraft);
+      clearMixtapeDraft();
       router.push("/success?kind=mixtape");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send mixtape");
@@ -512,11 +570,17 @@ export function MixtapeForm() {
   }
 
   async function startPayment() {
-    const problem = validate();
+    const current = resolveDraft();
+    if (current !== draft && draftHasSongs(current)) {
+      setDraft(current);
+    }
+    const problem = validate(current);
     if (problem) {
       setError(problem);
       return;
     }
+    // Flush before leaving for Stripe so return / other tabs keep the mix
+    saveMixtapeDraft(current);
     setPaying(true);
     setError("");
     play("click");
@@ -527,7 +591,8 @@ export function MixtapeForm() {
         body: JSON.stringify({
           returnPath: "/mixtape",
           kind: "mixtape",
-          trackCount: Math.max(1, draft.trackIds.length),
+          trackCount: Math.max(1, current.trackIds.length),
+          senderEmail: current.senderEmail.trim(),
         }),
       });
       const data = await res.json();
@@ -570,7 +635,12 @@ export function MixtapeForm() {
   const previewHref = previewMixHref();
 
   const previewMixButton = previewHref ? (
-    <Link href={previewHref} target="_blank" rel="noreferrer">
+    <Link
+      href={previewHref}
+      target="_blank"
+      rel="noreferrer"
+      onClick={() => saveMixtapeDraft(draft)}
+    >
       <PixelButton type="button" variant="secondary">
         ▶ Preview mix
       </PixelButton>
@@ -674,6 +744,23 @@ export function MixtapeForm() {
                 />
               </Field>
             </div>
+
+            <Field
+              label="Your email"
+              htmlFor="mix-sender-email"
+              hint="Tracks your free mixtape — not shown on the cassette"
+            >
+              <PixelInput
+                id="mix-sender-email"
+                type="email"
+                value={draft.senderEmail}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, senderEmail: e.target.value }))
+                }
+                placeholder="you@email.com"
+                required
+              />
+            </Field>
 
             <Field label="Their email" htmlFor="mix-email">
               <PixelInput

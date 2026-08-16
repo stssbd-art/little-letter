@@ -33,6 +33,8 @@ export interface LetterFormData {
   recipientName: string;
   recipientEmail: string;
   senderName: string;
+  /** Used to track free/paid sends without an account */
+  senderEmail: string;
   relationship: Relationship;
   occasion: Occasion;
   style: MessageStyle;
@@ -70,6 +72,8 @@ export interface MixtapePayload {
   recipientName: string;
   recipientEmail: string;
   senderName: string;
+  /** Used to track free/paid sends without an account */
+  senderEmail: string;
   title: string;
   dedication: string;
   trackIds: string[];

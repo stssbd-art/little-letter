@@ -5,7 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { YouTubeSongSearch } from "@/components/features/YouTubeSongSearch";
 import { useSound } from "@/components/providers/SoundProvider";
-import { STORAGE_KEYS } from "@/lib/constants";
+import {
+  EMPTY_MIXTAPE_DRAFT,
+  loadMixtapeDraft,
+  saveMixtapeDraft,
+} from "@/lib/mixtape-draft";
 import {
   MAX_MIXTAPE_TRACKS,
   MIX_TRACKS,
@@ -149,36 +153,22 @@ export function RetroMp3Player({ className }: { className?: string }) {
   function seedMixtapeAndGo() {
     play("click");
     try {
-      const raw = sessionStorage.getItem(STORAGE_KEYS.mixtapeDraft);
-      const base = {
-        recipientName: "",
-        recipientEmail: "",
-        senderName: "",
-        title: "",
-        dedication: "",
-        trackIds: [] as string[],
-        customTracks: [] as MixTrack[],
-      };
-      const parsed = raw ? (JSON.parse(raw) as Partial<typeof base>) : {};
-      const draft = { ...base, ...parsed };
-      const trackIds = draft.trackIds.includes(track.id)
-        ? draft.trackIds
-        : [...draft.trackIds, track.id].slice(0, MAX_MIXTAPE_TRACKS);
+      const loaded = loadMixtapeDraft() ?? EMPTY_MIXTAPE_DRAFT;
+      const trackIds = loaded.trackIds.includes(track.id)
+        ? loaded.trackIds
+        : [...loaded.trackIds, track.id].slice(0, MAX_MIXTAPE_TRACKS);
       const customTracks = track.id.startsWith("yt:")
         ? [
-            ...(draft.customTracks ?? []).filter((t) => t.id !== track.id),
+            ...(loaded.customTracks ?? []).filter((t) => t.id !== track.id),
             track,
           ]
-        : draft.customTracks ?? [];
-      sessionStorage.setItem(
-        STORAGE_KEYS.mixtapeDraft,
-        JSON.stringify({
-          ...draft,
-          trackIds,
-          customTracks,
-          title: draft.title || `${track.title} mix`,
-        })
-      );
+        : loaded.customTracks ?? [];
+      saveMixtapeDraft({
+        ...loaded,
+        trackIds,
+        customTracks,
+        title: loaded.title || `${track.title} mix`,
+      });
     } catch {
       /* ignore */
     }

@@ -16,6 +16,7 @@ const defaultForm: LetterFormData = {
   recipientName: "",
   recipientEmail: "",
   senderName: "",
+  senderEmail: "",
   relationship: "friend",
   occasion: "friendship",
   style: "cute",
@@ -44,7 +45,12 @@ export function LetterProvider({ children }: { children: ReactNode }) {
         form?: LetterFormData;
         letter?: GeneratedLetter | null;
       };
-      if (parsed.form) setFormState({ ...defaultForm, ...parsed.form });
+      if (parsed.form)
+        setFormState({
+          ...defaultForm,
+          ...parsed.form,
+          senderEmail: parsed.form.senderEmail ?? "",
+        });
       if (parsed.letter) setLetter(parsed.letter);
     } catch {
       // ignore corrupt draft

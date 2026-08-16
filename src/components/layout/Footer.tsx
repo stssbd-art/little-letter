@@ -10,6 +10,7 @@ const EXPLORE = [
   { href: "/mixtape", label: "Send a mixtape" },
   { href: "/faq", label: "FAQ" },
   { href: "/terms", label: "Terms & Copyright" },
+  { href: "/terms#refunds", label: "Refunds" },
   { href: "/privacy", label: "Privacy" },
 ] as const;
 
@@ -71,6 +72,13 @@ export function Footer() {
             className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
           >
             Terms
+          </Link>
+          <span aria-hidden>·</span>
+          <Link
+            href="/terms#refunds"
+            className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
+          >
+            Refunds
           </Link>
           <span aria-hidden>·</span>
           <Link

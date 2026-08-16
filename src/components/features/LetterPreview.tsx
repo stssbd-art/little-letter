@@ -9,6 +9,9 @@ import { PixelButton } from "@/components/ui/PixelButton";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS } from "@/lib/constants";
+import { TermsAcceptance } from "@/components/features/TermsAcceptance";
+
+const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
 type UsageInfo = {
   demo?: boolean;
@@ -32,9 +35,43 @@ export function LetterPreview() {
   const [usage, setUsage] = useState<UsageInfo | null>(null);
   const [needsPayment, setNeedsPayment] = useState(false);
   const [shareExample, setShareExample] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(TERMS_STORAGE_KEY) === "1") {
+        setAcceptedTerms(true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  function updateAcceptedTerms(next: boolean) {
+    setAcceptedTerms(next);
+    try {
+      sessionStorage.setItem(TERMS_STORAGE_KEY, next ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function hasAcceptedTerms() {
+    if (acceptedTerms) return true;
+    try {
+      return sessionStorage.getItem(TERMS_STORAGE_KEY) === "1";
+    } catch {
+      return false;
+    }
+  }
 
   async function refreshUsage() {
-    const res = await fetch(`/api/usage?t=${Date.now()}`, { cache: "no-store" });
+    const email = letter?.form?.senderEmail?.trim() ?? "";
+    const qs = new URLSearchParams({ t: String(Date.now()) });
+    if (email) qs.set("email", email);
+    const res = await fetch(`/api/usage?${qs.toString()}`, {
+      cache: "no-store",
+    });
     const data = (await res.json()) as UsageInfo;
     if (res.ok) {
       setUsage(data);
@@ -45,7 +82,8 @@ export function LetterPreview() {
 
   useEffect(() => {
     void refreshUsage();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [letter?.form?.senderEmail]);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
@@ -65,7 +103,10 @@ export function LetterPreview() {
           const verify = await fetch("/api/usage", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ sessionId }),
+            body: JSON.stringify({
+              sessionId,
+              senderEmail: letter.form.senderEmail?.trim(),
+            }),
           });
           const verifyData = await verify.json();
           if (!verify.ok) {
@@ -96,9 +137,21 @@ export function LetterPreview() {
     );
   }
 
-  const occasion = OCCASIONS.find((o) => o.value === letter.form.occasion);
+  const currentLetter = letter;
+  const occasion = OCCASIONS.find((o) => o.value === currentLetter.form.occasion);
 
   async function sendLetter() {
+    if (!hasAcceptedTerms()) {
+      setError("Please agree to the Terms, Privacy Policy, and Refund Policy before sending.");
+      return;
+    }
+    if (
+      !currentLetter.form.senderEmail?.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentLetter.form.senderEmail.trim())
+    ) {
+      setError("Your email is missing — go back and add it so we can track free sends.");
+      return;
+    }
     setSending(true);
     setError("");
     play("whoosh");
@@ -106,12 +159,16 @@ export function LetterPreview() {
       const res = await fetch("/api/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...letter, shareExample }),
+        body: JSON.stringify({ ...currentLetter, shareExample }),
       });
       const data = await res.json();
 
       if (res.status === 402) {
-        const latest = await fetch(`/api/usage?t=${Date.now()}`, {
+        const qs = new URLSearchParams({ t: String(Date.now()) });
+        if (currentLetter.form.senderEmail?.trim()) {
+          qs.set("email", currentLetter.form.senderEmail.trim());
+        }
+        const latest = await fetch(`/api/usage?${qs.toString()}`, {
           cache: "no-store",
         }).then((r) => r.json() as Promise<UsageInfo>);
         if (latest?.demo || latest?.canSend) {
@@ -142,6 +199,10 @@ export function LetterPreview() {
   }
 
   async function startPayment() {
+    if (!hasAcceptedTerms()) {
+      setError("Please agree to the Terms, Privacy Policy, and Refund Policy before paying.");
+      return;
+    }
     setPaying(true);
     setError("");
     play("click");
@@ -149,7 +210,11 @@ export function LetterPreview() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnPath: "/preview", kind: "letter" }),
+        body: JSON.stringify({
+          returnPath: "/preview",
+          kind: "letter",
+          senderEmail: currentLetter.form.senderEmail?.trim(),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not start payment");
@@ -283,6 +348,12 @@ export function LetterPreview() {
         </span>
       </label>
 
+      <TermsAcceptance
+        checked={acceptedTerms}
+        onChange={updateAcceptedTerms}
+        id="letter-accept-terms"
+      />
+
       <div className="flex flex-wrap gap-3">
         <PixelButton
           variant="ghost"
@@ -328,14 +399,18 @@ export function LetterPreview() {
         </PixelButton>
 
         {needsPayment && !demo ? (
-          <PixelButton size="lg" onClick={startPayment} disabled={paying || !open}>
+          <PixelButton
+            size="lg"
+            onClick={startPayment}
+            disabled={paying || !open || !acceptedTerms}
+          >
             {paying ? "Opening checkout..." : `💳 Pay ${priceLabel} & send`}
           </PixelButton>
         ) : (
           <PixelButton
             size="lg"
             onClick={sendLetter}
-            disabled={sending || paying || !open}
+            disabled={sending || paying || !open || !acceptedTerms}
           >
             {sending || paying
               ? "Sending..."

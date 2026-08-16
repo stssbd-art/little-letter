@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { createSendCheckoutSession, isStripeConfigured } from "@/lib/stripe";
 import {
   isDemoMode,
+  isValidSenderEmail,
   LETTER_PRICE_LABEL,
   mixtapePrice,
+  normalizeSenderEmail,
   type CheckoutKind,
 } from "@/lib/usage";
 
@@ -34,11 +36,13 @@ export async function POST(request: Request) {
     let returnPath = "/preview";
     let kind: CheckoutKind = "letter";
     let trackCount = 1;
+    let senderEmail = "";
     try {
       const body = (await request.json()) as {
         returnPath?: string;
         kind?: string;
         trackCount?: number;
+        senderEmail?: string;
       };
       if (body?.returnPath === "/mixtape" || body?.returnPath === "/preview") {
         returnPath = body.returnPath;
@@ -49,8 +53,21 @@ export async function POST(request: Request) {
       if (typeof body?.trackCount === "number" && body.trackCount > 0) {
         trackCount = Math.floor(body.trackCount);
       }
+      if (body?.senderEmail && isValidSenderEmail(body.senderEmail)) {
+        senderEmail = normalizeSenderEmail(body.senderEmail);
+      }
     } catch {
       /* empty body is fine */
+    }
+
+    if (!senderEmail) {
+      return NextResponse.json(
+        {
+          error:
+            "Your email is required before checkout so we can attach the paid credit to you.",
+        },
+        { status: 400 }
+      );
     }
 
     const session = await createSendCheckoutSession({
@@ -58,6 +75,7 @@ export async function POST(request: Request) {
       returnPath,
       kind,
       trackCount,
+      senderEmail,
     });
     if (!session.url) {
       return NextResponse.json(
