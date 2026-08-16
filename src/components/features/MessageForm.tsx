@@ -100,48 +100,6 @@ export function MessageForm() {
             onSubmit={onSubmit}
             className="space-y-5"
           >
-            <div>
-              <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
-                How do you want to write it?
-              </p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => setWriteMode("ai")}
-                  className={cn(
-                    "rounded-xl border-2 px-3 py-3 text-left transition",
-                    writeMode === "ai"
-                      ? "border-[var(--ll-pink-deep)] bg-[#fff6df] shadow-[3px_3px_0_var(--ll-lavender-shadow)]"
-                      : "border-[var(--ll-lavender)] bg-white/60 hover:border-[var(--ll-pink-deep)] dark:bg-white/5"
-                  )}
-                >
-                  <p className="font-display text-sm text-[var(--ll-ink)]">
-                    ✨ Help me write it
-                  </p>
-                  <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                    Pick a style — we draft a warm letter you can send.
-                  </p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setWriteMode("own")}
-                  className={cn(
-                    "rounded-xl border-2 px-3 py-3 text-left transition",
-                    writeMode === "own"
-                      ? "border-[var(--ll-pink-deep)] bg-[#fff6df] shadow-[3px_3px_0_var(--ll-lavender-shadow)]"
-                      : "border-[var(--ll-lavender)] bg-white/60 hover:border-[var(--ll-pink-deep)] dark:bg-white/5"
-                  )}
-                >
-                  <p className="font-display text-sm text-[var(--ll-ink)]">
-                    ✍️ I&apos;ll write it myself
-                  </p>
-                  <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                    Simple subject + your own words — no AI.
-                  </p>
-                </button>
-              </div>
-            </div>
-
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Recipient name" htmlFor="recipientName">
                 <PixelInput
@@ -310,16 +268,58 @@ export function MessageForm() {
               </p>
             ) : null}
 
-            <PixelButton
-              type="submit"
-              size="lg"
-              disabled={loading}
-              className="w-full sm:w-auto"
-            >
-              {writeMode === "own"
-                ? "💌 Preview my letter"
-                : "✨ Generate Little Letter"}
-            </PixelButton>
+            <div className="space-y-3 border-t-2 border-[var(--ll-lavender)]/60 pt-4">
+              <p className="font-display text-sm text-[var(--ll-ink)]">
+                How do you want to write it?
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setWriteMode("ai")}
+                  className={cn(
+                    "rounded-xl border-2 px-3 py-3 text-left transition",
+                    writeMode === "ai"
+                      ? "border-[var(--ll-pink-deep)] bg-[#fff6df] shadow-[3px_3px_0_var(--ll-lavender-shadow)]"
+                      : "border-[var(--ll-lavender)] bg-white/60 hover:border-[var(--ll-pink-deep)] dark:bg-white/5"
+                  )}
+                >
+                  <p className="font-display text-sm text-[var(--ll-ink)]">
+                    ✨ Help me write it
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--ll-muted)]">
+                    AI drafts a warm letter from your notes.
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWriteMode("own")}
+                  className={cn(
+                    "rounded-xl border-2 px-3 py-3 text-left transition",
+                    writeMode === "own"
+                      ? "border-[var(--ll-pink-deep)] bg-[#fff6df] shadow-[3px_3px_0_var(--ll-lavender-shadow)]"
+                      : "border-[var(--ll-lavender)] bg-white/60 hover:border-[var(--ll-pink-deep)] dark:bg-white/5"
+                  )}
+                >
+                  <p className="font-display text-sm text-[var(--ll-ink)]">
+                    ✍️ I&apos;ll write it myself
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--ll-muted)]">
+                    Your own words — no AI.
+                  </p>
+                </button>
+              </div>
+
+              <PixelButton
+                type="submit"
+                size="lg"
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
+                {writeMode === "own"
+                  ? "💌 Preview my letter"
+                  : "✨ Generate Little Letter"}
+              </PixelButton>
+            </div>
           </motion.form>
         ) : (
           <motion.div
