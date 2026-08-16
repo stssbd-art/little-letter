@@ -29,6 +29,8 @@ export type Relationship =
   | "colleague"
   | "other";
 
+export type LetterWriteMode = "ai" | "own";
+
 export interface LetterFormData {
   recipientName: string;
   recipientEmail: string;
@@ -39,6 +41,10 @@ export interface LetterFormData {
   occasion: Occasion;
   style: MessageStyle;
   customNote: string;
+  /** ai = generate with AI; own = sender writes the letter */
+  writeMode: LetterWriteMode;
+  ownSubject: string;
+  ownMessage: string;
 }
 
 export interface GeneratedLetter {

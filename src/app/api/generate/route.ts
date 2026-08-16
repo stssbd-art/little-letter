@@ -54,6 +54,9 @@ export async function POST(request: Request) {
       occasion: body.occasion!,
       style: body.style!,
       customNote: (body.customNote ?? "").slice(0, 500),
+      writeMode: "ai",
+      ownSubject: "",
+      ownMessage: "",
     };
 
     const result = await generateLetterMessage(form);

@@ -28,6 +28,10 @@ const FAQS = [
     a: "Finish one-time Gmail setup: add GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, and GMAIL_SETUP_SECRET on Vercel, redeploy, then open /api/gmail-setup?key=YOUR_SECRET. That connects Gmail API (same send path as the Gmail app). Letters go out as plain text with subject “Hi [name]”.",
   },
   {
+    q: "Can I write the letter myself?",
+    a: "Yes. On Create, choose “I’ll write it myself,” then add a subject and your own message — no AI. Or pick “Help me write it” for an AI draft from your occasion and style.",
+  },
+  {
     q: "How do free sends work without an account?",
     a: "You enter your email when creating a letter or mixtape. We track free/paid usage against that email (and browser cookies). Clearing cookies alone won’t reset your free allowance if you use the same email again. After free sends are used, Stripe charges apply.",
   },

@@ -10,7 +10,8 @@ import { Field, PixelInput, PixelSelect, PixelTextarea } from "@/components/ui/P
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
-import type { MessageStyle, Occasion } from "@/types";
+import type { LetterWriteMode, MessageStyle, Occasion } from "@/types";
+import { cn } from "@/lib/utils";
 
 export function MessageForm() {
   const router = useRouter();
@@ -19,6 +20,14 @@ export function MessageForm() {
   const [loading, setLoading] = useState(false);
   const [phase, setPhase] = useState<"form" | "closing" | "flying">("form");
   const [error, setError] = useState("");
+
+  const writeMode: LetterWriteMode = form.writeMode === "own" ? "own" : "ai";
+
+  function setWriteMode(mode: LetterWriteMode) {
+    play("click");
+    setForm({ writeMode: mode });
+    setError("");
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,22 +41,42 @@ export function MessageForm() {
       setPhase("flying");
       play("whoosh");
 
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error ?? "Could not generate letter");
-      }
+      if (writeMode === "own") {
+        const message = form.ownMessage.trim();
+        if (message.length < 8) {
+          throw new Error("Write a little more — at least a short note.");
+        }
+        if (message.length > 4000) {
+          throw new Error("Letter is a bit long — keep it under 4000 characters.");
+        }
+        const subject =
+          form.ownSubject.trim() ||
+          `Hi ${form.recipientName.trim() || "there"}`;
 
-      setLetter({
-        subject: data.subject,
-        message: data.message,
-        form,
-        createdAt: new Date().toISOString(),
-      });
+        setLetter({
+          subject,
+          message,
+          form: { ...form, writeMode: "own" },
+          createdAt: new Date().toISOString(),
+        });
+      } else {
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, writeMode: "ai" }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error ?? "Could not generate letter");
+        }
+
+        setLetter({
+          subject: data.subject,
+          message: data.message,
+          form: { ...form, writeMode: "ai" },
+          createdAt: new Date().toISOString(),
+        });
+      }
 
       await new Promise((r) => setTimeout(r, 900));
       play("sparkle");
@@ -71,6 +100,48 @@ export function MessageForm() {
             onSubmit={onSubmit}
             className="space-y-5"
           >
+            <div>
+              <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
+                How do you want to write it?
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setWriteMode("ai")}
+                  className={cn(
+                    "rounded-xl border-2 px-3 py-3 text-left transition",
+                    writeMode === "ai"
+                      ? "border-[var(--ll-pink-deep)] bg-[#fff6df] shadow-[3px_3px_0_var(--ll-lavender-shadow)]"
+                      : "border-[var(--ll-lavender)] bg-white/60 hover:border-[var(--ll-pink-deep)] dark:bg-white/5"
+                  )}
+                >
+                  <p className="font-display text-sm text-[var(--ll-ink)]">
+                    ✨ Help me write it
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--ll-muted)]">
+                    Pick a style — we draft a warm letter you can send.
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWriteMode("own")}
+                  className={cn(
+                    "rounded-xl border-2 px-3 py-3 text-left transition",
+                    writeMode === "own"
+                      ? "border-[var(--ll-pink-deep)] bg-[#fff6df] shadow-[3px_3px_0_var(--ll-lavender-shadow)]"
+                      : "border-[var(--ll-lavender)] bg-white/60 hover:border-[var(--ll-pink-deep)] dark:bg-white/5"
+                  )}
+                >
+                  <p className="font-display text-sm text-[var(--ll-ink)]">
+                    ✍️ I&apos;ll write it myself
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--ll-muted)]">
+                    Simple subject + your own words — no AI.
+                  </p>
+                </button>
+              </div>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Recipient name" htmlFor="recipientName">
                 <PixelInput
@@ -158,45 +229,80 @@ export function MessageForm() {
               </div>
             </div>
 
-            <div>
-              <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
-                Style
-              </p>
-              <div className="grid gap-2 sm:grid-cols-3">
-                {STYLES.map((s) => (
-                  <PixelCard
-                    key={s.value}
-                    as="button"
-                    selected={form.style === s.value}
-                    onClick={() => {
-                      play("click");
-                      setForm({ style: s.value as MessageStyle });
-                    }}
-                  >
-                    <p className="font-display text-sm text-[var(--ll-ink)]">
-                      {s.label}
-                    </p>
-                    <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                      {s.description}
-                    </p>
-                  </PixelCard>
-                ))}
-              </div>
-            </div>
+            {writeMode === "ai" ? (
+              <>
+                <div>
+                  <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
+                    Style
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {STYLES.map((s) => (
+                      <PixelCard
+                        key={s.value}
+                        as="button"
+                        selected={form.style === s.value}
+                        onClick={() => {
+                          play("click");
+                          setForm({ style: s.value as MessageStyle });
+                        }}
+                      >
+                        <p className="font-display text-sm text-[var(--ll-ink)]">
+                          {s.label}
+                        </p>
+                        <p className="mt-1 text-xs text-[var(--ll-muted)]">
+                          {s.description}
+                        </p>
+                      </PixelCard>
+                    ))}
+                  </div>
+                </div>
 
-            <Field
-              label="Custom notes (optional)"
-              htmlFor="customNote"
-              hint="Little details make the magic personal."
-            >
-              <PixelTextarea
-                id="customNote"
-                value={form.customNote}
-                onChange={(e) => setForm({ customNote: e.target.value })}
-                placeholder="Mention their new kitten, the rainy walk, the joke only you two get..."
-                maxLength={500}
-              />
-            </Field>
+                <Field
+                  label="Custom notes (optional)"
+                  htmlFor="customNote"
+                  hint="Little details make the magic personal."
+                >
+                  <PixelTextarea
+                    id="customNote"
+                    value={form.customNote}
+                    onChange={(e) => setForm({ customNote: e.target.value })}
+                    placeholder="Mention their new kitten, the rainy walk, the joke only you two get..."
+                    maxLength={500}
+                  />
+                </Field>
+              </>
+            ) : (
+              <>
+                <Field
+                  label="Subject"
+                  htmlFor="ownSubject"
+                  hint="Optional — defaults to “Hi [their name]”."
+                >
+                  <PixelInput
+                    id="ownSubject"
+                    value={form.ownSubject}
+                    onChange={(e) => setForm({ ownSubject: e.target.value })}
+                    placeholder={`Hi ${form.recipientName.trim() || "there"}`}
+                    maxLength={120}
+                  />
+                </Field>
+                <Field
+                  label="Your letter"
+                  htmlFor="ownMessage"
+                  hint="Write naturally — this is what they’ll read."
+                >
+                  <PixelTextarea
+                    id="ownMessage"
+                    required
+                    value={form.ownMessage}
+                    onChange={(e) => setForm({ ownMessage: e.target.value })}
+                    placeholder={`Dear ${form.recipientName.trim() || "friend"},\n\nI just wanted to say…\n\nLove,\n${form.senderName.trim() || "me"}`}
+                    maxLength={4000}
+                    className="min-h-[220px]"
+                  />
+                </Field>
+              </>
+            )}
 
             {error ? (
               <p className="rounded-xl border-2 border-rose-300 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-950/40 dark:text-rose-200">
@@ -204,8 +310,15 @@ export function MessageForm() {
               </p>
             ) : null}
 
-            <PixelButton type="submit" size="lg" disabled={loading} className="w-full sm:w-auto">
-              ✨ Generate Little Letter
+            <PixelButton
+              type="submit"
+              size="lg"
+              disabled={loading}
+              className="w-full sm:w-auto"
+            >
+              {writeMode === "own"
+                ? "💌 Preview my letter"
+                : "✨ Generate Little Letter"}
             </PixelButton>
           </motion.form>
         ) : (

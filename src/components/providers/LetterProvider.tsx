@@ -21,6 +21,9 @@ const defaultForm: LetterFormData = {
   occasion: "friendship",
   style: "cute",
   customNote: "",
+  writeMode: "ai",
+  ownSubject: "",
+  ownMessage: "",
 };
 
 interface LetterContextValue {
@@ -50,6 +53,9 @@ export function LetterProvider({ children }: { children: ReactNode }) {
           ...defaultForm,
           ...parsed.form,
           senderEmail: parsed.form.senderEmail ?? "",
+          writeMode: parsed.form.writeMode === "own" ? "own" : "ai",
+          ownSubject: parsed.form.ownSubject ?? "",
+          ownMessage: parsed.form.ownMessage ?? "",
         });
       if (parsed.letter) setLetter(parsed.letter);
     } catch {

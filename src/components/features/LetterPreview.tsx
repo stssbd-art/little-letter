@@ -437,17 +437,21 @@ export function LetterPreview() {
           variant="secondary"
           onClick={async () => {
             play("click");
+            if (currentLetter.form.writeMode === "own") {
+              router.push("/create");
+              return;
+            }
             setSending(true);
             try {
               const res = await fetch("/api/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(letter.form),
+                body: JSON.stringify(currentLetter.form),
               });
               const data = await res.json();
               if (!res.ok) throw new Error(data.error);
               setLetter({
-                ...letter,
+                ...currentLetter,
                 subject: data.subject,
                 message: data.message,
                 createdAt: new Date().toISOString(),
@@ -464,7 +468,9 @@ export function LetterPreview() {
           }}
           disabled={sending || paying}
         >
-          ✨ Regenerate
+          {currentLetter.form.writeMode === "own"
+            ? "✏️ Edit my letter"
+            : "✨ Regenerate"}
         </PixelButton>
 
         {needsPayment && !demo ? (
