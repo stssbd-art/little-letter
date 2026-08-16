@@ -8,7 +8,6 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
-import { OCCASIONS } from "@/lib/constants";
 import { TermsAcceptance } from "@/components/features/TermsAcceptance";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
@@ -138,7 +137,6 @@ export function LetterPreview() {
   }
 
   const currentLetter = letter;
-  const occasion = OCCASIONS.find((o) => o.value === currentLetter.form.occasion);
 
   async function sendLetter() {
     if (!hasAcceptedTerms()) {
@@ -252,50 +250,116 @@ export function LetterPreview() {
             className="relative w-full max-w-md cursor-pointer border-0 bg-transparent"
             onClick={() => {
               play("click");
-              setOpen((v) => !v);
+              setOpen((v) => {
+                const next = !v;
+                if (next) {
+                  window.setTimeout(() => play("sparkle"), 380);
+                }
+                return next;
+              });
             }}
             aria-expanded={open}
             aria-label={open ? "Close letter" : "Open letter"}
           >
-            <motion.div
-              className="relative mx-auto flex h-44 w-full max-w-sm items-end justify-center overflow-hidden rounded-2xl border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f0c96a] shadow-[6px_6px_0_var(--ll-pink-shadow)]"
-              animate={{ rotateX: open ? -18 : 0 }}
-              style={{ transformStyle: "preserve-3d" }}
+            <div
+              className="relative mx-auto w-full max-w-sm pt-10"
+              style={{ perspective: 1000 }}
             >
-              {/* Envelope flap */}
-              <motion.div
-                className="absolute left-1/2 top-0 z-20 h-0 w-0 -translate-x-1/2 border-l-[150px] border-r-[150px] border-t-[78px] border-l-transparent border-r-transparent border-t-[#f6c97a] origin-top drop-shadow-sm sm:border-l-[170px] sm:border-r-[170px]"
-                animate={{ rotateX: open ? 160 : 0 }}
-                transition={{ type: "spring", stiffness: 120, damping: 14 }}
-              />
+              <div className="relative h-48 w-full">
+                {/* Envelope back */}
+                <div className="absolute inset-x-0 bottom-0 h-40 rounded-2xl border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#ffe8b0] to-[#f0c96a] shadow-[6px_6px_0_var(--ll-pink-shadow)]" />
 
-              {/* Red love seal — closes the envelope when folded */}
-              <motion.div
-                className="absolute left-1/2 top-[42%] z-30 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-                animate={{
-                  scale: open ? 0.55 : 1,
-                  y: open ? 28 : 0,
-                  opacity: open ? 0.45 : 1,
-                }}
-                transition={{ type: "spring", stiffness: 160, damping: 16 }}
-              >
-                <span
-                  className="select-none text-5xl leading-none drop-shadow-[0_3px_0_rgba(120,20,40,0.35)] sm:text-6xl"
-                  aria-hidden
+                {/* Letter sliding out of the envelope */}
+                <motion.div
+                  className="absolute left-1/2 z-[15] w-[86%] -translate-x-1/2 overflow-hidden rounded-md border-2 border-[#d4b896] bg-[#fffdf6] px-3 py-2 shadow-[3px_3px_0_rgba(61,47,34,0.12)]"
+                  initial={false}
+                  animate={
+                    open
+                      ? { y: -8, opacity: 1, scale: 1 }
+                      : { y: 78, opacity: 0.92, scale: 0.98 }
+                  }
+                  transition={
+                    open
+                      ? {
+                          delay: 0.38,
+                          type: "spring",
+                          stiffness: 160,
+                          damping: 16,
+                        }
+                      : { duration: 0.28, ease: "easeIn" }
+                  }
+                  style={{ bottom: "3.25rem" }}
                 >
-                  ❤️
-                </span>
-                <span className="pointer-events-none absolute inset-0 rounded-full bg-[#e11d48]/15 blur-md" />
-              </motion.div>
+                  <p className="truncate font-pixel text-[8px] text-[var(--ll-pink-deep)]">
+                    {currentLetter.subject}
+                  </p>
+                  <p className="mt-1 truncate text-[11px] text-[var(--ll-muted)]">
+                    For {currentLetter.form.recipientName}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-left text-[11px] leading-snug text-[var(--ll-ink)]">
+                    {currentLetter.message}
+                  </p>
+                </motion.div>
 
-              <span className="relative z-10 mb-5 text-sm text-[var(--ll-muted)]">
-                {open ? (occasion?.emoji ?? "💌") : ""}
-              </span>
-            </motion.div>
+                {/* Envelope front pocket (covers the tucked letter) */}
+                <div
+                  className="absolute inset-x-0 bottom-0 z-20 h-[5.75rem] overflow-hidden rounded-b-2xl border-4 border-t-0 border-[var(--ll-pink-deep)]"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, #f6d58a 0%, #e8b86d 55%, #d9a45a 100%)",
+                    clipPath: "polygon(0 38%, 50% 0, 100% 38%, 100% 100%, 0 100%)",
+                  }}
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-10 rounded-b-2xl border-x-4 border-b-4 border-[var(--ll-pink-deep)] bg-[#e8b86d]" />
+
+                {/* Opening lip / flap */}
+                <motion.div
+                  className="absolute left-0 right-0 top-[0.35rem] z-30 h-[4.6rem] origin-top"
+                  style={{
+                    transformStyle: "preserve-3d",
+                    backfaceVisibility: "hidden",
+                  }}
+                  initial={false}
+                  animate={{ rotateX: open ? -158 : 0 }}
+                  transition={
+                    open
+                      ? { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
+                      : { duration: 0.35, ease: "easeIn" }
+                  }
+                >
+                  <div
+                    className="h-full w-full border-x-4 border-t-4 border-[var(--ll-pink-deep)]"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, #ffe6a8 0%, #f6c97a 70%, #e8b05a 100%)",
+                      clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                      boxShadow: "0 4px 0 rgba(120, 60, 20, 0.12)",
+                    }}
+                  />
+                  {/* Heart seal rides on the flap tip */}
+                  <motion.div
+                    className="absolute left-1/2 top-[58%] z-40 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+                    animate={{
+                      scale: open ? 0.4 : 1,
+                      opacity: open ? 0 : 1,
+                    }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <span
+                      className="select-none text-4xl leading-none drop-shadow-[0_3px_0_rgba(120,20,40,0.35)] sm:text-5xl"
+                      aria-hidden
+                    >
+                      ❤️
+                    </span>
+                  </motion.div>
+                </motion.div>
+              </div>
+            </div>
+
             <p className="mt-3 text-center text-sm text-[var(--ll-muted)]">
               {open
-                ? "Tap to seal with love"
-                : "Tap the red heart to open the envelope"}
+                ? "Tap to tuck the letter back & seal with love"
+                : "Tap the red heart — the lip opens, then your letter pops out"}
             </p>
           </button>
 
@@ -304,20 +368,25 @@ export function LetterPreview() {
             animate={{
               height: open ? "auto" : 0,
               opacity: open ? 1 : 0,
-              y: open ? 0 : -12,
+              y: open ? 0 : 16,
             }}
+            transition={
+              open
+                ? { delay: 0.55, duration: 0.4, ease: [0.22, 1, 0.36, 1] }
+                : { duration: 0.2 }
+            }
             className="w-full overflow-hidden"
           >
             <article className="mt-6 rounded-2xl border-2 border-[var(--ll-lavender)] bg-white/90 p-5 dark:bg-white/10">
               <p className="font-pixel text-[10px] text-[var(--ll-pink-deep)]">
-                {letter.subject}
+                {currentLetter.subject}
               </p>
               <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                To: {letter.form.recipientName} &lt;{letter.form.recipientEmail}
-                &gt;
+                To: {currentLetter.form.recipientName} &lt;
+                {currentLetter.form.recipientEmail}&gt;
               </p>
               <div className="mt-4 whitespace-pre-wrap font-display text-base leading-relaxed text-[var(--ll-ink)]">
-                {letter.message}
+                {currentLetter.message}
               </div>
             </article>
           </motion.div>
