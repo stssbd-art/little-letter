@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 declare global {
@@ -18,9 +18,14 @@ type EndPageAdProps = {
 /**
  * One quiet display ad at the end of the page.
  * Client/slot are passed from the server so Sensitive Vercel env vars still work.
+ * Collapses after Google reports unfilled so visitors never see a blank box.
  */
 export function EndPageAd({ client, slot, className }: EndPageAdProps) {
   const pushed = useRef(false);
+  const insRef = useRef<HTMLModElement>(null);
+  const [adStatus, setAdStatus] = useState<"pending" | "filled" | "unfilled">(
+    "pending"
+  );
 
   useEffect(() => {
     if (!client || !slot || pushed.current) return;
@@ -49,19 +54,59 @@ export function EndPageAd({ client, slot, className }: EndPageAdProps) {
     return () => window.clearTimeout(timer);
   }, [client, slot]);
 
+  useEffect(() => {
+    const el = insRef.current;
+    if (!el) return;
+
+    const sync = () => {
+      const status = el.getAttribute("data-ad-status");
+      if (status === "filled") setAdStatus("filled");
+      else if (status === "unfilled") setAdStatus("unfilled");
+    };
+
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(el, {
+      attributes: true,
+      attributeFilter: ["data-ad-status"],
+    });
+    const polls = [800, 2000, 4000, 8000].map((ms) => window.setTimeout(sync, ms));
+
+    return () => {
+      observer.disconnect();
+      polls.forEach((id) => window.clearTimeout(id));
+    };
+  }, [client, slot]);
+
   if (!client || !slot) return null;
+  if (adStatus === "unfilled") return null;
+
+  const showChrome = adStatus === "filled";
 
   return (
     <aside
-      className={cn("relative z-10 mx-auto mt-10 max-w-6xl px-4", className)}
+      className={cn(
+        "relative z-10 mx-auto max-w-6xl px-4",
+        showChrome ? "mt-10" : "mt-0",
+        className
+      )}
       aria-label="Sponsored"
+      aria-hidden={!showChrome}
     >
-      <div className="rounded-xl border-2 border-[var(--ll-lavender)]/70 bg-[var(--ll-window-bg)]/70 px-3 py-3">
-        <p className="mb-2 text-center font-pixel text-[7px] tracking-widest text-[var(--ll-muted)]">
-          SPONSORED · KEEPS THE SITE RUNNING
-        </p>
+      <div
+        className={cn(
+          showChrome &&
+            "rounded-xl border-2 border-[var(--ll-lavender)]/70 bg-[var(--ll-window-bg)]/70 px-3 py-3"
+        )}
+      >
+        {showChrome ? (
+          <p className="mb-2 text-center font-pixel text-[7px] tracking-widest text-[var(--ll-muted)]">
+            SPONSORED · KEEPS THE SITE RUNNING
+          </p>
+        ) : null}
         <ins
-          className="adsbygoogle block min-h-[90px] w-full"
+          ref={insRef}
+          className="adsbygoogle block w-full"
           style={{ display: "block" }}
           data-ad-client={client}
           data-ad-slot={slot}
