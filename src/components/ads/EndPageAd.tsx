@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { getAdsenseClientId, getAdsenseEndSlot } from "@/lib/adsense";
 import { cn } from "@/lib/utils";
 
 declare global {
@@ -15,11 +16,11 @@ type EndPageAdProps = {
 
 /**
  * One quiet display ad at the end of the page.
- * Renders nothing unless NEXT_PUBLIC_ADSENSE_CLIENT_ID and SLOT are set at build time.
+ * Needs NEXT_PUBLIC_ADSENSE_CLIENT_ID + NEXT_PUBLIC_ADSENSE_SLOT_END at build time.
  */
 export function EndPageAd({ className }: EndPageAdProps) {
-  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID?.trim();
-  const slot = process.env.NEXT_PUBLIC_ADSENSE_SLOT_END?.trim();
+  const client = getAdsenseClientId();
+  const slot = getAdsenseEndSlot();
   const pushed = useRef(false);
 
   useEffect(() => {
@@ -36,7 +37,6 @@ export function EndPageAd({ className }: EndPageAdProps) {
       }
     };
 
-    // Script may load after this component mounts
     const existing = document.querySelector(
       'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]'
     ) as HTMLScriptElement | null;

@@ -1,8 +1,9 @@
 import Script from "next/script";
+import { getAdsenseClientId } from "@/lib/adsense";
 
 /** Loads AdSense only when a publisher ID is configured. */
 export function AdSenseLoader() {
-  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID?.trim();
+  const client = getAdsenseClientId();
   if (!client) return null;
 
   return (
