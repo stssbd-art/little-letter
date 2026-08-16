@@ -11,8 +11,17 @@ export function getAdsenseClientId() {
   return normalizeAdsenseClientId(process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID);
 }
 
+/** Ad unit slot — must be the data-ad-slot from AdSense, not the publisher ID. */
 export function getAdsenseEndSlot() {
-  return process.env.NEXT_PUBLIC_ADSENSE_SLOT_END?.trim() || "";
+  const slot = process.env.NEXT_PUBLIC_ADSENSE_SLOT_END?.trim() || "";
+  if (!slot) return "";
+
+  const clientDigits = getAdsenseClientId().replace(/\D/g, "");
+  const slotDigits = slot.replace(/\D/g, "");
+  // Common mistake: pasting pub-… / ca-pub-… digits into the slot env var.
+  if (clientDigits && slotDigits && clientDigits === slotDigits) return "";
+
+  return slot;
 }
 
 export function adsenseConfigured() {
