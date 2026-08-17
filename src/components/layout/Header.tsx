@@ -15,6 +15,7 @@ const LINKS = [
   { href: "/about", label: "About" },
   { href: "/create", label: "Create" },
   { href: "/mixtape", label: "Mixtape" },
+  { href: "/occasions", label: "Occasions" },
   { href: "/faq", label: "FAQ" },
 ];
 

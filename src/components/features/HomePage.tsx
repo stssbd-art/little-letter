@@ -44,17 +44,14 @@ export function HomePage() {
               📼 Send a Mixtape
             </PixelButton>
           </Link>
+          <Link href="/occasions">
+            <PixelButton size="lg" variant="ghost">
+              🎉 Occasions
+            </PixelButton>
+          </Link>
         </motion.div>
         <p className="mt-4 font-pixel text-[9px] leading-relaxed text-[var(--ll-muted)]">
           Press play · write a note · burn a tape
-        </p>
-        <p className="mt-3">
-          <Link
-            href="/occasions"
-            className="font-display text-sm text-[var(--ll-pink-deep)] underline decoration-dotted underline-offset-4 hover:opacity-80"
-          >
-            Browse occasions →
-          </Link>
         </p>
 
         <div className="mt-10 w-full max-w-lg">
