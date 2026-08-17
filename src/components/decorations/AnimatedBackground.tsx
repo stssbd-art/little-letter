@@ -5,6 +5,11 @@ export function AnimatedBackground({
 }) {
   return (
     <div className="relative min-h-screen">
+      <div className="sun-catchers" aria-hidden>
+        {Array.from({ length: 12 }, (_, i) => (
+          <span key={i} className={`sun-catcher sun-catcher-${i + 1}`} />
+        ))}
+      </div>
       <div className="pointer-events-none absolute inset-0 crt-overlay" aria-hidden />
       <div
         className="pointer-events-none absolute inset-0 mp3-bezel opacity-40 dark:opacity-25"
