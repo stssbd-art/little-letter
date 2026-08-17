@@ -18,7 +18,7 @@ export function FloatingClouds() {
           key={i}
           className={`absolute opacity-70 ${cloud.size}`}
           style={{ left: cloud.left, top: cloud.top }}
-          animate={{ x: [0, 40, -20, 0], y: [0, -10, 8, 0] }}
+          animate={{ x: [0, 10, -6, 0], y: [0, -4, 3, 0] }}
           transition={{
             duration: cloud.duration,
             repeat: Infinity,

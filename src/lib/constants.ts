@@ -104,6 +104,6 @@ export const MOODS = [
   { emoji: "🍀", label: "Lucky" },
   { emoji: "💌", label: "Letter-y" },
   { emoji: "🌙", label: "Cosy" },
-  { emoji: "🦋", label: "Fluttery" },
+  { emoji: "📼", label: "Mixtape-y" },
   { emoji: "🌈", label: "Rainbow" },
 ] as const;

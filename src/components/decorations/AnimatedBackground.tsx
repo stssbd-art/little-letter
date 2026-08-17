@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { FloatingClouds } from "@/components/decorations/FloatingClouds";
 import { FloatingHearts } from "@/components/decorations/FloatingHearts";
-import { FlyingButterflies } from "@/components/decorations/FlyingButterflies";
+import { RainbowCassettes } from "@/components/decorations/RainbowCassettes";
 import { WhimsicalFlyers } from "@/components/decorations/WhimsicalFlyers";
 
 export function AnimatedBackground({
@@ -22,7 +22,7 @@ export function AnimatedBackground({
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen">
       <div className="pointer-events-none absolute inset-0 crt-overlay" aria-hidden />
       <div
         className="pointer-events-none absolute inset-0 mp3-bezel opacity-40 dark:opacity-25"
@@ -33,10 +33,10 @@ export function AnimatedBackground({
           <FloatingClouds />
           <WhimsicalFlyers />
           <FloatingHearts />
-          <FlyingButterflies />
         </div>
       )}
       <div className="relative z-10">{children}</div>
+      <RainbowCassettes reduceMotion={reduceMotion} />
     </div>
   );
 }

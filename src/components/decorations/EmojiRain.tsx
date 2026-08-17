@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEasterEggs } from "@/components/providers/EasterEggProvider";
 
-const EMOJIS = ["💌", "⭐", "🦋", "☁️", "🍀", "✨", "🌙", "🌈", "🐸", "🎮"];
+const EMOJIS = ["💌", "⭐", "📼", "☁️", "🍀", "✨", "🌙", "🌈", "🐸", "🎮"];
 
 export function EmojiRain() {
   const { emojiRain } = useEasterEggs();

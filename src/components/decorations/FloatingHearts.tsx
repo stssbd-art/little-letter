@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-const HEARTS = ["⭐", "✨", "💌", "🦋"];
+const HEARTS = ["⭐", "✨", "💌", "📼"];
 
 export function FloatingHearts() {
   return (
@@ -11,8 +11,8 @@ export function FloatingHearts() {
         <motion.span
           key={i}
           className="absolute text-base opacity-50"
-          style={{ left: `${10 + i * 15}%`, bottom: "-5%" }}
-          animate={{ y: ["0vh", "-110vh"], opacity: [0, 0.7, 0] }}
+          style={{ left: `${10 + i * 15}%`, bottom: `${12 + (i % 3) * 18}%` }}
+          animate={{ y: [0, -18, 0], opacity: [0.35, 0.7, 0.35] }}
           transition={{
             duration: 12 + i * 2,
             delay: i * 1.8,
