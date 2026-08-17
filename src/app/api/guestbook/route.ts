@@ -30,7 +30,7 @@ const SEED: GuestbookEntry[] = [
     id: "seed-3",
     name: "Pip",
     message: "GeoCities energy, modern manners. I approve.",
-    emoji: "🦋",
+    emoji: "🌈",
     createdAt: "2026-07-28T09:12:00.000Z",
   },
 ];

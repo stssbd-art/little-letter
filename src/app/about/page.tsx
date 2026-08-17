@@ -25,7 +25,7 @@ const REASONS = [
     text: "Because nostalgia should feel magical — not cluttered.",
   },
   {
-    icon: "🦋",
+    icon: "🌈",
     text: "Because the internet is better when it carries smiles.",
   },
 ];

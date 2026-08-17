@@ -90,7 +90,7 @@ export function SuccessCelebration() {
             🍃
           </motion.span>
           <motion.span animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 2.2, delay: 0.2 }}>
-            🦋
+            🌈
           </motion.span>
           <motion.span animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 1.8, delay: 0.4 }}>
             ⭐

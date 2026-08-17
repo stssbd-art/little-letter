@@ -68,7 +68,7 @@ const THEMES: Record<Occasion, FrameTheme> = {
     accent: "#6b4f36",
     badge: "soft hearts enclosed · handle with care",
     tagline: "a little love letter crossed the wires for you",
-    footerIcons: "💌 ✨ ⭐ 🦋 ☁️",
+    footerIcons: "💌 ✨ ⭐ 🌈 ☁️",
     mission: "If this made your heart flutter, the mission succeeded.",
   },
   friendship: {
@@ -108,7 +108,7 @@ const THEMES: Record<Occasion, FrameTheme> = {
     accent: "#6f8a45",
     badge: "lucky charms packed inside",
     tagline: "good luck stardust, specially for you",
-    footerIcons: "🍀 ⭐ ✨ 🦋 ☁️",
+    footerIcons: "🍀 ⭐ ✨ 🌈 ☁️",
     mission: "May this nudge the universe in your favour.",
   },
   "thinking-of-you": {
@@ -268,7 +268,7 @@ const THEMES: Record<Occasion, FrameTheme> = {
     accent: "#6b4f36",
     badge: "valentine soft · heart enclosed",
     tagline: "a Valentine note made just for you",
-    footerIcons: "💌 ✨ ⭐ 🦋 ☁️",
+    footerIcons: "💌 ✨ ⭐ 🌈 ☁️",
     mission: "If this made your heart flutter, mission succeeded.",
   },
   "mothers-day": {
@@ -288,7 +288,7 @@ const THEMES: Record<Occasion, FrameTheme> = {
     accent: "#6b4f36",
     badge: "for mum · with all the soft thanks",
     tagline: "a Mother's Day note wrapped in warmth",
-    footerIcons: "🌻 ✨ ⭐ 🍃 🦋",
+    footerIcons: "🌻 ✨ ⭐ 🍃 🌈",
     mission: "If this felt like a hug from afar, perfect.",
   },
   "fathers-day": {
