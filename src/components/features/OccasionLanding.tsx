@@ -70,14 +70,14 @@ export function OccasionLanding({ occasion }: Props) {
       </div>
 
       <PixelWindow title={`${occasion.slug}_card.txt`} icon={occasion.emoji}>
-        <div className="space-y-4 font-display text-base leading-relaxed text-[var(--ll-ink)]">
-          <p>{occasion.intro}</p>
+        <div className="space-y-4 text-left font-display text-base leading-relaxed text-[var(--ll-ink)]">
+          <p className="ll-copy">{occasion.intro}</p>
           {occasion.body.map((paragraph) => (
-            <p key={paragraph.slice(0, 24)} className="text-[var(--ll-muted)]">
+            <p key={paragraph.slice(0, 24)} className="ll-copy text-[var(--ll-muted)]">
               {paragraph}
             </p>
           ))}
-          <p className="text-sm text-[var(--ll-muted)]">
+          <p className="ll-copy text-sm text-[var(--ll-muted)]">
             Little Letter sends a <strong>digital email letter</strong>, not a
             printed greeting card — but it arrives with the same warmth and
             personal touch.
@@ -87,7 +87,7 @@ export function OccasionLanding({ occasion }: Props) {
 
       {occasion.exampleWishes.length > 0 ? (
         <PixelWindow title="example_wishes.txt" icon="✨">
-          <ul className="space-y-3 text-sm leading-relaxed text-[var(--ll-muted)]">
+          <ul className="space-y-3 text-left text-sm leading-relaxed text-[var(--ll-muted)]">
             {occasion.exampleWishes.map((wish) => (
               <li
                 key={wish.slice(0, 32)}

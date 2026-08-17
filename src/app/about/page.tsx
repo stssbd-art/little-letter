@@ -47,13 +47,13 @@ export default function AboutPage() {
             <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
               About Little Letter
             </h2>
-            <p className="font-display text-base leading-relaxed">
+            <p className="ll-copy font-display text-base leading-relaxed">
               Once upon a dial-up connection, the internet was full of glitter
               GIFs, guestbook signatures, and notes that felt handmade. Little
               Letter brings that cosy magic back — polished for today, soft
               enough to make you smile.
             </p>
-            <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+            <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
               Write to friends, family, partners, or colleagues. Choose an
               occasion and a style, add a personal note, and we&apos;ll help craft
               a warm message that never sounds like a factory greeting card.
@@ -61,7 +61,7 @@ export default function AboutPage() {
               romantic mixtape — pick songs, label a cassette, and email a
               playable mix.
             </p>
-            <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+            <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
               Meet Pip the Envelope — our tiny mascot who believes every inbox
               deserves a little sparkle. Hit play on the retro MP3 deck, then
               send someone a note.

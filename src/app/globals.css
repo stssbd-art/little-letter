@@ -75,9 +75,8 @@ main h3 {
   text-wrap: pretty;
 }
 
-/* Body sentences: flush left and right edges */
-.ll-copy,
-main p:not(.font-pixel):not(.text-center) {
+/* Long-form copy only — never short quotes, cards, or verse */
+.ll-copy {
   text-align: justify;
   text-justify: inter-word;
   hyphens: auto;

@@ -111,7 +111,7 @@ export default function FaqPage() {
             <h2 className="font-display text-base text-[var(--ll-ink)]">
               {item.q}
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--ll-muted)]">
+            <p className="mt-2 ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
               {item.a}
             </p>
           </PixelWindow>

@@ -12,10 +12,10 @@ export function DailyQuote() {
 
   return (
     <PixelWindow title="daily_quote.txt" icon="✨" liftOnHover>
-      <p className="font-display text-lg leading-relaxed text-[var(--ll-ink)]">
+      <p className="text-left font-display text-lg leading-relaxed text-[var(--ll-ink)]">
         “{quote}”
       </p>
-      <p className="mt-3 text-xs text-[var(--ll-muted)]">Today’s little inspiration</p>
+      <p className="mt-3 text-left text-xs text-[var(--ll-muted)]">Today’s little inspiration</p>
     </PixelWindow>
   );
 }

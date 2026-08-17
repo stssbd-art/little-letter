@@ -26,7 +26,7 @@ export function HomePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="ll-copy mt-6 max-w-lg font-display text-lg text-[var(--ll-muted)] sm:text-xl"
+          className="mt-6 max-w-lg text-center font-display text-lg text-[var(--ll-muted)] sm:text-xl"
         >
           {SITE_TAGLINE}
         </motion.p>

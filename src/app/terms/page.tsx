@@ -144,18 +144,18 @@ export default function TermsPage() {
           <p className="font-display text-base leading-relaxed">
             © {YEAR} {SITE_NAME}. All rights reserved.
           </p>
-          <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+          <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
             The {SITE_NAME} website — including its design, layout, text,
             graphics, logos, mascot, code, branding, and overall look and feel —
             is protected by copyright and other intellectual property laws.
           </p>
-          <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+          <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
             You may <strong className="font-semibold text-[var(--ll-ink)]">not</strong>{" "}
             copy, reproduce, republish, scrape, reverse-engineer, redistribute,
             sell, or create a derivative website or service based on {SITE_NAME}{" "}
             without prior written permission from the owner.
           </p>
-          <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+          <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
             Personal, non-commercial viewing of the site in a normal browser is
             allowed. Sharing a letter or mixtape you create through {SITE_NAME}{" "}
             with the intended recipient is allowed.
@@ -180,7 +180,7 @@ export default function TermsPage() {
                   <h3 className="font-display text-base leading-snug text-[var(--ll-ink)]">
                     {section.title}
                   </h3>
-                  <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+          <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
                     {section.body}
                   </p>
                 </section>

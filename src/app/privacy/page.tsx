@@ -45,7 +45,7 @@ export default function PrivacyPage() {
 
       <PixelWindow title="privacy_policy.txt" icon="🔒">
         <div className="space-y-5">
-          <p className="font-display text-base leading-relaxed text-[var(--ll-ink)]">
+          <p className="ll-copy font-display text-base leading-relaxed text-[var(--ll-ink)]">
             {SITE_NAME} (
             <a
               href={SITE_URL}
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
                 <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
                   {section.title}
                 </h2>
-                <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+                <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
                   {section.body}
                 </p>
               </section>

@@ -214,10 +214,10 @@ export function MessageForm() {
                           setForm({ style: s.value as MessageStyle });
                         }}
                       >
-                        <p className="font-display text-sm text-[var(--ll-ink)]">
+                        <p className="text-left font-display text-sm text-[var(--ll-ink)]">
                           {s.label}
                         </p>
-                        <p className="mt-1 text-xs text-[var(--ll-muted)]">
+                        <p className="mt-1 text-left text-xs text-[var(--ll-muted)]">
                           {s.description}
                         </p>
                       </PixelCard>

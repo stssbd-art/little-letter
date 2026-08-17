@@ -13,7 +13,7 @@ export function CuteFact() {
 
   return (
     <PixelWindow title="cute_facts.exe" icon="🐰">
-      <p className="text-sm leading-relaxed text-[var(--ll-ink)]">{fact}</p>
+      <p className="text-left text-sm leading-relaxed text-[var(--ll-ink)]">{fact}</p>
       <PixelButton
         size="sm"
         variant="secondary"

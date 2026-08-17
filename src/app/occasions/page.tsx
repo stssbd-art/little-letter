@@ -49,7 +49,7 @@ export default function OccasionsHubPage() {
       </PageHeader>
 
       <PixelWindow title="occasions_index.txt" icon="💌">
-        <p className="font-display text-base leading-relaxed text-[var(--ll-ink)]">
+        <p className="ll-copy font-display text-base leading-relaxed text-[var(--ll-ink)]">
           Pick an occasion below to see example wishes and start a letter. When
           someone searches for a birthday card, wedding wish, or Valentine
           message, this is what Little Letter is for: warm notes delivered by

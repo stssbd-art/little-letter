@@ -456,7 +456,7 @@ export function LetterPreview() {
                 To: {currentLetter.form.recipientName} &lt;
                 {currentLetter.form.recipientEmail}&gt;
               </p>
-              <div className="mt-4 whitespace-pre-wrap font-display text-base leading-relaxed text-[var(--ll-ink)]">
+              <div className="mt-4 whitespace-pre-wrap text-left font-display text-base leading-relaxed text-[var(--ll-ink)]">
                 {currentLetter.message}
               </div>
             </article>
