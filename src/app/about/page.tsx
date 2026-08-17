@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { Mascot } from "@/components/ui/Logo";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "About — Send Letters & Mixtapes Online",
@@ -33,21 +34,16 @@ const REASONS = [
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="text-center">
-        <h1 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-          About
-        </h1>
-        <p className="mt-2 font-display text-[var(--ll-muted)]">
-          Soft notes, mixtapes, and a little pixel magic.
-        </p>
-      </div>
+      <PageHeader title="About">
+        Soft notes, mixtapes, and a little pixel magic.
+      </PageHeader>
 
       <PixelWindow title="about_little_letter.txt" icon="📖">
-        <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:gap-8 sm:text-left">
+        <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-start sm:gap-8">
           <div className="shrink-0">
             <Mascot />
           </div>
-          <div className="min-w-0 flex-1 space-y-3 text-[var(--ll-ink)]">
+          <div className="min-w-0 flex-1 space-y-3 text-left text-[var(--ll-ink)]">
             <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
               About Little Letter
             </h2>
@@ -75,7 +71,7 @@ export default function AboutPage() {
       </PixelWindow>
 
       <PixelWindow title="a_little_about_me.txt" icon="💌">
-        <div className="mx-auto max-w-2xl space-y-3 text-center text-[var(--ll-ink)] sm:text-left">
+        <div className="space-y-3 text-left text-[var(--ll-ink)]">
           <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
             A Little About Me
           </h2>
@@ -102,8 +98,8 @@ export default function AboutPage() {
       </PixelWindow>
 
       <PixelWindow title="why_we_exist.ini" icon="💫">
-        <div className="mx-auto max-w-2xl space-y-5">
-          <h2 className="text-center font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-left sm:text-base">
+        <div className="space-y-5 text-left">
+          <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
             Why we exist
           </h2>
           <ul className="space-y-3">
@@ -122,7 +118,7 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
-          <div className="flex justify-center pt-1 sm:justify-start">
+          <div className="flex justify-start pt-1">
             <Link href="/create">
               <PixelButton>Create your first letter</PixelButton>
             </Link>

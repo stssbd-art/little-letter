@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -38,14 +39,9 @@ const SECTIONS = [
 export default function PrivacyPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
-      <header className="space-y-2 text-center">
-        <h1 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-          Privacy Policy
-        </h1>
-        <p className="font-display text-sm leading-relaxed text-[var(--ll-muted)] sm:text-base">
-          A short note on what we collect and why.
-        </p>
-      </header>
+      <PageHeader title="Privacy Policy">
+        A short note on what we collect and why.
+      </PageHeader>
 
       <PixelWindow title="privacy_policy.txt" icon="🔒">
         <div className="mx-auto max-w-2xl space-y-5">
@@ -76,7 +72,7 @@ export default function PrivacyPage() {
         </div>
       </PixelWindow>
 
-      <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+      <div className="flex flex-wrap items-center justify-start gap-3 pt-1">
         <Link href="/terms">
           <PixelButton variant="secondary">Terms &amp; Copyright</PixelButton>
         </Link>

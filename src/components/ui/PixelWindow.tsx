@@ -44,7 +44,7 @@ export function PixelWindow({
           <span className="h-3 w-3 rounded-sm border border-[#8a7a62]/50 bg-[#c4a574]" />
         </div>
       </header>
-      <div className="p-4 sm:p-6">{children}</div>
+      <div className="p-4 text-left sm:p-6">{children}</div>
     </motion.section>
   );
 }

@@ -8,6 +8,7 @@ import type { MixShare } from "@/lib/mixtape-link";
 import { resolveShareTracks } from "@/lib/mixtape-link";
 import { youtubeWatchUrl } from "@/lib/tracks";
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { cn } from "@/lib/utils";
 
 /** Short mix slice per track — not the full song */
@@ -253,17 +254,9 @@ export function MixtapePlayer({ mix }: Props) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="text-center">
-        <p className="font-pixel text-[9px] tracking-widest text-[var(--ll-muted)]">
-          SIDE A · 30-SEC MIX
-        </p>
-        <h1 className="mt-2 font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-          {mix.title}
-        </h1>
-        <p className="mt-2 font-display text-sm text-[var(--ll-muted)]">
-          for {mix.to || "you"} · from {mix.from || "a friend"}
-        </p>
-      </div>
+      <PageHeader kicker="SIDE A · 30-SEC MIX" title={mix.title}>
+        for {mix.to || "you"} · from {mix.from || "a friend"}
+      </PageHeader>
 
       <CassetteDeck
         title={mix.title}

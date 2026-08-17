@@ -50,7 +50,7 @@ export default async function MixPlayPage({ params }: Props) {
           text={shareText}
         />
       </PixelWindow>
-      <div className="flex justify-center gap-3">
+      <div className="flex justify-start gap-3">
         <Link
           href={`/mixtape?restore=${encodeURIComponent(code.trim())}`}
         >

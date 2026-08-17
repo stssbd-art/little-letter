@@ -707,9 +707,9 @@ export function MixtapeForm() {
             />
           </CassetteDeck>
           {playerError ? (
-            <p className="text-center text-xs text-[var(--ll-pink-deep)]">{playerError}</p>
+            <p className="text-left text-xs text-[var(--ll-pink-deep)]">{playerError}</p>
           ) : (
-            <p className="text-center font-pixel text-[8px] leading-relaxed text-[var(--ll-muted)]">
+            <p className="text-left font-pixel text-[8px] leading-relaxed text-[var(--ll-muted)]">
               {selected.length
                 ? playing
                   ? `Now playing · ${selected[playIndex]?.title ?? "your mix"}`
@@ -826,7 +826,7 @@ export function MixtapeForm() {
             </ul>
           </div>
 
-          <div className="flex justify-center">{previewMixButton}</div>
+          <div className="flex justify-start">{previewMixButton}</div>
         </div>
 
         <PixelWindow title="make_a_mix.bat" icon="📼" liftOnHover={false}>

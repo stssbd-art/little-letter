@@ -4,6 +4,7 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import type { OccasionSeo } from "@/lib/occasion-seo";
 import { OCCASION_SEO_LIST } from "@/lib/occasion-seo";
 import { SITE_URL } from "@/lib/constants";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 type Props = {
   occasion: OccasionSeo;
@@ -61,16 +62,11 @@ export function OccasionLanding({ occasion }: Props) {
         />
       ) : null}
 
-      <div className="text-center">
+      <div className="space-y-3 text-left">
         <p className="text-4xl" aria-hidden>
           {occasion.emoji}
         </p>
-        <h1 className="mt-3 font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-          {occasion.h1}
-        </h1>
-        <p className="mt-2 font-display text-[var(--ll-muted)]">
-          {occasion.tagline}
-        </p>
+        <PageHeader title={occasion.h1}>{occasion.tagline}</PageHeader>
       </div>
 
       <PixelWindow title={`${occasion.slug}_card.txt`} icon={occasion.emoji}>
@@ -121,7 +117,7 @@ export function OccasionLanding({ occasion }: Props) {
         </PixelWindow>
       ) : null}
 
-      <div className="flex flex-wrap justify-center gap-3">
+      <div className="flex flex-wrap justify-start gap-3">
         <Link href={`/create?occasion=${occasion.slug}`}>
           <PixelButton size="lg">
             {occasion.emoji} Create this {occasion.label.toLowerCase()} letter

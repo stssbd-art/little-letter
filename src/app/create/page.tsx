@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { MessageForm } from "@/components/features/MessageForm";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "Create & Send a Birthday Card or Letter Online",
@@ -19,18 +20,13 @@ export const metadata: Metadata = {
 export default function CreatePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="text-center">
-        <h1 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-          Create a Little Letter
-        </h1>
-        <p className="mt-2 font-display text-[var(--ll-muted)]">
-          Birthday cards, thank you notes, love letters, and more — write it
-          yourself or get help. First two letters free, then £0.99 each.
-        </p>
-      </div>
+      <PageHeader title="Create a Little Letter">
+        Birthday cards, thank you notes, love letters, and more — write it
+        yourself or get help. First two letters free, then £0.99 each.
+      </PageHeader>
       <Suspense
         fallback={
-          <p className="text-center text-sm text-[var(--ll-muted)]">
+          <p className="text-left text-sm text-[var(--ll-muted)]">
             Loading form…
           </p>
         }

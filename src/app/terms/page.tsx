@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "Terms & Copyright",
@@ -131,14 +132,9 @@ const SECTIONS = [
 export default function TermsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
-      <header className="space-y-2 text-center">
-        <h1 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-          Terms &amp; Copyright
-        </h1>
-        <p className="font-display text-sm leading-relaxed text-[var(--ll-muted)] sm:text-base">
-          Please read before using {SITE_NAME}.
-        </p>
-      </header>
+      <PageHeader title="Terms & Copyright">
+        Please read before using {SITE_NAME}.
+      </PageHeader>
 
       <PixelWindow title="copyright_notice.txt" icon="©">
         <div className="mx-auto max-w-2xl space-y-3 text-[var(--ll-ink)]">
@@ -194,7 +190,7 @@ export default function TermsPage() {
         </div>
       </PixelWindow>
 
-      <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+      <div className="flex flex-wrap items-center justify-start gap-3 pt-1">
         <Link href="/privacy">
           <PixelButton variant="secondary">Privacy Policy</PixelButton>
         </Link>

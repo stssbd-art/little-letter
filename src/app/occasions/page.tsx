@@ -4,6 +4,7 @@ import { PixelButton } from "@/components/ui/PixelButton";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { OCCASION_SEO_LIST } from "@/lib/occasion-seo";
 import { SITE_URL } from "@/lib/constants";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "Occasion Cards & Wishes — Birthday, Valentine’s & More",
@@ -43,14 +44,9 @@ export default function OccasionsHubPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="text-center">
-        <h1 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-          Cards & wishes for every occasion
-        </h1>
-        <p className="mt-2 font-display text-[var(--ll-muted)]">
-          Digital email letters — not printed cards, but just as personal.
-        </p>
-      </div>
+      <PageHeader title="Cards & wishes for every occasion">
+        Digital email letters — not printed cards, but just as personal.
+      </PageHeader>
 
       <PixelWindow title="occasions_index.txt" icon="💌">
         <p className="font-display text-base leading-relaxed text-[var(--ll-ink)]">
@@ -83,7 +79,7 @@ export default function OccasionsHubPage() {
         </ul>
       </PixelWindow>
 
-      <div className="flex justify-center">
+      <div className="flex justify-start">
         <Link href="/create">
           <PixelButton size="lg">💌 Create any letter</PixelButton>
         </Link>

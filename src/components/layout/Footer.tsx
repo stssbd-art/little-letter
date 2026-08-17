@@ -61,7 +61,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-[var(--ll-lavender)]/50 px-4 py-4">
-        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs leading-relaxed text-[var(--ll-muted)]">
+        <p className="flex flex-wrap items-center justify-start gap-x-2 gap-y-1 text-left text-xs leading-relaxed text-[var(--ll-muted)]">
           <span>
             © {YEAR} {SITE_NAME}
           </span>

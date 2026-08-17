@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "FAQ — Sending Letters & Mixtapes",
@@ -96,14 +97,9 @@ export default function FaqPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <div className="text-center">
-        <h1 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
-          FAQ
-        </h1>
-        <p className="mt-2 font-display text-[var(--ll-muted)]">
-          Tiny answers for curious hearts.
-        </p>
-      </div>
+      <PageHeader title="FAQ">
+        Tiny answers for curious hearts.
+      </PageHeader>
 
       <div className="space-y-4">
         {FAQS.map((item, i) => (
@@ -122,7 +118,7 @@ export default function FaqPage() {
         ))}
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-start">
         <Link href="/create">
           <PixelButton>Ready to write? 💌</PixelButton>
         </Link>
