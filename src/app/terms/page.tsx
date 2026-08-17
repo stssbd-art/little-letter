@@ -137,7 +137,7 @@ export default function TermsPage() {
       </PageHeader>
 
       <PixelWindow title="copyright_notice.txt" icon="©">
-        <div className="mx-auto max-w-2xl space-y-3 text-[var(--ll-ink)]">
+        <div className="space-y-3 text-left text-[var(--ll-ink)]">
           <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
             Copyright notice
           </h2>
@@ -164,7 +164,7 @@ export default function TermsPage() {
       </PixelWindow>
 
       <PixelWindow title="terms_of_use.ini" icon="📜">
-        <div className="mx-auto max-w-2xl space-y-5">
+        <div className="space-y-5">
           <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
             Terms of use
           </h2>

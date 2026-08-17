@@ -44,7 +44,7 @@ export default function PrivacyPage() {
       </PageHeader>
 
       <PixelWindow title="privacy_policy.txt" icon="🔒">
-        <div className="mx-auto max-w-2xl space-y-5">
+        <div className="space-y-5">
           <p className="font-display text-base leading-relaxed text-[var(--ll-ink)]">
             {SITE_NAME} (
             <a

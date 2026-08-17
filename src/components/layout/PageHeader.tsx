@@ -8,7 +8,7 @@ export function PageHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <header className="max-w-2xl space-y-2 text-left">
+    <header className="w-full space-y-2 text-left">
       {kicker ? (
         <p className="font-pixel text-[9px] tracking-widest text-[var(--ll-muted)]">
           {kicker}
@@ -18,7 +18,7 @@ export function PageHeader({
         {title}
       </h1>
       {children ? (
-        <p className="font-display leading-relaxed text-pretty text-[var(--ll-muted)]">
+        <p className="ll-copy font-display leading-relaxed text-[var(--ll-muted)]">
           {children}
         </p>
       ) : null}

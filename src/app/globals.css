@@ -75,6 +75,15 @@ main h3 {
   text-wrap: pretty;
 }
 
+/* Body sentences: flush left and right edges */
+.ll-copy,
+main p:not(.font-pixel):not(.text-center) {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
 body {
   background:
     radial-gradient(ellipse at 12% 0%, rgba(246, 213, 138, 0.55), transparent 45%),
