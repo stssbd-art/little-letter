@@ -26,7 +26,7 @@ const FAQS = [
   },
   {
     q: "Why did my letter go to spam?",
-    a: "Finish one-time Gmail setup: add GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, and GMAIL_SETUP_SECRET on Vercel, redeploy, then open /api/gmail-setup?key=YOUR_SECRET. That connects Gmail API (same send path as the Gmail app). Letters go out as plain text with subject “Hi [name]”.",
+    a: "Sometimes inboxes are extra cautious with new messages. Ask your person to check Spam or Junk and mark the letter as “Not spam” — after that, the next ones usually land in the inbox. A short, friendly subject also helps.",
   },
   {
     q: "Can I write the letter myself?",
