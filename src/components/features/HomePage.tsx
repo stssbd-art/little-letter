@@ -44,11 +44,6 @@ export function HomePage() {
               📼 Send a Mixtape
             </PixelButton>
           </Link>
-          <Link href="/occasions">
-            <PixelButton size="lg" variant="ghost">
-              🎉 Occasions
-            </PixelButton>
-          </Link>
         </motion.div>
         <p className="mt-4 font-pixel text-[9px] leading-relaxed text-[var(--ll-muted)]">
           Press play · write a note · burn a tape
