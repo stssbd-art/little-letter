@@ -130,80 +130,64 @@ body {
   pointer-events: none;
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 30;
   overflow: hidden;
 }
 
 .sun-catcher {
   position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 236, 180, 0.7) 40%,
-    transparent 70%
+  width: 9px;
+  height: 9px;
+  background: #fff6d4;
+  clip-path: polygon(
+    50% 0%,
+    58% 42%,
+    100% 50%,
+    58% 58%,
+    50% 100%,
+    42% 58%,
+    0% 50%,
+    42% 42%
   );
-  opacity: 0.28;
-  mix-blend-mode: overlay;
+  filter: drop-shadow(0 0 4px rgba(255, 220, 140, 0.95));
   animation:
-    sun-catch-twinkle 4.8s ease-in-out infinite,
-    sun-catch-drift 28s ease-in-out infinite;
-}
-
-.sun-catcher::before,
-.sun-catcher::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  background: rgba(255, 252, 235, 0.7);
-}
-
-.sun-catcher::before {
-  width: 10px;
-  height: 1px;
-  transform: translate(-50%, -50%);
-}
-
-.sun-catcher::after {
-  width: 1px;
-  height: 10px;
-  transform: translate(-50%, -50%);
+    sun-catch-twinkle 3.6s ease-in-out infinite,
+    sun-catch-drift 22s ease-in-out infinite;
 }
 
 .dark .sun-catcher {
-  mix-blend-mode: screen;
-  opacity: 0.22;
+  background: #ffe9a8;
+  filter: drop-shadow(0 0 5px rgba(232, 184, 109, 0.85));
 }
 
-.sun-catcher-1 { left: 8%; top: 18%; animation-duration: 5.2s, 32s; animation-delay: 0s, 0s; }
-.sun-catcher-2 { left: 22%; top: 42%; width: 4px; height: 4px; animation-duration: 4.1s, 26s; animation-delay: 0.6s, 1.2s; }
-.sun-catcher-3 { left: 38%; top: 12%; animation-duration: 5.8s, 34s; animation-delay: 1.1s, 0.4s; }
-.sun-catcher-4 { left: 54%; top: 28%; width: 3px; height: 3px; animation-duration: 3.9s, 24s; animation-delay: 1.8s, 2s; }
-.sun-catcher-5 { left: 71%; top: 16%; animation-duration: 4.6s, 30s; animation-delay: 0.3s, 0.8s; }
-.sun-catcher-6 { left: 86%; top: 36%; width: 4px; height: 4px; animation-duration: 5.4s, 36s; animation-delay: 2.2s, 1.5s; }
-.sun-catcher-7 { left: 12%; top: 68%; width: 3px; height: 3px; animation-duration: 4.4s, 28s; animation-delay: 0.9s, 2.4s; }
-.sun-catcher-8 { left: 31%; top: 82%; animation-duration: 5s, 33s; animation-delay: 1.4s, 0.6s; }
-.sun-catcher-9 { left: 48%; top: 58%; width: 4px; height: 4px; animation-duration: 4.7s, 27s; animation-delay: 2s, 1.8s; }
-.sun-catcher-10 { left: 66%; top: 74%; width: 3px; height: 3px; animation-duration: 5.6s, 31s; animation-delay: 0.5s, 2.8s; }
-.sun-catcher-11 { left: 81%; top: 62%; animation-duration: 4.2s, 29s; animation-delay: 1.7s, 1.1s; }
-.sun-catcher-12 { left: 93%; top: 88%; width: 4px; height: 4px; animation-duration: 5.1s, 35s; animation-delay: 2.5s, 0.2s; }
+.sun-catcher-1 { left: 6%; top: 22%; animation-duration: 3.2s, 24s; animation-delay: 0s, 0s; }
+.sun-catcher-2 { left: 18%; top: 48%; width: 7px; height: 7px; animation-duration: 4s, 20s; animation-delay: 0.4s, 1s; }
+.sun-catcher-3 { left: 34%; top: 14%; animation-duration: 3.8s, 26s; animation-delay: 0.9s, 0.3s; }
+.sun-catcher-4 { left: 52%; top: 32%; width: 6px; height: 6px; animation-duration: 2.9s, 18s; animation-delay: 1.4s, 1.6s; }
+.sun-catcher-5 { left: 68%; top: 18%; animation-duration: 3.5s, 23s; animation-delay: 0.2s, 0.7s; }
+.sun-catcher-6 { left: 84%; top: 40%; width: 8px; height: 8px; animation-duration: 4.1s, 28s; animation-delay: 1.8s, 1.2s; }
+.sun-catcher-7 { left: 10%; top: 72%; width: 6px; height: 6px; animation-duration: 3.4s, 21s; animation-delay: 0.7s, 2s; }
+.sun-catcher-8 { left: 28%; top: 86%; animation-duration: 3.9s, 25s; animation-delay: 1.1s, 0.5s; }
+.sun-catcher-9 { left: 46%; top: 62%; width: 7px; height: 7px; animation-duration: 3.3s, 19s; animation-delay: 1.6s, 1.4s; }
+.sun-catcher-10 { left: 64%; top: 78%; width: 6px; height: 6px; animation-duration: 4.2s, 27s; animation-delay: 0.3s, 2.2s; }
+.sun-catcher-11 { left: 78%; top: 58%; animation-duration: 3.1s, 22s; animation-delay: 1.3s, 0.9s; }
+.sun-catcher-12 { left: 91%; top: 84%; width: 7px; height: 7px; animation-duration: 3.7s, 29s; animation-delay: 2s, 0.2s; }
+.sun-catcher-13 { left: 41%; top: 8%; width: 6px; height: 6px; animation-duration: 3s, 17s; animation-delay: 0.8s, 1.8s; }
+.sun-catcher-14 { left: 73%; top: 92%; width: 8px; height: 8px; animation-duration: 4.3s, 24s; animation-delay: 1.5s, 1.1s; }
 
 @keyframes sun-catch-twinkle {
   0%,
   100% {
-    opacity: 0.12;
-    transform: scale(0.7);
+    opacity: 0.15;
+    transform: scale(0.6) rotate(0deg);
   }
-  45% {
-    opacity: 0.42;
-    transform: scale(1);
+  40% {
+    opacity: 0.9;
+    transform: scale(1.15) rotate(20deg);
   }
   70% {
-    opacity: 0.2;
-    transform: scale(0.85);
+    opacity: 0.35;
+    transform: scale(0.8) rotate(8deg);
   }
 }
 
@@ -213,23 +197,8 @@ body {
     translate: 0 0;
   }
   50% {
-    translate: 14px -18px;
+    translate: 18px -22px;
   }
-}
-
-.dark .sun-catcher-1,
-.dark .sun-catcher-2,
-.dark .sun-catcher-3,
-.dark .sun-catcher-4,
-.dark .sun-catcher-5,
-.dark .sun-catcher-6,
-.dark .sun-catcher-7,
-.dark .sun-catcher-8,
-.dark .sun-catcher-9,
-.dark .sun-catcher-10,
-.dark .sun-catcher-11,
-.dark .sun-catcher-12 {
-  opacity: 0.18;
 }
 
 .lcd-screen {
