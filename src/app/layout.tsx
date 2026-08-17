@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AdSenseLoader } from "@/components/ads/AdSenseLoader";
 import { EndPageAdGate } from "@/components/ads/EndPageAdGate";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import {
   SEO_KEYWORDS,
   SITE_DESCRIPTION,
@@ -136,6 +137,7 @@ export default function RootLayout({
             <Footer />
           </AnimatedBackground>
         </AppProviders>
+        <GoogleAnalytics />
         <AdSenseLoader />
       </body>
     </html>

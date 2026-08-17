@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function MixtapePage() {
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       <div className="text-center">
         <p className="font-pixel text-[9px] tracking-widest text-[var(--ll-muted)]">
           SIDE A · PRESS RECORD

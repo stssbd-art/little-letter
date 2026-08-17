@@ -52,17 +52,30 @@ export function MixtapePlayer({ mix }: Props) {
   }, [index]);
 
   useEffect(() => {
-    if (!tracks.length || !hostRef.current) return;
+    if (!tracks.length) return;
 
     let cancelled = false;
-    const mount = hostRef.current;
+    let tries = 0;
 
-    void (async () => {
+    const mountPlayer = async () => {
+      const container = hostRef.current;
+      if (!container) {
+        if (!cancelled && tries++ < 30) {
+          window.setTimeout(() => void mountPlayer(), 50);
+        }
+        return;
+      }
+
       try {
         const YT = await loadYouTubeApi();
-        if (cancelled || !mount) return;
+        if (cancelled) return;
 
         playerRef.current?.destroy();
+        const mount = document.createElement("div");
+        mount.style.width = "100%";
+        mount.style.height = "100%";
+        container.replaceChildren(mount);
+
         playerRef.current = new YT.Player(mount, {
           videoId: tracks[0]!.youtubeId,
           width: "100%",
@@ -87,7 +100,6 @@ export function MixtapePlayer({ mix }: Props) {
               const { ENDED, PLAYING, PAUSED } = YT.PlayerState;
               if (event.data === PLAYING) {
                 setPlaying(true);
-                // After load, duration may only be ready once playing
                 const duration = event.target.getDuration() || 0;
                 if (
                   clipStartRef.current === 0 &&
@@ -122,7 +134,9 @@ export function MixtapePlayer({ mix }: Props) {
           setError("Could not load the music player. Check your connection.");
         }
       }
-    })();
+    };
+
+    void mountPlayer();
 
     return () => {
       cancelled = true;
@@ -257,6 +271,8 @@ export function MixtapePlayer({ mix }: Props) {
         toName={mix.to}
         tracks={tracks}
         spinning={playing}
+        nowPlaying={current}
+        screenRef={hostRef}
         onPlay={playMix}
         onStop={stopMix}
         onPrev={() => void playIndex(Math.max(0, index - 1))}
@@ -287,10 +303,6 @@ export function MixtapePlayer({ mix }: Props) {
             <p className="truncate text-xs text-[var(--ll-muted)]">
               {current?.artist} · {current?.year}
             </p>
-          </div>
-
-          <div className="aspect-video overflow-hidden rounded-xl border-2 border-[var(--ll-lavender)] bg-black">
-            <div ref={hostRef} className="h-full w-full" />
           </div>
 
           <div className="h-2 overflow-hidden rounded-full bg-[#ebe1cd]">

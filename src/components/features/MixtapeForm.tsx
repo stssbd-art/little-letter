@@ -127,20 +127,33 @@ export function MixtapeForm() {
   }, [playIndex]);
 
   useEffect(() => {
-    if (!hostRef.current) return;
     let cancelled = false;
-    const mount = hostRef.current;
+    let tries = 0;
+
     const seedId =
       MIX_TRACKS[0]?.youtubeId ||
       selected[0]?.youtubeId ||
       "dQw4w9WgXcQ";
 
-    void (async () => {
+    const mountPlayer = async () => {
+      const container = hostRef.current;
+      if (!container) {
+        if (!cancelled && tries++ < 30) {
+          window.setTimeout(() => void mountPlayer(), 50);
+        }
+        return;
+      }
+
       try {
         const YT = await loadYouTubeApi();
-        if (cancelled || !mount) return;
+        if (cancelled) return;
 
         playerRef.current?.destroy();
+        const mount = document.createElement("div");
+        mount.style.width = "100%";
+        mount.style.height = "100%";
+        container.replaceChildren(mount);
+
         playerRef.current = new YT.Player(mount, {
           videoId: seedId,
           width: "100%",
@@ -198,7 +211,9 @@ export function MixtapeForm() {
           setPlayerError("Could not load the music player. Check your connection.");
         }
       }
-    })();
+    };
+
+    void mountPlayer();
 
     return () => {
       cancelled = true;
@@ -665,7 +680,7 @@ export function MixtapeForm() {
         </p>
       </PixelWindow>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.05fr] lg:items-start">
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.9fr] lg:items-start">
         <div className="space-y-4">
           <CassetteDeck
             title={draft.title}
@@ -673,6 +688,9 @@ export function MixtapeForm() {
             toName={draft.recipientName}
             tracks={selected}
             spinning={playing}
+            nowPlaying={selected[playIndex] ?? null}
+            className="max-w-none"
+            screenRef={hostRef}
             onPlay={playSelected}
             onStop={stopSelected}
             onPrev={prevSelected}
@@ -680,10 +698,14 @@ export function MixtapeForm() {
             controlsDisabled={!playerReady || selected.length === 0}
             prevDisabled={selected.length < 2}
             nextDisabled={selected.length < 2}
-          />
-          <div className="aspect-video overflow-hidden rounded-xl border-[3px] border-[#2a2218] bg-black shadow-[6px_6px_0_rgba(61,47,34,0.18)]">
-            <div ref={hostRef} className="h-full w-full" />
-          </div>
+          >
+            <YouTubeSongSearch
+              selectedIds={draft.trackIds}
+              full={draft.trackIds.length >= MAX_MIXTAPE_TRACKS}
+              onAdd={addTrack}
+              className="rounded-lg border border-[#1a1510]/70 bg-[#fff6df]/15 p-2"
+            />
+          </CassetteDeck>
           {playerError ? (
             <p className="text-center text-xs text-[var(--ll-pink-deep)]">{playerError}</p>
           ) : (
@@ -691,10 +713,119 @@ export function MixtapeForm() {
               {selected.length
                 ? playing
                   ? `Now playing · ${selected[playIndex]?.title ?? "your mix"}`
-                  : "Tap a song to audition it on the deck"
+                  : "Tap a song under the deck to audition it"
                 : `Hand-labelled · Side A forever · pick at least ${MIN_MIXTAPE_TRACKS} song${MIN_MIXTAPE_TRACKS === 1 ? "" : "s"}`}
             </p>
           )}
+
+          <div className="rounded-xl border-2 border-[#d2a35a] bg-[#fff6df]/80 p-3">
+            <div className="mb-2 flex items-end justify-between gap-2">
+              <p className="font-display text-sm text-[var(--ll-ink)]">Your mix</p>
+              <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
+                {draft.trackIds.length}/{MAX_MIXTAPE_TRACKS} · min{" "}
+                {MIN_MIXTAPE_TRACKS}
+              </p>
+            </div>
+            {selected.length ? (
+              <ul className="space-y-1">
+                {selected.map((track, i) => (
+                  <li
+                    key={track.id}
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-1 py-1",
+                      i === playIndex && playing
+                        ? "bg-[#f6d58a]/50"
+                        : "hover:bg-[#f6d58a]/25"
+                    )}
+                  >
+                    <button
+                      type="button"
+                      className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                      onClick={() => {
+                        play("click");
+                        playTrackAt(selected, i);
+                      }}
+                    >
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-[#8b5e34] font-pixel text-[8px] text-[#fff6df]">
+                        {i + 1}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-display text-sm text-[var(--ll-ink)]">
+                          {track.title}
+                        </span>
+                        <span className="block truncate font-pixel text-[7px] text-[var(--ll-muted)]">
+                          {track.artist}
+                        </span>
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeTrack(track.id)}
+                      className="font-pixel text-[8px] text-[var(--ll-muted)] hover:text-[var(--ll-ink)]"
+                    >
+                      remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="font-pixel text-[8px] leading-relaxed text-[var(--ll-muted)]">
+                Pick songs below — they’ll line up here.
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-xl border-2 border-[var(--ll-lavender)] bg-[#fffbf2]/80 p-3 dark:bg-white/5">
+            <p className="mb-1 font-display text-sm text-[var(--ll-ink)]">
+              From our crate
+            </p>
+            <p className="mb-2 text-xs text-[var(--ll-muted)]">
+              Tap a track to add it to the mix.
+            </p>
+            <ul className="max-h-72 space-y-1.5 overflow-y-auto rounded-xl border-2 border-[var(--ll-lavender)] bg-white/70 p-2 dark:bg-white/5">
+              {MIX_TRACKS.map((track) => {
+                const on = draft.trackIds.includes(track.id);
+                const order = draft.trackIds.indexOf(track.id);
+                return (
+                  <li key={track.id}>
+                    <button
+                      type="button"
+                      onClick={() => toggleTrack(track.id)}
+                      className={cn(
+                        "flex w-full items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition",
+                        on
+                          ? "border-[#8b5e34] bg-[#fff6df] shadow-[2px_2px_0_#d2a35a]"
+                          : "border-transparent hover:border-[#cbb892] hover:bg-white/60 dark:hover:bg-white/10"
+                      )}
+                      aria-pressed={on}
+                    >
+                      <span
+                        className={cn(
+                          "flex h-6 w-6 shrink-0 items-center justify-center rounded-sm font-pixel text-[9px]",
+                          on
+                            ? "bg-[#8b5e34] text-[#fff6df]"
+                            : "bg-[#ebe1cd] text-[#6b5a44]"
+                        )}
+                      >
+                        {on ? order + 1 : "+"}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-display text-sm text-[var(--ll-ink)]">
+                          {track.mood === "romantic" ? "♥ " : ""}
+                          {track.title}
+                        </span>
+                        <span className="block truncate font-pixel text-[7px] text-[var(--ll-muted)]">
+                          {track.artist} · {track.year}
+                          {track.mood === "romantic" ? " · romantic" : ""}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
           <div className="flex justify-center">{previewMixButton}</div>
         </div>
 
@@ -790,117 +921,6 @@ export function MixtapeForm() {
                 maxLength={400}
               />
             </Field>
-
-            <div>
-              <div className="mb-2 flex items-end justify-between gap-2">
-                <p className="font-display text-sm text-[var(--ll-ink)]">
-                  Songs
-                </p>
-                <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
-                  {draft.trackIds.length}/{MAX_MIXTAPE_TRACKS} · min{" "}
-                  {MIN_MIXTAPE_TRACKS}
-                </p>
-              </div>
-              <p className="mb-2 text-xs text-[var(--ll-muted)]">
-                Pick from the crate, or search YouTube and add a song.
-              </p>
-
-              {selected.length ? (
-                <ul className="mb-3 space-y-1 rounded-xl border-2 border-[#d2a35a] bg-[#fff6df]/80 p-2">
-                  {selected.map((track, i) => (
-                    <li
-                      key={track.id}
-                      className={cn(
-                        "flex items-center gap-2 rounded-lg px-1 py-1",
-                        i === playIndex && playing
-                          ? "bg-[#f6d58a]/50"
-                          : "hover:bg-[#f6d58a]/25"
-                      )}
-                    >
-                      <button
-                        type="button"
-                        className="flex min-w-0 flex-1 items-center gap-2 text-left"
-                        onClick={() => {
-                          play("click");
-                          playTrackAt(selected, i);
-                        }}
-                      >
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-[#8b5e34] font-pixel text-[8px] text-[#fff6df]">
-                          {i + 1}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-display text-sm text-[var(--ll-ink)]">
-                            {track.title}
-                          </span>
-                          <span className="block truncate font-pixel text-[7px] text-[var(--ll-muted)]">
-                            {track.artist}
-                          </span>
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeTrack(track.id)}
-                        className="font-pixel text-[8px] text-[var(--ll-muted)] hover:text-[var(--ll-ink)]"
-                      >
-                        remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-
-              <YouTubeSongSearch
-                selectedIds={draft.trackIds}
-                full={draft.trackIds.length >= MAX_MIXTAPE_TRACKS}
-                onAdd={addTrack}
-              />
-
-              <p className="mb-1 mt-3 font-pixel text-[8px] text-[var(--ll-muted)]">
-                From our crate
-              </p>
-              <ul className="max-h-64 space-y-1.5 overflow-y-auto rounded-xl border-2 border-[var(--ll-lavender)] bg-[#fffbf2]/70 p-2 dark:bg-white/5">
-                {MIX_TRACKS.map((track) => {
-                  const on = draft.trackIds.includes(track.id);
-                  const order = draft.trackIds.indexOf(track.id);
-                  return (
-                    <li key={track.id}>
-                      <button
-                        type="button"
-                        onClick={() => toggleTrack(track.id)}
-                        className={cn(
-                          "flex w-full items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition",
-                          on
-                            ? "border-[#8b5e34] bg-[#fff6df] shadow-[2px_2px_0_#d2a35a]"
-                            : "border-transparent hover:border-[#cbb892] hover:bg-white/60 dark:hover:bg-white/10"
-                        )}
-                        aria-pressed={on}
-                      >
-                        <span
-                          className={cn(
-                            "flex h-6 w-6 shrink-0 items-center justify-center rounded-sm font-pixel text-[9px]",
-                            on
-                              ? "bg-[#8b5e34] text-[#fff6df]"
-                              : "bg-[#ebe1cd] text-[#6b5a44]"
-                          )}
-                        >
-                          {on ? order + 1 : "+"}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-display text-sm text-[var(--ll-ink)]">
-                            {track.mood === "romantic" ? "♥ " : ""}
-                            {track.title}
-                          </span>
-                          <span className="block truncate font-pixel text-[7px] text-[var(--ll-muted)]">
-                            {track.artist} · {track.year}
-                            {track.mood === "romantic" ? " · romantic" : ""}
-                          </span>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
 
             {error ? (
               <p className="rounded-xl border-2 border-rose-300 bg-rose-50 px-3 py-2 text-sm text-rose-700">

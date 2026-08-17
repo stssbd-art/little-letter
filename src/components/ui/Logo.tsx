@@ -13,7 +13,7 @@ export function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   return (
     <Link
       href="/"
-      className="group inline-flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ll-pink-deep)]"
+      className="group inline-flex items-center gap-2 rounded-sm outline-none focus-visible:outline-none focus-visible:underline focus-visible:decoration-2 focus-visible:underline-offset-4"
       aria-label="Little Letter home"
     >
       <motion.span

@@ -19,11 +19,11 @@ const SECTIONS = [
   },
   {
     title: "Technical & payment data",
-    body: `We may use cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts are also stored on our database. Payments are processed by Stripe; we do not store your full card details.`,
+    body: `We may use cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts are also stored on our database. Payments are processed by Stripe; we do not store your full card details. If Google Analytics is enabled, Google may collect anonymous visit data (pages viewed, country, device) so we can see how the site is used.`,
   },
   {
     title: "Third-party services",
-    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Those services have their own privacy policies.`,
+    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Ads may be shown by Google AdSense. Visit counts may be measured with Google Analytics. Those services have their own privacy policies.`,
   },
   {
     title: "Guestbook",

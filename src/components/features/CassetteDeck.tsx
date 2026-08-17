@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, type ReactNode, type Ref } from "react";
 import { motion } from "framer-motion";
 import type { MixTrack } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,11 @@ type CassetteDeckProps = {
   tracks: MixTrack[];
   spinning?: boolean;
   className?: string;
-  /** When set, shows working Play / Stop / Prev / Next controls on the deck */
+  nowPlaying?: MixTrack | null;
+  /** Stable host for the YouTube iframe */
+  screenRef?: Ref<HTMLDivElement>;
+  /** Extra controls (search, etc.) between the LCD and the video */
+  children?: ReactNode;
   onPlay?: () => void;
   onStop?: () => void;
   onPrev?: () => void;
@@ -28,6 +33,9 @@ export function CassetteDeck({
   tracks,
   spinning = false,
   className,
+  nowPlaying,
+  screenRef,
+  children,
   onPlay,
   onStop,
   onPrev,
@@ -40,183 +48,158 @@ export function CassetteDeck({
   const forLine = toName.trim() || "someone special";
   const fromLine = fromName.trim() || "a friend";
   const hasControls = Boolean(onPlay || onStop || onPrev || onNext);
+  const showScreen = Boolean(screenRef);
+  const current = nowPlaying ?? tracks[0] ?? null;
 
   return (
-    <div className={cn("mx-auto w-full max-w-md", className)}>
-      <div
+    <div
+      className={cn(
+        "mx-auto w-full",
+        className ?? (showScreen ? "max-w-lg" : "max-w-md")
+      )}
+    >
+      <section
         className={cn(
-          "relative overflow-hidden rounded-[18px] border-[3px] border-[#2a2218]",
+          "overflow-hidden rounded-[22px] border-[3px] border-[#2a2218]",
           "bg-gradient-to-b from-[#4a4036] via-[#322a22] to-[#241c16]",
-          "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),10px_12px_0_rgba(61,47,34,0.22)]"
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),6px_8px_0_rgba(61,47,34,0.22)]"
         )}
       >
-        {/* Screws */}
-        {[
-          "left-3 top-3",
-          "right-3 top-3",
-          "bottom-3 left-3",
-          "bottom-3 right-3",
-        ].map((pos) => (
-          <span
-            key={pos}
-            className={cn(
-              "absolute h-2.5 w-2.5 rounded-full bg-[#1a1510] shadow-[inset_0_1px_0_#6b5a44]",
-              pos
-            )}
-          />
-        ))}
+        <div className="flex items-center justify-between border-b border-[#1a1510]/80 px-3 py-2">
+          <p className="font-pixel text-[9px] tracking-wide text-[#f6d58a]">
+            SIDE A · LITTLE LETTER MIX
+          </p>
+          <p className="font-pixel text-[8px] text-[#cbb892]">
+            {spinning ? "STEREO" : showScreen ? "READY" : "STOP"}
+          </p>
+        </div>
 
-        {/* Label sticker */}
-        <div className="m-4 mb-3 rounded-md border-2 border-[#8b5e34]/80 bg-gradient-to-br from-[#f7ecd4] via-[#f0d9a0] to-[#e4c078] px-3 py-2.5 shadow-inner">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-pixel text-[7px] tracking-widest text-[#8b5e34]/80">
-                SIDE A · LITTLE LETTER MIX
-              </p>
-              <p className="mt-1 truncate font-display text-lg font-semibold text-[#3d2f22]">
-                {labelTitle}
-              </p>
-              <p className="mt-0.5 font-pixel text-[8px] text-[#6b4f36]">
-                for {forLine} · from {fromLine}
-              </p>
-            </div>
-            <span className="shrink-0 rounded-sm border border-[#8b5e34]/50 bg-[#fff6df] px-1.5 py-1 font-pixel text-[7px] text-[#8b5e34]">
-              ♡
-            </span>
-          </div>
-          <div className="mt-2 space-y-0.5 border-t border-dashed border-[#8b5e34]/35 pt-2">
-            {(tracks.length
-              ? tracks
-              : [{ id: "empty", title: "— pick tracks —", artist: "", year: "" }]
-            )
-              .slice(0, 4)
-              .map((t, i) => (
-                <p
-                  key={t.id}
-                  className="truncate font-pixel text-[7px] leading-relaxed text-[#5c4a34]"
-                >
-                  {i + 1}. {t.title}
-                  {t.artist ? ` · ${t.artist}` : ""}
+        <div className="space-y-3 p-3">
+          <div className="rounded-md border-2 border-[#1a1510] bg-[#1a1510] px-3 py-3 text-[#f6d58a] shadow-[inset_0_0_18px_rgba(0,0,0,0.55)]">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-pixel text-[8px] text-[#e8b86d]/80">
+                  NOW PLAYING · {labelTitle}
                 </p>
-              ))}
-            {tracks.length > 4 ? (
-              <p className="font-pixel text-[7px] text-[#8b5e34]/70">
-                +{tracks.length - 4} more on the B-side…
-              </p>
-            ) : null}
-          </div>
-        </div>
-
-        {/* Reel window */}
-        <div className="mx-4 mb-3 flex items-center justify-between gap-3 rounded-lg border-2 border-[#1a1510] bg-[#0f0c09] px-4 py-3 shadow-[inset_0_0_20px_rgba(0,0,0,0.65)]">
-          <Reel spinning={spinning} />
-          <div className="flex flex-1 flex-col items-center gap-1">
-            <div className="h-1.5 w-full rounded-full bg-gradient-to-r from-[#2a2218] via-[#6b5a44] to-[#2a2218]" />
-            <p className="font-pixel text-[6px] tracking-widest text-[#8a7a62]">
-              {spinning ? "▶ PLAYING" : "■ STOP"}
-            </p>
-            <div className="h-1.5 w-full rounded-full bg-gradient-to-r from-[#2a2218] via-[#6b5a44] to-[#2a2218]" />
-          </div>
-          <Reel spinning={spinning} />
-        </div>
-
-        {hasControls ? (
-          <div className="mx-4 mb-4 flex items-center justify-center gap-2">
-            {onPrev ? (
-              <button
-                type="button"
-                aria-label="Previous track"
-                disabled={controlsDisabled || prevDisabled}
-                onClick={onPrev}
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#1a1510] bg-gradient-to-b from-[#d8cdb6] to-[#b9a888] text-base text-[#3d2f22]",
-                  "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
-                  "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
-                )}
-              >
-                ⏮
-              </button>
-            ) : null}
-            <button
-              type="button"
-              aria-label="Play"
-              disabled={controlsDisabled || spinning}
-              onClick={onPlay}
-              className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#1a1510] bg-gradient-to-b from-[#f6d58a] to-[#e0b45a] text-base text-[#3d2f22]",
-                "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
-                "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
-              )}
-            >
-              ▶
-            </button>
-            <button
-              type="button"
-              aria-label="Stop"
-              disabled={controlsDisabled || !spinning}
-              onClick={onStop}
-              className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#1a1510] bg-gradient-to-b from-[#d8cdb6] to-[#b9a888] text-base text-[#3d2f22]",
-                "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
-                "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
-              )}
-            >
-              ■
-            </button>
-            {onNext ? (
-              <button
-                type="button"
-                aria-label="Next track"
-                disabled={controlsDisabled || nextDisabled}
-                onClick={onNext}
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#1a1510] bg-gradient-to-b from-[#d8cdb6] to-[#b9a888] text-base text-[#3d2f22]",
-                  "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
-                  "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
-                )}
-              >
-                ⏭
-              </button>
-            ) : null}
-          </div>
-        ) : (
-          <div className="flex justify-center gap-1 pb-3">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <span
-                key={i}
-                className="h-2 w-2 rounded-[2px] bg-[#1a1510]/80"
+                <p className="mt-1 truncate font-pixel text-[10px] leading-relaxed text-[#fff0c2]">
+                  {current?.title ?? "Pick a song"}
+                </p>
+                <p className="mt-1 truncate font-pixel text-[8px] text-[#cbb892]">
+                  {current
+                    ? `${current.artist}${current.year ? ` · ${current.year}` : ""}`
+                    : `for ${forLine} · from ${fromLine}`}
+                </p>
+              </div>
+              <motion.div
+                animate={spinning ? { rotate: 360 } : { rotate: 0 }}
+                transition={
+                  spinning
+                    ? { repeat: Infinity, duration: 2.4, ease: "linear" }
+                    : { duration: 0.2 }
+                }
+                className="mt-0.5 size-8 shrink-0 rounded-full border-2 border-[#f6d58a]/50 bg-[#0f0c09]"
               />
-            ))}
+            </div>
+            <p className="mt-3 border-t border-[#f6d58a]/20 pt-2 font-pixel text-[7px] leading-relaxed text-[#cbb892]">
+              for {forLine} · from {fromLine}
+              {tracks.length ? ` · ${tracks.length} track${tracks.length === 1 ? "" : "s"}` : ""}
+            </p>
           </div>
-        )}
-      </div>
+
+          {children}
+
+          {showScreen ? (
+            <div className="overflow-hidden rounded-lg border-2 border-[#1a1510] bg-black">
+              <div className="relative aspect-video min-h-[200px] w-full bg-black">
+                <ScreenHost screenRef={screenRef} />
+              </div>
+            </div>
+          ) : null}
+
+          {hasControls ? (
+            <div className="flex items-center justify-center gap-2">
+              {onPrev ? (
+                <DeckButton
+                  label="Previous track"
+                  disabled={controlsDisabled || prevDisabled}
+                  onClick={onPrev}
+                >
+                  ⏮
+                </DeckButton>
+              ) : null}
+              <DeckButton
+                label="Play"
+                disabled={controlsDisabled || spinning}
+                onClick={onPlay}
+                play
+              >
+                ▶
+              </DeckButton>
+              <DeckButton
+                label="Stop"
+                disabled={controlsDisabled || !spinning}
+                onClick={onStop}
+              >
+                ■
+              </DeckButton>
+              {onNext ? (
+                <DeckButton
+                  label="Next track"
+                  disabled={controlsDisabled || nextDisabled}
+                  onClick={onNext}
+                >
+                  ⏭
+                </DeckButton>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </section>
     </div>
   );
 }
 
-function Reel({ spinning }: { spinning: boolean }) {
+function DeckButton({
+  label,
+  disabled,
+  onClick,
+  play = false,
+  children,
+}: {
+  label: string;
+  disabled?: boolean;
+  onClick?: () => void;
+  play?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <motion.div
-      className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-[#5c4a34] bg-gradient-to-br from-[#3d3228] to-[#1a1510]"
-      animate={spinning ? { rotate: 360 } : { rotate: 0 }}
-      transition={
-        spinning
-          ? { duration: 2.4, repeat: Infinity, ease: "linear" }
-          : { duration: 0.4 }
-      }
+    <button
+      type="button"
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "flex items-center justify-center rounded-full border-2 border-[#1a1510] text-[#3d2f22]",
+        play ? "h-11 w-11 bg-[#f6d58a] text-base" : "h-10 w-10 bg-[#d8cdb6] text-sm",
+        "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
+        "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
+      )}
     >
-      <div className="absolute inset-2 rounded-full border border-[#6b5a44]/50" />
-      {/* Three diameters through the hub = six even spokes */}
-      {[0, 60, 120].map((deg) => (
-        <span
-          key={deg}
-          className="absolute left-1/2 top-1/2 h-[2px] w-10 bg-[#8a7a62]/85"
-          style={{
-            transform: `translate(-50%, -50%) rotate(${deg}deg)`,
-          }}
-        />
-      ))}
-      <span className="absolute left-1/2 top-1/2 z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0f0c09] ring-2 ring-[#8a7a62]" />
-    </motion.div>
+      {children}
+    </button>
   );
 }
+
+/** Isolated so cassette re-renders don’t wipe the YouTube iframe. */
+const ScreenHost = memo(function ScreenHost({
+  screenRef,
+}: {
+  screenRef?: Ref<HTMLDivElement>;
+}) {
+  return (
+    <div
+      ref={screenRef}
+      className="absolute inset-0 h-full w-full [&_iframe]:absolute [&_iframe]:inset-0 [&_iframe]:h-full [&_iframe]:w-full"
+    />
+  );
+});
