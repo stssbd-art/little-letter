@@ -4,7 +4,7 @@ export const SITE_NAME = "Little Letter";
 export const SITE_TAGLINE =
   "Send a cute letter or romantic mixtape by email — cosy notes for someone you miss.";
 export const SITE_DESCRIPTION =
-  "Little Letter helps you send a personal letter or romantic mixtape online. Write a warm message or burn a cassette-style mix, then email it to a friend, partner, or family member. First two letters free · then £0.99. First mixtape free · then from £1.25.";
+  "Little Letter helps you send digital birthday cards, occasion wishes, personal letters, and romantic mixtapes by email. Write a warm message for birthdays, weddings, Valentine's, thank you notes, and more — or burn a cassette-style mix. First two letters free · then £0.99.";
 const DEFAULT_SITE_URL = "https://sendlittleletter.vercel.app";
 
 function resolveSiteUrl() {
@@ -24,18 +24,22 @@ function resolveSiteUrl() {
 export const SITE_URL = resolveSiteUrl();
 
 export const SEO_KEYWORDS = [
+  "birthday card",
+  "birthday wish",
+  "digital birthday card",
+  "occasion card",
+  "send wish online",
+  "digital greeting card",
+  "e-card",
   "send a letter online",
-  "send a letter by email",
   "send mixtape online",
-  "email a mixtape",
-  "romantic mixtape email",
-  "send cute message",
+  "valentines day card",
+  "mothers day card",
+  "thank you card online",
+  "wedding congratulations card",
   "send love letter online",
-  "digital mixtape for someone",
   "personal email letter",
   "little letter",
-  "nostalgic email letter",
-  "cassette mixtape gift",
 ];
 
 export const OCCASIONS: {

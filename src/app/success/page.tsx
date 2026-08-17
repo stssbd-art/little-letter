@@ -5,6 +5,7 @@ import { SuccessCelebration } from "@/components/features/SuccessCelebration";
 export const metadata: Metadata = {
   title: "Success",
   description: "Your little letter or mixtape has been sent!",
+  robots: { index: false, follow: false },
 };
 
 export default function SuccessPage() {

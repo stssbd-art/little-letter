@@ -5,6 +5,7 @@ import { LetterPreview } from "@/components/features/LetterPreview";
 export const metadata: Metadata = {
   title: "Preview",
   description: "Preview your Little Letter before it flies through the internet.",
+  robots: { index: false, follow: false },
 };
 
 export default function PreviewPage() {

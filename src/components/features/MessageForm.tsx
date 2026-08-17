@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
@@ -10,16 +10,26 @@ import { Field, PixelInput, PixelSelect, PixelTextarea } from "@/components/ui/P
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
+import { isOccasionSlug } from "@/lib/occasion-seo";
 import type { LetterWriteMode, MessageStyle, Occasion } from "@/types";
 import { cn } from "@/lib/utils";
 
 export function MessageForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { form, setForm, setLetter } = useLetter();
   const { play } = useSound();
   const [loading, setLoading] = useState(false);
   const [phase, setPhase] = useState<"form" | "closing" | "flying">("form");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fromUrl = searchParams.get("occasion");
+    if (fromUrl && isOccasionSlug(fromUrl) && form.occasion !== fromUrl) {
+      setForm({ occasion: fromUrl });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- prefill once from landing page link
+  }, [searchParams]);
 
   const writeMode: LetterWriteMode = form.writeMode === "own" ? "own" : "ai";
 

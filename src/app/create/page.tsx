@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { MessageForm } from "@/components/features/MessageForm";
 
 export const metadata: Metadata = {
-  title: "Create & Send a Letter Online",
+  title: "Create & Send a Birthday Card or Letter Online",
   description:
-    "Create a cute personal letter online and email it to someone you care about. First two letters free, then £0.99.",
+    "Create a digital birthday card, occasion wish, or personal letter and email it to someone you care about. First two letters free, then £0.99.",
   alternates: { canonical: "/create" },
   keywords: [
-    "send a letter online",
+    "birthday card online",
+    "create digital card",
+    "send wish by email",
     "email a love letter",
-    "send cute message by email",
     "personal letter generator",
   ],
 };
@@ -22,11 +24,19 @@ export default function CreatePage() {
           Create a Little Letter
         </h1>
         <p className="mt-2 font-display text-[var(--ll-muted)]">
-          Write it yourself, or let us help — first two letters free, then £0.99
-          each.
+          Birthday cards, thank you notes, love letters, and more — write it
+          yourself or get help. First two letters free, then £0.99 each.
         </p>
       </div>
-      <MessageForm />
+      <Suspense
+        fallback={
+          <p className="text-center text-sm text-[var(--ll-muted)]">
+            Loading form…
+          </p>
+        }
+      >
+        <MessageForm />
+      </Suspense>
     </div>
   );
 }
