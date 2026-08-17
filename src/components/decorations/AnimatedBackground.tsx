@@ -5,6 +5,11 @@ export function AnimatedBackground({
 }) {
   return (
     <div className="relative min-h-screen">
+      <div className="sun-reflections" aria-hidden>
+        <div className="sun-orb" />
+        <div className="sun-rays" />
+        <div className="sun-glint" />
+      </div>
       <div className="pointer-events-none absolute inset-0 crt-overlay" aria-hidden />
       <div
         className="pointer-events-none absolute inset-0 mp3-bezel opacity-40 dark:opacity-25"
