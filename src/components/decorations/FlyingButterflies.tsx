@@ -25,17 +25,17 @@ export function FlyingButterflies() {
 
   return (
     <>
-      <div className="absolute inset-0 overflow-hidden" aria-hidden>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         {BUTTERFLIES.map((b, i) => (
           <motion.button
             key={i}
             type="button"
-            className="absolute cursor-pointer border-0 bg-transparent text-2xl"
+            className="pointer-events-auto absolute cursor-pointer border-0 bg-transparent text-2xl opacity-70"
             style={{ left: b.left, top: b.top }}
             animate={{
-              x: [0, 50, -30, 0],
-              y: [0, -40, 20, 0],
-              rotate: [0, 15, -10, 0],
+              x: [0, 90, -50, 40, 0],
+              y: [0, -70, 30, -20, 0],
+              rotate: [0, 18, -14, 8, 0],
             }}
             transition={{ duration: b.duration, repeat: Infinity, ease: "easeInOut" }}
             onClick={() => {

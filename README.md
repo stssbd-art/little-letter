@@ -39,8 +39,6 @@ Open [http://localhost:3000](http://localhost:3000).
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | For paid sends | Stripe publishable key |
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Production URL for SEO + Stripe returns |
 | `DEMO_MODE` | No | Set `true` only for temporary free testing (disables charges). Leave unset for public paid sends. |
-| `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | No | Google AdSense publisher ID (`ca-pub-…`) — enables one end-of-page ad |
-| `NEXT_PUBLIC_ADSENSE_SLOT_END` | With AdSense | Display ad unit slot ID for the end-of-page unit |
 
 **Inbox placement:** Prefer Resend + a verified custom domain (SPF, DKIM, DMARC). Shared senders like `onboarding@resend.dev` are blocked because they land in spam. Gmail SMTP is the fallback and can email any address (Google daily limits apply).
 

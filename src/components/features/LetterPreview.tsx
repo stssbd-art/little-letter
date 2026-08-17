@@ -268,18 +268,16 @@ export function LetterPreview() {
               {/*
                 Shared 320×200 viewBox on every layer.
                 Lip tip + pocket peak both sit at (160, 100).
-                One outer border; lip is clipped to the same rounded face.
+                Shadow only on the flat back layer (keeps 3D flap unfiltered).
               */}
-              <div
-                className="relative aspect-[8/5] w-full overflow-visible"
-                style={{ filter: "drop-shadow(6px 6px 0 var(--ll-pink-shadow))" }}
-              >
+              <div className="relative aspect-[8/5] w-full overflow-visible">
                 {/* Back + outer silhouette */}
                 <svg
                   className="absolute inset-0 z-10 h-full w-full"
                   viewBox="0 0 320 200"
                   preserveAspectRatio="none"
                   aria-hidden
+                  style={{ filter: "drop-shadow(6px 6px 0 var(--ll-pink-shadow))" }}
                 >
                   <defs>
                     <linearGradient id="ll-env-back" x1="0" y1="0" x2="0" y2="1">
@@ -287,9 +285,6 @@ export function LetterPreview() {
                       <stop offset="45%" stopColor="#f6d58a" />
                       <stop offset="100%" stopColor="#e8b86d" />
                     </linearGradient>
-                    <clipPath id="ll-env-face">
-                      <rect x="5" y="5" width="310" height="190" rx="16" />
-                    </clipPath>
                   </defs>
                   <rect
                     x="2.5"
@@ -408,22 +403,26 @@ export function LetterPreview() {
                       />
                     </g>
                   </svg>
-                  <motion.div
-                    className="absolute left-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-                    style={{ top: "36%" }}
-                    animate={{
-                      scale: open ? 0.35 : 1,
-                      opacity: open ? 0 : 1,
-                    }}
-                    transition={{ duration: 0.25 }}
+                  <div
+                    className="absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2"
+                    style={{ top: "50%" }}
                   >
-                    <span
-                      className="select-none text-4xl leading-none drop-shadow-[0_3px_0_rgba(120,20,40,0.35)] sm:text-5xl"
-                      aria-hidden
+                    <motion.div
+                      className="flex items-center justify-center"
+                      animate={{
+                        scale: open ? 0.35 : 1,
+                        opacity: open ? 0 : 1,
+                      }}
+                      transition={{ duration: 0.25 }}
                     >
-                      ❤️
-                    </span>
-                  </motion.div>
+                      <span
+                        className="select-none text-4xl leading-none drop-shadow-[0_3px_0_rgba(120,20,40,0.35)] sm:text-5xl"
+                        aria-hidden
+                      >
+                        ❤️
+                      </span>
+                    </motion.div>
+                  </div>
                 </motion.div>
               </div>
             </div>

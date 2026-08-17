@@ -23,7 +23,7 @@ const SECTIONS = [
   },
   {
     title: "Third-party services",
-    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. When advertising is enabled, Google AdSense may show a small sponsored unit near the end of the page and may use cookies or similar technology for ad delivery and measurement. Those services have their own privacy policies.`,
+    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Those services have their own privacy policies.`,
   },
   {
     title: "Guestbook",
