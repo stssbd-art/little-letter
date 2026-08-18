@@ -28,7 +28,7 @@ export function Field({ label, htmlFor, hint, children, className }: FieldProps)
 }
 
 const inputClass =
-  "w-full rounded-xl border-2 border-[var(--ll-lavender)] bg-white/90 px-3 py-2.5 text-sm text-[var(--ll-ink)] shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] outline-none transition focus:border-[var(--ll-pink-deep)] focus:ring-2 focus:ring-[var(--ll-pink-glow)] dark:bg-white/10";
+  "w-full rounded-xl border-2 border-[var(--ll-lavender)] bg-white/90 px-3 py-2.5 text-sm text-[var(--ll-ink)] shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] outline-none transition placeholder:text-[var(--ll-muted)] focus:border-[var(--ll-pink-deep)] focus:ring-2 focus:ring-[var(--ll-pink-glow)] dark:bg-[#2a2118] dark:text-[#fff8ee]";
 
 export function PixelInput(
   props: React.InputHTMLAttributes<HTMLInputElement>

@@ -24,9 +24,9 @@ export function PixelButton({
 
   const variants = {
     primary:
-      "bg-gradient-to-b from-[var(--ll-pink)] to-[var(--ll-pink-deep)] text-white border-[var(--ll-pink-deep)] shadow-[0_4px_0_var(--ll-pink-shadow)]",
+      "bg-gradient-to-b from-[var(--ll-btn-from)] to-[var(--ll-btn-to)] text-[var(--ll-btn-text)] border-[var(--ll-btn-to)] shadow-[0_4px_0_var(--ll-pink-shadow)] [text-shadow:0_1px_0_rgba(61,47,34,0.35)]",
     secondary:
-      "bg-gradient-to-b from-[var(--ll-mint)] to-[var(--ll-mint-deep)] text-white border-[var(--ll-mint-deep)] shadow-[0_4px_0_var(--ll-mint-shadow)]",
+      "bg-gradient-to-b from-[var(--ll-btn-mint-from)] to-[var(--ll-btn-mint-to)] text-[var(--ll-btn-mint-text)] border-[var(--ll-btn-mint-to)] shadow-[0_4px_0_var(--ll-mint-shadow)] [text-shadow:0_1px_0_rgba(47,58,30,0.4)]",
     ghost:
       "bg-white/70 dark:bg-white/10 text-[var(--ll-ink)] border-[var(--ll-lavender)] shadow-[0_3px_0_var(--ll-lavender-shadow)]",
     danger:

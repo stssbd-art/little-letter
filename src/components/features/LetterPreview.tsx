@@ -319,13 +319,13 @@ export function LetterPreview() {
                   }
                   style={{ height: "54%" }}
                 >
-                  <p className="truncate font-pixel text-[8px] text-[var(--ll-pink-deep)]">
+                  <p className="truncate font-pixel text-[8px] text-[#8b5e34]">
                     {currentLetter.subject}
                   </p>
-                  <p className="mt-1 truncate text-[11px] text-[var(--ll-muted)]">
+                  <p className="mt-1 truncate text-[11px] text-[#7a654f]">
                     For {currentLetter.form.recipientName}
                   </p>
-                  <p className="mt-1 line-clamp-2 text-left text-[11px] leading-snug text-[var(--ll-ink)]">
+                  <p className="mt-1 line-clamp-2 text-left text-[11px] leading-snug text-[#3d2f22]">
                     {currentLetter.message}
                   </p>
                 </motion.div>

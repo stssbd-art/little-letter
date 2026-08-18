@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Accent kept as --ll-pink* names for existing components; values are honey/amber */
   --ll-pink: #f6d58a;
@@ -24,8 +26,15 @@
   --ll-title-from: #e8b86d;
   --ll-title-via: #c4a574;
   --ll-title-to: #a3b875;
+  --ll-btn-from: #f6d58a;
+  --ll-btn-to: #8b5e34;
+  --ll-btn-text: #fffdf6;
+  --ll-btn-mint-from: #c5d4a0;
+  --ll-btn-mint-to: #5f7538;
+  --ll-btn-mint-text: #fffdf6;
   --background: #faf4e8;
   --foreground: #3d2f22;
+  color-scheme: light;
 }
 
 .dark {
@@ -43,16 +52,23 @@
   --ll-baby-blue: #d2a35a;
   --ll-cream: #1c1610;
   --ll-yellow: #f6d58a;
-  --ll-ink: #f5ecd9;
-  --ll-muted: #cbb892;
+  --ll-ink: #fff8ee;
+  --ll-muted: #ead9b4;
   --ll-window-bg: rgba(36, 28, 20, 0.94);
   --ll-window-border: #8b5e34;
   --ll-window-shadow: #2a1f14;
-  --ll-title-from: #8b5e34;
-  --ll-title-via: #6b4f36;
-  --ll-title-to: #6f8a45;
+  --ll-title-from: #f6d58a;
+  --ll-title-via: #e8b86d;
+  --ll-title-to: #c5d4a0;
+  --ll-btn-from: #e8b86d;
+  --ll-btn-to: #8b5e34;
+  --ll-btn-text: #fffdf6;
+  --ll-btn-mint-from: #a3b875;
+  --ll-btn-mint-to: #4e632c;
+  --ll-btn-mint-text: #fffdf6;
   --background: #1c1610;
-  --foreground: #f5ecd9;
+  --foreground: #fff8ee;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -92,6 +108,18 @@ body {
   color: var(--ll-ink);
   font-family: var(--font-nunito), "Trebuchet MS", sans-serif;
   min-height: 100vh;
+}
+
+input,
+textarea,
+select {
+  color: var(--ll-ink);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--ll-muted);
+  opacity: 0.9;
 }
 
 .dark body {
