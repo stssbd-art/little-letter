@@ -334,7 +334,7 @@ export function MixtapePlayer({ mix }: Props) {
       </PixelWindow>
 
       <PixelWindow title="side_a.tracklist" icon="📜" liftOnHover={false}>
-        <ul className="space-y-1">
+        <ul className="ll-song-scroll max-h-64 space-y-1 pr-1">
           {tracks.map((t, i) => (
             <li key={`${t.id}-${i}`}>
               <button

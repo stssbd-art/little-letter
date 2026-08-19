@@ -782,7 +782,7 @@ export function MixtapeForm() {
             <p className="mb-2 text-xs text-[var(--ll-muted)]">
               Tap a track to add it to the mix.
             </p>
-            <ul className="max-h-72 space-y-1.5 overflow-y-auto rounded-xl border-2 border-[var(--ll-lavender)] bg-white/70 p-2 dark:bg-white/5">
+            <ul className="ll-song-scroll max-h-72 space-y-1.5 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/70 p-2 pr-1 dark:bg-white/5">
               {MIX_TRACKS.map((track) => {
                 const on = draft.trackIds.includes(track.id);
                 const order = draft.trackIds.indexOf(track.id);

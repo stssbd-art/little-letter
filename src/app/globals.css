@@ -168,6 +168,44 @@ textarea::placeholder {
   background-size: 24px 24px;
 }
 
+.ll-song-scroll {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #8b5e34 #efe6d4;
+}
+
+.ll-song-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.ll-song-scroll::-webkit-scrollbar-track {
+  margin: 4px 0;
+  background: rgba(255, 246, 223, 0.7);
+  border-radius: 999px;
+  border: 1px solid rgba(139, 94, 52, 0.25);
+}
+
+.ll-song-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #e8b86d, #8b5e34);
+  border-radius: 999px;
+  border: 2px solid #efe6d4;
+}
+
+.dark .ll-song-scroll {
+  scrollbar-color: #e8b86d #2a2118;
+}
+
+.dark .ll-song-scroll::-webkit-scrollbar-track {
+  background: rgba(26, 21, 16, 0.75);
+  border-color: rgba(232, 184, 109, 0.3);
+}
+
+.dark .ll-song-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #e8b86d, #8b5e34);
+  border-color: #241c16;
+}
+
 .sun-catchers {
   pointer-events: none;
   position: fixed;

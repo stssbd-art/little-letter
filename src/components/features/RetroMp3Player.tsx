@@ -317,7 +317,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           </p>
         ) : null}
 
-        <ul className="max-h-36 space-y-1 overflow-y-auto rounded-lg border border-[#b9a888]/60 bg-white/40 p-2 dark:bg-black/20">
+        <ul className="ll-song-scroll max-h-44 space-y-1 rounded-lg border border-[#b9a888]/60 bg-white/40 p-2 pr-1 dark:bg-black/20">
           {tracks.map((t, i) => (
             <li key={t.id}>
               <button
