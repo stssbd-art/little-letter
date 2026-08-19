@@ -49,8 +49,8 @@ export function mixtapePrice(trackCount: number) {
 }
 
 /**
- * Public launch: payments ON by default.
- * Set DEMO_MODE=true on Vercel only for temporary free testing.
+ * Payments are on unless DEMO_MODE=true is set (temporary testing only).
+ * Do not set DEMO_MODE on production once testing is finished.
  */
 export function isDemoMode() {
   return process.env.DEMO_MODE === "true";
