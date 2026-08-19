@@ -14,6 +14,7 @@ import {
   SITE_TAGLINE,
   SITE_URL,
 } from "@/lib/constants";
+import { getAdsenseClientId } from "@/lib/adsense";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -74,6 +75,9 @@ export const metadata: Metadata = {
     },
   },
   category: "lifestyle",
+  ...(getAdsenseClientId()
+    ? { other: { "google-adsense-account": getAdsenseClientId() } }
+    : {}),
   verification: {
     google:
       process.env.GOOGLE_SITE_VERIFICATION ??
