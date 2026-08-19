@@ -641,7 +641,7 @@ export function MixtapeForm() {
         tracks: draft.trackIds,
         extras: draft.customTracks,
       });
-      return `/mix/${encodeURIComponent(code)}`;
+      return `/mix/${encodeURIComponent(code)}?from=create`;
     } catch {
       return null;
     }
@@ -826,7 +826,26 @@ export function MixtapeForm() {
             </ul>
           </div>
 
-          <div className="flex justify-start">{previewMixButton}</div>
+          <div className="flex flex-wrap justify-start gap-3">
+            {previewMixButton}
+            <PixelButton
+              type="button"
+              size="lg"
+              disabled={!previewHref || sending || paying || !acceptedTerms}
+              onClick={() => {
+                const form = document.getElementById("mix-title")?.closest("form");
+                form?.requestSubmit();
+              }}
+            >
+              {sending || paying
+                ? "Posting the tape..."
+                : needsPayment && !demo
+                  ? `💳 Pay ${priceLabel} & send mix`
+                  : demo
+                    ? "📼 Send mixtape (demo)"
+                    : "📼 Mail the mixtape"}
+            </PixelButton>
+          </div>
         </div>
 
         <PixelWindow title="make_a_mix.bat" icon="📼" liftOnHover={false}>

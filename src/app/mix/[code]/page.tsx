@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { MixtapePlayer } from "@/components/features/MixtapePlayer";
+import { MixPreviewSend } from "@/components/features/MixPreviewSend";
 import { ShareBar } from "@/components/features/ShareBar";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PixelWindow } from "@/components/ui/PixelWindow";
@@ -39,10 +41,14 @@ export default async function MixPlayPage({ params }: Props) {
 
   const shareUrl = `${SITE_URL}/mix/${encodeURIComponent(code.trim())}`;
   const shareText = `${mix.from} made a mixtape for ${mix.to}: “${mix.title}”`;
+  const mixPath = `/mix/${encodeURIComponent(code.trim())}`;
 
   return (
     <div className="space-y-8">
       <MixtapePlayer mix={mix} />
+      <Suspense fallback={null}>
+        <MixPreviewSend mix={mix} mixPath={mixPath} />
+      </Suspense>
       <PixelWindow title="share_this_mix.lnk" icon="📣" liftOnHover={false}>
         <ShareBar
           url={shareUrl}

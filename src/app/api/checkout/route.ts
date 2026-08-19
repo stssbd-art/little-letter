@@ -44,7 +44,14 @@ export async function POST(request: Request) {
         trackCount?: number;
         senderEmail?: string;
       };
-      if (body?.returnPath === "/mixtape" || body?.returnPath === "/preview") {
+      if (
+        body?.returnPath === "/mixtape" ||
+        body?.returnPath === "/preview" ||
+        (typeof body?.returnPath === "string" &&
+          body.returnPath.startsWith("/mix/") &&
+          body.returnPath.length < 2000 &&
+          !body.returnPath.includes("//"))
+      ) {
         returnPath = body.returnPath;
       }
       if (body?.kind === "mixtape" || returnPath === "/mixtape") {
