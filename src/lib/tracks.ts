@@ -122,12 +122,12 @@ export const MIX_TRACKS: MixTrack[] = [
     youtubeId: "an4ySOlsUMY",
   },
   {
-    id: "stand-by-me",
-    title: "Stand By Me",
-    artist: "Ben E. King",
-    year: "1961",
-    mood: "romantic",
-    youtubeId: "z5i9vT8wGY8",
+    id: "runaway-aurora",
+    title: "Runaway",
+    artist: "AURORA",
+    year: "2015",
+    mood: "soft",
+    youtubeId: "d_HlPboLRL8",
   },
 ];
 
