@@ -10,6 +10,8 @@ import {
 import { buildMixPlayUrl } from "@/lib/mixtape-link";
 import { isGmailApiConfigured, sendViaGmailApi } from "@/lib/gmail-api";
 import { SITE_NAME } from "@/lib/constants";
+import type { VoiceNotePayload } from "@/lib/voice-note";
+import { voiceNoteToAttachment } from "@/lib/voice-note";
 
 type SendResult = {
   id: string;
@@ -119,7 +121,10 @@ async function deliverEmail(opts: {
   html: string;
   logLabel: string;
   senderName?: string;
+  voiceNote?: VoiceNotePayload | null;
 }): Promise<SendResult> {
+  const attachment = opts.voiceNote ? voiceNoteToAttachment(opts.voiceNote) : undefined;
+
   if (isGmailApiConfigured()) {
     try {
       const id = await sendViaGmailApi({
@@ -128,6 +133,7 @@ async function deliverEmail(opts: {
         subject: opts.subject,
         text: opts.text,
         html: opts.html,
+        attachment,
       });
       return { id, simulated: false, provider: "gmail-api" };
     } catch (err) {
@@ -145,6 +151,15 @@ async function deliverEmail(opts: {
         text: opts.text,
         html: opts.html,
         replyTo: gmail.user,
+        attachments: attachment
+          ? [
+              {
+                filename: attachment.filename,
+                content: attachment.content,
+                contentType: attachment.contentType,
+              },
+            ]
+          : undefined,
       });
       return {
         id: info.messageId || `gmail-${Date.now()}`,
@@ -166,6 +181,15 @@ async function deliverEmail(opts: {
       text: opts.text,
       html: opts.html,
       replyTo: verified.replyTo,
+      attachments: attachment
+        ? [
+            {
+              filename: attachment.filename,
+              content: attachment.content,
+              contentType: attachment.contentType,
+            },
+          ]
+        : undefined,
     });
     if (error) throw new Error(error.message);
     return {
@@ -194,18 +218,26 @@ async function deliverEmail(opts: {
   return { id: `demo-${Date.now()}`, simulated: true, provider: "demo" };
 }
 
-export async function sendLetterEmail(letter: GeneratedLetter): Promise<SendResult> {
+export async function sendLetterEmail(
+  letter: GeneratedLetter,
+  voiceNote?: VoiceNotePayload | null
+): Promise<SendResult> {
+  const hasVoice = Boolean(voiceNote);
   return deliverEmail({
     to: letter.form.recipientEmail,
     subject: letterSubject(letter),
-    text: buildLetterEmailText(letter),
-    html: buildLetterEmailHtml(letter),
+    text: buildLetterEmailText(letter, hasVoice),
+    html: buildLetterEmailHtml(letter, hasVoice),
     logLabel: "send",
     senderName: letter.form.senderName,
+    voiceNote,
   });
 }
 
-export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult> {
+export async function sendMixtapeEmail(
+  mix: MixtapePayload,
+  voiceNote?: VoiceNotePayload | null
+): Promise<SendResult> {
   const playUrl = buildMixPlayUrl({
     title: mix.title,
     from: mix.senderName,
@@ -215,12 +247,14 @@ export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult>
     extras: mix.customTracks,
   });
 
+  const hasVoice = Boolean(voiceNote);
   return deliverEmail({
     to: mix.recipientEmail,
     subject: mixtapeSubject(mix),
-    text: buildMixtapeEmailText(mix, playUrl),
-    html: buildMixtapeEmailHtml(mix, playUrl),
+    text: buildMixtapeEmailText(mix, playUrl, hasVoice),
+    html: buildMixtapeEmailHtml(mix, playUrl, hasVoice),
     logLabel: "mixtape",
     senderName: mix.senderName,
+    voiceNote,
   });
 }

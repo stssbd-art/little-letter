@@ -7,6 +7,7 @@ import { PixelButton } from "@/components/ui/PixelButton";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { Field, PixelInput } from "@/components/ui/PixelInput";
 import { TermsAcceptance } from "@/components/features/TermsAcceptance";
+import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
 import { useSound } from "@/components/providers/SoundProvider";
 import {
   clearMixtapeDraft,
@@ -14,6 +15,7 @@ import {
   saveMixtapeDraft,
   type MixtapeDraft,
 } from "@/lib/mixtape-draft";
+import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import type { MixShare } from "@/lib/mixtape-link";
 import type { MixtapePayload } from "@/types";
 
@@ -156,10 +158,11 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
     };
 
     try {
+      const voiceNote = await loadVoicePayload("mixtape");
       const res = await fetch("/api/send-mixtape", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, shareExample }),
+        body: JSON.stringify({ ...payload, shareExample, voiceNote }),
       });
       const data = await res.json();
       if (res.status === 402) {
@@ -176,6 +179,7 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
         colors: ["#f6d58a", "#8b5e34", "#3d2f22", "#cbb892", "#e8b86d"],
       });
       play("success");
+      await clearVoiceBlob("mixtape");
       clearMixtapeDraft();
       router.push("/success?kind=mixtape");
     } catch (err) {
@@ -298,6 +302,10 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
             required
           />
         </Field>
+      </div>
+
+      <div className="mt-4">
+        <VoiceNoteRecorder kind="mixtape" />
       </div>
 
       <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">

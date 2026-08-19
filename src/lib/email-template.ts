@@ -325,12 +325,18 @@ function whyFooter(senderName: string, accent: string) {
   </p>`;
 }
 
-export function buildLetterEmailText(letter: GeneratedLetter): string {
+function voiceNoteHtml() {
+  return `<div style="margin-top:16px;padding:12px 14px;background:#fff6df;border:2px dashed #d2a35a;border-radius:12px;font-size:13px;line-height:1.5;color:#5c3d1e;">
+    🎙️ A voice note is attached — open the audio file in this email to hear it.
+  </div>`;
+}
+
+export function buildLetterEmailText(letter: GeneratedLetter, hasVoiceNote = false): string {
   return [
     `Little Letter for ${letter.form.recipientName}`,
     "",
     letter.message,
-    "",
+    hasVoiceNote ? "\nA voice note is attached to this email.\n" : "",
     `— ${letter.form.senderName}`,
     "",
     `Sent with Little Letter (${SITE_URL})`,
@@ -338,7 +344,11 @@ export function buildLetterEmailText(letter: GeneratedLetter): string {
   ].join("\n");
 }
 
-export function buildMixtapeEmailText(mix: MixtapePayload, playUrl: string): string {
+export function buildMixtapeEmailText(
+  mix: MixtapePayload,
+  playUrl: string,
+  hasVoiceNote = false
+): string {
   const tracks = getTracksByIds(mix.trackIds, mix.customTracks);
   const list = tracks
     .map((t, i) => `${i + 1}. ${t.title} — ${t.artist} (${t.year})`)
@@ -348,6 +358,7 @@ export function buildMixtapeEmailText(mix: MixtapePayload, playUrl: string): str
     `A mixtape for ${mix.recipientName}: ${mix.title}`,
     `From: ${mix.senderName}`,
     mix.dedication.trim() ? `\n“${mix.dedication.trim()}”\n` : "",
+    hasVoiceNote ? "A voice note is attached to this email.\n" : "",
     list ? `Tracklist:\n${list}\n` : "",
     `Play your mixtape:\n${playUrl}`,
     "",
@@ -358,7 +369,10 @@ export function buildMixtapeEmailText(mix: MixtapePayload, playUrl: string): str
     .join("\n");
 }
 
-export function buildLetterEmailHtml(letter: GeneratedLetter): string {
+export function buildLetterEmailHtml(
+  letter: GeneratedLetter,
+  hasVoiceNote = false
+): string {
   const meta = OCCASIONS.find((o) => o.value === letter.form.occasion);
   const emoji = meta?.emoji ?? "💌";
   const label = meta?.label ?? "Note";
@@ -406,6 +420,7 @@ export function buildLetterEmailHtml(letter: GeneratedLetter): string {
               <div style="font-size:15px;line-height:1.7;color:${theme.bodyInk};background:#fff;border:2px solid ${theme.msgBorder};border-radius:14px;padding:20px;">
                 ${safeMessage}
               </div>
+              ${hasVoiceNote ? voiceNoteHtml() : ""}
             </td>
           </tr>
           <tr>
@@ -429,7 +444,11 @@ export function buildLetterEmailHtml(letter: GeneratedLetter): string {
 </html>`;
 }
 
-export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): string {
+export function buildMixtapeEmailHtml(
+  mix: MixtapePayload,
+  playUrl: string,
+  hasVoiceNote = false
+): string {
   const tracks = getTracksByIds(mix.trackIds, mix.customTracks);
   const hasMusic = tracks.length > 0;
   const preheader = `${mix.senderName} made you a mixtape: ${mix.title}`;
@@ -512,6 +531,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
                 </div>
               </div>
               ${dedication}
+              ${hasVoiceNote ? voiceNoteHtml() : ""}
             </td>
           </tr>
           ${playBlock}

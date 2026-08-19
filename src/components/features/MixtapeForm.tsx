@@ -27,6 +27,8 @@ import {
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
 import { YouTubeSongSearch } from "@/components/features/YouTubeSongSearch";
 import { TermsAcceptance } from "@/components/features/TermsAcceptance";
+import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
+import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import type { MixtapePayload } from "@/types";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -524,10 +526,11 @@ export function MixtapeForm() {
     };
 
     try {
+      const voiceNote = await loadVoicePayload("mixtape");
       const res = await fetch("/api/send-mixtape", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, shareExample }),
+        body: JSON.stringify({ ...payload, shareExample, voiceNote }),
       });
       const data = await res.json();
 
@@ -576,6 +579,7 @@ export function MixtapeForm() {
       } catch {
         /* ignore */
       }
+      await clearVoiceBlob("mixtape");
       clearMixtapeDraft();
       router.push("/success?kind=mixtape");
     } catch (err) {
@@ -679,6 +683,8 @@ export function MixtapeForm() {
                 : `Your free mixtape is used. Extra mixes are £1.25 for 1 song · £1.55 for 2 or more. Current pick (${songCount} song${songCount === 1 ? "" : "s"}): ${priceLabel}.`}
         </p>
       </PixelWindow>
+
+      <VoiceNoteRecorder kind="mixtape" />
 
       <div className="grid gap-6 lg:grid-cols-[1.2fr_0.9fr] lg:items-start">
         <div className="space-y-4">

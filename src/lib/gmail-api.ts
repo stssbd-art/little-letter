@@ -1,5 +1,11 @@
 import { google } from "googleapis";
 
+export type GmailAttachment = {
+  filename: string;
+  contentType: string;
+  content: Buffer;
+};
+
 type GmailApiSendOpts = {
   to: string;
   /** Display From, e.g. `"Ada via Little Letter" <you@gmail.com>` */
@@ -7,6 +13,7 @@ type GmailApiSendOpts = {
   subject: string;
   text: string;
   html: string;
+  attachment?: GmailAttachment;
 };
 
 function getGmailUser() {
@@ -28,25 +35,12 @@ function encodeFrom(from: string) {
   return `=?UTF-8?B?${Buffer.from(name!, "utf8").toString("base64")}?= <${email}>`;
 }
 
-function buildRawMessage(opts: {
-  to: string;
-  from: string;
-  subject: string;
-  text: string;
-  html: string;
-}) {
-  const boundary = `ll_alt_${Date.now()}`;
-  const text = opts.text.replace(/\r?\n/g, "\r\n");
-  const html = opts.html.replace(/\r?\n/g, "\r\n");
+function wrapBase64(value: string) {
+  return value.match(/.{1,76}/g)?.join("\r\n") ?? value;
+}
 
-  const lines = [
-    `From: ${encodeFrom(opts.from)}`,
-    `To: ${opts.to}`,
-    `Subject: ${encodeSubject(opts.subject)}`,
-    `Date: ${new Date().toUTCString()}`,
-    "MIME-Version: 1.0",
-    `Content-Type: multipart/alternative; boundary="${boundary}"`,
-    "",
+function alternativeParts(boundary: string, text: string, html: string) {
+  return [
     `--${boundary}`,
     "Content-Type: text/plain; charset=UTF-8",
     "Content-Transfer-Encoding: 8bit",
@@ -61,7 +55,56 @@ function buildRawMessage(opts: {
     "",
     `--${boundary}--`,
   ];
+}
 
+function buildRawMessage(opts: {
+  to: string;
+  from: string;
+  subject: string;
+  text: string;
+  html: string;
+  attachment?: GmailAttachment;
+}) {
+  const text = opts.text.replace(/\r?\n/g, "\r\n");
+  const html = opts.html.replace(/\r?\n/g, "\r\n");
+  const headers = [
+    `From: ${encodeFrom(opts.from)}`,
+    `To: ${opts.to}`,
+    `Subject: ${encodeSubject(opts.subject)}`,
+    `Date: ${new Date().toUTCString()}`,
+    "MIME-Version: 1.0",
+  ];
+
+  if (!opts.attachment) {
+    const boundary = `ll_alt_${Date.now()}`;
+    const lines = [
+      ...headers,
+      `Content-Type: multipart/alternative; boundary="${boundary}"`,
+      "",
+      ...alternativeParts(boundary, text, html),
+    ];
+    return Buffer.from(lines.join("\r\n"), "utf8").toString("base64url");
+  }
+
+  const mixed = `ll_mixed_${Date.now()}`;
+  const alt = `ll_alt_${Date.now()}`;
+  const safeName = opts.attachment.filename.replace(/["\r\n]/g, "");
+  const lines = [
+    ...headers,
+    `Content-Type: multipart/mixed; boundary="${mixed}"`,
+    "",
+    `--${mixed}`,
+    `Content-Type: multipart/alternative; boundary="${alt}"`,
+    "",
+    ...alternativeParts(alt, text, html),
+    `--${mixed}`,
+    `Content-Type: ${opts.attachment.contentType}; name="${safeName}"`,
+    `Content-Disposition: attachment; filename="${safeName}"`,
+    "Content-Transfer-Encoding: base64",
+    "",
+    wrapBase64(opts.attachment.content.toString("base64")),
+    `--${mixed}--`,
+  ];
   return Buffer.from(lines.join("\r\n"), "utf8").toString("base64url");
 }
 

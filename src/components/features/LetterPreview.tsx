@@ -6,9 +6,11 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
+import { TermsAcceptance } from "@/components/features/TermsAcceptance";
+import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
-import { TermsAcceptance } from "@/components/features/TermsAcceptance";
+import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
@@ -154,10 +156,11 @@ export function LetterPreview() {
     setError("");
     play("whoosh");
     try {
+      const voiceNote = await loadVoicePayload("letter");
       const res = await fetch("/api/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...currentLetter, shareExample }),
+        body: JSON.stringify({ ...currentLetter, shareExample, voiceNote }),
       });
       const data = await res.json();
 
@@ -181,6 +184,8 @@ export function LetterPreview() {
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to send");
+
+      await clearVoiceBlob("letter");
 
       confetti({
         particleCount: 120,
@@ -469,6 +474,8 @@ export function LetterPreview() {
           {error}
         </p>
       ) : null}
+
+      <VoiceNoteRecorder kind="letter" />
 
       <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">
         <input

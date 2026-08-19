@@ -16,7 +16,7 @@ const UPDATED = "16 August 2026";
 const SECTIONS = [
   {
     title: "Information you provide",
-    body: `When you send a letter or mixtape, you may enter names, email addresses (including your own sender email), message text, dedications, and song choices. We use recipient details to deliver your message. We use your sender email to track free-send limits and paid credits so clearing browser cookies cannot reset those limits.`,
+    body: `When you send a letter or mixtape, you may enter names, email addresses (including your own sender email), message text, dedications, song choices, and an optional voice recording. We use recipient details to deliver your message. A voice note is attached to that email and is not kept on our servers after send. We use your sender email to track free-send limits and paid credits so clearing browser cookies cannot reset those limits.`,
   },
   {
     title: "Technical & payment data",

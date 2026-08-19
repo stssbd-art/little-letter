@@ -18,6 +18,7 @@ import {
   youtubeTrackId,
 } from "@/lib/tracks";
 import { addMixtapeExample } from "@/lib/shared-examples";
+import { parseVoiceNote } from "@/lib/voice-note";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Partial<MixtapePayload> & {
       shareExample?: boolean;
+      voiceNote?: unknown;
     };
 
     if (!body.recipientEmail || !isValidEmail(body.recipientEmail)) {
@@ -110,7 +112,16 @@ export async function POST(request: Request) {
       createdAt: body.createdAt || new Date().toISOString(),
     };
 
-    const result = await sendMixtapeEmail(mix);
+    let voiceNote;
+    try {
+      voiceNote = parseVoiceNote(body.voiceNote);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Voice note is invalid." },
+        { status: 400 }
+      );
+    }
+    const result = await sendMixtapeEmail(mix, voiceNote);
     const usage = await consumeMixtapeSendAccess(senderEmail);
 
     if (body.shareExample) {

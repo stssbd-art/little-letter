@@ -11,6 +11,7 @@ import {
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
 import { addLetterExample } from "@/lib/shared-examples";
+import { parseVoiceNote } from "@/lib/voice-note";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as GeneratedLetter & {
       shareExample?: boolean;
+      voiceNote?: unknown;
     };
 
     if (!body?.form?.recipientEmail || !isValidEmail(body.form.recipientEmail)) {
@@ -67,7 +69,16 @@ export async function POST(request: Request) {
       createdAt: body.createdAt || new Date().toISOString(),
     };
 
-    const result = await sendLetterEmail(letter);
+    let voiceNote;
+    try {
+      voiceNote = parseVoiceNote(body.voiceNote);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Voice note is invalid." },
+        { status: 400 }
+      );
+    }
+    const result = await sendLetterEmail(letter, voiceNote);
     const usage = await consumeSendAccess(senderEmail);
 
     if (body.shareExample) {

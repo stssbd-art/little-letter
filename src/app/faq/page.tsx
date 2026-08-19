@@ -33,6 +33,10 @@ const FAQS = [
     a: "Yes. On Create, choose “I’ll write it myself,” then add a subject and your own message — no AI. Or pick “Help me write it” for an AI draft from your occasion and style.",
   },
   {
+    q: "Can I add a voice note?",
+    a: "Yes — optional on letters and mixtapes. Record up to 60 seconds before you send. It arrives as an audio attachment they can play in the email. You can skip it and send just the written note.",
+  },
+  {
     q: "How do free sends work without an account?",
     a: "You enter your email when creating a letter or mixtape. We track free/paid usage against that email (and browser cookies). Clearing cookies alone won’t reset your free allowance if you use the same email again. After free sends are used, Stripe charges apply.",
   },
