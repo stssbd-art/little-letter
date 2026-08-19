@@ -460,7 +460,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
                 ▶ Play this mixtape
               </a>
               <div style="margin-top:10px;font-size:11px;color:#cbb892;">
-                Romantic mix — ~30 seconds of each original song
+                Press play to hear the mix
               </div>
             </td>
           </tr>
@@ -499,7 +499,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
             <td style="background:linear-gradient(90deg,#5c3d1e,#8b5e34,#6b4f36);padding:18px 22px;text-align:center;">
               <div style="font-size:26px;letter-spacing:3px;">📼</div>
               <div style="font-family:Georgia,serif;font-size:22px;color:#fff6df;margin-top:6px;">A mixtape for you</div>
-              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · ${hasMusic ? "30-sec romantic mix" : "note only"}</div>
+              <div style="font-size:12px;color:#f6d58a;margin-top:4px;">hand-labelled · Side A · ${hasMusic ? "playable mix" : "note only"}</div>
             </td>
           </tr>
           <tr>
@@ -518,7 +518,7 @@ export function buildMixtapeEmailHtml(mix: MixtapePayload, playUrl: string): str
           <tr>
             <td style="padding:18px 22px 26px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#cbb892;line-height:1.6;">
-                Hit play and listen to the mix — about 30 seconds of each original song.
+                Hit play and listen to the mix — each song plays in full, then the next begins.
               </p>
               <p style="margin:14px 0 0;font-size:11px;color:#8a7a62;word-break:break-all;">
                 ${escapeHtml(playUrl)}

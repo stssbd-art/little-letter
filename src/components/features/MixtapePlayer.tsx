@@ -11,9 +11,6 @@ import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { cn } from "@/lib/utils";
 
-/** Short mix slice per track — not the full song */
-const CLIP_SEC = 30;
-
 type Props = {
   mix: MixShare;
 };
@@ -25,24 +22,18 @@ function formatTime(seconds: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-function pickClipStart(duration: number) {
-  if (!Number.isFinite(duration) || duration <= CLIP_SEC + 5) return 0;
-  // Start ~20% in so the slice feels like a mix drop, not always the intro
-  return Math.min(duration - CLIP_SEC - 1, Math.max(0, duration * 0.2));
-}
-
 export function MixtapePlayer({ mix }: Props) {
   const tracks = resolveShareTracks(mix);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YtPlayer | null>(null);
   const indexRef = useRef(0);
-  const clipStartRef = useRef(0);
   const advancingRef = useRef(false);
 
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [ready, setReady] = useState(false);
-  const [clipTime, setClipTime] = useState(0);
+  const [playTime, setPlayTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
 
@@ -89,11 +80,8 @@ export function MixtapePlayer({ mix }: Props) {
             origin: window.location.origin,
           },
           events: {
-            onReady: (event) => {
+            onReady: () => {
               if (cancelled) return;
-              const startAt = pickClipStart(event.target.getDuration() || 0);
-              clipStartRef.current = startAt;
-              if (startAt > 0) event.target.seekTo(startAt, true);
               setReady(true);
             },
             onStateChange: (event) => {
@@ -101,16 +89,7 @@ export function MixtapePlayer({ mix }: Props) {
               const { ENDED, PLAYING, PAUSED } = YT.PlayerState;
               if (event.data === PLAYING) {
                 setPlaying(true);
-                const duration = event.target.getDuration() || 0;
-                if (
-                  clipStartRef.current === 0 &&
-                  duration > CLIP_SEC + 5 &&
-                  event.target.getCurrentTime() < 2
-                ) {
-                  const startAt = pickClipStart(duration);
-                  clipStartRef.current = startAt;
-                  event.target.seekTo(startAt, true);
-                }
+                setDuration(event.target.getDuration() || 0);
               }
               if (event.data === PAUSED) setPlaying(false);
               if (event.data === ENDED) {
@@ -149,30 +128,23 @@ export function MixtapePlayer({ mix }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mix.title, tracks.map((t) => t.id).join(",")]);
 
-  // Poll clip progress and auto-advance after ~30s
+  // Track progress for the full song
   useEffect(() => {
     if (!ready) return;
     const id = window.setInterval(() => {
       const player = playerRef.current;
       if (!player || advancingRef.current) return;
       try {
-        if (player.getPlayerState() !== 1) return;
-        const elapsed = Math.max(
-          0,
-          player.getCurrentTime() - clipStartRef.current
-        );
-        setClipTime(Math.min(CLIP_SEC, elapsed));
-        setProgress(Math.min(100, (elapsed / CLIP_SEC) * 100));
-        if (elapsed >= CLIP_SEC) {
-          void advanceFrom(indexRef.current);
-        }
+        const total = player.getDuration() || 0;
+        const current = player.getCurrentTime() || 0;
+        setDuration(total);
+        setPlayTime(current);
+        setProgress(total > 0 ? Math.min(100, (current / total) * 100) : 0);
       } catch {
         /* player may be mid-swap */
       }
     }, 250);
     return () => window.clearInterval(id);
-    // advanceFrom is stable via refs
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, tracks.length]);
 
   async function advanceFrom(fromIndex: number) {
@@ -187,7 +159,6 @@ export function MixtapePlayer({ mix }: Props) {
       player?.pauseVideo();
       setPlaying(false);
       setProgress(100);
-      setClipTime(CLIP_SEC);
     }
   }
 
@@ -198,26 +169,16 @@ export function MixtapePlayer({ mix }: Props) {
     setError("");
     setIndex(nextIndex);
     indexRef.current = nextIndex;
-    setClipTime(0);
+    setPlayTime(0);
     setProgress(0);
-    clipStartRef.current = 0;
+    setDuration(0);
 
     player.loadVideoById({
       videoId: track.youtubeId,
       startSeconds: 0,
     });
-    // Brief wait so duration metadata can arrive, then seek into the slice
-    await new Promise((r) => setTimeout(r, 600));
-    try {
-      const startAt = pickClipStart(player.getDuration() || 0);
-      clipStartRef.current = startAt;
-      if (startAt > 0) player.seekTo(startAt, true);
-      player.playVideo();
-      setPlaying(true);
-    } catch {
-      player.playVideo();
-      setPlaying(true);
-    }
+    player.playVideo();
+    setPlaying(true);
   }
 
   function playMix() {
@@ -254,7 +215,7 @@ export function MixtapePlayer({ mix }: Props) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader kicker="SIDE A · 30-SEC MIX" title={mix.title}>
+      <PageHeader kicker="SIDE A · PLAY" title={mix.title}>
         for {mix.to || "you"} · from {mix.from || "a friend"}
       </PageHeader>
 
@@ -287,7 +248,7 @@ export function MixtapePlayer({ mix }: Props) {
         <div className="space-y-4">
           <div className="min-w-0">
             <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
-              SLICE {index + 1}/{tracks.length} · 30 SEC
+              TRACK {index + 1}/{tracks.length}
               {!ready ? " · LOADING…" : playing ? " · LIVE" : " · READY"}
             </p>
             <p className="truncate font-display text-base text-[var(--ll-ink)]">
@@ -305,8 +266,8 @@ export function MixtapePlayer({ mix }: Props) {
             />
           </div>
           <div className="flex justify-between font-pixel text-[7px] text-[var(--ll-muted)]">
-            <span>{formatTime(clipTime)}</span>
-            <span>0:30 slice</span>
+            <span>{formatTime(playTime)}</span>
+            <span>{formatTime(duration)}</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -367,8 +328,7 @@ export function MixtapePlayer({ mix }: Props) {
           ) : null}
 
           <p className="text-center font-pixel text-[7px] leading-relaxed text-[var(--ll-muted)]">
-            Original songs via YouTube — each plays a 30-second mix slice, then
-            the next track starts. Not the full recording.
+            Songs play through YouTube. When one finishes, the next track starts.
           </p>
         </div>
       </PixelWindow>
@@ -393,7 +353,7 @@ export function MixtapePlayer({ mix }: Props) {
                   {t.title}
                 </span>
                 <span className="shrink-0 font-pixel text-[7px] opacity-60">
-                  0:30
+                  {i === index && duration > 0 ? formatTime(duration) : ""}
                 </span>
               </button>
             </li>
