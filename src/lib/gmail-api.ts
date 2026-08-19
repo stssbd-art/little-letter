@@ -2,7 +2,7 @@ import { google } from "googleapis";
 
 type GmailApiSendOpts = {
   to: string;
-  /** Always set — branded "Little Letter" From for consistent inbox display. */
+  /** Display From, e.g. `"Ada via Little Letter" <you@gmail.com>` */
   from: string;
   subject: string;
   text: string;

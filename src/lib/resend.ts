@@ -59,11 +59,15 @@ function getVerifiedResendFrom(): { from: string; replyTo: string } | null {
 }
 
 /**
- * Inbox From name — always "Little Letter", never a bare email address.
- * Do not change this for avatar experiments; public sends must stay consistent.
+ * Inbox From — “Ada via Little Letter”, never a bare address.
  */
-function brandedFrom(accountEmail: string) {
-  return `"${SITE_NAME}" <${accountEmail}>`;
+function brandedFrom(accountEmail: string, senderName?: string) {
+  const name = senderName
+    ?.trim()
+    .replace(/["<>\r\n]/g, "")
+    .slice(0, 40);
+  const display = name ? `${name} via ${SITE_NAME}` : SITE_NAME;
+  return `"${display}" <${accountEmail}>`;
 }
 
 function letterSubject(letter: GeneratedLetter) {
@@ -108,12 +112,13 @@ async function deliverEmail(opts: {
   text: string;
   html: string;
   logLabel: string;
+  senderName?: string;
 }): Promise<SendResult> {
   if (isGmailApiConfigured()) {
     try {
       const id = await sendViaGmailApi({
         to: opts.to,
-        from: brandedFrom(process.env.GMAIL_USER!.trim()),
+        from: brandedFrom(process.env.GMAIL_USER!.trim(), opts.senderName),
         subject: opts.subject,
         text: opts.text,
         html: opts.html,
@@ -128,7 +133,7 @@ async function deliverEmail(opts: {
   if (gmail) {
     try {
       const info = await gmail.transporter.sendMail({
-        from: brandedFrom(gmail.user),
+        from: brandedFrom(gmail.user, opts.senderName),
         to: opts.to,
         subject: opts.subject,
         text: opts.text,
@@ -190,6 +195,7 @@ export async function sendLetterEmail(letter: GeneratedLetter): Promise<SendResu
     text: buildLetterEmailText(letter),
     html: buildLetterEmailHtml(letter),
     logLabel: "send",
+    senderName: letter.form.senderName,
   });
 }
 
@@ -209,5 +215,6 @@ export async function sendMixtapeEmail(mix: MixtapePayload): Promise<SendResult>
     text: buildMixtapeEmailText(mix, playUrl),
     html: buildMixtapeEmailHtml(mix, playUrl),
     logLabel: "mixtape",
+    senderName: mix.senderName,
   });
 }
