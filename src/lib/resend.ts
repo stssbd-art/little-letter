@@ -70,14 +70,20 @@ function brandedFrom(accountEmail: string, senderName?: string) {
   return `"${display}" <${accountEmail}>`;
 }
 
+function withEnvelope(subject: string) {
+  const trimmed = subject.trim();
+  if (trimmed.startsWith("💌")) return trimmed.slice(0, 120);
+  return `💌 ${trimmed}`.slice(0, 120);
+}
+
 function letterSubject(letter: GeneratedLetter) {
   const custom = letter.subject?.trim();
-  if (custom) return custom.slice(0, 120);
-  return `A little letter for ${letter.form.recipientName}`.slice(0, 120);
+  const base = custom || `A little letter for ${letter.form.recipientName}`;
+  return withEnvelope(base);
 }
 
 function mixtapeSubject(mix: MixtapePayload) {
-  return `Mixtape for you: ${mix.title}`.slice(0, 120);
+  return withEnvelope(`Mixtape for you: ${mix.title}`);
 }
 
 function hasGmailConfigured() {
