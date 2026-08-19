@@ -260,6 +260,8 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
   const priceLabel = usage?.price ?? "£1.25";
 
   return (
+    <div className="space-y-4">
+      <VoiceNoteRecorder kind="mixtape" />
     <PixelWindow title="send_this_mix.bat" icon="💌" liftOnHover={false}>
       <p className="font-display text-sm text-[var(--ll-ink)]">
         Like how it sounds? Mail this mixtape from here — no need to go back.
@@ -302,10 +304,6 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
             required
           />
         </Field>
-      </div>
-
-      <div className="mt-4">
-        <VoiceNoteRecorder kind="mixtape" />
       </div>
 
       <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">
@@ -358,5 +356,6 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
         )}
       </div>
     </PixelWindow>
+    </div>
   );
 }

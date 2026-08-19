@@ -7,6 +7,7 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PixelCard } from "@/components/ui/PixelCard";
 import { Field, PixelInput, PixelSelect, PixelTextarea } from "@/components/ui/PixelInput";
+import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
@@ -99,6 +100,7 @@ export function MessageForm() {
   }
 
   return (
+    <div className="space-y-5">
     <PixelWindow title="create_message.exe" icon="✍️" liftOnHover={false}>
       <AnimatePresence mode="wait">
         {phase === "form" ? (
@@ -373,5 +375,7 @@ export function MessageForm() {
         )}
       </AnimatePresence>
     </PixelWindow>
+    {phase === "form" ? <VoiceNoteRecorder kind="letter" /> : null}
+    </div>
   );
 }

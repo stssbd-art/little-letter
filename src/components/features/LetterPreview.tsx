@@ -248,6 +248,8 @@ export function LetterPreview() {
         </p>
       </PixelWindow>
 
+      <VoiceNoteRecorder kind="letter" />
+
       <PixelWindow title="letter_preview.rtf" icon="📬" liftOnHover={false}>
         <div className="flex flex-col items-center">
           <button
@@ -474,8 +476,6 @@ export function LetterPreview() {
           {error}
         </p>
       ) : null}
-
-      <VoiceNoteRecorder kind="letter" />
 
       <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">
         <input

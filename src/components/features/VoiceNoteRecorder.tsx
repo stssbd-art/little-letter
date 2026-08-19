@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PixelButton } from "@/components/ui/PixelButton";
+import { PixelWindow } from "@/components/ui/PixelWindow";
 import {
   clearVoiceBlob,
   loadVoiceBlob,
@@ -126,27 +127,19 @@ export function VoiceNoteRecorder({ kind }: Props) {
     await clearVoiceBlob(kind);
   }
 
-  if (!supported) {
-    return (
-      <div className="rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">
-        <p className="font-display text-sm text-[var(--ll-ink)]">Voice note (optional)</p>
-        <p className="mt-1 text-xs text-[var(--ll-muted)]">
-          Recording isn’t available in this browser. You can still send the written note.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">
-      <p className="font-display text-sm text-[var(--ll-ink)]">Voice note (optional)</p>
-      <p className="mt-0.5 text-xs text-[var(--ll-muted)]">
-        Record up to {MAX_VOICE_SECONDS} seconds. It arrives as an audio attachment they can play
-        in the email.
+    <PixelWindow title="voice_note.wav" icon="🎙️" liftOnHover={false}>
+      <p className="font-display text-base text-[var(--ll-ink)]">
+        Add a voice note (optional)
+      </p>
+      <p className="mt-1 text-sm text-[var(--ll-muted)]">
+        {supported
+          ? `Tap Record, speak for up to ${MAX_VOICE_SECONDS} seconds, then Stop. It goes with the email as an audio file.`
+          : "Recording isn’t available in this browser. You can still send the written note."}
       </p>
 
       {recording ? (
-        <p className="mt-2 font-pixel text-[10px] text-[var(--ll-pink-deep)]">
+        <p className="mt-3 font-pixel text-[10px] text-[var(--ll-pink-deep)]">
           Recording… {seconds}s / {MAX_VOICE_SECONDS}s
         </p>
       ) : null}
@@ -158,25 +151,27 @@ export function VoiceNoteRecorder({ kind }: Props) {
       ) : null}
 
       {error ? (
-        <p className="mt-2 text-xs text-rose-700">{error}</p>
+        <p className="mt-2 text-sm text-rose-700">{error}</p>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {recording ? (
-          <PixelButton type="button" size="sm" onClick={stopRecording}>
-            Stop
-          </PixelButton>
-        ) : (
-          <PixelButton type="button" size="sm" variant="secondary" onClick={() => void startRecording()}>
-            {url ? "Re-record" : "Record voice"}
-          </PixelButton>
-        )}
-        {url && !recording ? (
-          <PixelButton type="button" size="sm" variant="ghost" onClick={() => void removeNote()}>
-            Remove
-          </PixelButton>
-        ) : null}
-      </div>
-    </div>
+      {supported ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {recording ? (
+            <PixelButton type="button" size="lg" onClick={stopRecording}>
+              ⏹ Stop
+            </PixelButton>
+          ) : (
+            <PixelButton type="button" size="lg" onClick={() => void startRecording()}>
+              {url ? "🎙️ Re-record" : "🎙️ Record voice"}
+            </PixelButton>
+          )}
+          {url && !recording ? (
+            <PixelButton type="button" variant="ghost" onClick={() => void removeNote()}>
+              Remove
+            </PixelButton>
+          ) : null}
+        </div>
+      ) : null}
+    </PixelWindow>
   );
 }

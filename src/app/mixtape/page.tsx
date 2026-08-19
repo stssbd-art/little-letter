@@ -22,9 +22,9 @@ export default function MixtapePage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader kicker="SIDE A · PRESS RECORD" title="Send a Mixtape">
-        Label a cassette, pick one or more songs, add a tiny dedication —
-        first mixtape free, then £1.25 for 1 song or £1.55 for 2+ — then mail
-        the mix across the internet.
+        Label a cassette, pick songs, add a tiny dedication or a spoken voice
+        note — first mixtape free, then £1.25 for 1 song or £1.55 for 2+ — then
+        mail the mix.
       </PageHeader>
 
       <Suspense
