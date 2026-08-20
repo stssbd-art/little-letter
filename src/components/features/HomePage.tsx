@@ -34,24 +34,26 @@ export function HomePage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-3"
+          className="mt-8 flex w-full max-w-lg flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center"
         >
-          <Link href="/create">
-            <PixelButton size="lg">💌 Create a Little Letter</PixelButton>
+          <Link href="/create" className="sm:w-auto">
+            <PixelButton size="lg" className="w-full sm:w-auto">
+              💌 Create a Little Letter
+            </PixelButton>
           </Link>
-          <Link href="/cards">
-            <PixelButton size="lg" variant="secondary">
+          <Link href="/cards" className="sm:w-auto">
+            <PixelButton size="lg" variant="secondary" className="w-full sm:w-auto">
               🎴 Send a Card
             </PixelButton>
           </Link>
-          <Link href="/mixtape">
-            <PixelButton size="lg" variant="ghost">
+          <Link href="/mixtape" className="sm:w-auto">
+            <PixelButton size="lg" variant="ghost" className="w-full sm:w-auto">
               📼 Send a Mixtape
             </PixelButton>
           </Link>
         </motion.div>
         <p className="mt-4 font-pixel text-[9px] leading-relaxed text-[var(--ll-muted)]">
-          Letter · card · mixtape
+          Press play · write a note · burn a tape
         </p>
 
         <div className="mt-10 w-full max-w-lg">

@@ -67,13 +67,13 @@ export default function CardsPage() {
 
       <PixelWindow title="pick_an_occasion.ini" icon="✨">
         <p className="mb-4 text-sm text-[var(--ll-muted)]">
-          Tap an occasion to start with that vibe already picked.
+          Tap an occasion to open the create form with that card type ready.
         </p>
         <ul className="grid gap-3 sm:grid-cols-2">
           {OCCASION_SEO_LIST.map((o) => (
             <li key={o.slug}>
               <Link
-                href={`/${o.slug}`}
+                href={`/create?occasion=${o.slug}`}
                 className="flex items-start gap-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/60 px-4 py-3 transition hover:border-[var(--ll-pink-deep)] dark:bg-white/5"
               >
                 <span className="text-2xl" aria-hidden>

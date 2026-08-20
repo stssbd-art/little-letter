@@ -14,10 +14,8 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
-  { href: "/create", label: "Create" },
   { href: "/cards", label: "Cards" },
   { href: "/mixtape", label: "Mixtape" },
-  { href: "/occasions", label: "Occasions" },
   { href: "/paperless", label: "Planet" },
   { href: "/faq", label: "FAQ" },
 ];
