@@ -84,8 +84,7 @@ function letterSubject(letter: GeneratedLetter) {
   const custom = letter.subject?.trim();
   if (letter.form.cardDesign) {
     const base = custom || `${letter.form.senderName} sent you a card`;
-    // No emoji in subject — some inboxes render them as “?”
-    return base.replace(/^[💌🎴]\s*/, "").slice(0, 120);
+    return withEnvelope(base);
   }
   const base = custom || `A little letter for ${letter.form.recipientName}`;
   return withEnvelope(base);
