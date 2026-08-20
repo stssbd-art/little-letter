@@ -419,23 +419,63 @@ export function buildLetterEmailHtml(
   const label = design?.title ?? meta?.label ?? "Note";
   const theme = themeForLetter(letter);
   const safeMessage = escapeHtml(letter.message).replace(/\n/g, "<br />");
+  const safeSubject = escapeHtml(letter.subject);
   const preheader = `${letter.form.senderName} sent you a ${design ? "digital card" : `${(meta?.label ?? "note").toLowerCase()} letter`} on Little Letter.`;
+  const sparkleRow = design
+    ? design.sparkles.map((s) => `<span style="margin:0 4px;">${s}</span>`).join("")
+    : theme.footerIcons;
 
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(letter.subject)}</title>
-</head>
-<body style="margin:0;padding:0;background:#faf4e8;font-family:'Trebuchet MS',Verdana,sans-serif;color:${theme.bodyInk};">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
-    ${escapeHtml(preheader)}
-  </div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${theme.pageBg};padding:32px 12px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="100%" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
+  const cardBody = design
+    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:${design.pageBg};border:4px solid ${design.border};border-radius:22px;overflow:hidden;box-shadow:0 10px 0 ${design.border};">
+          <tr>
+            <td style="padding:22px 18px 10px;text-align:center;">
+              <div style="font-size:48px;line-height:1;">${emoji}</div>
+              <div style="display:inline-block;margin-top:12px;background:rgba(255,255,255,0.55);border:2px solid ${design.border};border-radius:999px;padding:6px 14px;font-size:12px;letter-spacing:0.5px;color:${design.accent};">
+                ${escapeHtml(design.badge)}
+              </div>
+              <div style="font-family:Georgia,serif;font-size:26px;color:${design.accent};margin-top:12px;">${escapeHtml(design.title)}</div>
+              <div style="font-size:13px;color:${design.muted};margin-top:4px;">${escapeHtml(design.blurb)}</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 18px 22px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${design.cardBg};border:3px solid ${design.border};border-radius:16px;">
+                <tr>
+                  <td style="padding:22px 24px;">
+                    <p style="margin:0 0 4px;font-size:11px;letter-spacing:1px;color:${design.accent};text-transform:uppercase;">
+                      ${escapeHtml(label)} · digital card
+                    </p>
+                    <h1 style="margin:0 0 6px;font-size:20px;color:${design.accent};font-family:Georgia,serif;">
+                      ${safeSubject}
+                    </h1>
+                    <p style="margin:0 0 14px;font-size:13px;color:${design.muted};">
+                      For ${escapeHtml(letter.form.recipientName)}
+                    </p>
+                    <div style="font-size:15px;line-height:1.75;color:${design.ink};border-top:2px dashed ${design.border};padding-top:16px;">
+                      ${safeMessage}
+                    </div>
+                    ${hasVoiceNote ? voiceNoteHtml() : ""}
+                    <p style="margin:18px 0 0;text-align:right;font-family:Georgia,serif;font-size:15px;color:${design.accent};">
+                      — ${escapeHtml(letter.form.senderName)}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 18px 22px;text-align:center;">
+              <div style="font-size:20px;letter-spacing:4px;">${sparkleRow}</div>
+              <p style="margin:12px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
+                Sent with care via Little Letter
+              </p>
+              <p style="margin:8px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
+                Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
+              </p>
+            </td>
+          </tr>
+        </table>`
+    : `<table role="presentation" width="100%" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
           <tr>
             <td style="background:${theme.headerGrad};padding:18px 22px;text-align:center;">
               <div style="font-size:28px;letter-spacing:2px;">✨ ${emoji} ✨</div>
@@ -453,7 +493,7 @@ export function buildLetterEmailHtml(
           <tr>
             <td style="padding:12px 28px 8px;">
               <p style="margin:0 0 4px;font-size:11px;letter-spacing:1px;color:${theme.accent};text-transform:uppercase;">
-                ${escapeHtml(label)}${design ? " · digital card" : " · category frame"}
+                ${escapeHtml(label)} · category frame
               </p>
               <h1 style="margin:0 0 14px;font-size:20px;color:${theme.titleInk};font-family:Georgia,serif;">
                 For ${escapeHtml(letter.form.recipientName)}
@@ -476,7 +516,23 @@ export function buildLetterEmailHtml(
               </p>
             </td>
           </tr>
-        </table>
+        </table>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(letter.subject)}</title>
+</head>
+<body style="margin:0;padding:0;background:#faf4e8;font-family:'Trebuchet MS',Verdana,sans-serif;color:${theme.bodyInk};">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
+    ${escapeHtml(preheader)}
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${theme.pageBg};padding:32px 12px;">
+    <tr>
+      <td align="center">
+        ${cardBody}
         <p style="margin:18px 0 0;font-size:11px;color:#9ca3af;">
           ✉️ ${theme.mission}
         </p>

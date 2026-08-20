@@ -36,7 +36,7 @@ export type CardDesign = {
   muted: string;
   badge: string;
   sparkles: string[];
-  /** Extra motion flavour for the animated preview */
+  /** Extra motion flavour + decorative layer preset for animated previews */
   vibe: "party" | "soft" | "garden" | "night" | "retro";
 };
 

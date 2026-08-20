@@ -141,8 +141,15 @@ export function CardComposeForm({ designId }: Props) {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 14, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: "spring", stiffness: 220, damping: 22 }}
+          className="rounded-3xl border-[3px] p-3 sm:p-4"
+          style={{
+            background: design.pageBg,
+            borderColor: design.border,
+            boxShadow: `6px 6px 0 ${design.border}55`,
+          }}
         >
           <GreetingCard
             designId={designId}

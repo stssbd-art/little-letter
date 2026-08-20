@@ -65,33 +65,38 @@ export function CardsGallery() {
         personalise and send by email.
       </p>
 
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {designs.map((design, index) => {
           const occasion = OCCASIONS.find((o) => o.value === design.occasion);
           return (
             <motion.li
               key={design.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(index * 0.03, 0.35) }}
+              initial={{ opacity: 0, y: 22, rotate: -1.5 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{
+                delay: Math.min(index * 0.045, 0.5),
+                type: "spring",
+                stiffness: 260,
+                damping: 22,
+              }}
             >
               <Link
                 href={`/cards/${design.id}`}
                 onClick={() => play("click")}
-                className="block rounded-2xl outline-offset-4 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ll-pink-deep)]"
+                className="group block rounded-2xl outline-offset-4 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ll-pink-deep)]"
               >
                 <GreetingCard designId={design.id} compact />
-                <div className="mt-2 flex items-start justify-between gap-2 px-1">
+                <div className="mt-2.5 flex items-start justify-between gap-2 px-1">
                   <div>
-                    <p className="font-display text-sm text-[var(--ll-ink)]">
+                    <p className="font-display text-sm text-[var(--ll-ink)] transition group-hover:text-[var(--ll-pink-deep)]">
                       {design.title}
                     </p>
                     <p className="text-xs text-[var(--ll-muted)]">
                       {occasion?.emoji} {occasion?.label}
                     </p>
                   </div>
-                  <span className="shrink-0 font-pixel text-[7px] text-[var(--ll-pink-deep)]">
-                    SEND →
+                  <span className="shrink-0 font-pixel text-[7px] text-[var(--ll-pink-deep)] transition group-hover:translate-x-0.5">
+                    OPEN →
                   </span>
                 </div>
               </Link>
