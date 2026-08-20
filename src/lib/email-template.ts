@@ -435,7 +435,6 @@ export function buildLetterEmailHtml(
               </div>
               <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;color:${design.accent};margin-top:14px;font-weight:bold;">${escapeHtml(design.title)}</div>
               <div style="font-size:13px;color:${design.muted};margin-top:6px;max-width:280px;margin-left:auto;margin-right:auto;">${escapeHtml(design.blurb)}</div>
-              <div style="margin-top:18px;width:44px;height:44px;line-height:44px;border-radius:50%;background:${design.accent};color:#fff;font-size:12px;font-weight:bold;margin-left:auto;margin-right:auto;border:2px solid ${design.border};">LL</div>
             </td>
           </tr>
           <tr>

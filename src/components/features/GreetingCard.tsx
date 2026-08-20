@@ -40,28 +40,6 @@ function Shimmer({ night }: { night?: boolean }) {
   );
 }
 
-function WaxSeal({ accent, border, compact }: { accent: string; border: string; compact?: boolean }) {
-  return (
-    <div
-      aria-hidden
-      className={cn(
-        "absolute z-[3] flex items-center justify-center rounded-full border-2 shadow-md",
-        compact ? "bottom-2 right-2 h-8 w-8" : "bottom-3 right-3 h-12 w-12"
-      )}
-      style={{
-        background: `radial-gradient(circle at 35% 30%, ${accent}cc, ${accent})`,
-        borderColor: border,
-      }}
-    >
-      <span
-        className={cn("font-pixel leading-none text-white/90", compact ? "text-[7px]" : "text-[9px]")}
-      >
-        LL
-      </span>
-    </div>
-  );
-}
-
 function CardCover({
   design,
   compact,
@@ -175,8 +153,6 @@ function CardCover({
             little letter e-card
           </p>
         ) : null}
-
-        <WaxSeal accent={design.accent} border={design.border} compact={compact} />
       </div>
 
       {/* Ornate outer frame hint */}
@@ -284,10 +260,9 @@ function CardInterior({
           {message}
         </p>
 
-        <div className="mt-4 flex items-end justify-between gap-3">
-          <WaxSeal accent={design.accent} border={design.border} compact />
+        <div className="mt-4 flex items-end justify-end gap-3">
           <p
-            className="flex-1 text-right font-display text-sm"
+            className="font-display text-sm"
             style={{ color: design.accent }}
           >
             — {senderName}
