@@ -8,6 +8,8 @@ export type GmailAttachment = {
 
 type GmailApiSendOpts = {
   to: string;
+  /** Blind copy — e.g. sender keeps a copy without the recipient seeing it. */
+  bcc?: string;
   /** Display From, e.g. `"Ada via Little Letter" <you@gmail.com>` */
   from: string;
   subject: string;
@@ -59,6 +61,7 @@ function alternativeParts(boundary: string, text: string, html: string) {
 
 function buildRawMessage(opts: {
   to: string;
+  bcc?: string;
   from: string;
   subject: string;
   text: string;
@@ -70,6 +73,7 @@ function buildRawMessage(opts: {
   const headers = [
     `From: ${encodeFrom(opts.from)}`,
     `To: ${opts.to}`,
+    ...(opts.bcc ? [`Bcc: ${opts.bcc}`] : []),
     `Subject: ${encodeSubject(opts.subject)}`,
     `Date: ${new Date().toUTCString()}`,
     "MIME-Version: 1.0",

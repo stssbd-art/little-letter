@@ -114,6 +114,14 @@ export async function verifyGmailSmtp(): Promise<{ ok: boolean; error?: string }
   }
 }
 
+/** Sender gets a blind copy when their address differs from the recipient. */
+function senderCopyBcc(to: string, senderEmail?: string) {
+  const bcc = senderEmail?.trim().toLowerCase();
+  if (!bcc || !bcc.includes("@")) return undefined;
+  if (bcc === to.trim().toLowerCase()) return undefined;
+  return bcc;
+}
+
 async function deliverEmail(opts: {
   to: string;
   subject: string;
@@ -121,14 +129,17 @@ async function deliverEmail(opts: {
   html: string;
   logLabel: string;
   senderName?: string;
+  senderEmail?: string;
   voiceNote?: VoiceNotePayload | null;
 }): Promise<SendResult> {
   const attachment = opts.voiceNote ? voiceNoteToAttachment(opts.voiceNote) : undefined;
+  const bcc = senderCopyBcc(opts.to, opts.senderEmail);
 
   if (isGmailApiConfigured()) {
     try {
       const id = await sendViaGmailApi({
         to: opts.to,
+        bcc,
         from: brandedFrom(process.env.GMAIL_USER!.trim(), opts.senderName),
         subject: opts.subject,
         text: opts.text,
@@ -147,6 +158,7 @@ async function deliverEmail(opts: {
       const info = await gmail.transporter.sendMail({
         from: brandedFrom(gmail.user, opts.senderName),
         to: opts.to,
+        bcc,
         subject: opts.subject,
         text: opts.text,
         html: opts.html,
@@ -177,6 +189,7 @@ async function deliverEmail(opts: {
     const { data, error } = await resend.emails.send({
       from: verified.from,
       to: opts.to,
+      bcc: bcc ? [bcc] : undefined,
       subject: opts.subject,
       text: opts.text,
       html: opts.html,
@@ -213,6 +226,7 @@ async function deliverEmail(opts: {
 
   console.info(`[Little Letter] No email provider — simulating ${opts.logLabel}`, {
     to: opts.to,
+    bcc,
     subject: opts.subject,
   });
   return { id: `demo-${Date.now()}`, simulated: true, provider: "demo" };
@@ -230,6 +244,7 @@ export async function sendLetterEmail(
     html: buildLetterEmailHtml(letter, hasVoice),
     logLabel: "send",
     senderName: letter.form.senderName,
+    senderEmail: letter.form.senderEmail,
     voiceNote,
   });
 }
@@ -255,6 +270,7 @@ export async function sendMixtapeEmail(
     html: buildMixtapeEmailHtml(mix, playUrl, hasVoice),
     logLabel: "mixtape",
     senderName: mix.senderName,
+    senderEmail: mix.senderEmail,
     voiceNote,
   });
 }

@@ -23,7 +23,7 @@ const FAQS = [
   },
   {
     q: "How do I send to any email?",
-    a: "Yes — put in any recipient email address and we’ll deliver the letter or mixtape there. Stripe charges apply only after your free letter allowance, and after your first free mixtape.",
+    a: "Yes — put in any recipient email address and we’ll deliver the letter or mixtape there. You also get a copy in the inbox for the email you enter as the sender (so you can keep what you sent). Stripe charges apply only after your free letter allowance, and after your first free mixtape.",
   },
   {
     q: "Why did my letter go to spam?",
