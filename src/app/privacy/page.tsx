@@ -11,16 +11,24 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-const UPDATED = "16 August 2026";
+const UPDATED = "20 August 2026";
 
 const SECTIONS = [
   {
     title: "Information you provide",
-    body: `When you send a letter or mixtape, you may enter names, email addresses (including your own sender email), message text, dedications, song choices, and an optional voice recording. We use recipient details to deliver your message. A voice note is attached to that email and is not kept on our servers after send. We use your sender email to track free-send limits and paid credits so clearing browser cookies cannot reset those limits.`,
+    body: `When you send a letter or mixtape, you may enter names, email addresses (including your own sender email), message text, dedications, song choices, and an optional voice recording. We use recipient details only to deliver that one message.`,
+  },
+  {
+    title: "We do not hold your message data",
+    body: `${SITE_NAME} is a delivery tool. We do not store, archive, or keep copies of your letter text, dedications, voice recordings, or mixtape contents after the email is sent. Drafts may live briefly in your own browser; voice notes are attached to the email and are not kept on our servers. We may keep only minimal technical records needed to run the service (for example free-send / paid-credit counts tied to your sender email, and optional guestbook or shared-example posts you choose to publish). We do not keep a library of private messages.`,
+  },
+  {
+    title: "No liability for illegal use",
+    body: `You are solely responsible for what you write, record, and send. Do not use ${SITE_NAME} for anything illegal, harmful, harassing, fraudulent, or without the right to contact the recipient. ${SITE_NAME} and its creator are not liable for any illegal, abusive, or unauthorised activity carried out by users of the site, or for the content of messages users choose to send.`,
   },
   {
     title: "Technical & payment data",
-    body: `We may use cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts are also stored on our database. Payments are processed by Stripe; we do not store your full card details. If Google Analytics is enabled, Google may collect anonymous visit data (pages viewed, country, device) so we can see how the site is used.`,
+    body: `We may use cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts may be stored so free allowances cannot be reset by clearing cookies alone. Payments are processed by Stripe; we do not store your full card details. If Google Analytics is enabled, Google may collect anonymous visit data (pages viewed, country, device) so we can see how the site is used.`,
   },
   {
     title: "Third-party services",

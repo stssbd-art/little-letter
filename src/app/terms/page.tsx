@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const YEAR = new Date().getFullYear();
-const UPDATED = "15 August 2026";
+const UPDATED = "20 August 2026";
 
 const SECTIONS = [
   {
@@ -114,12 +114,32 @@ const SECTIONS = [
       <>
         To the fullest extent allowed by law, {SITE_NAME} and its creator are
         not liable for indirect, incidental, or consequential damages arising
-        from your use of the site.
+        from your use of the site. We are also not liable for any illegal,
+        abusive, fraudulent, or unauthorised activity by users, or for the
+        content of letters, voice notes, or mixtapes that users choose to send.
+        You use the service at your own risk and are responsible for complying
+        with applicable law.
       </>
     ),
   },
   {
-    title: "9. Changes",
+    title: "9. No message archive",
+    body: (
+      <>
+        {SITE_NAME} does not hold or archive your private letter text, voice
+        recordings, or mixtape contents after delivery. See our{" "}
+        <Link
+          href="/privacy"
+          className="text-[var(--ll-pink-deep)] underline underline-offset-2"
+        >
+          Privacy Policy
+        </Link>{" "}
+        for details.
+      </>
+    ),
+  },
+  {
+    title: "10. Changes",
     body: (
       <>
         These Terms may be updated from time to time. Continued use after
