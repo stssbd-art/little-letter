@@ -57,11 +57,20 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: "en_GB",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} — Send a letter or mixtape online`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} — Send a Letter or Mixtape Online`,
     description: SITE_TAGLINE,
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,

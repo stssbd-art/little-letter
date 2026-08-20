@@ -123,6 +123,7 @@ function buildTargets(opts: {
   text: string;
   onCopy: () => void;
   onNative?: () => void;
+  onFacebook?: () => void;
   canNative: boolean;
 }): ShareTarget[] {
   const encodedUrl = encodeURIComponent(opts.url);
@@ -139,7 +140,8 @@ function buildTargets(opts: {
     {
       id: "facebook",
       label: "Facebook",
-      href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      // Popup open works more reliably than target=_blank (blockers / blank tabs)
+      onClick: opts.onFacebook,
     },
     {
       id: "x",
@@ -182,6 +184,34 @@ function buildTargets(opts: {
   }
 
   return targets;
+}
+
+function openSharePopup(href: string) {
+  const width = 600;
+  const height = 640;
+  const left = Math.max(0, Math.round(window.screen.width / 2 - width / 2));
+  const top = Math.max(0, Math.round(window.screen.height / 2 - height / 2));
+  const features = `noopener,noreferrer,width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+  const popup = window.open(href, "ll-share", features);
+  if (!popup) {
+    // Popup blocked — fall back to same-tab navigation
+    window.location.assign(href);
+  }
+}
+
+function facebookShareUrl(pageUrl: string) {
+  // Prefer homepage with trailing slash — Facebook scrapes it more reliably
+  let shareUrl = pageUrl.trim();
+  try {
+    const parsed = new URL(shareUrl);
+    if (parsed.pathname === "" || parsed.pathname === "/") {
+      parsed.pathname = "/";
+      shareUrl = parsed.toString();
+    }
+  } catch {
+    /* keep as-is */
+  }
+  return `https://www.facebook.com/sharer.php?u=${encodeURIComponent(shareUrl)}`;
 }
 
 export function ShareBar({
@@ -228,6 +258,10 @@ export function ShareBar({
     }
   }
 
+  function shareOnFacebook() {
+    openSharePopup(facebookShareUrl(pageUrl));
+  }
+
   const targets = useMemo(
     () =>
       buildTargets({
@@ -236,6 +270,7 @@ export function ShareBar({
         text,
         onCopy: () => void copyLink(),
         onNative: () => void nativeShare(),
+        onFacebook: shareOnFacebook,
         canNative,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
