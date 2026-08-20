@@ -1,4 +1,4 @@
-import { AFFILIATE_OFFERS } from "@/lib/affiliates";
+import { FOOTER_AFFILIATE_OFFERS } from "@/lib/affiliates";
 import { cn } from "@/lib/utils";
 
 /** Small sponsored affiliate banners above the footer. */
@@ -8,7 +8,7 @@ export function AffiliateBanner() {
       className="relative z-10 mx-auto mt-8 max-w-6xl space-y-3 px-4"
       aria-label="Sponsored"
     >
-      {AFFILIATE_OFFERS.map((offer) => (
+      {FOOTER_AFFILIATE_OFFERS.map((offer) => (
         <a
           key={offer.id}
           href={offer.href}

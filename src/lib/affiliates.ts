@@ -69,6 +69,11 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
 ];
 
 /** Offers shown in the fixed side slide-out tab. */
-export const SIDE_SLIDE_OFFERS = AFFILIATE_OFFERS.filter((o) =>
-  o.id === "cadbury" || o.id === "social-stories"
+export const SIDE_SLIDE_OFFERS = AFFILIATE_OFFERS.filter(
+  (o) => o.id === "cadbury" || o.id === "social-stories"
+);
+
+/** Offers shown in the footer banners (side-slide exclusives stay out). */
+export const FOOTER_AFFILIATE_OFFERS = AFFILIATE_OFFERS.filter(
+  (o) => o.id !== "social-stories"
 );
