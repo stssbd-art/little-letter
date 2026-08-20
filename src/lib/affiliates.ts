@@ -68,7 +68,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
   },
 ];
 
-/** Offers shown in the fixed side slide-out tab. */
+/** Cadbury + Social Stories each get their own side slide (not stacked in one panel). */
 export const SIDE_SLIDE_OFFERS = AFFILIATE_OFFERS.filter(
   (o) => o.id === "cadbury" || o.id === "social-stories"
 );
