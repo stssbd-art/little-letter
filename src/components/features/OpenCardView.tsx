@@ -58,7 +58,7 @@ export function OpenCardView({ card, code }: Props) {
 
       <div className="flex flex-wrap justify-center gap-3">
         <Link href="/cards">
-          <PixelButton>🎀 Send a card back</PixelButton>
+          <PixelButton>💝 Send a card back</PixelButton>
         </Link>
         <Link href="/">
           <PixelButton variant="ghost">Home</PixelButton>
