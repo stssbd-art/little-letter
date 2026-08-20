@@ -555,7 +555,7 @@ export function LetterPreview() {
           <PixelButton
             size="lg"
             onClick={startPayment}
-            disabled={paying || !open || !acceptedTerms}
+            disabled={paying || !acceptedTerms}
           >
             {paying ? "Opening checkout..." : `💳 Pay ${priceLabel} & send`}
           </PixelButton>
@@ -563,7 +563,7 @@ export function LetterPreview() {
           <PixelButton
             size="lg"
             onClick={sendLetter}
-            disabled={sending || paying || !open || !acceptedTerms}
+            disabled={sending || paying || !acceptedTerms}
           >
             {sending || paying
               ? "Sending..."
@@ -575,11 +575,6 @@ export function LetterPreview() {
           </PixelButton>
         )}
       </div>
-      {!open ? (
-        <p className="text-xs text-[var(--ll-muted)]">
-          Open the envelope to read before sending.
-        </p>
-      ) : null}
     </div>
   );
 }
