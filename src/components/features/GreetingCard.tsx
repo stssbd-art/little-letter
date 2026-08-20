@@ -144,15 +144,6 @@ function CardCover({
         >
           {design.blurb}
         </p>
-
-        {!compact ? (
-          <p
-            className="mt-3 font-pixel text-[7px] uppercase tracking-[0.18em]"
-            style={{ color: design.border }}
-          >
-            little letter e-card
-          </p>
-        ) : null}
       </div>
 
       {/* Ornate outer frame hint */}

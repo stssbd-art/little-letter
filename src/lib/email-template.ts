@@ -445,12 +445,6 @@ export function buildLetterEmailHtml(
               <div style="font-size:13px;color:${design.muted};margin-top:6px;line-height:1.4;">
                 ${escapeHtml(design.blurb)}
               </div>
-              <div style="margin:16px auto 0;width:42px;height:42px;line-height:42px;border-radius:50%;background:${design.accent};color:#ffffff;font-size:11px;font-weight:bold;border:2px solid ${design.border};">
-                LL
-              </div>
-              <div style="margin-top:10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:${design.border};">
-                little letter e-card
-              </div>
             </td>
           </tr>
           <tr>
