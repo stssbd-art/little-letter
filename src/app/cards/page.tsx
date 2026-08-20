@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PixelWindow } from "@/components/ui/PixelWindow";
+import { CardsDesignShowcase } from "@/components/features/CardsDesignShowcase";
 import { OCCASION_SEO_LIST } from "@/lib/occasion-seo";
 import { SITE_URL } from "@/lib/constants";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -51,9 +52,9 @@ export default function CardsPage() {
       <PixelWindow title="send_a_card.exe" icon="🎴">
         <p className="ll-copy font-display text-base leading-relaxed text-[var(--ll-ink)]">
           Same cosy Little Letter magic, framed as a card for the moment.
-          Choose an occasion, write (or get help writing) a short wish, add an
-          optional voice note, and send it by email — paperless, personal, and
-          ready in minutes.
+          Choose an occasion, pick a card look, write (or get help writing) a
+          short wish, add an optional voice note, and send it by email —
+          paperless, personal, and ready in minutes.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link href="/create">
@@ -65,7 +66,15 @@ export default function CardsPage() {
         </div>
       </PixelWindow>
 
-      <PixelWindow title="pick_an_occasion.ini" icon="✨">
+      <PixelWindow title="card_designs.ani" icon="✨">
+        <p className="mb-4 text-sm text-[var(--ll-muted)]">
+          Six animated looks — birthday balloons, blush hearts, garden mint,
+          starlight, mixtape, and classic honey. Tap one to start creating.
+        </p>
+        <CardsDesignShowcase />
+      </PixelWindow>
+
+      <PixelWindow title="pick_an_occasion.ini" icon="🎂">
         <p className="mb-4 text-sm text-[var(--ll-muted)]">
           Tap an occasion to open the create form with that card type ready.
         </p>

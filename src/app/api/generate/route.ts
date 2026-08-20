@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { generateLetterMessage } from "@/lib/openai";
 import type { LetterFormData } from "@/types";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
+import {
+  defaultCardDesignForOccasion,
+  isCardDesignId,
+} from "@/lib/card-designs";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -57,6 +61,10 @@ export async function POST(request: Request) {
       writeMode: "ai",
       ownSubject: "",
       ownMessage: "",
+      cardDesign:
+        body.cardDesign && isCardDesignId(body.cardDesign)
+          ? body.cardDesign
+          : defaultCardDesignForOccasion(body.occasion!),
     };
 
     const result = await generateLetterMessage(form);

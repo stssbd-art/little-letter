@@ -8,11 +8,13 @@ import { PixelButton } from "@/components/ui/PixelButton";
 import { PixelCard } from "@/components/ui/PixelCard";
 import { Field, PixelInput, PixelSelect, PixelTextarea } from "@/components/ui/PixelInput";
 import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
+import { CardDesignPicker } from "@/components/features/CardDesignPicker";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
+import { defaultCardDesignForOccasion } from "@/lib/card-designs";
 import { isOccasionSlug } from "@/lib/occasion-seo";
-import type { LetterWriteMode, MessageStyle, Occasion } from "@/types";
+import type { CardDesignId, LetterWriteMode, MessageStyle, Occasion } from "@/types";
 import { cn } from "@/lib/utils";
 
 export function MessageForm() {
@@ -27,7 +29,10 @@ export function MessageForm() {
   useEffect(() => {
     const fromUrl = searchParams.get("occasion");
     if (fromUrl && isOccasionSlug(fromUrl) && form.occasion !== fromUrl) {
-      setForm({ occasion: fromUrl });
+      setForm({
+        occasion: fromUrl,
+        cardDesign: defaultCardDesignForOccasion(fromUrl),
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- prefill once from landing page link
   }, [searchParams]);
@@ -186,7 +191,11 @@ export function MessageForm() {
                     selected={form.occasion === o.value}
                     onClick={() => {
                       play("click");
-                      setForm({ occasion: o.value as Occasion });
+                      const occasion = o.value as Occasion;
+                      setForm({
+                        occasion,
+                        cardDesign: defaultCardDesignForOccasion(occasion),
+                      });
                     }}
                     className="flex flex-col items-center gap-1 py-3"
                   >
@@ -198,6 +207,15 @@ export function MessageForm() {
                 ))}
               </div>
             </div>
+
+            <CardDesignPicker
+              occasion={form.occasion}
+              value={
+                (form.cardDesign as CardDesignId) ||
+                defaultCardDesignForOccasion(form.occasion)
+              }
+              onChange={(cardDesign) => setForm({ cardDesign })}
+            />
 
             {writeMode === "ai" ? (
               <>

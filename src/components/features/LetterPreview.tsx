@@ -8,9 +8,12 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { TermsAcceptance } from "@/components/features/TermsAcceptance";
 import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
+import { GreetingCard } from "@/components/features/GreetingCard";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
+import { OCCASIONS } from "@/lib/constants";
+import { getCardDesign, type CardDesignId } from "@/lib/card-designs";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
@@ -455,17 +458,20 @@ export function LetterPreview() {
             }
             className="w-full overflow-hidden"
           >
-            <article className="mt-6 rounded-2xl border-2 border-[var(--ll-lavender)] bg-white/90 p-5 dark:bg-white/10">
-              <p className="font-pixel text-[10px] text-[var(--ll-pink-deep)]">
-                {currentLetter.subject}
-              </p>
-              <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                To: {currentLetter.form.recipientName} &lt;
-                {currentLetter.form.recipientEmail}&gt;
-              </p>
-              <div className="mt-4 whitespace-pre-wrap text-left font-display text-base leading-relaxed text-[var(--ll-ink)]">
-                {currentLetter.message}
-              </div>
+            <article className="mt-6">
+              <GreetingCard
+                designId={
+                  (getCardDesign(currentLetter.form.cardDesign).id as CardDesignId)
+                }
+                recipientName={currentLetter.form.recipientName}
+                subject={currentLetter.subject}
+                message={currentLetter.message}
+                senderName={currentLetter.form.senderName}
+                occasionLabel={
+                  OCCASIONS.find((o) => o.value === currentLetter.form.occasion)
+                    ?.label
+                }
+              />
             </article>
           </motion.div>
         </div>
