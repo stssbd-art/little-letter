@@ -30,7 +30,8 @@ export function CookieConsentBanner() {
             </p>
             <p className="mt-2 font-display text-sm leading-relaxed text-[var(--ll-ink)] sm:text-base">
               We use necessary cookies to run Little Letter (free-send limits,
-              theme, sound). Optional cookies help with Analytics and ads.{" "}
+              theme, sound). Optional cookies help with Analytics, ads, and
+              affiliate tracking.{" "}
               <Link
                 href="/privacy"
                 className="text-[var(--ll-pink-deep)] underline underline-offset-2"

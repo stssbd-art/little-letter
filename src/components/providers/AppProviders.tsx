@@ -8,6 +8,7 @@ import { CookieConsentProvider } from "@/components/providers/CookieConsentProvi
 import { CookieConsentBanner } from "@/components/features/CookieConsentBanner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AdSenseLoader } from "@/components/ads/AdSenseLoader";
+import { AwinMasterTag } from "@/components/ads/AwinMasterTag";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -20,6 +21,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
               <CookieConsentBanner />
               <GoogleAnalytics />
               <AdSenseLoader />
+              <AwinMasterTag />
             </EasterEggProvider>
           </LetterProvider>
         </SoundProvider>

@@ -28,11 +28,11 @@ const SECTIONS = [
   },
   {
     title: "Technical & payment data",
-    body: `We may use necessary cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts may be stored so free allowances cannot be reset by clearing cookies alone. Optional cookies for Google Analytics and AdSense only load after you choose “Accept all” on the cookie banner (or you can pick “Necessary only”). Payments are processed by Stripe; we do not store your full card details.`,
+    body: `We may use necessary cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts may be stored so free allowances cannot be reset by clearing cookies alone. Optional cookies for Google Analytics, AdSense, and Awin affiliate tracking only load after you choose “Accept all” on the cookie banner (or you can pick “Necessary only”). Payments are processed by Stripe; we do not store your full card details.`,
   },
   {
     title: "Third-party services",
-    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Ads may be shown by Google AdSense. Visit counts may be measured with Google Analytics. We may show sponsored affiliate links (for example via Awin or partner short links) to brands such as Cadbury Gifts Direct, Social Stories Club, and Happy Days Factory; those partners have their own privacy policies.`,
+    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Ads may be shown by Google AdSense. Visit counts may be measured with Google Analytics. Affiliate tracking may use Awin (publisher ID 3048693). We may show sponsored affiliate links to brands such as Cadbury Gifts Direct, Social Stories Club, and Happy Days Factory; those partners and Awin have their own privacy policies.`,
   },
   {
     title: "Guestbook",
