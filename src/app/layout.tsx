@@ -5,6 +5,7 @@ import { AnimatedBackground } from "@/components/decorations/AnimatedBackground"
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { EndPageAdGate } from "@/components/ads/EndPageAdGate";
+import { AffiliateBanner } from "@/components/ads/AffiliateBanner";
 import {
   SEO_KEYWORDS,
   SITE_DESCRIPTION,
@@ -145,6 +146,7 @@ export default function RootLayout({
               {children}
             </main>
             <EndPageAdGate />
+            <AffiliateBanner />
             <Footer />
           </AnimatedBackground>
         </AppProviders>
