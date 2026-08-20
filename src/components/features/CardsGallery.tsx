@@ -61,8 +61,8 @@ export function CardsGallery() {
       </div>
 
       <p className="text-sm text-[var(--ll-muted)]">
-        {designs.length} card{designs.length === 1 ? "" : "s"} — tap one to
-        personalise and send by email.
+        {designs.length} illustrated e-card{designs.length === 1 ? "" : "s"} —
+        tap one to personalise and send by email.
       </p>
 
       <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

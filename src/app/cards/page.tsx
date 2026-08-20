@@ -44,16 +44,16 @@ export default function CardsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <PageHeader title="Send a digital card">
-        Browse designs by occasion — pick one, write a wish, email it. Animated
-        e-cards · first two free · then £0.99.
+      <PageHeader title="Send an e-card">
+        Illustrated digital greeting cards — pick a design, write a wish, email
+        it. Flip-open covers · first two free · then £0.99.
       </PageHeader>
 
       <PixelWindow title="card_gallery.exe" icon="🎴">
         <p className="mb-5 font-display text-base leading-relaxed text-[var(--ll-ink)]">
-          Choose a look that fits the moment — birthday balloons, blush hearts,
-          wedding champagne, and more. Tap a card to personalise it live, then
-          send it by email.
+          Each card has its own illustrated cover — balloons, rose gardens,
+          starlit nights, and more. Tap one to open it, personalise the inside,
+          and send by email.
         </p>
         <CardsGallery />
       </PixelWindow>
