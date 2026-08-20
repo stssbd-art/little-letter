@@ -31,14 +31,6 @@ export type Relationship =
 
 export type LetterWriteMode = "ai" | "own";
 
-export type CardDesignId =
-  | "honey"
-  | "balloon"
-  | "blush"
-  | "garden"
-  | "starlight"
-  | "cassette";
-
 export interface LetterFormData {
   recipientName: string;
   recipientEmail: string;
@@ -53,8 +45,6 @@ export interface LetterFormData {
   writeMode: LetterWriteMode;
   ownSubject: string;
   ownMessage: string;
-  /** Animated greeting-card look for preview + email */
-  cardDesign: CardDesignId;
 }
 
 export interface GeneratedLetter {

@@ -1,7 +1,6 @@
 import type { GeneratedLetter, MixtapePayload, Occasion } from "@/types";
 import { OCCASIONS, SITE_URL } from "@/lib/constants";
 import { getTracksByIds } from "@/lib/tracks";
-import { getCardDesign } from "@/lib/card-designs";
 
 function escapeHtml(text: string) {
   return text
@@ -387,18 +386,8 @@ export function buildLetterEmailHtml(
   const emoji = meta?.emoji ?? "💌";
   const label = meta?.label ?? "Note";
   const theme = themeFor(letter.form.occasion);
-  const design = getCardDesign(letter.form.cardDesign);
-  const pageBg = design.pageBg;
-  const cardBg = design.cardBg;
-  const border = design.border;
-  const accent = design.accent;
-  const ink = design.ink;
-  const muted = design.muted;
-  const badge = design.badge;
-  const sparkle = design.sparkles.join(" ");
-  const headerEmoji = design.emoji || emoji;
   const safeMessage = escapeHtml(letter.message).replace(/\n/g, "<br />");
-  const preheader = `${letter.form.senderName} sent you a ${label.toLowerCase()} card on Little Letter.`;
+  const preheader = `${letter.form.senderName} sent you a ${label.toLowerCase()} letter on Little Letter.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -407,37 +396,37 @@ export function buildLetterEmailHtml(
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(letter.subject)}</title>
 </head>
-<body style="margin:0;padding:0;background:#faf4e8;font-family:'Trebuchet MS',Verdana,sans-serif;color:${ink};">
+<body style="margin:0;padding:0;background:#faf4e8;font-family:'Trebuchet MS',Verdana,sans-serif;color:${theme.bodyInk};">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
     ${escapeHtml(preheader)}
   </div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${pageBg};padding:32px 12px;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${theme.pageBg};padding:32px 12px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width:560px;background:${cardBg};border:4px solid ${border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
+        <table role="presentation" width="100%" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
           <tr>
-            <td style="background:${pageBg};padding:18px 22px;text-align:center;">
-              <div style="font-size:28px;letter-spacing:2px;">${sparkle} ${headerEmoji}</div>
-              <div style="font-family:Georgia,serif;font-size:22px;color:${accent};margin-top:6px;">Little Letter</div>
-              <div style="font-size:12px;color:${muted};margin-top:4px;">${escapeHtml(design.label)} · ${theme.tagline}</div>
+            <td style="background:${theme.headerGrad};padding:18px 22px;text-align:center;">
+              <div style="font-size:28px;letter-spacing:2px;">✨ ${emoji} ✨</div>
+              <div style="font-family:Georgia,serif;font-size:22px;color:${theme.headerInk};margin-top:6px;">Little Letter</div>
+              <div style="font-size:12px;color:${theme.headerSub};margin-top:4px;">${theme.tagline}</div>
             </td>
           </tr>
           <tr>
             <td style="padding:24px 26px 8px;text-align:center;">
-              <div style="display:inline-block;background:${cardBg};border:2px dashed ${border};border-radius:12px;padding:8px 14px;font-size:13px;color:${accent};">
-                ${escapeHtml(badge)}
+              <div style="display:inline-block;background:${theme.badgeBg};border:2px dashed ${theme.badgeBorder};border-radius:12px;padding:8px 14px;font-size:13px;color:${theme.badgeInk};">
+                ${theme.badge}
               </div>
             </td>
           </tr>
           <tr>
             <td style="padding:12px 28px 8px;">
-              <p style="margin:0 0 4px;font-size:11px;letter-spacing:1px;color:${accent};text-transform:uppercase;">
-                ${escapeHtml(label)} card · ${escapeHtml(design.label)}
+              <p style="margin:0 0 4px;font-size:11px;letter-spacing:1px;color:${theme.accent};text-transform:uppercase;">
+                ${escapeHtml(label)} · category frame
               </p>
-              <h1 style="margin:0 0 14px;font-size:20px;color:${accent};font-family:Georgia,serif;">
+              <h1 style="margin:0 0 14px;font-size:20px;color:${theme.titleInk};font-family:Georgia,serif;">
                 For ${escapeHtml(letter.form.recipientName)}
               </h1>
-              <div style="font-size:15px;line-height:1.7;color:${ink};background:#fff;border:2px solid ${border};border-radius:14px;padding:20px;">
+              <div style="font-size:15px;line-height:1.7;color:${theme.bodyInk};background:#fff;border:2px solid ${theme.msgBorder};border-radius:14px;padding:20px;">
                 ${safeMessage}
               </div>
               ${hasVoiceNote ? voiceNoteHtml() : ""}
@@ -445,9 +434,9 @@ export function buildLetterEmailHtml(
           </tr>
           <tr>
             <td style="padding:18px 28px 28px;text-align:center;">
-              <div style="font-size:22px;letter-spacing:6px;">${sparkle}</div>
-              <p style="margin:14px 0 0;font-size:12px;color:${muted};line-height:1.5;">
-                Sent with care from <strong style="color:${accent};">${escapeHtml(letter.form.senderName)}</strong><br />
+              <div style="font-size:22px;letter-spacing:6px;">${theme.footerIcons}</div>
+              <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
+                Sent with care from <strong style="color:${theme.accent};">${escapeHtml(letter.form.senderName)}</strong><br />
                 via Little Letter — cosy notes for cosy people
               </p>
               <p style="margin:12px 0 0;font-size:11px;color:#8a7a62;line-height:1.5;">
@@ -459,7 +448,7 @@ export function buildLetterEmailHtml(
         <p style="margin:18px 0 0;font-size:11px;color:#9ca3af;">
           ✉️ ${theme.mission}
         </p>
-        ${whyFooter(letter.form.senderName, accent)}
+        ${whyFooter(letter.form.senderName, theme.accent)}
       </td>
     </tr>
   </table>

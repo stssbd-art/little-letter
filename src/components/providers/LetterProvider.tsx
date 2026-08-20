@@ -11,10 +11,6 @@ import {
 } from "react";
 import type { GeneratedLetter, LetterFormData } from "@/types";
 import { STORAGE_KEYS } from "@/lib/constants";
-import {
-  defaultCardDesignForOccasion,
-  isCardDesignId,
-} from "@/lib/card-designs";
 
 const defaultForm: LetterFormData = {
   recipientName: "",
@@ -28,7 +24,6 @@ const defaultForm: LetterFormData = {
   writeMode: "ai",
   ownSubject: "",
   ownMessage: "",
-  cardDesign: "honey",
 };
 
 interface LetterContextValue {
@@ -62,12 +57,6 @@ export function LetterProvider({ children }: { children: ReactNode }) {
             writeMode: parsed.form.writeMode === "own" ? "own" : "ai",
             ownSubject: parsed.form.ownSubject ?? "",
             ownMessage: parsed.form.ownMessage ?? "",
-            cardDesign:
-              parsed.form.cardDesign && isCardDesignId(parsed.form.cardDesign)
-                ? parsed.form.cardDesign
-                : defaultCardDesignForOccasion(
-                    parsed.form.occasion ?? defaultForm.occasion
-                  ),
           });
         if (parsed.letter) setLetter(parsed.letter);
       }
