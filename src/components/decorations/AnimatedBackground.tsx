@@ -11,7 +11,7 @@ export function AnimatedBackground({
         aria-hidden
       />
       <div className="relative z-10">{children}</div>
-      <div className="sun-catchers" aria-hidden>
+      <div className="sun-catchers hidden dark:block" aria-hidden>
         {Array.from({ length: 14 }, (_, i) => (
           <span key={i} className={`sun-catcher sun-catcher-${i + 1}`} />
         ))}
