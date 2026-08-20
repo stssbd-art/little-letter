@@ -1,1 +1,14 @@
-export { default, alt, size, contentType, runtime } from "./opengraph-image";
+import {
+  createBrandOpenGraphImage,
+  ogAlt,
+  ogContentType,
+  ogSize,
+} from "@/lib/og-brand";
+
+export const alt = ogAlt;
+export const size = ogSize;
+export const contentType = ogContentType;
+
+export default async function TwitterImage() {
+  return createBrandOpenGraphImage();
+}
