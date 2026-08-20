@@ -78,8 +78,8 @@ const FAQS = [
     a: "Letter drafts live in your browser session. Guestbook entries and opt-in shared examples are saved on the server. Shared examples never store emails — only names and a short preview. Never put secrets in the guestbook.",
   },
   {
-    q: "Can I show my letter on the homepage?",
-    a: "Yes — when you send a letter or mixtape, tick “Share a short preview on the homepage.” It appears in Shared examples as a short snippet (names + occasion or tape title). Emails and full private text stay private.",
+    q: "Can I show my letter on The Wall?",
+    a: "Yes — when you send a letter or mixtape, tick “Share a short preview on The Wall.” It appears on The Wall as a short snippet (names + occasion or tape title). Emails and full private text stay private.",
   },
   {
     q: "Does it work on mobile?",

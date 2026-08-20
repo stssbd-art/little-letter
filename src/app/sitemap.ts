@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/create", priority: 0.95, changeFrequency: "weekly" },
     { path: "/cards", priority: 0.95, changeFrequency: "weekly" },
     { path: "/mixtape", priority: 0.95, changeFrequency: "weekly" },
+    { path: "/wall", priority: 0.75, changeFrequency: "weekly" },
     { path: "/about", priority: 0.8, changeFrequency: "monthly" },
     { path: "/paperless", priority: 0.7, changeFrequency: "monthly" },
     { path: "/faq", priority: 0.8, changeFrequency: "monthly" },

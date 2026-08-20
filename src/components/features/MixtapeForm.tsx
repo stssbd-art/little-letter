@@ -962,11 +962,11 @@ export function MixtapeForm() {
               />
               <span>
                 <span className="block font-display text-sm text-[var(--ll-ink)]">
-                  Share a short preview on the homepage
+                  Share a short preview on The Wall
                 </span>
                 <span className="mt-0.5 block text-xs text-[var(--ll-muted)]">
-                  Optional example for others — names, tape title, and a short
-                  dedication line. Never the email.
+                  Optional peek for others on The Wall — names, tape title, and a
+                  short dedication line. Never the email.
                 </span>
               </span>
             </label>

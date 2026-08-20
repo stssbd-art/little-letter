@@ -86,7 +86,7 @@ export interface GuestbookEntry {
   createdAt: string;
 }
 
-/** Opt-in homepage example — short preview only, never emails. */
+/** Opt-in Wall example — short preview only, never emails. */
 export interface SharedExample {
   id: string;
   kind: "letter" | "mixtape";

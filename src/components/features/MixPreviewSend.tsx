@@ -314,7 +314,7 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
           onChange={(e) => setShareExample(e.target.checked)}
         />
         <span className="text-sm text-[var(--ll-muted)]">
-          Share a short preview on the homepage
+          Share a short preview on The Wall
         </span>
       </label>
 

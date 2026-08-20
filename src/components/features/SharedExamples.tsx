@@ -25,13 +25,13 @@ export function SharedExamples() {
   }, []);
 
   return (
-    <PixelWindow title="shared_examples.txt" icon="💌">
+    <PixelWindow title="the_wall.txt" icon="🧱">
       <p className="font-display text-sm text-[var(--ll-ink)]">
-        Short previews from letters and mixtapes people chose to share as
-        examples — never emails or the full private message.
+        Short peeks from letters and mixtapes people chose to share — never
+        emails or the full private message.
       </p>
       <p className="mt-1 text-xs text-[var(--ll-muted)]">
-        When you send, tick “Share a short preview on the homepage.”
+        When you send, tick “Share a short preview on The Wall.”
       </p>
 
       {loading ? (

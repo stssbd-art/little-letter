@@ -507,11 +507,11 @@ export function LetterPreview() {
         />
         <span>
           <span className="block font-display text-sm text-[var(--ll-ink)]">
-            Share a short preview on the homepage
+            Share a short preview on The Wall
           </span>
           <span className="mt-0.5 block text-xs text-[var(--ll-muted)]">
-            Optional example for others — names, occasion, and a short line.
-            Never the email or full letter.
+            Optional peek for others on The Wall — names, occasion, and a short
+            line. Never the email or full letter.
           </span>
         </span>
       </label>

@@ -11,7 +11,6 @@ import { FortuneCookie } from "@/components/features/FortuneCookie";
 import { VisitorCounter } from "@/components/features/VisitorCounter";
 import { TodaysMood } from "@/components/features/TodaysMood";
 import { Guestbook } from "@/components/features/Guestbook";
-import { SharedExamples } from "@/components/features/SharedExamples";
 import { SITE_TAGLINE } from "@/lib/constants";
 
 export function HomePage() {
@@ -69,8 +68,16 @@ export function HomePage() {
       </section>
 
       <TodaysMood />
-      <SharedExamples />
       <Guestbook />
+      <p className="text-center text-sm text-[var(--ll-muted)]">
+        Curious what people share?{" "}
+        <Link
+          href="/wall"
+          className="font-display text-[var(--ll-pink-deep)] underline-offset-2 hover:underline"
+        >
+          Peek at The Wall →
+        </Link>
+      </p>
     </div>
   );
 }

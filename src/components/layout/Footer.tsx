@@ -11,6 +11,7 @@ const EXPLORE = [
   { href: "/occasions", label: "Browse occasions" },
   { href: "/create", label: "Create a letter" },
   { href: "/mixtape", label: "Send a mixtape" },
+  { href: "/wall", label: "The Wall" },
   { href: "/paperless", label: "Paperless wishes" },
   { href: "/faq", label: "FAQ" },
   { href: "/terms", label: "Terms & Copyright" },
