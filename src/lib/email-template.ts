@@ -322,8 +322,15 @@ function whyFooter(senderName: string, accent: string) {
     You received this because <strong>${escapeHtml(senderName)}</strong> sent you a personal note with
     <a href="${escapeHtml(SITE_URL)}" style="color:${accent};">Little Letter</a>.
     This is a one-off message, not a mailing list.
+  </p>
+  <p style="margin:10px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
+    <strong style="color:${accent};">Please don’t reply to this email</strong> — replies won’t reach
+    ${escapeHtml(senderName)}. This is a no-reply delivery from Little Letter.
   </p>`;
 }
+
+const NO_REPLY_TEXT =
+  "Please don’t reply to this email — replies won’t reach the sender. This is a no-reply delivery from Little Letter.";
 
 function voiceNoteHtml() {
   return `<div style="margin-top:16px;padding:12px 14px;background:#fff6df;border:2px dashed #d2a35a;border-radius:12px;font-size:13px;line-height:1.5;color:#5c3d1e;">
@@ -341,6 +348,7 @@ export function buildLetterEmailText(letter: GeneratedLetter, hasVoiceNote = fal
     "",
     `Sent with Little Letter (${SITE_URL})`,
     "This is a personal one-off message, not a newsletter.",
+    NO_REPLY_TEXT,
   ].join("\n");
 }
 
@@ -364,6 +372,7 @@ export function buildMixtapeEmailText(
     "",
     `Sent with Little Letter (${SITE_URL})`,
     "This is a personal one-off message, not a newsletter.",
+    NO_REPLY_TEXT,
   ]
     .filter(Boolean)
     .join("\n");
@@ -429,6 +438,9 @@ export function buildLetterEmailHtml(
               <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
                 Sent with care from <strong style="color:${theme.accent};">${escapeHtml(letter.form.senderName)}</strong><br />
                 via Little Letter — cosy notes for cosy people
+              </p>
+              <p style="margin:12px 0 0;font-size:11px;color:#8a7a62;line-height:1.5;">
+                Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
               </p>
             </td>
           </tr>
@@ -545,6 +557,9 @@ export function buildMixtapeEmailHtml(
               </p>
               <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;">
                 Sent with care via <strong style="color:#f6d58a;">Little Letter</strong>
+              </p>
+              <p style="margin:12px 0 0;font-size:11px;color:#8a7a62;line-height:1.5;">
+                Please don’t reply to this email — replies won’t reach ${escapeHtml(mix.senderName)}.
               </p>
             </td>
           </tr>
