@@ -35,6 +35,22 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
     },
   },
   {
+    id: "social-stories",
+    href: "https://www.awin1.com/cread.php?awinmid=125422&awinaffid=3048693&ued=https%3A%2F%2Fsocialstoriesclub.com%2F",
+    label: "Social Stories Club",
+    blurb: "Personalised story books for little ones — Social Stories Club",
+    emoji: "📖",
+    tone: {
+      border: "border-[#7a4a5a]/40",
+      bg: "bg-gradient-to-r from-[#4a2838] via-[#6a3a4a] to-[#8a5a6a]",
+      iconBg: "bg-[#ffe8f0]",
+      muted: "text-[#ffe0ea]/85",
+      title: "text-[#fff5f8]",
+      ctaBorder: "border-[#ffe0ea]/35",
+      ctaBg: "bg-[#ffe0ea]/15 group-hover:bg-[#ffe0ea]/25",
+    },
+  },
+  {
     id: "happy-days",
     href: "https://tidd.ly/468RNB4",
     label: "Happy Days Factory",
@@ -51,3 +67,8 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
     },
   },
 ];
+
+/** Offers shown in the fixed side slide-out tab. */
+export const SIDE_SLIDE_OFFERS = AFFILIATE_OFFERS.filter((o) =>
+  o.id === "cadbury" || o.id === "social-stories"
+);
