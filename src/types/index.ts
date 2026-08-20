@@ -31,6 +31,28 @@ export type Relationship =
 
 export type LetterWriteMode = "ai" | "own";
 
+export type CardDesignId =
+  | "balloon-bash"
+  | "cake-candles"
+  | "confetti-pop"
+  | "blush-hearts"
+  | "rose-garden"
+  | "starlit-love"
+  | "buddy-highfive"
+  | "rainbow-note"
+  | "clover-luck"
+  | "sunflower-thanks"
+  | "sparkler-congrats"
+  | "soft-sorry"
+  | "wedding-rings"
+  | "cap-toss"
+  | "promo-rocket"
+  | "valentine-box"
+  | "tulip-mum"
+  | "tie-dad"
+  | "honey-classic"
+  | "moon-whisper";
+
 export interface LetterFormData {
   recipientName: string;
   recipientEmail: string;
@@ -45,6 +67,8 @@ export interface LetterFormData {
   writeMode: LetterWriteMode;
   ownSubject: string;
   ownMessage: string;
+  /** Set when sending from the Cards gallery flow */
+  cardDesign?: CardDesignId;
 }
 
 export interface GeneratedLetter {

@@ -7,6 +7,7 @@ const YEAR = new Date().getFullYear();
 
 const EXPLORE = [
   { href: "/about", label: "About" },
+  { href: "/cards", label: "Send a card" },
   { href: "/occasions", label: "Browse occasions" },
   { href: "/create", label: "Create a letter" },
   { href: "/mixtape", label: "Send a mixtape" },

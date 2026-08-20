@@ -1,6 +1,7 @@
 import type { GeneratedLetter, MixtapePayload, Occasion } from "@/types";
 import { OCCASIONS, SITE_URL } from "@/lib/constants";
 import { getTracksByIds } from "@/lib/tracks";
+import { getCardDesign, isCardDesignId } from "@/lib/card-designs";
 
 function escapeHtml(text: string) {
   return text
@@ -317,6 +318,33 @@ function themeFor(occasion: Occasion): FrameTheme {
   return THEMES[occasion] ?? THEMES["thinking-of-you"];
 }
 
+function themeForLetter(letter: GeneratedLetter): FrameTheme {
+  const base = themeFor(letter.form.occasion);
+  const designId = letter.form.cardDesign;
+  if (!designId || !isCardDesignId(designId)) return base;
+  const design = getCardDesign(designId);
+  return {
+    ...base,
+    pageBg: design.pageBg,
+    cardBg: design.cardBg,
+    border: design.border,
+    shadow: design.border,
+    headerGrad: `linear-gradient(90deg,${design.border},${design.accent})`,
+    headerInk: design.ink,
+    headerSub: design.muted,
+    badgeBg: design.cardBg,
+    badgeBorder: design.border,
+    badgeInk: design.accent,
+    titleInk: design.accent,
+    bodyInk: design.ink,
+    msgBorder: design.border,
+    accent: design.accent,
+    badge: design.badge,
+    tagline: design.blurb,
+    footerIcons: design.sparkles.join(" "),
+  };
+}
+
 function whyFooter(senderName: string, accent: string) {
   return `<p style="margin:18px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
     You received this because <strong>${escapeHtml(senderName)}</strong> sent you a personal note with
@@ -383,11 +411,15 @@ export function buildLetterEmailHtml(
   hasVoiceNote = false
 ): string {
   const meta = OCCASIONS.find((o) => o.value === letter.form.occasion);
-  const emoji = meta?.emoji ?? "💌";
-  const label = meta?.label ?? "Note";
-  const theme = themeFor(letter.form.occasion);
+  const design =
+    letter.form.cardDesign && isCardDesignId(letter.form.cardDesign)
+      ? getCardDesign(letter.form.cardDesign)
+      : null;
+  const emoji = design?.emoji ?? meta?.emoji ?? "💌";
+  const label = design?.title ?? meta?.label ?? "Note";
+  const theme = themeForLetter(letter);
   const safeMessage = escapeHtml(letter.message).replace(/\n/g, "<br />");
-  const preheader = `${letter.form.senderName} sent you a ${label.toLowerCase()} letter on Little Letter.`;
+  const preheader = `${letter.form.senderName} sent you a ${design ? "digital card" : `${(meta?.label ?? "note").toLowerCase()} letter`} on Little Letter.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -421,7 +453,7 @@ export function buildLetterEmailHtml(
           <tr>
             <td style="padding:12px 28px 8px;">
               <p style="margin:0 0 4px;font-size:11px;letter-spacing:1px;color:${theme.accent};text-transform:uppercase;">
-                ${escapeHtml(label)} · category frame
+                ${escapeHtml(label)}${design ? " · digital card" : " · category frame"}
               </p>
               <h1 style="margin:0 0 14px;font-size:20px;color:${theme.titleInk};font-family:Georgia,serif;">
                 For ${escapeHtml(letter.form.recipientName)}
