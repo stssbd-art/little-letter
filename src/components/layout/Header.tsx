@@ -14,11 +14,34 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
+  { href: "/create", label: "Letter" },
   { href: "/cards", label: "Cards" },
   { href: "/mixtape", label: "Mixtape" },
   { href: "/paperless", label: "Planet" },
   { href: "/faq", label: "FAQ" },
 ];
+
+function linkIsActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  if (href === "/create") {
+    return (
+      pathname === "/create" ||
+      pathname === "/preview" ||
+      pathname.startsWith("/preview/")
+    );
+  }
+  if (href === "/cards") {
+    return pathname === "/cards" || pathname.startsWith("/cards/");
+  }
+  if (href === "/mixtape") {
+    return (
+      pathname === "/mixtape" ||
+      pathname.startsWith("/mixtape/") ||
+      pathname.startsWith("/mix/")
+    );
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 function BurgerIcon({ open }: { open: boolean }) {
   return (
@@ -140,7 +163,7 @@ export function Header() {
                       }}
                       className={cn(
                         "block rounded-xl px-4 py-3 font-display text-base transition",
-                        pathname === link.href
+                        linkIsActive(pathname, link.href)
                           ? "bg-[var(--ll-pink-soft)] text-[var(--ll-pink-deep)]"
                           : "text-[var(--ll-ink)] hover:bg-white/60 dark:hover:bg-white/10"
                       )}
@@ -185,7 +208,7 @@ export function Header() {
               onClick={() => play("click")}
               className={cn(
                 "rounded-md px-3 py-1.5 font-display text-sm transition",
-                pathname === link.href
+                linkIsActive(pathname, link.href)
                   ? "bg-[var(--ll-pink-soft)] text-[var(--ll-pink-deep)]"
                   : "text-[var(--ll-ink)] hover:bg-white/60 dark:hover:bg-white/10"
               )}
@@ -218,8 +241,8 @@ export function Header() {
           >
             {theme === "light" ? "🌙" : "☀️"}
           </PixelButton>
-          <Link href="/create" className="hidden sm:block">
-            <PixelButton size="sm">💌 Create</PixelButton>
+          <Link href="/create" className="sm:block md:hidden">
+            <PixelButton size="sm">💌 Letter</PixelButton>
           </Link>
           <button
             type="button"
