@@ -12,10 +12,7 @@ import { isGmailApiConfigured, sendViaGmailApi } from "@/lib/gmail-api";
 import { SITE_NAME } from "@/lib/constants";
 import type { VoiceNotePayload } from "@/lib/voice-note";
 import { voiceNoteToAttachment } from "@/lib/voice-note";
-import {
-  getCardCoverPng,
-  type InlineImageAttachment,
-} from "@/lib/card-cover";
+import type { InlineImageAttachment } from "@/lib/card-cover";
 import { buildCardOpenUrl, cardShareFromLetter } from "@/lib/card-link";
 
 type SendResult = {
@@ -272,28 +269,15 @@ export async function sendLetterEmail(
   const share = cardShareFromLetter(letter);
   const openUrl = share ? buildCardOpenUrl(share) : undefined;
 
-  let cover: InlineImageAttachment | null = null;
-  try {
-    if (share) {
-      cover = await getCardCoverPng(share.designId);
-    }
-  } catch (err) {
-    console.warn("[Little Letter] Card cover embed failed — sending without CID", err);
-  }
-
   return deliverEmail({
     to: letter.form.recipientEmail,
     subject: letterSubject(letter),
     text: buildLetterEmailText(letter, hasVoice, { openUrl }),
-    html: buildLetterEmailHtml(letter, hasVoice, {
-      embedCover: Boolean(cover),
-      openUrl,
-    }),
+    html: buildLetterEmailHtml(letter, hasVoice, { openUrl }),
     logLabel: "send",
     senderName: letter.form.senderName,
     senderEmail: letter.form.senderEmail,
     voiceNote,
-    inlineImages: cover ? [cover] : undefined,
   });
 }
 

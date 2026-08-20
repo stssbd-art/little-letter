@@ -4,9 +4,7 @@ import { getTracksByIds } from "@/lib/tracks";
 import {
   getCardDesign,
   isCardDesignId,
-  type CardDesign,
 } from "@/lib/card-designs";
-import { CARD_COVER_CID } from "@/lib/card-cover";
 
 function escapeHtml(text: string) {
   return text
@@ -350,27 +348,6 @@ function themeForLetter(letter: GeneratedLetter): FrameTheme {
   };
 }
 
-/** Email-safe illustrated header — works even when images are blocked. */
-function cardIllustrationHtml(design: CardDesign, coverSrc: string) {
-  const sparks = design.sparkles
-    .map((s) => `<span style="margin:0 6px;font-size:22px;">${s}</span>`)
-    .join("");
-  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${design.pageBg};">
-    <tr>
-      <td style="padding:18px 16px 8px;text-align:center;">
-        <div style="font-size:18px;letter-spacing:2px;line-height:1.4;">${sparks}</div>
-        <div style="font-size:52px;line-height:1.2;margin:8px 0 4px;">${design.emoji}</div>
-        <div style="font-size:18px;letter-spacing:2px;line-height:1.4;">${sparks}</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding:0 12px 16px;line-height:0;font-size:0;">
-        <img src="${escapeHtml(coverSrc)}" width="420" height="280" alt="${escapeHtml(design.title)} illustrated cover" style="display:block;width:100%;max-width:420px;height:auto;border:0;outline:none;text-decoration:none;border-radius:12px;" />
-      </td>
-    </tr>
-  </table>`;
-}
-
 function whyFooter(senderName: string, accent: string) {
   return `<p style="margin:18px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
     You received this because <strong>${escapeHtml(senderName)}</strong> sent you a personal note with
@@ -457,91 +434,66 @@ export function buildMixtapeEmailText(
 export function buildLetterEmailHtml(
   letter: GeneratedLetter,
   hasVoiceNote = false,
-  opts?: { embedCover?: boolean; openUrl?: string }
+  opts?: { openUrl?: string }
 ): string {
   const meta = OCCASIONS.find((o) => o.value === letter.form.occasion);
   const design =
     letter.form.cardDesign && isCardDesignId(letter.form.cardDesign)
       ? getCardDesign(letter.form.cardDesign)
       : null;
-  const emoji = design?.emoji ?? meta?.emoji ?? "💌";
   const label = design?.title ?? meta?.label ?? "Note";
   const theme = themeForLetter(letter);
   const safeMessage = escapeHtml(letter.message).replace(/\n/g, "<br />");
   const safeSubject = escapeHtml(letter.subject);
   const preheader = `${letter.form.senderName} sent you a ${design ? "digital card" : `${(meta?.label ?? "note").toLowerCase()} letter`} on Little Letter.`;
-  const sparkleRow = design
-    ? design.sparkles.map((s) => `<span style="margin:0 4px;">${s}</span>`).join("")
-    : theme.footerIcons;
-
-  const coverSrc = design
-    ? opts?.embedCover
-      ? `cid:${CARD_COVER_CID}`
-      : `${SITE_URL}/ecards/${design.id}.png`
-    : "";
 
   const openUrl = opts?.openUrl?.trim() || "";
 
-  // Digital cards: teaser email → open animated card on the website
+  // Digital cards: plain open-on-web box (no images/emoji — many inboxes show “?”)
   const cardBody =
     design && openUrl
-      ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:5px solid ${design.border};border-radius:24px;overflow:hidden;box-shadow:0 12px 0 ${design.border};">
+      ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:4px solid ${design.border};border-radius:18px;overflow:hidden;">
           <tr>
-            <td style="padding:0;">
-              ${cardIllustrationHtml(design, coverSrc)}
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:22px 24px 8px;text-align:center;background:${design.cardBg};">
-              <div style="display:inline-block;background:${design.accent};color:#ffffff;border-radius:6px;padding:7px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;">
-                ${escapeHtml(design.badge)}
-              </div>
-              <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;color:${design.accent};margin-top:14px;font-weight:bold;line-height:1.25;">
+            <td style="padding:28px 24px;text-align:center;background:${design.cardBg};">
+              <p style="margin:0;font-size:11px;letter-spacing:1.5px;color:${design.accent};text-transform:uppercase;">
+                Digital card
+              </p>
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:${design.accent};margin-top:10px;font-weight:bold;line-height:1.25;">
                 ${escapeHtml(design.title)}
               </div>
-              <p style="margin:12px 0 0;font-size:15px;color:${design.ink};line-height:1.5;">
+              <p style="margin:14px 0 0;font-size:15px;color:${design.ink};line-height:1.5;">
                 ${escapeHtml(letter.form.senderName)} sent you a card
               </p>
               <p style="margin:6px 0 0;font-size:13px;color:${design.muted};">
                 For ${escapeHtml(letter.form.recipientName)}
               </p>
               <p style="margin:16px 0 0;font-size:14px;color:${design.muted};line-height:1.55;">
-                Open it on Little Letter to see the illustrated, animated e-card and your message inside.
+                Open it on the Little Letter website to see your illustrated card and message.
               </p>
               ${hasVoiceNote ? voiceNoteHtml() : ""}
-              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:22px auto 8px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:24px auto 0;">
                 <tr>
-                  <td style="border-radius:14px;background:${design.accent};">
+                  <td style="border-radius:12px;background:${design.accent};">
                     <a href="${escapeHtml(openUrl)}" style="display:inline-block;padding:14px 28px;font-family:Georgia,serif;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;">
-                      ${design.emoji} Open your card
+                      Open your card
                     </a>
                   </td>
                 </tr>
               </table>
-              <p style="margin:10px 0 0;font-size:11px;color:${design.muted};line-height:1.5;word-break:break-all;">
+              <p style="margin:14px 0 0;font-size:11px;color:${design.muted};line-height:1.5;word-break:break-all;">
                 Or paste this link:<br />
                 <a href="${escapeHtml(openUrl)}" style="color:${design.accent};">${escapeHtml(openUrl)}</a>
               </p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:8px 24px 24px;text-align:center;background:${design.cardBg};">
-              <div style="font-size:18px;letter-spacing:4px;">${sparkleRow}</div>
-              <p style="margin:12px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
+              <p style="margin:18px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
                 Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
               </p>
             </td>
           </tr>
         </table>`
       : design
-        ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:5px solid ${design.border};border-radius:24px;overflow:hidden;box-shadow:0 12px 0 ${design.border};">
+        ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:4px solid ${design.border};border-radius:18px;overflow:hidden;">
           <tr>
-            <td style="padding:0;">
-              ${cardIllustrationHtml(design, coverSrc)}
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:22px 24px 8px;background:${design.cardBg};">
+            <td style="padding:22px 24px;background:${design.cardBg};">
               <h1 style="margin:0 0 6px;font-size:20px;color:${design.accent};font-family:Georgia,serif;">
                 ${safeSubject}
               </h1>
@@ -561,8 +513,7 @@ export function buildLetterEmailHtml(
         : `<table role="presentation" width="100%" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
           <tr>
             <td style="background:${theme.headerGrad};padding:18px 22px;text-align:center;">
-              <div style="font-size:28px;letter-spacing:2px;">✨ ${emoji} ✨</div>
-              <div style="font-family:Georgia,serif;font-size:22px;color:${theme.headerInk};margin-top:6px;">Little Letter</div>
+              <div style="font-family:Georgia,serif;font-size:22px;color:${theme.headerInk};">Little Letter</div>
               <div style="font-size:12px;color:${theme.headerSub};margin-top:4px;">${theme.tagline}</div>
             </td>
           </tr>
@@ -589,7 +540,6 @@ export function buildLetterEmailHtml(
           </tr>
           <tr>
             <td style="padding:18px 28px 28px;text-align:center;">
-              <div style="font-size:22px;letter-spacing:6px;">${theme.footerIcons}</div>
               <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
                 Sent with care from <strong style="color:${theme.accent};">${escapeHtml(letter.form.senderName)}</strong><br />
                 via Little Letter — cosy notes for cosy people
