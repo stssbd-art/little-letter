@@ -17,6 +17,7 @@ const LINKS = [
   { href: "/create", label: "Create" },
   { href: "/mixtape", label: "Mixtape" },
   { href: "/occasions", label: "Occasions" },
+  { href: "/paperless", label: "Planet" },
   { href: "/faq", label: "FAQ" },
 ];
 
