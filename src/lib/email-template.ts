@@ -425,7 +425,7 @@ export function buildLetterEmailHtml(
     ? design.sparkles.map((s) => `<span style="margin:0 4px;">${s}</span>`).join("")
     : theme.footerIcons;
 
-  const sceneUrl = design ? `${SITE_URL}/api/card-scene/${design.id}` : "";
+  const sceneUrl = design ? `${SITE_URL}/ecards/${design.id}.png` : "";
 
   const cardBody = design
     ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:5px solid ${design.border};border-radius:24px;overflow:hidden;box-shadow:0 12px 0 ${design.border};">
