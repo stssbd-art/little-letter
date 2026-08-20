@@ -4,16 +4,57 @@ import { useEffect, useState } from "react";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { STORAGE_KEYS } from "@/lib/constants";
 
+const SESSION_FLAG = "little-letter-visit-counted";
+
 export function VisitorCounter() {
   const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEYS.visitorCount);
-    let next = raw ? Number(raw) : 12847 + Math.floor(Math.random() * 400);
-    if (!Number.isFinite(next) || next < 1000) next = 12847;
-    next += 1;
-    localStorage.setItem(STORAGE_KEYS.visitorCount, String(next));
-    setCount(next);
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const alreadyCounted = sessionStorage.getItem(SESSION_FLAG) === "1";
+        if (!alreadyCounted) {
+          // Mark first so React Strict Mode remounts don't double-count
+          sessionStorage.setItem(SESSION_FLAG, "1");
+        }
+        const res = await fetch("/api/visitors", {
+          method: alreadyCounted ? "GET" : "POST",
+          cache: "no-store",
+        });
+        const data = (await res.json()) as { count?: number };
+        const next =
+          typeof data.count === "number" && Number.isFinite(data.count)
+            ? Math.max(1, Math.floor(data.count))
+            : null;
+        if (!cancelled && next !== null) {
+          setCount(next);
+          try {
+            localStorage.setItem(STORAGE_KEYS.visitorCount, String(next));
+          } catch {
+            /* ignore */
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEYS.visitorCount);
+            const fallback = raw ? Number(raw) : 12847;
+            setCount(
+              Number.isFinite(fallback) && fallback > 0 ? fallback : 12847
+            );
+          } catch {
+            setCount(12847);
+          }
+        }
+      }
+    }
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const display = (count ?? 0).toString().padStart(8, "0");
@@ -38,7 +79,7 @@ export function VisitorCounter() {
           ))}
         </div>
         <p className="text-[10px] text-[var(--ll-muted)]">
-          (slightly magical counting · GeoCities approved)
+          Live count · updates when someone visits
         </p>
       </div>
     </PixelWindow>
