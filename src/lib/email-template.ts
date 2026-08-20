@@ -4,6 +4,7 @@ import { getTracksByIds } from "@/lib/tracks";
 import {
   getCardDesign,
   isCardDesignId,
+  type CardDesign,
 } from "@/lib/card-designs";
 
 function escapeHtml(text: string) {
@@ -321,6 +322,46 @@ function themeFor(occasion: Occasion): FrameTheme {
   return THEMES[occasion] ?? THEMES["thinking-of-you"];
 }
 
+/** Very common emoji that render in Gmail/Outlook (avoid rare glyphs like ✦). */
+function cardEmailDecor(design: CardDesign): { hero: string; row: string } {
+  const byId: Partial<Record<CardDesign["id"], { hero: string; row: string }>> = {
+    "balloon-bash": { hero: "🎈", row: "🎈 🎉 🧁 🎈" },
+    "cake-candles": { hero: "🎂", row: "✨ 🎂 ⭐ ✨" },
+    "confetti-pop": { hero: "🎊", row: "🎊 ✨ 🌟 🎊" },
+    "blush-hearts": { hero: "💕", row: "💗 🌹 ✨ 💗" },
+    "rose-garden": { hero: "🌹", row: "🌹 🦋 ✨ 🌹" },
+    "starlit-love": { hero: "🌙", row: "⭐ 🌙 ✨ ⭐" },
+    "buddy-highfive": { hero: "🤝", row: "⭐ 🤝 ☁️ ⭐" },
+    "rainbow-note": { hero: "🌈", row: "🌈 ✨ ☁️ 🌈" },
+    "clover-luck": { hero: "🍀", row: "🍀 ✨ 🌟 🍀" },
+    "sunflower-thanks": { hero: "🌻", row: "🌻 ☀️ ✨ 🌻" },
+    "sparkler-congrats": { hero: "🎉", row: "🎉 ⭐ 💫 🎉" },
+    "soft-sorry": { hero: "💙", row: "💙 ☁️ ✨ 💙" },
+    "wedding-rings": { hero: "💒", row: "💍 ✨ 🥂 💍" },
+    "cap-toss": { hero: "🎓", row: "🎓 ⭐ 📜 🎓" },
+    "promo-rocket": { hero: "🚀", row: "🚀 ✨ 📈 🚀" },
+    "valentine-box": { hero: "💝", row: "💝 💕 ✨ 💝" },
+    "tulip-mum": { hero: "🌷", row: "🌷 💕 ☀️ 🌷" },
+    "tie-dad": { hero: "👔", row: "👔 ⭐ ☕ 👔" },
+    "honey-classic": { hero: "💌", row: "✨ ☁️ ⭐ ✨" },
+    "moon-whisper": { hero: "🌙", row: "🌙 ⭐ ✨ 🌙" },
+  };
+  return byId[design.id] ?? { hero: "💌", row: "✨ 💌 ⭐ ✨" };
+}
+
+function cardDecorBannerHtml(design: CardDesign) {
+  const decor = cardEmailDecor(design);
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${design.pageBg};">
+    <tr>
+      <td style="padding:20px 16px 12px;text-align:center;">
+        <div style="font-size:20px;line-height:1.4;letter-spacing:4px;">${decor.row}</div>
+        <div style="font-size:48px;line-height:1.2;margin:10px 0 6px;">${decor.hero}</div>
+        <div style="font-size:20px;line-height:1.4;letter-spacing:4px;">${decor.row}</div>
+      </td>
+    </tr>
+  </table>`;
+}
+
 function themeForLetter(letter: GeneratedLetter): FrameTheme {
   const base = themeFor(letter.form.occasion);
   const designId = letter.form.cardDesign;
@@ -449,12 +490,17 @@ export function buildLetterEmailHtml(
 
   const openUrl = opts?.openUrl?.trim() || "";
 
-  // Digital cards: plain open-on-web box (no images/emoji — many inboxes show “?”)
+  // Digital cards: cute emoji banner + open-on-web box (no remote images)
   const cardBody =
     design && openUrl
       ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:4px solid ${design.border};border-radius:18px;overflow:hidden;">
           <tr>
-            <td style="padding:28px 24px;text-align:center;background:${design.cardBg};">
+            <td style="padding:0;">
+              ${cardDecorBannerHtml(design)}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 24px 28px;text-align:center;background:${design.cardBg};">
               <p style="margin:0;font-size:11px;letter-spacing:1.5px;color:${design.accent};text-transform:uppercase;">
                 Digital card
               </p>
@@ -484,7 +530,10 @@ export function buildLetterEmailHtml(
                 Or paste this link:<br />
                 <a href="${escapeHtml(openUrl)}" style="color:${design.accent};">${escapeHtml(openUrl)}</a>
               </p>
-              <p style="margin:18px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
+              <p style="margin:18px 0 0;font-size:20px;letter-spacing:6px;line-height:1.4;">
+                ${cardEmailDecor(design).row}
+              </p>
+              <p style="margin:14px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
                 Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
               </p>
             </td>
@@ -492,6 +541,11 @@ export function buildLetterEmailHtml(
         </table>`
       : design
         ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:4px solid ${design.border};border-radius:18px;overflow:hidden;">
+          <tr>
+            <td style="padding:0;">
+              ${cardDecorBannerHtml(design)}
+            </td>
+          </tr>
           <tr>
             <td style="padding:22px 24px;background:${design.cardBg};">
               <h1 style="margin:0 0 6px;font-size:20px;color:${design.accent};font-family:Georgia,serif;">
@@ -513,7 +567,8 @@ export function buildLetterEmailHtml(
         : `<table role="presentation" width="100%" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
           <tr>
             <td style="background:${theme.headerGrad};padding:18px 22px;text-align:center;">
-              <div style="font-family:Georgia,serif;font-size:22px;color:${theme.headerInk};">Little Letter</div>
+              <div style="font-size:22px;letter-spacing:2px;">✨ 💌 ✨</div>
+              <div style="font-family:Georgia,serif;font-size:22px;color:${theme.headerInk};margin-top:6px;">Little Letter</div>
               <div style="font-size:12px;color:${theme.headerSub};margin-top:4px;">${theme.tagline}</div>
             </td>
           </tr>
@@ -540,6 +595,7 @@ export function buildLetterEmailHtml(
           </tr>
           <tr>
             <td style="padding:18px 28px 28px;text-align:center;">
+              <div style="font-size:20px;letter-spacing:6px;">${theme.footerIcons}</div>
               <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
                 Sent with care from <strong style="color:${theme.accent};">${escapeHtml(letter.form.senderName)}</strong><br />
                 via Little Letter — cosy notes for cosy people
