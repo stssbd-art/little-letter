@@ -21,11 +21,14 @@ const occasionRedirects = [
 
 const nextConfig: NextConfig = {
   async redirects() {
-    return occasionRedirects.map(([source, destination]) => ({
-      source: `/${source}`,
-      destination: `/${destination}`,
-      permanent: true,
-    }));
+    return [
+      { source: "/cards", destination: "/create", permanent: true },
+      ...occasionRedirects.map(([source, destination]) => ({
+        source: `/${source}`,
+        destination: `/${destination}`,
+        permanent: true,
+      })),
+    ];
   },
 };
 
