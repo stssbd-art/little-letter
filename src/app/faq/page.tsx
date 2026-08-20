@@ -66,6 +66,10 @@ const FAQS = [
     a: "Yes — open Mixtape, label a cassette, pick songs from the crate or search YouTube, add an optional dedication, and email it. The Play link opens the mix (via YouTube). Each song plays in full, then the next one starts. Your first mixtape is free; extra mixes are £1.25 for 1 song, £1.55 for 2 or more.",
   },
   {
+    q: "Can I send a digital card?",
+    a: "Yes. Open Cards in the menu, choose an occasion like birthday or thank you, then create and email your card. Same Little Letter send — framed as a card for that moment. First two free · then £0.99.",
+  },
+  {
     q: "Can I mute the sounds?",
     a: "Absolutely. Use the speaker button in the header. Sounds start muted by default so nothing surprises you.",
   },

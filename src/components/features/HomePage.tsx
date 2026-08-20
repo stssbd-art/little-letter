@@ -39,14 +39,19 @@ export function HomePage() {
           <Link href="/create">
             <PixelButton size="lg">💌 Create a Little Letter</PixelButton>
           </Link>
-          <Link href="/mixtape">
+          <Link href="/cards">
             <PixelButton size="lg" variant="secondary">
+              🎴 Send a Card
+            </PixelButton>
+          </Link>
+          <Link href="/mixtape">
+            <PixelButton size="lg" variant="ghost">
               📼 Send a Mixtape
             </PixelButton>
           </Link>
         </motion.div>
         <p className="mt-4 font-pixel text-[9px] leading-relaxed text-[var(--ll-muted)]">
-          Press play · write a note · burn a tape
+          Letter · card · mixtape
         </p>
 
         <div className="mt-10 w-full max-w-lg">

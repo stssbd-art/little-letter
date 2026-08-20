@@ -22,8 +22,8 @@ export default function CreatePage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title="Create a Little Letter">
         Birthday cards, thank you notes, love letters, and more — write it
-        First two letters free, then £0.99 each. You can add a spoken voice note
-        too.
+        yourself or get help. First two letters free, then £0.99 each. You can
+        add a spoken voice note too.
       </PageHeader>
       <Suspense
         fallback={
