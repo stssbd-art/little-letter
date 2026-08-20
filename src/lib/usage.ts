@@ -53,7 +53,7 @@ export function mixtapePrice(trackCount: number) {
  * Do not set DEMO_MODE on production once testing is finished.
  */
 export function isDemoMode() {
-  return process.env.DEMO_MODE === "true";
+  return process.env.DEMO_MODE?.trim() === "true";
 }
 
 export function paymentsEnabled() {
