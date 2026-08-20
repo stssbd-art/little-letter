@@ -17,8 +17,8 @@ export function SuccessCelebration() {
   const searchParams = useSearchParams();
   const kind = searchParams.get("kind");
   const isMixtape = kind === "mixtape";
-  const isCard = kind === "card" || Boolean(letter?.form.cardDesign);
   const { letter, resetForm } = useLetter();
+  const isCard = kind === "card" || Boolean(letter?.form.cardDesign);
   const { play } = useSound();
   const { triggerPetals, triggerStars } = useEasterEggs();
   const [mixMeta, setMixMeta] = useState<{
