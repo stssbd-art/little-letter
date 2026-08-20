@@ -261,7 +261,7 @@ export function CardComposeForm({ designId }: Props) {
                 {helpLoading ? "Drafting…" : "✨ Help me write"}
               </PixelButton>
               <PixelButton type="submit" disabled={loading || helpLoading}>
-                {loading ? "Opening preview…" : "Preview & send →"}
+                {loading ? "Opening preview…" : "Preview & send card →"}
               </PixelButton>
             </div>
 

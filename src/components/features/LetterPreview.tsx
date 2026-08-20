@@ -142,6 +142,9 @@ export function LetterPreview() {
   }
 
   const currentLetter = letter;
+  const isCard =
+    Boolean(currentLetter.form.cardDesign) &&
+    isCardDesignId(currentLetter.form.cardDesign ?? "");
 
   async function sendLetter() {
     if (!hasAcceptedTerms()) {
@@ -197,7 +200,7 @@ export function LetterPreview() {
         colors: ["#f6d58a", "#cbb892", "#c5d4a0", "#e8b86d", "#8b5e34"],
       });
       play("success");
-      router.push("/success");
+      router.push(isCard ? "/success?kind=card" : "/success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send letter");
       setSending(false);
@@ -590,7 +593,11 @@ export function LetterPreview() {
             onClick={startPayment}
             disabled={paying || !acceptedTerms}
           >
-            {paying ? "Opening checkout..." : `💳 Pay ${priceLabel} & send`}
+            {paying
+              ? "Opening checkout..."
+              : isCard
+                ? `💳 Pay ${priceLabel} & send card`
+                : `💳 Pay ${priceLabel} & send`}
           </PixelButton>
         ) : (
           <PixelButton
@@ -600,11 +607,17 @@ export function LetterPreview() {
           >
             {sending || paying
               ? "Sending..."
-              : demo
-                ? "💌 Send letter (demo)"
-                : freeLeft
-                  ? `💌 Send free letter (${freeRemaining} left)`
-                  : "💌 Send Little Letter"}
+              : isCard
+                ? demo
+                  ? "🎴 Send card (demo)"
+                  : freeLeft
+                    ? `🎴 Send free card (${freeRemaining} left)`
+                    : "🎴 Send card"
+                : demo
+                  ? "💌 Send letter (demo)"
+                  : freeLeft
+                    ? `💌 Send free letter (${freeRemaining} left)`
+                    : "💌 Send Little Letter"}
           </PixelButton>
         )}
       </div>

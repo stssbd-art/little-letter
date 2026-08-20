@@ -17,6 +17,7 @@ export function SuccessCelebration() {
   const searchParams = useSearchParams();
   const kind = searchParams.get("kind");
   const isMixtape = kind === "mixtape";
+  const isCard = kind === "card" || Boolean(letter?.form.cardDesign);
   const { letter, resetForm } = useLetter();
   const { play } = useSound();
   const { triggerPetals, triggerStars } = useEasterEggs();
@@ -75,7 +76,7 @@ export function SuccessCelebration() {
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
             className="inline-block"
           >
-            {isMixtape ? "📼" : "💌"}
+            {isMixtape ? "📼" : isCard ? "🎴" : "💌"}
           </motion.span>
         </motion.div>
 
@@ -106,12 +107,16 @@ export function SuccessCelebration() {
         <p className="mt-3 font-display text-xl text-[var(--ll-ink)]">
           {isMixtape
             ? "Your mixtape is on its way."
-            : "Your little letter has been sent."}
+            : isCard
+              ? "Your card is on its way."
+              : "Your little letter has been sent."}
         </p>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-[var(--ll-muted)]">
           {isMixtape
             ? "They’ll get an email with a Play link for your cassette mix."
-            : "Your little message is flying through the internet... Hopefully it lands with a smile."}
+            : isCard
+              ? "They’ll get an email with a button to open the animated card on the website."
+              : "Your little message is flying through the internet... Hopefully it lands with a smile."}
         </p>
         {isMixtape && mixMeta ? (
           <p className="mt-3 text-xs text-[var(--ll-muted)]">
@@ -131,7 +136,9 @@ export function SuccessCelebration() {
             text={
               isMixtape
                 ? `I just sent a mixtape with ${SITE_NAME} — send someone a cassette mix too.`
-                : `I just sent a little letter with ${SITE_NAME}. ${SITE_TAGLINE}`
+                : isCard
+                  ? `I just sent a digital card with ${SITE_NAME}. ${SITE_TAGLINE}`
+                  : `I just sent a little letter with ${SITE_NAME}. ${SITE_TAGLINE}`
             }
           />
         </div>
@@ -140,6 +147,16 @@ export function SuccessCelebration() {
           {isMixtape ? (
             <Link href="/mixtape">
               <PixelButton>Burn another tape 📼</PixelButton>
+            </Link>
+          ) : isCard ? (
+            <Link href="/cards">
+              <PixelButton
+                onClick={() => {
+                  resetForm();
+                }}
+              >
+                Send another card 🎴
+              </PixelButton>
             </Link>
           ) : (
             <Link href="/create">
