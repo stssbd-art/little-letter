@@ -67,7 +67,7 @@ const FAQS = [
   },
   {
     q: "Can I send a digital card?",
-    a: "Yes — open Cards, browse designs by occasion (birthday, love, thank you, and more), tap a card, write your wish (or get help writing), then preview and email it. First two free · then £0.99.",
+    a: "Yes — open Cards, browse designs by occasion, personalise one, then email it. The recipient gets a link to open the animated illustrated card on the Little Letter website. First two free · then £0.99.",
   },
   {
     q: "Can I mute the sounds?",

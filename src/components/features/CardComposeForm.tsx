@@ -167,8 +167,10 @@ export function CardComposeForm({ designId }: Props) {
         <PixelWindow title="personalise_card.exe" icon={design.emoji}>
           <form onSubmit={onSubmit} className="space-y-4">
             <p className="text-sm text-[var(--ll-muted)]">
-              {design.blurb}. Fill in the details, then preview & send — same
-              free/paid rules as letters (first two free · then £0.99).
+              {design.blurb}. Fill in the details, then preview &amp; send —
+              same free/paid rules as letters (first two free · then £0.99).
+              They’ll get an email with a button to open the animated card on
+              the website.
             </p>
 
             <div className="grid gap-3 sm:grid-cols-2">

@@ -16,7 +16,7 @@ import {
   getCardCoverPng,
   type InlineImageAttachment,
 } from "@/lib/card-cover";
-import { isCardDesignId } from "@/lib/card-designs";
+import { buildCardOpenUrl, cardShareFromLetter } from "@/lib/card-link";
 
 type SendResult = {
   id: string;
@@ -85,6 +85,11 @@ function withEnvelope(subject: string) {
 
 function letterSubject(letter: GeneratedLetter) {
   const custom = letter.subject?.trim();
+  if (letter.form.cardDesign) {
+    const base = custom || `${letter.form.senderName} sent you a card`;
+    if (base.startsWith("💌") || base.startsWith("🎴")) return base.slice(0, 120);
+    return `🎴 ${base}`.slice(0, 120);
+  }
   const base = custom || `A little letter for ${letter.form.recipientName}`;
   return withEnvelope(base);
 }
@@ -264,10 +269,13 @@ export async function sendLetterEmail(
   voiceNote?: VoiceNotePayload | null
 ): Promise<SendResult> {
   const hasVoice = Boolean(voiceNote);
+  const share = cardShareFromLetter(letter);
+  const openUrl = share ? buildCardOpenUrl(share) : undefined;
+
   let cover: InlineImageAttachment | null = null;
   try {
-    if (letter.form.cardDesign && isCardDesignId(letter.form.cardDesign)) {
-      cover = await getCardCoverPng(letter.form.cardDesign);
+    if (share) {
+      cover = await getCardCoverPng(share.designId);
     }
   } catch (err) {
     console.warn("[Little Letter] Card cover embed failed — sending without CID", err);
@@ -276,9 +284,10 @@ export async function sendLetterEmail(
   return deliverEmail({
     to: letter.form.recipientEmail,
     subject: letterSubject(letter),
-    text: buildLetterEmailText(letter, hasVoice),
+    text: buildLetterEmailText(letter, hasVoice, { openUrl }),
     html: buildLetterEmailHtml(letter, hasVoice, {
       embedCover: Boolean(cover),
+      openUrl,
     }),
     logLabel: "send",
     senderName: letter.form.senderName,
