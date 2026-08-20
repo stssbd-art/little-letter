@@ -425,22 +425,38 @@ export function buildLetterEmailHtml(
     ? design.sparkles.map((s) => `<span style="margin:0 4px;">${s}</span>`).join("")
     : theme.footerIcons;
 
+  const sceneUrl = design ? `${SITE_URL}/api/card-scene/${design.id}` : "";
+
   const cardBody = design
     ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:5px solid ${design.border};border-radius:24px;overflow:hidden;box-shadow:0 12px 0 ${design.border};">
           <tr>
-            <td style="background:${design.pageBg};padding:36px 20px 28px;text-align:center;border-bottom:3px solid ${design.border};">
-              <div style="font-size:64px;line-height:1;filter:drop-shadow(0 4px 0 rgba(61,47,34,0.12));">${emoji}</div>
-              <div style="margin-top:16px;display:inline-block;background:${design.accent};color:#fff;border-radius:6px;padding:8px 18px;font-size:11px;letter-spacing:1px;text-transform:uppercase;">
-                ${escapeHtml(design.badge)}
-              </div>
-              <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;color:${design.accent};margin-top:14px;font-weight:bold;">${escapeHtml(design.title)}</div>
-              <div style="font-size:13px;color:${design.muted};margin-top:6px;max-width:280px;margin-left:auto;margin-right:auto;">${escapeHtml(design.blurb)}</div>
+            <td style="padding:0;line-height:0;font-size:0;background:${design.pageBg};">
+              <img src="${escapeHtml(sceneUrl)}" width="420" height="280" alt="${escapeHtml(design.title)}" style="display:block;width:100%;max-width:420px;height:auto;border:0;outline:none;text-decoration:none;" />
             </td>
           </tr>
           <tr>
-            <td style="padding:22px 24px 8px;">
+            <td style="padding:18px 22px 16px;text-align:center;background:${design.cardBg};border-bottom:3px solid ${design.border};">
+              <div style="display:inline-block;background:${design.accent};color:#ffffff;border-radius:6px;padding:7px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;">
+                ${escapeHtml(design.badge)}
+              </div>
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;color:${design.accent};margin-top:12px;font-weight:bold;line-height:1.2;">
+                ${escapeHtml(design.title)}
+              </div>
+              <div style="font-size:13px;color:${design.muted};margin-top:6px;line-height:1.4;">
+                ${escapeHtml(design.blurb)}
+              </div>
+              <div style="margin:16px auto 0;width:42px;height:42px;line-height:42px;border-radius:50%;background:${design.accent};color:#ffffff;font-size:11px;font-weight:bold;border:2px solid ${design.border};">
+                LL
+              </div>
+              <div style="margin-top:10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:${design.border};">
+                little letter e-card
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:22px 24px 8px;background:${design.cardBg};">
               <p style="margin:0 0 4px;font-size:10px;letter-spacing:1.5px;color:${design.accent};text-transform:uppercase;">
-                ${escapeHtml(label)} · e-card
+                ${escapeHtml(label)} · inside
               </p>
               <h1 style="margin:0 0 6px;font-size:20px;color:${design.accent};font-family:Georgia,serif;">
                 ${safeSubject}
@@ -448,7 +464,7 @@ export function buildLetterEmailHtml(
               <p style="margin:0 0 16px;font-size:13px;color:${design.muted};">
                 For ${escapeHtml(letter.form.recipientName)}
               </p>
-              <div style="font-size:15px;line-height:1.75;color:${design.ink};border-top:2px dashed ${design.border};padding-top:16px;">
+              <div style="font-size:15px;line-height:1.75;color:${design.ink};border-top:2px dashed ${design.border};padding-top:16px;font-family:Georgia,'Times New Roman',serif;">
                 ${safeMessage}
               </div>
               ${hasVoiceNote ? voiceNoteHtml() : ""}
@@ -458,10 +474,10 @@ export function buildLetterEmailHtml(
             </td>
           </tr>
           <tr>
-            <td style="padding:8px 24px 24px;text-align:center;">
+            <td style="padding:8px 24px 24px;text-align:center;background:${design.cardBg};">
               <div style="font-size:18px;letter-spacing:4px;">${sparkleRow}</div>
               <p style="margin:12px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
-                A Little Letter e-card
+                Same illustrated cover as the preview — sent with Little Letter
               </p>
               <p style="margin:8px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
                 Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
