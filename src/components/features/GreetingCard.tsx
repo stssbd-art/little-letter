@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { CardSceneArt } from "@/components/features/CardSceneArt";
 import { getCardDesign, type CardDesign, type CardDesignId } from "@/lib/card-designs";
@@ -50,12 +51,41 @@ function CardCover({
   const night = design.vibe === "night";
   const clipId = useId().replace(/:/g, "");
 
+  /* Gallery thumbs: photo of a physical card (PNG), not cartoon SVG */
+  if (compact) {
+    return (
+      <div
+        className="relative aspect-[4/3] overflow-hidden rounded-[0.85rem] bg-[#f3ebe0]"
+        style={{
+          boxShadow:
+            "0 1px 0 rgba(255,255,255,0.65) inset, 0 14px 28px rgba(61,47,34,0.16), 0 2px 6px rgba(61,47,34,0.08)",
+          border: "1px solid rgba(61,47,34,0.12)",
+        }}
+      >
+        <Image
+          src={`/ecards/${design.id}.png`}
+          alt={`${design.title} greeting card`}
+          fill
+          sizes="(max-width:640px) 90vw, (max-width:1024px) 45vw, 30vw"
+          className="object-cover object-center"
+          priority={design.id === "balloon-bash"}
+        />
+        {/* Soft paper edge so it reads as print stock */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[inherit]"
+          style={{
+            boxShadow:
+              "inset 0 0 0 1px rgba(255,255,255,0.35), inset 0 0 28px rgba(61,47,34,0.08)",
+          }}
+          aria-hidden
+        />
+      </div>
+    );
+  }
+
   return (
     <div
-      className={cn(
-        "relative overflow-hidden rounded-[1.35rem] border-[3px]",
-        compact ? "aspect-[3/4]" : "aspect-[3/4] w-full max-w-md mx-auto"
-      )}
+      className="relative mx-auto aspect-[3/4] w-full max-w-md overflow-hidden rounded-[1.35rem] border-[3px]"
       style={{
         borderColor: design.border,
         boxShadow: `6px 8px 0 ${design.border}44, 0 18px 40px rgba(61,47,34,0.14)`,
@@ -67,7 +97,6 @@ function CardCover({
       <div className="relative h-[58%] w-full overflow-hidden">
         <CardSceneArt
           designId={design.id}
-          compact={compact}
           accent={design.accent}
           border={design.border}
           gid={`${clipId}-cover`}
@@ -83,19 +112,11 @@ function CardCover({
 
       {/* Title plate */}
       <div
-        className={cn(
-          "relative flex h-[42%] flex-col items-center justify-center px-4 text-center",
-          compact ? "pb-2 pt-1" : "pb-4 pt-2"
-        )}
+        className="relative flex h-[42%] flex-col items-center justify-center px-4 pb-4 pt-2 text-center"
         style={{ background: design.cardBg }}
       >
         {/* Ribbon */}
-        <div
-          className={cn(
-            "relative mb-2 inline-flex max-w-[95%] items-center justify-center px-4",
-            compact ? "min-h-[1.4rem]" : "min-h-[1.85rem]"
-          )}
-        >
+        <div className="relative mb-2 inline-flex min-h-[1.85rem] max-w-[95%] items-center justify-center px-4">
           <svg
             className="absolute inset-0 h-full w-full"
             viewBox="0 0 200 36"
@@ -115,31 +136,20 @@ function CardCover({
               opacity="0.92"
             />
           </svg>
-          <span
-            className={cn(
-              "relative z-[1] font-pixel tracking-wide text-white",
-              compact ? "text-[6px]" : "text-[8px]"
-            )}
-          >
+          <span className="relative z-[1] font-pixel text-[8px] tracking-wide text-white">
             {design.badge}
           </span>
         </div>
 
         <h3
-          className={cn(
-            "font-display leading-tight",
-            compact ? "line-clamp-2 text-base" : "text-2xl sm:text-3xl"
-          )}
-          style={{ color: night ? design.accent : design.accent }}
+          className="font-display text-2xl leading-tight sm:text-3xl"
+          style={{ color: design.accent }}
         >
           {design.title}
         </h3>
 
         <p
-          className={cn(
-            "mt-1.5 max-w-[16rem] leading-snug",
-            compact ? "line-clamp-2 text-[10px]" : "text-sm"
-          )}
+          className="mt-1.5 max-w-[16rem] text-sm leading-snug"
           style={{ color: design.muted }}
         >
           {design.blurb}
