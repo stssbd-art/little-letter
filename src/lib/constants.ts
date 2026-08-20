@@ -23,6 +23,9 @@ function resolveSiteUrl() {
 
 export const SITE_URL = resolveSiteUrl();
 
+/** Public support / privacy contact (shown in footer and legal pages). */
+export const CONTACT_EMAIL = "sendlittleletter@gmail.com";
+
 export const SEO_KEYWORDS = [
   "birthday card",
   "birthday wish",

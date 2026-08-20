@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import { SITE_NAME, SITE_URL, CONTACT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -40,7 +40,7 @@ const SECTIONS = [
   },
   {
     title: "Contact",
-    body: `For privacy questions about ${SITE_NAME}, reach out through the contact details you publish for the project. Last updated: ${UPDATED}.`,
+    body: `For privacy questions about ${SITE_NAME}, email ${CONTACT_EMAIL}. Last updated: ${UPDATED}.`,
   },
 ] as const;
 
@@ -71,9 +71,22 @@ export default function PrivacyPage() {
                 <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
                   {section.title}
                 </h2>
-                <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
-                  {section.body}
-                </p>
+                {section.title === "Contact" ? (
+                  <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
+                    For privacy questions about {SITE_NAME}, email{" "}
+                    <a
+                      href={`mailto:${CONTACT_EMAIL}`}
+                      className="break-all text-[var(--ll-pink-deep)] underline underline-offset-2"
+                    >
+                      {CONTACT_EMAIL}
+                    </a>
+                    . Last updated: {UPDATED}.
+                  </p>
+                ) : (
+                  <p className="ll-copy text-sm leading-relaxed text-[var(--ll-muted)]">
+                    {section.body}
+                  </p>
+                )}
               </section>
             ))}
           </div>

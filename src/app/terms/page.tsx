@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
-import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import { SITE_NAME, SITE_URL, CONTACT_EMAIL } from "@/lib/constants";
 import { PageHeader } from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
@@ -90,8 +90,15 @@ const SECTIONS = [
           non-refundable
         </strong>
         . Digital delivery begins when we attempt to send the message, so we
-        cannot reverse or refund a completed send. If a payment is taken but the
-        email clearly failed to send because of our systems, contact us and we
+        cannot reverse or refund a completed send.         If a payment is taken but the
+        email clearly failed to send because of our systems, email{" "}
+        <a
+          href={`mailto:${CONTACT_EMAIL}`}
+          className="break-all text-[var(--ll-pink-deep)] underline underline-offset-2"
+        >
+          {CONTACT_EMAIL}
+        </a>{" "}
+        and we
         will help (credit or resend where reasonable). Inbox placement (including
         spam folders) is outside our control and is not grounds for a refund
         after a successful send.
@@ -139,7 +146,22 @@ const SECTIONS = [
     ),
   },
   {
-    title: "10. Changes",
+    title: "10. Contact",
+    body: (
+      <>
+        Questions about these Terms, refunds, or the service: email{" "}
+        <a
+          href={`mailto:${CONTACT_EMAIL}`}
+          className="break-all text-[var(--ll-pink-deep)] underline underline-offset-2"
+        >
+          {CONTACT_EMAIL}
+        </a>
+        .
+      </>
+    ),
+  },
+  {
+    title: "11. Changes",
     body: (
       <>
         These Terms may be updated from time to time. Continued use after

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ShareBar } from "@/components/features/ShareBar";
-import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/constants";
+import { SITE_NAME, SITE_TAGLINE, SITE_URL, CONTACT_EMAIL } from "@/lib/constants";
 
 const YEAR = new Date().getFullYear();
 
@@ -29,6 +29,15 @@ export function Footer() {
           <p className="text-xs leading-relaxed text-[var(--ll-muted)]">
             © {YEAR} {SITE_NAME}. All rights reserved. Design, code, and
             branding may not be copied without permission.
+          </p>
+          <p className="text-sm leading-relaxed text-[var(--ll-ink)]">
+            Contact:{" "}
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="break-all text-[var(--ll-pink-deep)] underline underline-offset-2 hover:opacity-90"
+            >
+              {CONTACT_EMAIL}
+            </a>
           </p>
         </div>
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { CONTACT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "FAQ — Sending Letters & Mixtapes",
@@ -22,7 +23,7 @@ const FAQS = [
   },
   {
     q: "How do I send to any email?",
-    a: "Email delivery uses Gmail (GMAIL_USER + GMAIL_APP_PASSWORD). Recipients can be any address. Stripe charges apply only after your free letter allowance, and after your first free mixtape.",
+    a: "Yes — put in any recipient email address and we’ll deliver the letter or mixtape there. Stripe charges apply only after your free letter allowance, and after your first free mixtape.",
   },
   {
     q: "Why did my letter go to spam?",
@@ -42,7 +43,11 @@ const FAQS = [
   },
   {
     q: "Can I get a refund?",
-    a: "Once the email has been sent to your recipient, payments are non-refundable. If a charge went through but our system clearly failed to send the email, contact us and we’ll help with a credit or resend where reasonable. Landing in spam is not a refund reason after a successful send.",
+    a: `Once the email has been sent to your recipient, payments are non-refundable. If a charge went through but our system clearly failed to send the email, email ${CONTACT_EMAIL} and we’ll help with a credit or resend where reasonable. Landing in spam is not a refund reason after a successful send.`,
+  },
+  {
+    q: "How do I contact you?",
+    a: `Email ${CONTACT_EMAIL} — we read everything about privacy, refunds, or problems with a send.`,
   },
   {
     q: "How are messages written?",

@@ -4,6 +4,7 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { Mascot } from "@/components/ui/Logo";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { CONTACT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "About — Send Letters & Mixtapes Online",
@@ -93,6 +94,16 @@ export default function AboutPage() {
             <span className="font-semibold text-[var(--ll-pink-deep)]">
               Send someone a little piece of you.
             </span>
+          </p>
+          <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+            Questions or help? Email{" "}
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="break-all font-semibold text-[var(--ll-pink-deep)] underline underline-offset-2"
+            >
+              {CONTACT_EMAIL}
+            </a>
+            .
           </p>
         </div>
       </PixelWindow>
