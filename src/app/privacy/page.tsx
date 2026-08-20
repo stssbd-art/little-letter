@@ -32,7 +32,7 @@ const SECTIONS = [
   },
   {
     title: "Third-party services",
-    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Ads may be shown by Google AdSense. Visit counts may be measured with Google Analytics. We may show sponsored affiliate links (for example via Awin) to partners such as Cadbury Gifts Direct; those partners and Awin have their own privacy policies.`,
+    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Ads may be shown by Google AdSense. Visit counts may be measured with Google Analytics. We may show sponsored affiliate links (for example via Awin or partner short links) to brands such as Cadbury Gifts Direct and Happy Days Factory; those partners have their own privacy policies.`,
   },
   {
     title: "Guestbook",

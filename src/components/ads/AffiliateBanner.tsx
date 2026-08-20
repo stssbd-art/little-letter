@@ -1,39 +1,72 @@
-import { AWIN_CADBURY } from "@/lib/affiliates";
+import { AFFILIATE_OFFERS } from "@/lib/affiliates";
+import { cn } from "@/lib/utils";
 
-/** Small sponsored Awin banner above the footer. */
+/** Small sponsored affiliate banners above the footer. */
 export function AffiliateBanner() {
   return (
     <aside
-      className="relative z-10 mx-auto mt-8 max-w-6xl px-4"
+      className="relative z-10 mx-auto mt-8 max-w-6xl space-y-3 px-4"
       aria-label="Sponsored"
     >
-      <a
-        href={AWIN_CADBURY.href}
-        target="_blank"
-        rel="sponsored noopener noreferrer"
-        className="group flex items-center gap-3 overflow-hidden rounded-xl border-2 border-[#6b3a2a]/40 bg-gradient-to-r from-[#4a2018] via-[#6b3a2a] to-[#8b4a32] px-3 py-2.5 shadow-[3px_3px_0_rgba(61,47,34,0.2)] transition hover:brightness-110 sm:gap-4 sm:px-4 sm:py-3"
-      >
-        <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#f5e6c8] text-2xl shadow-inner sm:h-12 sm:w-12"
-          aria-hidden
+      {AFFILIATE_OFFERS.map((offer) => (
+        <a
+          key={offer.id}
+          href={offer.href}
+          target="_blank"
+          rel="sponsored noopener noreferrer"
+          className={cn(
+            "group flex items-center gap-3 overflow-hidden rounded-xl border-2 px-3 py-2.5 shadow-[3px_3px_0_rgba(61,47,34,0.2)] transition hover:brightness-110 sm:gap-4 sm:px-4 sm:py-3",
+            offer.tone.border,
+            offer.tone.bg
+          )}
         >
-          🍫
-        </span>
-        <span className="min-w-0 flex-1 text-left">
-          <span className="block font-pixel text-[6px] tracking-widest text-[#f5e6c8]/80">
-            SPONSORED
+          <span
+            className={cn(
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-2xl shadow-inner sm:h-12 sm:w-12",
+              offer.tone.iconBg
+            )}
+            aria-hidden
+          >
+            {offer.emoji}
           </span>
-          <span className="mt-0.5 block truncate font-display text-sm text-[#fff6df] sm:text-base">
-            {AWIN_CADBURY.label}
+          <span className="min-w-0 flex-1 text-left">
+            <span
+              className={cn(
+                "block font-pixel text-[6px] tracking-widest",
+                offer.tone.muted
+              )}
+            >
+              SPONSORED
+            </span>
+            <span
+              className={cn(
+                "mt-0.5 block truncate font-display text-sm sm:text-base",
+                offer.tone.title
+              )}
+            >
+              {offer.label}
+            </span>
+            <span
+              className={cn(
+                "mt-0.5 block truncate text-xs",
+                offer.tone.muted
+              )}
+            >
+              {offer.blurb}
+            </span>
           </span>
-          <span className="mt-0.5 block truncate text-xs text-[#f5e6c8]/90">
-            {AWIN_CADBURY.blurb}
+          <span
+            className={cn(
+              "shrink-0 rounded-lg border px-2.5 py-1.5 font-pixel text-[7px] transition",
+              offer.tone.title,
+              offer.tone.ctaBorder,
+              offer.tone.ctaBg
+            )}
+          >
+            SHOP →
           </span>
-        </span>
-        <span className="shrink-0 rounded-lg border border-[#f5e6c8]/35 bg-[#f5e6c8]/15 px-2.5 py-1.5 font-pixel text-[7px] text-[#fff6df] transition group-hover:bg-[#f5e6c8]/25">
-          SHOP →
-        </span>
-      </a>
+        </a>
+      ))}
     </aside>
   );
 }
