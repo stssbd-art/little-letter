@@ -98,6 +98,7 @@ export const STORAGE_KEYS = {
   theme: "little-letter-theme",
   visitorCount: "little-letter-visitor-count",
   mood: "little-letter-mood",
+  cookieConsent: "little-letter-cookie-consent",
 } as const;
 
 export const MOODS = [

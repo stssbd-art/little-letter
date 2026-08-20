@@ -28,7 +28,7 @@ const SECTIONS = [
   },
   {
     title: "Technical & payment data",
-    body: `We may use cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts may be stored so free allowances cannot be reset by clearing cookies alone. Payments are processed by Stripe; we do not store your full card details. If Google Analytics is enabled, Google may collect anonymous visit data (pages viewed, country, device) so we can see how the site is used.`,
+    body: `We may use necessary cookies or similar storage for free-send limits, paid credits, and site preferences (such as sound or theme). Sender-email usage counts may be stored so free allowances cannot be reset by clearing cookies alone. Optional cookies for Google Analytics and AdSense only load after you choose “Accept all” on the cookie banner (or you can pick “Necessary only”). Payments are processed by Stripe; we do not store your full card details.`,
   },
   {
     title: "Third-party services",

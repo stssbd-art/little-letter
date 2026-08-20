@@ -1,10 +1,15 @@
+"use client";
+
 import Script from "next/script";
+import { useCookieConsent } from "@/components/providers/CookieConsentProvider";
 import { getGaMeasurementId } from "@/lib/analytics";
 
-/** Loads the Google tag (gtag.js) when a GA4 Measurement ID is set. */
+/** Loads GA4 only after the visitor accepts optional cookies. */
 export function GoogleAnalytics() {
+  const { ready, marketingAllowed } = useCookieConsent();
   const id = getGaMeasurementId();
-  if (!id) return null;
+
+  if (!id || !ready || !marketingAllowed) return null;
 
   return (
     <>

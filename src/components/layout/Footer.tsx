@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ShareBar } from "@/components/features/ShareBar";
+import { CookieSettingsButton } from "@/components/features/CookieSettingsButton";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL, CONTACT_EMAIL } from "@/lib/constants";
 
 const YEAR = new Date().getFullYear();
@@ -99,6 +100,8 @@ export function Footer() {
           >
             Privacy
           </Link>
+          <span aria-hidden>·</span>
+          <CookieSettingsButton />
         </p>
       </div>
     </footer>
