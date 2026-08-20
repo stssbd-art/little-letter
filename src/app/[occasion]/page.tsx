@@ -14,6 +14,9 @@ export function generateStaticParams() {
   return OCCASION_SEO_LIST.map(({ slug }) => ({ occasion: slug }));
 }
 
+/** Only known occasion slugs — keeps /wall and other app routes safe. */
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { occasion: slug } = await params;
   const data = getOccasionSeo(slug);

@@ -4,6 +4,9 @@ import { SharedExamples } from "@/components/features/SharedExamples";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { SITE_URL } from "@/lib/constants";
+import { listSharedExamples } from "@/lib/shared-examples";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "The Wall — Shared Letter & Mixtape Peeks",
@@ -27,7 +30,9 @@ const jsonLd = {
   url: `${SITE_URL}/wall`,
 };
 
-export default function WallPage() {
+export default async function WallPage() {
+  const entries = await listSharedExamples();
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <script
@@ -40,7 +45,7 @@ export default function WallPage() {
         message.
       </PageHeader>
 
-      <SharedExamples />
+      <SharedExamples initialEntries={entries} />
 
       <div className="flex flex-wrap gap-3">
         <Link href="/create">

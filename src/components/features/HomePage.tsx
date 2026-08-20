@@ -69,15 +69,13 @@ export function HomePage() {
 
       <TodaysMood />
       <Guestbook />
-      <p className="text-center text-sm text-[var(--ll-muted)]">
-        Curious what people share?{" "}
-        <Link
-          href="/wall"
-          className="font-display text-[var(--ll-pink-deep)] underline-offset-2 hover:underline"
-        >
-          Peek at The Wall →
+      <div className="flex justify-center">
+        <Link href="/wall">
+          <PixelButton variant="secondary" size="lg">
+            🧱 See shared peeks on The Wall
+          </PixelButton>
         </Link>
-      </p>
+      </div>
     </div>
   );
 }

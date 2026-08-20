@@ -6,11 +6,17 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import type { SharedExample } from "@/types";
 import { formatDate } from "@/lib/utils";
 
-export function SharedExamples() {
-  const [entries, setEntries] = useState<SharedExample[]>([]);
-  const [loading, setLoading] = useState(true);
+type Props = {
+  /** Server-loaded peeks so The Wall isn’t empty on first paint */
+  initialEntries?: SharedExample[];
+};
+
+export function SharedExamples({ initialEntries }: Props) {
+  const [entries, setEntries] = useState<SharedExample[]>(initialEntries ?? []);
+  const [loading, setLoading] = useState(!initialEntries);
 
   useEffect(() => {
+    if (initialEntries) return;
     void (async () => {
       try {
         const res = await fetch("/api/shared-examples");
@@ -22,7 +28,7 @@ export function SharedExamples() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [initialEntries]);
 
   return (
     <PixelWindow title="the_wall.txt" icon="🧱">
@@ -43,7 +49,7 @@ export function SharedExamples() {
           No examples yet — yours could be the first.
         </p>
       ) : (
-        <ul className="mt-5 max-h-96 space-y-3 overflow-y-auto pr-1">
+        <ul className="mt-5 max-h-[32rem] space-y-3 overflow-y-auto pr-1">
           <AnimatePresence initial={false}>
             {entries.map((entry) => (
               <motion.li
