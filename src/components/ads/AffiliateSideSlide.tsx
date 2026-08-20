@@ -107,7 +107,7 @@ export function AffiliateSideSlide() {
             href={offer.href}
             target="_blank"
             rel="sponsored noopener noreferrer"
-            className="block animate-in fade-in duration-300"
+            className="block"
           >
             <span className="flex items-start gap-2.5">
               <span
