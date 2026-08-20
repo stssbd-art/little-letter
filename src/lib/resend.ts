@@ -12,6 +12,11 @@ import { isGmailApiConfigured, sendViaGmailApi } from "@/lib/gmail-api";
 import { SITE_NAME } from "@/lib/constants";
 import type { VoiceNotePayload } from "@/lib/voice-note";
 import { voiceNoteToAttachment } from "@/lib/voice-note";
+import {
+  getCardCoverPng,
+  type InlineImageAttachment,
+} from "@/lib/card-cover";
+import { isCardDesignId } from "@/lib/card-designs";
 
 type SendResult = {
   id: string;
@@ -131,9 +136,11 @@ async function deliverEmail(opts: {
   senderName?: string;
   senderEmail?: string;
   voiceNote?: VoiceNotePayload | null;
+  inlineImages?: InlineImageAttachment[];
 }): Promise<SendResult> {
   const attachment = opts.voiceNote ? voiceNoteToAttachment(opts.voiceNote) : undefined;
   const bcc = senderCopyBcc(opts.to, opts.senderEmail);
+  const inlineImages = opts.inlineImages ?? [];
 
   if (isGmailApiConfigured()) {
     try {
@@ -145,6 +152,7 @@ async function deliverEmail(opts: {
         text: opts.text,
         html: opts.html,
         attachment,
+        inlineImages,
       });
       return { id, simulated: false, provider: "gmail-api" };
     } catch (err) {
@@ -155,6 +163,24 @@ async function deliverEmail(opts: {
   const gmail = getGmailTransport();
   if (gmail) {
     try {
+      const mailAttachments = [
+        ...inlineImages.map((img) => ({
+          filename: img.filename,
+          content: img.content,
+          contentType: img.contentType,
+          cid: img.cid,
+          contentDisposition: "inline" as const,
+        })),
+        ...(attachment
+          ? [
+              {
+                filename: attachment.filename,
+                content: attachment.content,
+                contentType: attachment.contentType,
+              },
+            ]
+          : []),
+      ];
       const info = await gmail.transporter.sendMail({
         from: brandedFrom(gmail.user, opts.senderName),
         to: opts.to,
@@ -163,15 +189,7 @@ async function deliverEmail(opts: {
         text: opts.text,
         html: opts.html,
         replyTo: gmail.user,
-        attachments: attachment
-          ? [
-              {
-                filename: attachment.filename,
-                content: attachment.content,
-                contentType: attachment.contentType,
-              },
-            ]
-          : undefined,
+        attachments: mailAttachments.length ? mailAttachments : undefined,
       });
       return {
         id: info.messageId || `gmail-${Date.now()}`,
@@ -186,6 +204,23 @@ async function deliverEmail(opts: {
   const verified = getVerifiedResendFrom();
   const resend = verified ? getResend() : null;
   if (resend && verified) {
+    const mailAttachments = [
+      ...inlineImages.map((img) => ({
+        filename: img.filename,
+        content: img.content,
+        contentType: img.contentType,
+        contentId: img.cid,
+      })),
+      ...(attachment
+        ? [
+            {
+              filename: attachment.filename,
+              content: attachment.content,
+              contentType: attachment.contentType,
+            },
+          ]
+        : []),
+    ];
     const { data, error } = await resend.emails.send({
       from: verified.from,
       to: opts.to,
@@ -194,15 +229,7 @@ async function deliverEmail(opts: {
       text: opts.text,
       html: opts.html,
       replyTo: verified.replyTo,
-      attachments: attachment
-        ? [
-            {
-              filename: attachment.filename,
-              content: attachment.content,
-              contentType: attachment.contentType,
-            },
-          ]
-        : undefined,
+      attachments: mailAttachments.length ? mailAttachments : undefined,
     });
     if (error) throw new Error(error.message);
     return {
@@ -237,15 +264,27 @@ export async function sendLetterEmail(
   voiceNote?: VoiceNotePayload | null
 ): Promise<SendResult> {
   const hasVoice = Boolean(voiceNote);
+  let cover: InlineImageAttachment | null = null;
+  try {
+    if (letter.form.cardDesign && isCardDesignId(letter.form.cardDesign)) {
+      cover = await getCardCoverPng(letter.form.cardDesign);
+    }
+  } catch (err) {
+    console.warn("[Little Letter] Card cover embed failed — sending without CID", err);
+  }
+
   return deliverEmail({
     to: letter.form.recipientEmail,
     subject: letterSubject(letter),
     text: buildLetterEmailText(letter, hasVoice),
-    html: buildLetterEmailHtml(letter, hasVoice),
+    html: buildLetterEmailHtml(letter, hasVoice, {
+      embedCover: Boolean(cover),
+    }),
     logLabel: "send",
     senderName: letter.form.senderName,
     senderEmail: letter.form.senderEmail,
     voiceNote,
+    inlineImages: cover ? [cover] : undefined,
   });
 }
 

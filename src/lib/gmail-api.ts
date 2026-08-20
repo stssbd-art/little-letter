@@ -6,6 +6,11 @@ export type GmailAttachment = {
   content: Buffer;
 };
 
+export type GmailInlineImage = GmailAttachment & {
+  /** Content-ID without angle brackets, e.g. `ll-card-cover` */
+  cid: string;
+};
+
 type GmailApiSendOpts = {
   to: string;
   /** Blind copy — e.g. sender keeps a copy without the recipient seeing it. */
@@ -15,7 +20,10 @@ type GmailApiSendOpts = {
   subject: string;
   text: string;
   html: string;
+  /** Regular downloadable attachment (e.g. voice note). */
   attachment?: GmailAttachment;
+  /** Inline images referenced as cid:… in HTML. */
+  inlineImages?: GmailInlineImage[];
 };
 
 function getGmailUser() {
@@ -59,6 +67,22 @@ function alternativeParts(boundary: string, text: string, html: string) {
   ];
 }
 
+function inlineImageParts(images: GmailInlineImage[]) {
+  return images.flatMap((img) => {
+    const safeName = img.filename.replace(/["\r\n]/g, "");
+    const cid = img.cid.replace(/[<>\r\n]/g, "");
+    return [
+      `Content-Type: ${img.contentType}; name="${safeName}"`,
+      `Content-Transfer-Encoding: base64`,
+      `Content-ID: <${cid}>`,
+      `Content-Disposition: inline; filename="${safeName}"`,
+      "",
+      wrapBase64(img.content.toString("base64")),
+      "",
+    ];
+  });
+}
+
 function buildRawMessage(opts: {
   to: string;
   bcc?: string;
@@ -67,6 +91,7 @@ function buildRawMessage(opts: {
   text: string;
   html: string;
   attachment?: GmailAttachment;
+  inlineImages?: GmailInlineImage[];
 }) {
   const text = opts.text.replace(/\r?\n/g, "\r\n");
   const html = opts.html.replace(/\r?\n/g, "\r\n");
@@ -79,28 +104,53 @@ function buildRawMessage(opts: {
     "MIME-Version: 1.0",
   ];
 
+  const inlines = opts.inlineImages ?? [];
+  const stamp = Date.now();
+
+  // HTML + inline images live in multipart/related
+  const buildRelated = () => {
+    if (inlines.length === 0) {
+      const alt = `ll_alt_${stamp}`;
+      return {
+        headers: [`Content-Type: multipart/alternative; boundary="${alt}"`],
+        body: alternativeParts(alt, text, html),
+      };
+    }
+    const related = `ll_rel_${stamp}`;
+    const alt = `ll_alt_${stamp}`;
+    return {
+      headers: [`Content-Type: multipart/related; type="multipart/alternative"; boundary="${related}"`],
+      body: [
+        `--${related}`,
+        `Content-Type: multipart/alternative; boundary="${alt}"`,
+        "",
+        ...alternativeParts(alt, text, html),
+        ...inlines.flatMap((img) => [
+          `--${related}`,
+          ...inlineImageParts([img]),
+        ]),
+        `--${related}--`,
+      ],
+    };
+  };
+
+  const related = buildRelated();
+
   if (!opts.attachment) {
-    const boundary = `ll_alt_${Date.now()}`;
-    const lines = [
-      ...headers,
-      `Content-Type: multipart/alternative; boundary="${boundary}"`,
-      "",
-      ...alternativeParts(boundary, text, html),
-    ];
+    const lines = [...headers, ...related.headers, "", ...related.body];
     return Buffer.from(lines.join("\r\n"), "utf8").toString("base64url");
   }
 
-  const mixed = `ll_mixed_${Date.now()}`;
-  const alt = `ll_alt_${Date.now()}`;
+  const mixed = `ll_mixed_${stamp}`;
   const safeName = opts.attachment.filename.replace(/["\r\n]/g, "");
   const lines = [
     ...headers,
     `Content-Type: multipart/mixed; boundary="${mixed}"`,
     "",
     `--${mixed}`,
-    `Content-Type: multipart/alternative; boundary="${alt}"`,
+    ...related.headers,
     "",
-    ...alternativeParts(alt, text, html),
+    ...related.body,
     `--${mixed}`,
     `Content-Type: ${opts.attachment.contentType}; name="${safeName}"`,
     `Content-Disposition: attachment; filename="${safeName}"`,

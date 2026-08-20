@@ -20,6 +20,10 @@ const occasionRedirects = [
 ] as const;
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["@resvg/resvg-js"],
+  outputFileTracingIncludes: {
+    "/api/**/*": ["./public/ecards/**/*"],
+  },
   async redirects() {
     return occasionRedirects.map(([source, destination]) => ({
       source: `/${source}`,

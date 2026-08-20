@@ -1,7 +1,12 @@
 import type { GeneratedLetter, MixtapePayload, Occasion } from "@/types";
 import { OCCASIONS, SITE_URL } from "@/lib/constants";
 import { getTracksByIds } from "@/lib/tracks";
-import { getCardDesign, isCardDesignId } from "@/lib/card-designs";
+import {
+  getCardDesign,
+  isCardDesignId,
+  type CardDesign,
+} from "@/lib/card-designs";
+import { CARD_COVER_CID } from "@/lib/card-cover";
 
 function escapeHtml(text: string) {
   return text
@@ -345,6 +350,27 @@ function themeForLetter(letter: GeneratedLetter): FrameTheme {
   };
 }
 
+/** Email-safe illustrated header — works even when images are blocked. */
+function cardIllustrationHtml(design: CardDesign, coverSrc: string) {
+  const sparks = design.sparkles
+    .map((s) => `<span style="margin:0 6px;font-size:22px;">${s}</span>`)
+    .join("");
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${design.pageBg};">
+    <tr>
+      <td style="padding:18px 16px 8px;text-align:center;">
+        <div style="font-size:18px;letter-spacing:2px;line-height:1.4;">${sparks}</div>
+        <div style="font-size:52px;line-height:1.2;margin:8px 0 4px;">${design.emoji}</div>
+        <div style="font-size:18px;letter-spacing:2px;line-height:1.4;">${sparks}</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 12px 16px;line-height:0;font-size:0;">
+        <img src="${escapeHtml(coverSrc)}" width="420" height="280" alt="${escapeHtml(design.title)} illustrated cover" style="display:block;width:100%;max-width:420px;height:auto;border:0;outline:none;text-decoration:none;border-radius:12px;" />
+      </td>
+    </tr>
+  </table>`;
+}
+
 function whyFooter(senderName: string, accent: string) {
   return `<p style="margin:18px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
     You received this because <strong>${escapeHtml(senderName)}</strong> sent you a personal note with
@@ -408,7 +434,8 @@ export function buildMixtapeEmailText(
 
 export function buildLetterEmailHtml(
   letter: GeneratedLetter,
-  hasVoiceNote = false
+  hasVoiceNote = false,
+  opts?: { embedCover?: boolean }
 ): string {
   const meta = OCCASIONS.find((o) => o.value === letter.form.occasion);
   const design =
@@ -425,13 +452,18 @@ export function buildLetterEmailHtml(
     ? design.sparkles.map((s) => `<span style="margin:0 4px;">${s}</span>`).join("")
     : theme.footerIcons;
 
-  const sceneUrl = design ? `${SITE_URL}/ecards/${design.id}.png` : "";
+  // Prefer CID when the PNG is attached inline; fall back to public URL.
+  const coverSrc = design
+    ? opts?.embedCover
+      ? `cid:${CARD_COVER_CID}`
+      : `${SITE_URL}/ecards/${design.id}.png`
+    : "";
 
   const cardBody = design
     ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;background:${design.cardBg};border:5px solid ${design.border};border-radius:24px;overflow:hidden;box-shadow:0 12px 0 ${design.border};">
           <tr>
-            <td style="padding:0;line-height:0;font-size:0;background:${design.pageBg};">
-              <img src="${escapeHtml(sceneUrl)}" width="420" height="280" alt="${escapeHtml(design.title)}" style="display:block;width:100%;max-width:420px;height:auto;border:0;outline:none;text-decoration:none;" />
+            <td style="padding:0;">
+              ${cardIllustrationHtml(design, coverSrc)}
             </td>
           </tr>
           <tr>
@@ -471,7 +503,7 @@ export function buildLetterEmailHtml(
             <td style="padding:8px 24px 24px;text-align:center;background:${design.cardBg};">
               <div style="font-size:18px;letter-spacing:4px;">${sparkleRow}</div>
               <p style="margin:12px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
-                Same illustrated cover as the preview — sent with Little Letter
+                Illustrated digital card · sent with Little Letter
               </p>
               <p style="margin:8px 0 0;font-size:11px;color:${design.muted};line-height:1.5;">
                 Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
