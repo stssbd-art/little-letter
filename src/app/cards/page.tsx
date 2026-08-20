@@ -49,7 +49,7 @@ export default function CardsPage() {
         it. Flip-open covers · first two free · then £0.99.
       </PageHeader>
 
-      <PixelWindow title="card_gallery.exe" icon="🎴">
+      <PixelWindow title="card_gallery.exe" icon="🎀">
         <p className="mb-5 font-display text-base leading-relaxed text-[var(--ll-ink)]">
           Each card has its own illustrated cover — balloons, rose gardens,
           starlit nights, and more. Tap one to open it, personalise the inside,

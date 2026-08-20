@@ -42,7 +42,7 @@ export function HomePage() {
           </Link>
           <Link href="/cards" className="sm:w-auto">
             <PixelButton size="lg" variant="secondary" className="w-full sm:w-auto">
-              🎴 Send a Card
+              🎀 Send a Card
             </PixelButton>
           </Link>
           <Link href="/mixtape" className="sm:w-auto">
