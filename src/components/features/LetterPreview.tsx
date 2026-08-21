@@ -14,6 +14,7 @@ import { useSound } from "@/components/providers/SoundProvider";
 import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import { OCCASIONS } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
+import { LETTER_PRICE_LABEL } from "@/lib/usage-labels";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
@@ -95,7 +96,14 @@ export function LetterPreview() {
     const cancelled = searchParams.get("cancelled");
 
     if (cancelled) {
-      setError("Payment cancelled. Your first two letters are free; extras are £0.99.");
+      const cancelledWasCard =
+        Boolean(letter?.form.cardDesign) &&
+        isCardDesignId(letter?.form.cardDesign ?? "");
+      setError(
+        cancelledWasCard
+          ? `Payment cancelled. Your first two cards or letters are free; extras are ${LETTER_PRICE_LABEL}.`
+          : `Payment cancelled. Your first two letters are free; extras are ${LETTER_PRICE_LABEL}.`
+      );
       return;
     }
 
@@ -184,7 +192,12 @@ export function LetterPreview() {
           setError("Demo mode is on — try Send again (no payment).");
         } else {
           setNeedsPayment(true);
-          setError(data.error ?? "Payment required for extra letters.");
+          setError(
+            data.error ??
+              (isCard
+                ? `Payment required for extra cards (${LETTER_PRICE_LABEL}).`
+                : "Payment required for extra letters.")
+          );
         }
         setSending(false);
         return;
@@ -234,7 +247,8 @@ export function LetterPreview() {
     }
   }
 
-  const priceLabel = usage?.price ?? "£0.99";
+  // Cards share the letter free pool and £0.99 price — never mixtape (£1.25)
+  const priceLabel = LETTER_PRICE_LABEL;
   const demo = usage?.demo ?? false;
   const freeLeft = usage?.freeAvailable ?? true;
   const freeRemaining = usage?.freeLeft ?? 2;
@@ -245,12 +259,18 @@ export function LetterPreview() {
       <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
         <p className="font-display text-sm text-[var(--ll-ink)]">
           {demo
-            ? "Demo mode — sends are free for testing. No payment asked right now."
+            ? isCard
+              ? "Demo mode — e-cards are free for testing. No payment asked right now."
+              : "Demo mode — sends are free for testing. No payment asked right now."
             : freeLeft
-              ? `Your first ${freeTotal} letters are free (${freeRemaining} left). Extra letters are ${priceLabel} each.`
+              ? isCard
+                ? `Your first ${freeTotal} cards or letters are free (${freeRemaining} left). Extra cards are ${priceLabel} each.`
+                : `Your first ${freeTotal} letters are free (${freeRemaining} left). Extra letters are ${priceLabel} each.`
               : usage && usage.credits > 0
-                ? `You have ${usage.credits} paid letter credit${usage.credits === 1 ? "" : "s"} ready.`
-                : `Your free letters are used. Next letter costs ${priceLabel}.`}
+                ? `You have ${usage.credits} paid ${isCard ? "card" : "letter"} credit${usage.credits === 1 ? "" : "s"} ready.`
+                : isCard
+                  ? `Your free cards/letters are used. Next card costs ${priceLabel}.`
+                  : `Your free letters are used. Next letter costs ${priceLabel}.`}
         </p>
       </PixelWindow>
 

@@ -31,27 +31,8 @@ export type Relationship =
 
 export type LetterWriteMode = "ai" | "own";
 
-export type CardDesignId =
-  | "balloon-bash"
-  | "cake-candles"
-  | "confetti-pop"
-  | "blush-hearts"
-  | "rose-garden"
-  | "starlit-love"
-  | "buddy-highfive"
-  | "rainbow-note"
-  | "clover-luck"
-  | "sunflower-thanks"
-  | "sparkler-congrats"
-  | "soft-sorry"
-  | "wedding-rings"
-  | "cap-toss"
-  | "promo-rocket"
-  | "valentine-box"
-  | "tulip-mum"
-  | "tie-dad"
-  | "honey-classic"
-  | "moon-whisper";
+export type { CardDesignId } from "@/lib/card-designs";
+import type { CardDesignId } from "@/lib/card-designs";
 
 export interface LetterFormData {
   recipientName: string;

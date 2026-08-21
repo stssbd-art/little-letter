@@ -48,9 +48,12 @@ export async function POST(request: Request) {
     const senderEmail = normalizeSenderEmail(body.form.senderEmail);
     const access = await getSendAccess(senderEmail);
     if (!access.allowed) {
+      const isCard = Boolean(body.form.cardDesign);
       return NextResponse.json(
         {
-          error: `Your first ${FREE_LETTERS} letters are free. Extra letters are ${LETTER_PRICE_LABEL} each.`,
+          error: isCard
+            ? `Your first ${FREE_LETTERS} cards or letters are free. Extra cards are ${LETTER_PRICE_LABEL} each.`
+            : `Your first ${FREE_LETTERS} letters are free. Extra letters are ${LETTER_PRICE_LABEL} each.`,
           requiresPayment: true,
           price: LETTER_PRICE_LABEL,
           stripeConfigured: isStripeConfigured(),

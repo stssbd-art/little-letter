@@ -11,18 +11,28 @@ import {
   readSenderUsage,
   writeSenderUsage,
 } from "@/lib/sender-usage";
+import {
+  FREE_LETTERS,
+  FREE_MIXTAPES,
+  LETTER_PRICE_LABEL,
+  MIX_MULTI_SONG_LABEL,
+  MIX_ONE_SONG_LABEL,
+} from "@/lib/usage-labels";
+
+export {
+  FREE_LETTERS,
+  FREE_MIXTAPES,
+  LETTER_PRICE_LABEL,
+  MIX_MULTI_SONG_LABEL,
+  MIX_ONE_SONG_LABEL,
+} from "@/lib/usage-labels";
 
 /** Letters: first 2 free, then £0.99 each */
-export const FREE_LETTERS = 2;
 export const LETTER_PRICE_PENCE = 99;
-export const LETTER_PRICE_LABEL = "£0.99";
 
 /** Mixtapes: first one free, then £1.25 for 1 song, £1.55 for 2+ songs */
-export const FREE_MIXTAPES = 1;
 export const MIX_ONE_SONG_PENCE = 125;
-export const MIX_ONE_SONG_LABEL = "£1.25";
 export const MIX_MULTI_SONG_PENCE = 155;
-export const MIX_MULTI_SONG_LABEL = "£1.55";
 
 /** @deprecated use LETTER_PRICE_* — kept for older imports during transition */
 export const SEND_PRICE_LABEL = LETTER_PRICE_LABEL;
