@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     description:
       "Browse short shared peeks from letters and mixtapes people opted to show.",
     url: "/wall",
+    type: "website",
   },
 };
 

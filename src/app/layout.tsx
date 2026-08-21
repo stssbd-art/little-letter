@@ -17,6 +17,19 @@ import {
 import { getAdsenseClientId } from "@/lib/adsense";
 import "./globals.css";
 
+function facebookAppId() {
+  return (process.env.NEXT_PUBLIC_FB_APP_ID ?? "").trim();
+}
+
+function extraMetaTags(): Record<string, string> {
+  const tags: Record<string, string> = {};
+  const adsense = getAdsenseClientId();
+  if (adsense) tags["google-adsense-account"] = adsense;
+  const fbAppId = facebookAppId();
+  if (fbAppId) tags["fb:app_id"] = fbAppId;
+  return tags;
+}
+
 const nunito = Nunito({
   variable: "--font-nunito",
   subsets: ["latin"],
@@ -91,8 +104,8 @@ export const metadata: Metadata = {
     },
   },
   category: "lifestyle",
-  ...(getAdsenseClientId()
-    ? { other: { "google-adsense-account": getAdsenseClientId() } }
+  ...(Object.keys(extraMetaTags()).length
+    ? { other: extraMetaTags() }
     : {}),
   verification: {
     google:

@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     description:
       "Pick from animated card designs and email a personal wish — like a cosy e-card site.",
     url: "/cards",
+    type: "website",
   },
 };
 

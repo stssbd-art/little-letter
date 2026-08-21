@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${design.title} — Little Letter`,
       description: design.blurb,
       url: `/cards/${design.id}`,
+      type: "website",
     },
   };
 }

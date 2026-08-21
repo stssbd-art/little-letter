@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     description:
       "Digital birthday cards, love notes, thank you messages, and more — sent by email.",
     url: "/occasions",
+    type: "website",
   },
 };
 
