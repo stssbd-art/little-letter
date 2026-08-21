@@ -1,4 +1,11 @@
 /** Affiliate / sponsored placements (publisher links). */
+
+/** Awin publisher ID — MasterTag + cread affiliate links */
+export const AWIN_PUBLISHER_ID = "3048693";
+
+/** Official Publisher MasterTag script (Toolbox → Publisher MasterTag). */
+export const AWIN_MASTER_TAG_SRC = `https://www.dwin2.com/pub.${AWIN_PUBLISHER_ID}.min.js`;
+
 export type AffiliateOffer = {
   id: string;
   href: string;
