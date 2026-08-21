@@ -61,7 +61,7 @@ export function SharedExamples({ initialEntries }: Props) {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="rounded-sm border border-[#8b5e34]/40 bg-[#fff6df] px-1.5 py-0.5 font-pixel text-[7px] text-[#8b5e34] dark:bg-[#3d2f22] dark:text-[#e6c98a]">
-                      {entry.kind === "mixtape" ? "📼 MIX" : "💌 LETTER"}
+                      {entry.kind === "mixtape" ? "📼 MIX" : "✉️ LETTER"}
                     </span>
                     <p className="font-display text-sm text-[var(--ll-ink)]">
                       {entry.fromName} → {entry.toName}

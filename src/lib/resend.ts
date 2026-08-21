@@ -87,10 +87,10 @@ function letterSubject(letter: GeneratedLetter) {
   const custom = letter.subject?.trim();
   if (letter.form.cardDesign) {
     const base = custom || `${letter.form.senderName} sent you a card`;
-    return withLeadingEmoji("💝", base);
+    return withLeadingEmoji("💌", base);
   }
   const base = custom || `A little letter for ${letter.form.recipientName}`;
-  return withLeadingEmoji("💌", base);
+  return withLeadingEmoji("✉️", base);
 }
 
 function mixtapeSubject(mix: MixtapePayload) {
