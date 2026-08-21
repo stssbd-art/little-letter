@@ -59,22 +59,26 @@ export function EndPageAd({ client, slot, className }: EndPageAdProps) {
     if (!el) return;
 
     const sync = () => {
-      const status = el.getAttribute("data-ad-status");
-      if (status === "filled") setAdStatus("filled");
-      else if (status === "unfilled") setAdStatus("unfilled");
+      const fill = el.getAttribute("data-ad-status");
+      if (fill === "filled") setAdStatus("filled");
+      else if (fill === "unfilled") setAdStatus("unfilled");
     };
 
     sync();
     const observer = new MutationObserver(sync);
     observer.observe(el, {
       attributes: true,
-      attributeFilter: ["data-ad-status"],
+      attributeFilter: ["data-ad-status", "data-adsbygoogle-status"],
     });
     const polls = [800, 2000, 4000, 8000].map((ms) => window.setTimeout(sync, ms));
+    const giveUp = window.setTimeout(() => {
+      if (el.getAttribute("data-ad-status") !== "filled") setAdStatus("unfilled");
+    }, 6000);
 
     return () => {
       observer.disconnect();
       polls.forEach((id) => window.clearTimeout(id));
+      window.clearTimeout(giveUp);
     };
   }, [client, slot]);
 

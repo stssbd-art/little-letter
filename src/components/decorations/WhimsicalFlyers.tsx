@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 const FLYERS = [
-  { emoji: "💌", left: "6%", top: "18%", size: "text-lg", duration: 18, x: 10, y: -8 },
+  { emoji: "✉️", left: "6%", top: "18%", size: "text-lg", duration: 18, x: 10, y: -8 },
   { emoji: "🌈", left: "78%", top: "10%", size: "text-[10px]", duration: 22, x: 6, y: -4 },
   { emoji: "⭐", left: "18%", top: "72%", size: "text-sm", duration: 14, x: 8, y: -10 },
   { emoji: "✨", left: "88%", top: "58%", size: "text-base", duration: 20, x: -8, y: -6 },
@@ -15,7 +15,7 @@ const FLYERS = [
   { emoji: "📼", left: "84%", top: "76%", size: "text-xs", duration: 18, x: -4, y: -4 },
   { emoji: "🌈", left: "48%", top: "84%", size: "text-[10px]", duration: 21, x: -3, y: -5 },
   { emoji: "📼", left: "70%", top: "28%", size: "text-sm", duration: 19, x: 4, y: 3 },
-  { emoji: "💌", left: "52%", top: "88%", size: "text-sm", duration: 19, x: 6, y: -10 },
+  { emoji: "✉️", left: "52%", top: "88%", size: "text-sm", duration: 19, x: 6, y: -10 },
 ] as const;
 
 export function WhimsicalFlyers() {

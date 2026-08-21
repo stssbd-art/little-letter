@@ -48,7 +48,7 @@ export default function OccasionsHubPage() {
         Digital email letters — not printed cards, but just as personal.
       </PageHeader>
 
-      <PixelWindow title="occasions_index.txt" icon="💌">
+      <PixelWindow title="occasions_index.txt" icon="✉️">
         <p className="ll-copy font-display text-base leading-relaxed text-[var(--ll-ink)]">
           Pick an occasion below to see example wishes and start a letter. When
           someone searches for a birthday card, wedding wish, or Valentine
@@ -81,7 +81,7 @@ export default function OccasionsHubPage() {
 
       <div className="flex justify-start">
         <Link href="/create">
-          <PixelButton size="lg">💌 Create any letter</PixelButton>
+          <PixelButton size="lg">✉️ Create any letter</PixelButton>
         </Link>
       </div>
     </div>

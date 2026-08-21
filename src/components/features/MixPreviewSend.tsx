@@ -262,7 +262,7 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
   return (
     <div className="space-y-4">
       <VoiceNoteRecorder kind="mixtape" />
-    <PixelWindow title="send_this_mix.bat" icon="💌" liftOnHover={false}>
+    <PixelWindow title="send_this_mix.bat" icon="📼" liftOnHover={false}>
       <p className="font-display text-sm text-[var(--ll-ink)]">
         Like how it sounds? Mail this mixtape from here — no need to go back.
       </p>

@@ -15,7 +15,7 @@ export function PixelWindow({
   title,
   children,
   className,
-  icon = "💌",
+  icon = "✉️",
   liftOnHover = true,
 }: PixelWindowProps) {
   return (

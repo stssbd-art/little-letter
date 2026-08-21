@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
     const name = body.name?.trim() ?? "";
     const message = body.message?.trim() ?? "";
-    const emoji = body.emoji?.trim() || "💌";
+    const emoji = body.emoji?.trim() || "✉️";
 
     if (name.length < 1 || name.length > 40) {
       return NextResponse.json(

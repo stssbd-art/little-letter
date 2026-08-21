@@ -104,7 +104,7 @@ export async function createBrandOpenGraphImage() {
               background: "linear-gradient(180deg, #e8cdb6 0%, #d8c09a 100%)",
             }}
           >
-            <div style={{ fontSize: 28, display: "flex" }}>💌</div>
+            <div style={{ fontSize: 28, display: "flex" }}>✉️</div>
             <div
               style={{
                 fontFamily: "Pixel",
@@ -179,7 +179,7 @@ export async function createBrandOpenGraphImage() {
               }}
             >
               <div style={{ fontSize: 72, display: "flex", lineHeight: 1 }}>
-                💌
+                ✉️
               </div>
               <div
                 style={{

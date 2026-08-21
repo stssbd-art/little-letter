@@ -328,7 +328,7 @@ export function MessageForm() {
                 className="w-full sm:w-auto"
               >
                 {writeMode === "own"
-                  ? "💌 Preview my letter"
+                  ? "✉️ Preview my letter"
                   : "✨ Generate Little Letter"}
               </PixelButton>
             </div>
@@ -356,7 +356,7 @@ export function MessageForm() {
               className="text-6xl"
               aria-hidden
             >
-              💌
+              ✉️
             </motion.div>
             <motion.div
               initial={{ opacity: 0 }}
