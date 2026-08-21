@@ -300,80 +300,75 @@ export function LetterPreview() {
             aria-label={open ? "Close letter" : "Open letter"}
           >
             <div
-              className="relative mx-auto w-full max-w-sm overflow-visible pt-14"
-              style={{ perspective: 1100 }}
+              className="relative mx-auto w-full max-w-sm overflow-visible pt-10"
+              style={{ perspective: 1200 }}
             >
-              {/*
-                Shared 320×200 viewBox on every layer.
-                Lip tip + pocket peak both sit at (160, 100).
-                Shadow only on the flat back layer (keeps 3D flap unfiltered).
-              */}
               <div className="relative aspect-[8/5] w-full overflow-visible">
-                {/* Back + outer silhouette */}
+                {/* Envelope body */}
                 <svg
                   className="absolute inset-0 z-10 h-full w-full"
                   viewBox="0 0 320 200"
                   preserveAspectRatio="none"
                   aria-hidden
-                  style={{ filter: "drop-shadow(6px 6px 0 var(--ll-pink-shadow))" }}
+                  style={{ filter: "drop-shadow(5px 7px 0 rgba(139,94,52,0.28))" }}
                 >
                   <defs>
                     <linearGradient id="ll-env-back" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#fff0c2" />
-                      <stop offset="45%" stopColor="#f6d58a" />
-                      <stop offset="100%" stopColor="#e8b86d" />
+                      <stop offset="0%" stopColor="#fff6df" />
+                      <stop offset="55%" stopColor="#f6d58a" />
+                      <stop offset="100%" stopColor="#e4b05a" />
                     </linearGradient>
                   </defs>
                   <rect
-                    x="2.5"
-                    y="2.5"
-                    width="315"
-                    height="195"
-                    rx="18"
+                    x="4"
+                    y="4"
+                    width="312"
+                    height="192"
+                    rx="14"
                     fill="url(#ll-env-back)"
-                    stroke="var(--ll-pink-deep)"
-                    strokeWidth="5"
+                    stroke="#8b5e34"
+                    strokeWidth="4"
                   />
                 </svg>
 
-                {/* Letter — tucked fully under the pocket when sealed; slides up when open */}
+                {/* Letter — fully under the pocket when sealed; slides up when open */}
                 <motion.div
-                  className="absolute left-1/2 z-[15] w-[78%] -translate-x-1/2 overflow-hidden rounded-md border-2 border-[#d4b896] bg-[#fffdf6] px-3 py-2 shadow-[3px_3px_0_rgba(61,47,34,0.12)]"
+                  className="absolute left-1/2 z-[15] w-[72%] -translate-x-1/2 overflow-hidden rounded-sm border border-[#e2c9a0] bg-[#fffdf8] px-2.5 py-1.5 shadow-[2px_2px_0_rgba(61,47,34,0.1)]"
                   initial={false}
                   animate={
                     open
-                      ? { top: "10%", height: "52%", opacity: 1, scale: 1 }
+                      ? { top: "8%", height: "54%", opacity: 1, scale: 1 }
                       : {
-                          /* Keep wholly below the flap tip (~50%) so it stays inside the pocket */
-                          top: "54%",
-                          height: "38%",
+                          /* Below pocket V (~59%) so nothing peeks out when sealed */
+                          top: "64%",
+                          height: "28%",
                           opacity: 1,
-                          scale: 0.98,
+                          scale: 0.97,
                         }
                   }
                   transition={
                     open
                       ? {
-                          delay: 0.38,
+                          delay: 0.4,
                           type: "spring",
-                          stiffness: 160,
-                          damping: 16,
+                          stiffness: 170,
+                          damping: 18,
                         }
-                      : { duration: 0.32, ease: "easeIn" }
+                      : { duration: 0.3, ease: "easeIn" }
                   }
                 >
-                  <p className="truncate font-pixel text-[8px] text-[#8b5e34]">
+                  <p className="truncate font-pixel text-[7px] text-[#8b5e34]">
                     {currentLetter.subject}
                   </p>
-                  <p className="mt-1 truncate text-[11px] text-[#7a654f]">
+                  <p className="mt-0.5 truncate text-[10px] text-[#7a654f]">
                     For {currentLetter.form.recipientName}
                   </p>
-                  <p className="mt-1 line-clamp-2 text-left text-[11px] leading-snug text-[#3d2f22]">
+                  <p className="mt-0.5 line-clamp-2 text-left text-[10px] leading-snug text-[#3d2f22]">
                     {currentLetter.message}
                   </p>
                 </motion.div>
 
-                {/* Front pocket — V peak at (160, 100) */}
+                {/* Front pocket — clean V, no inner scratch lines */}
                 <svg
                   className="pointer-events-none absolute inset-0 z-20 h-full w-full"
                   viewBox="0 0 320 200"
@@ -382,32 +377,42 @@ export function LetterPreview() {
                 >
                   <defs>
                     <linearGradient id="ll-env-front" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f0c96a" />
-                      <stop offset="100%" stopColor="#d9a45a" />
+                      <stop offset="0%" stopColor="#f3cb72" />
+                      <stop offset="100%" stopColor="#d9a045" />
+                    </linearGradient>
+                    <linearGradient id="ll-env-pocket-shade" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="rgba(139,94,52,0.12)" />
+                      <stop offset="100%" stopColor="rgba(139,94,52,0)" />
                     </linearGradient>
                     <clipPath id="ll-env-front-face">
-                      <rect x="5" y="5" width="310" height="190" rx="16" />
+                      <rect x="6" y="6" width="308" height="188" rx="12" />
                     </clipPath>
                   </defs>
                   <g clipPath="url(#ll-env-front-face)">
                     <path
-                      d="M5 118 L160 100 L315 118 L315 195 L5 195 Z"
+                      d="M6 122 L160 102 L314 122 L314 194 L6 194 Z"
                       fill="url(#ll-env-front)"
                     />
                     <path
-                      d="M18 120 L160 155 L302 120"
+                      d="M6 122 L160 102 L314 122 L314 138 L160 118 L6 138 Z"
+                      fill="url(#ll-env-pocket-shade)"
+                    />
+                    <path
+                      d="M6 122 L160 102 L314 122"
                       fill="none"
-                      stroke="rgba(120,70,20,0.2)"
-                      strokeWidth="1.25"
+                      stroke="#8b5e34"
+                      strokeWidth="2.5"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
                     />
                   </g>
                 </svg>
 
-                {/* Lip — same tip (160,100); clipped to face when closed */}
+                {/* Lip / flap */}
                 <motion.div
                   className="absolute inset-0 z-30"
                   style={{
-                    transformOrigin: "50% 2.5%",
+                    transformOrigin: "50% 3%",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
                   }}
@@ -427,20 +432,20 @@ export function LetterPreview() {
                   >
                     <defs>
                       <linearGradient id="ll-env-flap" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#fff0c2" />
+                        <stop offset="0%" stopColor="#fff8e8" />
                         <stop offset="100%" stopColor="#f0c96a" />
                       </linearGradient>
                       <clipPath id="ll-env-flap-face">
-                        <rect x="5" y="5" width="310" height="190" rx="16" />
+                        <rect x="6" y="6" width="308" height="188" rx="12" />
                       </clipPath>
                     </defs>
                     <g clipPath={open ? undefined : "url(#ll-env-flap-face)"}>
-                      <path d="M5 5 H315 L160 100 Z" fill="url(#ll-env-flap)" />
+                      <path d="M6 6 H314 L160 102 Z" fill="url(#ll-env-flap)" />
                       <path
-                        d="M5 5 L160 100 L315 5"
+                        d="M6 6 L160 102 L314 6"
                         fill="none"
-                        stroke="var(--ll-pink-deep)"
-                        strokeWidth="5"
+                        stroke="#8b5e34"
+                        strokeWidth="2.5"
                         strokeLinejoin="round"
                         strokeLinecap="round"
                       />
@@ -448,7 +453,7 @@ export function LetterPreview() {
                   </svg>
                   <div
                     className="absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2"
-                    style={{ top: "50%" }}
+                    style={{ top: "48%" }}
                   >
                     <motion.div
                       className="flex items-center justify-center"
