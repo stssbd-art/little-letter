@@ -517,14 +517,16 @@ export function buildLetterEmailHtml(
                 For ${escapeHtml(letter.form.recipientName)}
               </p>
               <p style="margin:16px 0 0;font-size:14px;color:${design.muted};line-height:1.55;">
-                Open it on the Little Letter website to see your illustrated card and message.
+                Tap below to open your illustrated card ✨
               </p>
               ${hasVoiceNote ? voiceNoteHtml() : ""}
               <table role="presentation" cellspacing="0" cellpadding="0" style="margin:24px auto 0;">
                 <tr>
-                  <td style="border-radius:12px;background:${design.accent};">
-                    <a href="${escapeHtml(openUrl)}" style="display:inline-block;padding:14px 28px;font-family:Georgia,serif;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;">
-                      Open your card
+                  <td style="border-radius:14px;background:${design.accent};box-shadow:0 4px 0 ${design.border};">
+                    <a href="${escapeHtml(openUrl)}" style="display:inline-block;padding:16px 30px;font-family:Georgia,serif;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;line-height:1.35;">
+                      <span style="font-size:22px;line-height:1;vertical-align:middle;">${cardEmailDecor(design).hero}</span>
+                      &nbsp;Open your card&nbsp;
+                      <span style="font-size:18px;line-height:1;vertical-align:middle;">💌</span>
                     </a>
                   </td>
                 </tr>
