@@ -268,10 +268,8 @@ function CardInterior({
 export function GreetingCard({
   designId,
   recipientName = "friend",
-  subject = "A little card",
   message = "Your words will land here…",
   senderName = "you",
-  occasionLabel,
   className,
   compact = false,
   defaultOpen = false,
