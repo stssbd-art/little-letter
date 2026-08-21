@@ -15,7 +15,7 @@ import { isOccasionSlug } from "@/lib/occasion-seo";
 import type { LetterWriteMode, MessageStyle, Occasion } from "@/types";
 import { cn } from "@/lib/utils";
 
-type Phase = "form" | "closing" | "flying" | "draft";
+type Phase = "form" | "draft" | "flying";
 
 export function MessageForm() {
   const router = useRouter();
@@ -30,8 +30,6 @@ export function MessageForm() {
   const rootRef = useRef<HTMLDivElement>(null);
 
   function scrollLetterIntoView() {
-    // Keep the letter / sealing animation at the top — don't leave the viewport
-    // stuck at the old Generate button after the tall form collapses.
     const el = rootRef.current;
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 88;
@@ -55,7 +53,7 @@ export function MessageForm() {
   }, [letter, phase]);
 
   useEffect(() => {
-    if (phase === "closing" || phase === "draft") {
+    if (phase === "draft" || phase === "flying") {
       scrollLetterIntoView();
     }
   }, [phase]);
@@ -73,13 +71,8 @@ export function MessageForm() {
     setError("");
     setLoading(true);
     play("click");
-    setPhase("closing");
 
     try {
-      await new Promise((r) => setTimeout(r, 700));
-      setPhase("flying");
-      play("whoosh");
-
       if (writeMode === "own") {
         const message = form.ownMessage.trim();
         if (message.length < 8) {
@@ -117,7 +110,6 @@ export function MessageForm() {
         });
       }
 
-      await new Promise((r) => setTimeout(r, 500));
       play("sparkle");
       restoredDraft.current = true;
       setPhase("draft");
@@ -157,7 +149,7 @@ export function MessageForm() {
     }
   }
 
-  function goToPreview() {
+  async function goToPreview() {
     if (!letter) return;
     const subject = letter.subject.trim();
     const message = letter.message.trim();
@@ -169,8 +161,12 @@ export function MessageForm() {
       setError("Add a short subject for the letter.");
       return;
     }
+    setError("");
     setLetter({ ...letter, subject, message });
     play("click");
+    setPhase("flying");
+    play("whoosh");
+    await new Promise((r) => setTimeout(r, 900));
     router.push("/preview");
   }
 
@@ -402,9 +398,13 @@ export function MessageForm() {
                   disabled={loading}
                   className="w-full sm:w-auto"
                 >
-                  {writeMode === "own"
-                    ? "✉️ Preview my letter"
-                    : "✨ Generate Little Letter"}
+                  {loading
+                    ? writeMode === "own"
+                      ? "Preparing…"
+                      : "Writing…"
+                    : writeMode === "own"
+                      ? "✉️ Put in letter box"
+                      : "✨ Generate Little Letter"}
                 </PixelButton>
               </div>
             </motion.form>
@@ -486,7 +486,7 @@ export function MessageForm() {
                 <PixelButton
                   size="lg"
                   type="button"
-                  onClick={goToPreview}
+                  onClick={() => void goToPreview()}
                   className="sm:ml-auto"
                 >
                   Next →
@@ -495,24 +495,20 @@ export function MessageForm() {
             </motion.div>
           ) : (
             <motion.div
-              key="anim"
+              key="flying"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="flex min-h-[280px] flex-col items-center justify-center gap-4 py-8"
             >
               <motion.div
-                animate={
-                  phase === "closing"
-                    ? { scaleY: [1, 0.2, 0.2], rotate: [0, 0, -8] }
-                    : {
-                        x: [0, 40, 180],
-                        y: [0, -30, -120],
-                        rotate: [0, -20, -45],
-                        opacity: [1, 1, 0],
-                        scale: [1, 0.9, 0.5],
-                      }
-                }
-                transition={{ duration: phase === "closing" ? 0.7 : 0.9 }}
+                animate={{
+                  x: [0, 40, 180],
+                  y: [0, -30, -120],
+                  rotate: [0, -20, -45],
+                  opacity: [1, 1, 0],
+                  scale: [1, 0.9, 0.5],
+                }}
+                transition={{ duration: 0.9 }}
                 className="text-6xl"
                 aria-hidden
               >
@@ -527,11 +523,7 @@ export function MessageForm() {
                 ✨ ⭐ ✨
               </motion.div>
               <p className="font-display text-[var(--ll-ink)]">
-                {phase === "closing"
-                  ? "Sealing your envelope..."
-                  : writeMode === "own"
-                    ? "Tucking your letter into the box..."
-                    : "Writing your letter..."}
+                Your letter is flying to the preview desk...
               </p>
             </motion.div>
           )}

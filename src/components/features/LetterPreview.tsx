@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
@@ -35,6 +35,7 @@ export function LetterPreview() {
   const { play } = useSound();
   const [open, setOpen] = useState(false);
   const [sending, setSending] = useState(false);
+  const [flying, setFlying] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [usage, setUsage] = useState<UsageInfo | null>(null);
@@ -172,7 +173,6 @@ export function LetterPreview() {
     }
     setSending(true);
     setError("");
-    play("whoosh");
     try {
       const voiceNote = await loadVoicePayload("letter");
       const res = await fetch("/api/send", {
@@ -211,6 +211,10 @@ export function LetterPreview() {
 
       await clearVoiceBlob("letter");
 
+      setFlying(true);
+      play("whoosh");
+      await new Promise((r) => setTimeout(r, 900));
+
       confetti({
         particleCount: 120,
         spread: 80,
@@ -220,6 +224,7 @@ export function LetterPreview() {
       play("success");
       router.push(isCard ? "/success?kind=card" : "/success");
     } catch (err) {
+      setFlying(false);
       setError(err instanceof Error ? err.message : "Could not send letter");
       setSending(false);
     }
@@ -260,7 +265,37 @@ export function LetterPreview() {
   const freeTotal = usage?.freeTotal ?? 2;
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      <AnimatePresence>
+        {flying ? (
+          <motion.div
+            key="send-flying"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-[#fff8ee]/90 backdrop-blur-sm dark:bg-[#1a1510]/90"
+          >
+            <motion.div
+              animate={{
+                x: [0, 40, 180],
+                y: [0, -30, -120],
+                rotate: [0, -20, -45],
+                opacity: [1, 1, 0],
+                scale: [1, 0.9, 0.5],
+              }}
+              transition={{ duration: 0.9 }}
+              className="text-6xl"
+              aria-hidden
+            >
+              ✉️
+            </motion.div>
+            <p className="font-display text-[var(--ll-ink)]">
+              {isCard ? "Your card is on its way..." : "Your letter is on its way..."}
+            </p>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
       <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
         <p className="font-display text-sm text-[var(--ll-ink)]">
           {demo
