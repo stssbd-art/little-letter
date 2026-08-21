@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CardSceneArt } from "@/components/features/CardSceneArt";
 import { getCardDesign, type CardDesign, type CardDesignId } from "@/lib/card-designs";
@@ -16,8 +16,6 @@ type Props = {
   className?: string;
   compact?: boolean;
   defaultOpen?: boolean;
-  /** When true, cover opens on its own after a short delay. Off by default. */
-  autoOpen?: boolean;
 };
 
 function Shimmer({ night }: { night?: boolean }) {
@@ -228,8 +226,6 @@ function CardInterior({
           backgroundPosition: "0 5rem",
           WebkitOverflowScrolling: "touch",
         }}
-        onClick={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-start justify-between gap-2">
           <div
@@ -311,16 +307,58 @@ export function GreetingCard({
   className,
   compact = false,
   defaultOpen = false,
-  autoOpen = false,
 }: Props) {
   const design = getCardDesign(designId);
   const [open, setOpen] = useState(defaultOpen);
+  const openRef = useRef(open);
+  const lockUntil = useRef(0);
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
 
-  useEffect(() => {
-    if (compact || defaultOpen || !autoOpen) return;
-    const id = window.setTimeout(() => setOpen(true), 1400);
-    return () => window.clearTimeout(id);
-  }, [compact, defaultOpen, autoOpen, designId]);
+  openRef.current = open;
+
+  function canAct() {
+    return Date.now() >= lockUntil.current;
+  }
+
+  function armLock() {
+    // Block duplicate touch + click / double-fires for half a second
+    lockUntil.current = Date.now() + 500;
+  }
+
+  function openCard() {
+    if (!canAct() || openRef.current) return;
+    armLock();
+    setOpen(true);
+  }
+
+  function closeCard() {
+    if (!canAct() || !openRef.current) return;
+    armLock();
+    setOpen(false);
+  }
+
+  /** One intentional tap opens or closes — never both in one gesture. */
+  function onCardActivate() {
+    if (!canAct()) return;
+    if (openRef.current) closeCard();
+    else openCard();
+  }
+
+  function onPointerDown(e: React.PointerEvent) {
+    pointerStart.current = { x: e.clientX, y: e.clientY };
+  }
+
+  function onPointerUp(e: React.PointerEvent) {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    const start = pointerStart.current;
+    pointerStart.current = null;
+    if (!start) return;
+    const moved =
+      Math.abs(e.clientX - start.x) > 12 || Math.abs(e.clientY - start.y) > 12;
+    if (moved) return; // scroll / drag — don't toggle
+    e.preventDefault();
+    onCardActivate();
+  }
 
   if (compact) {
     return (
@@ -340,12 +378,18 @@ export function GreetingCard({
     <div className={cn("relative w-full", className)}>
       <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
         <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
-          {open ? "scroll inside to read · tap Close when done" : "tap the cover to open"}
+          {open
+            ? "scroll to read · tap again to close"
+            : "tap the cover to open"}
         </p>
         <button
           type="button"
           className="font-pixel text-[8px] text-[var(--ll-pink-deep)] underline decoration-dotted underline-offset-2"
-          onClick={() => setOpen((v) => !v)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onCardActivate();
+          }}
         >
           {open ? "Close card" : "Open card"}
         </button>
@@ -359,12 +403,27 @@ export function GreetingCard({
         style={{ perspective: 1400, perspectiveOrigin: "left center" }}
       >
         <div
-          className="relative aspect-[3/4] w-full [transform-style:preserve-3d]"
-          role="region"
-          aria-label={open ? "Open e-card" : "Closed e-card"}
+          className="relative aspect-[3/4] w-full touch-manipulation [transform-style:preserve-3d]"
+          role="button"
+          tabIndex={0}
+          aria-label={open ? "Close e-card" : "Open e-card"}
+          aria-expanded={open}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onCardActivate();
+            }
+          }}
         >
-          {/* Message page — scrollable when open */}
-          <div className="absolute inset-0">
+          {/* Message page — on top when open so it can scroll */}
+          <div
+            className={cn(
+              "absolute inset-0",
+              open ? "z-20" : "z-0"
+            )}
+          >
             <CardInterior
               design={design}
               recipientName={recipientName}
@@ -375,29 +434,16 @@ export function GreetingCard({
             />
           </div>
 
-          {/* Cover — click to open/close; ignores pointer when open so message scrolls */}
+          {/* Cover — on top when closed; swings open and yields pointer to message */}
           <motion.div
             className={cn(
-              "absolute inset-0 z-10 [transform-style:preserve-3d]",
-              open ? "pointer-events-none" : "cursor-pointer"
+              "absolute inset-0 [transform-style:preserve-3d]",
+              open ? "pointer-events-none z-10" : "z-20"
             )}
             style={{ transformOrigin: "left center" }}
             animate={{ rotateY: open ? -158 : 0 }}
             transition={{ duration: 0.7, ease: [0.33, 1, 0.32, 1] }}
-            onClick={() => {
-              if (!open) setOpen(true);
-            }}
-            role="button"
-            tabIndex={open ? -1 : 0}
-            aria-label="Open e-card"
-            aria-expanded={open}
-            onKeyDown={(e) => {
-              if (open) return;
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setOpen(true);
-              }
-            }}
+            aria-hidden={open}
           >
             <div
               className="absolute inset-0 [backface-visibility:hidden]"
