@@ -42,7 +42,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 **Inbox placement:** Prefer Resend + a verified custom domain (SPF, DKIM, DMARC). Shared senders like `onboarding@resend.dev` are blocked because they land in spam. Gmail SMTP is the fallback and can email any address (Google daily limits apply).
 
-**Pricing (public):** first two letters free · then £0.99 · first mixtape free · then £1.25 (1 song) / £1.55 (2+ songs).
+**Pricing (public):** first two letters free · then £0.70 · first mixtape free · then £0.99 (1 song) / £1.20 (2+ songs).
 
 ## Scripts
 

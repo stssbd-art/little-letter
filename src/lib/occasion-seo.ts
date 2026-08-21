@@ -30,7 +30,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Birthday",
     title: "Send a Birthday Card & Wish Online",
     metaDescription:
-      "Send a free digital birthday card and warm birthday wish by email. Write your own message or let AI help — first two letters free, then £0.99.",
+      "Send a free digital birthday card and warm birthday wish by email. Write your own message or let AI help — first two letters free, then £0.70.",
     keywords: [
       "birthday card",
       "birthday wish",
@@ -46,7 +46,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
       "Skip the shop-bought card. Little Letter helps you send a personal birthday wish by email: cute retro styling, your words (or AI help), and delivery straight to someone you love.",
     body: [
       "Whether it is for a best friend, partner, parent, or colleague, you pick the tone — cute, funny, romantic, or encouraging — and we help you write something that feels like you.",
-      "Recipients open a warm email that reads like a sealed note, not a marketing blast. Your first two birthday letters are free; extras are £0.99 each.",
+      "Recipients open a warm email that reads like a sealed note, not a marketing blast. Your first two birthday letters are free; extras are £0.70 each.",
     ],
     exampleWishes: [
       "Happy birthday! Hope your day is full of cake, laughter, and one surprise that makes you grin.",

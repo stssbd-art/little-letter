@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 export const metadata: Metadata = {
   title: "Send a Romantic Mixtape Online",
   description:
-    "Burn a romantic mixtape online and email it to someone you miss. Pick songs, label a cassette, add a dedication — first mixtape free, then £1.25 for 1 song, £1.55 for 2+.",
+    "Burn a romantic mixtape online and email it to someone you miss. Pick songs, label a cassette, add a dedication — first mixtape free, then £0.99 for 1 song, £1.20 for 2+.",
   alternates: { canonical: "/mixtape" },
   keywords: [
     "send mixtape online",
@@ -23,7 +23,7 @@ export default function MixtapePage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader kicker="SIDE A · PRESS RECORD" title="Send a Mixtape">
         Label a cassette, pick songs, add a tiny dedication or a spoken voice
-        note — first mixtape free, then £1.25 for 1 song or £1.55 for 2+ — then
+        note — first mixtape free, then £0.99 for 1 song or £1.20 for 2+ — then
         mail the mix.
       </PageHeader>
 

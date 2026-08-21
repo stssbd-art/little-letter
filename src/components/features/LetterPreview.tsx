@@ -14,7 +14,7 @@ import { useSound } from "@/components/providers/SoundProvider";
 import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import { OCCASIONS } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
-import { LETTER_PRICE_LABEL } from "@/lib/usage-labels";
+import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
@@ -72,8 +72,12 @@ export function LetterPreview() {
 
   async function refreshUsage() {
     const email = letter?.form?.senderEmail?.trim() ?? "";
+    const isCardUsage =
+      Boolean(letter?.form?.cardDesign) &&
+      isCardDesignId(letter?.form?.cardDesign ?? "");
     const qs = new URLSearchParams({ t: String(Date.now()) });
     if (email) qs.set("email", email);
+    if (isCardUsage) qs.set("kind", "card");
     const res = await fetch(`/api/usage?${qs.toString()}`, {
       cache: "no-store",
     });
@@ -88,7 +92,7 @@ export function LetterPreview() {
   useEffect(() => {
     void refreshUsage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [letter?.form?.senderEmail]);
+  }, [letter?.form?.senderEmail, letter?.form?.cardDesign]);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
@@ -101,7 +105,7 @@ export function LetterPreview() {
         isCardDesignId(letter?.form.cardDesign ?? "");
       setError(
         cancelledWasCard
-          ? `Payment cancelled. Your first two cards or letters are free; extras are ${LETTER_PRICE_LABEL}.`
+          ? `Payment cancelled. E-cards are ${CARD_PRICE_LABEL} each.`
           : `Payment cancelled. Your first two letters are free; extras are ${LETTER_PRICE_LABEL}.`
       );
       return;
@@ -183,6 +187,7 @@ export function LetterPreview() {
         if (currentLetter.form.senderEmail?.trim()) {
           qs.set("email", currentLetter.form.senderEmail.trim());
         }
+        if (isCard) qs.set("kind", "card");
         const latest = await fetch(`/api/usage?${qs.toString()}`, {
           cache: "no-store",
         }).then((r) => r.json() as Promise<UsageInfo>);
@@ -195,7 +200,7 @@ export function LetterPreview() {
           setError(
             data.error ??
               (isCard
-                ? `Payment required for extra cards (${LETTER_PRICE_LABEL}).`
+                ? `Payment required — e-cards are ${CARD_PRICE_LABEL} each.`
                 : "Payment required for extra letters.")
           );
         }
@@ -234,7 +239,7 @@ export function LetterPreview() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           returnPath: "/preview",
-          kind: "letter",
+          kind: isCard ? "card" : "letter",
           senderEmail: currentLetter.form.senderEmail?.trim(),
         }),
       });
@@ -247,10 +252,10 @@ export function LetterPreview() {
     }
   }
 
-  // Cards share the letter free pool and £0.99 price — never mixtape (£1.25)
-  const priceLabel = LETTER_PRICE_LABEL;
+  // Cards: always £1.25, no free allowance. Letters: first 2 free, then £0.70.
+  const priceLabel = isCard ? CARD_PRICE_LABEL : LETTER_PRICE_LABEL;
   const demo = usage?.demo ?? false;
-  const freeLeft = usage?.freeAvailable ?? true;
+  const freeLeft = isCard ? false : (usage?.freeAvailable ?? true);
   const freeRemaining = usage?.freeLeft ?? 2;
   const freeTotal = usage?.freeTotal ?? 2;
 
@@ -262,14 +267,14 @@ export function LetterPreview() {
             ? isCard
               ? "Demo mode — e-cards are free for testing. No payment asked right now."
               : "Demo mode — sends are free for testing. No payment asked right now."
-            : freeLeft
-              ? isCard
-                ? `Your first ${freeTotal} cards or letters are free (${freeRemaining} left). Extra cards are ${priceLabel} each.`
-                : `Your first ${freeTotal} letters are free (${freeRemaining} left). Extra letters are ${priceLabel} each.`
-              : usage && usage.credits > 0
-                ? `You have ${usage.credits} paid ${isCard ? "card" : "letter"} credit${usage.credits === 1 ? "" : "s"} ready.`
-                : isCard
-                  ? `Your free cards/letters are used. Next card costs ${priceLabel}.`
+            : isCard
+              ? usage && usage.credits > 0
+                ? `You have ${usage.credits} paid card credit${usage.credits === 1 ? "" : "s"} ready.`
+                : `E-cards are ${priceLabel} each — there is no free card allowance.`
+              : freeLeft
+                ? `Your first ${freeTotal} letters are free (${freeRemaining} left). Extra letters are ${priceLabel} each.`
+                : usage && usage.credits > 0
+                  ? `You have ${usage.credits} paid letter credit${usage.credits === 1 ? "" : "s"} ready.`
                   : `Your free letters are used. Next letter costs ${priceLabel}.`}
         </p>
       </PixelWindow>
@@ -630,9 +635,7 @@ export function LetterPreview() {
               : isCard
                 ? demo
                   ? "🎴 Send card (demo)"
-                  : freeLeft
-                    ? `🎴 Send free card (${freeRemaining} left)`
-                    : "🎴 Send card"
+                  : "🎴 Send card"
                 : demo
                   ? "✉️ Send letter (demo)"
                   : freeLeft

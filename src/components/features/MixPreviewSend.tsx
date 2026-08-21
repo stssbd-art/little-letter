@@ -18,6 +18,7 @@ import {
 import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import type { MixShare } from "@/lib/mixtape-link";
 import type { MixtapePayload } from "@/types";
+import { MIX_ONE_SONG_LABEL } from "@/lib/usage-labels";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
@@ -257,7 +258,7 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
   if (!ready || !draft) return null;
 
   const demo = usage?.demo ?? false;
-  const priceLabel = usage?.price ?? "£1.25";
+  const priceLabel = usage?.price ?? MIX_ONE_SONG_LABEL;
 
   return (
     <div className="space-y-4">

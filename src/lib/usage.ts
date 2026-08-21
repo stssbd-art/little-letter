@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import {
   addPaidCreditForEmail,
   consumeLetterForEmail,
+  consumeCardForEmail,
   consumeMixtapeForEmail,
   hasUsageDatabase,
   isValidSenderEmail,
@@ -15,6 +16,7 @@ import {
   FREE_LETTERS,
   FREE_MIXTAPES,
   LETTER_PRICE_LABEL,
+  CARD_PRICE_LABEL,
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
 } from "@/lib/usage-labels";
@@ -22,23 +24,28 @@ import {
 export {
   FREE_LETTERS,
   FREE_MIXTAPES,
+  FREE_CARDS,
   LETTER_PRICE_LABEL,
+  CARD_PRICE_LABEL,
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
 } from "@/lib/usage-labels";
 
-/** Letters: first 2 free, then £0.99 each */
-export const LETTER_PRICE_PENCE = 99;
+/** Letters: first 2 free, then £0.70 each */
+export const LETTER_PRICE_PENCE = 70;
 
-/** Mixtapes: first one free, then £1.25 for 1 song, £1.55 for 2+ songs */
-export const MIX_ONE_SONG_PENCE = 125;
-export const MIX_MULTI_SONG_PENCE = 155;
+/** E-cards: no free sends — £1.25 each */
+export const CARD_PRICE_PENCE = 125;
+
+/** Mixtapes: first one free, then £0.99 for 1 song, £1.20 for 2+ songs */
+export const MIX_ONE_SONG_PENCE = 99;
+export const MIX_MULTI_SONG_PENCE = 120;
 
 /** @deprecated use LETTER_PRICE_* — kept for older imports during transition */
 export const SEND_PRICE_LABEL = LETTER_PRICE_LABEL;
 export const SEND_PRICE_PENCE = LETTER_PRICE_PENCE;
 
-export type CheckoutKind = "letter" | "mixtape";
+export type CheckoutKind = "letter" | "mixtape" | "card";
 
 export function mixtapePrice(trackCount: number) {
   const count = Math.max(0, Math.floor(trackCount));
@@ -259,6 +266,18 @@ export async function getSendAccess(senderEmail?: string) {
   return { allowed: false as const, reason: "payment_required" as const, usage };
 }
 
+/** E-cards never use the letter free pool — paid credit or demo only. */
+export async function getCardSendAccess(senderEmail?: string) {
+  const usage = await readUsage(senderEmail);
+  if (isDemoMode()) {
+    return { allowed: true as const, reason: "demo" as const, usage };
+  }
+  if (usage.letterCredits > 0) {
+    return { allowed: true as const, reason: "credit" as const, usage };
+  }
+  return { allowed: false as const, reason: "payment_required" as const, usage };
+}
+
 export async function consumeSendAccess(senderEmail?: string) {
   const usage = await readUsage(senderEmail);
   if (isDemoMode()) {
@@ -295,6 +314,50 @@ export async function consumeSendAccess(senderEmail?: string) {
     usage.letterCredits -= 1;
   } else {
     throw new Error("No send credit available.");
+  }
+  const next = finalize(usage);
+  await writeUsage(next, senderEmail);
+  return next;
+}
+
+/** Consume a paid credit for an e-card (never burns letter free allowance). */
+export async function consumeCardSendAccess(senderEmail?: string) {
+  const usage = await readUsage(senderEmail);
+  if (isDemoMode()) {
+    return usage;
+  }
+
+  if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
+    try {
+      const emailUsage = await consumeCardForEmail(senderEmail);
+      const next = finalize({
+        letterFreeUsed: Math.max(
+          usage.letterFreeUsed,
+          emailUsage.letterFreeUsed
+        ),
+        letterCredits: emailUsage.letterCredits,
+        mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
+        mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
+        usedSessionIds: Array.from(
+          new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
+        ).slice(-30),
+      });
+      await writeUsage(next, senderEmail);
+      return next;
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        err.message.includes("No card send credit available")
+      ) {
+        throw err;
+      }
+    }
+  }
+
+  if (usage.letterCredits > 0) {
+    usage.letterCredits -= 1;
+  } else {
+    throw new Error("No card send credit available.");
   }
   const next = finalize(usage);
   await writeUsage(next, senderEmail);
@@ -396,6 +459,7 @@ export async function addPaidCredit(
   if (kind === "mixtape") {
     usage.mixCredits += 1;
   } else {
+    /* letter + card payments both grant a send credit */
     usage.letterCredits += 1;
   }
   usage.usedSessionIds = [...usage.usedSessionIds, sessionId].slice(-30);
