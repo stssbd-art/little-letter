@@ -66,6 +66,12 @@ export function CardSceneArt({
       return <HoneyScene {...props} />;
     case "moon-whisper":
       return <MoonScene {...props} />;
+    case "pearl-locket":
+      return <PearlLocketScene {...props} />;
+    case "daisy-duo":
+      return <DaisyDuoScene {...props} />;
+    case "ivory-veil":
+      return <IvoryVeilScene {...props} />;
     default:
       return <HoneyScene {...props} />;
   }
@@ -925,6 +931,152 @@ function MoonScene({ gid }: SceneProps) {
         animate={{ x: [-6, 6, -6] }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
       />
+    </svg>
+  );
+}
+
+function PearlLocketScene({ accent, border, gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-pearlBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f3e8f4" />
+          <stop offset="100%" stopColor="#efe4f0" />
+        </linearGradient>
+        <radialGradient id={`${gid}-pearlShine`} cx="40%" cy="35%" r="50%">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.7" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-pearlBg)`} />
+      {[30, 55, 185, 210].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={28 + (i % 2) * 18}
+          r={2 + (i % 2)}
+          fill="#fff"
+          opacity="0.85"
+          animate={{ opacity: [0.35, 1, 0.35], y: [0, -6, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.2 }}
+        />
+      ))}
+      <line x1="120" y1="18" x2="120" y2="48" stroke={border} strokeWidth="2" />
+      <circle cx="120" cy="16" r="4" fill="#e8d0e0" stroke={accent} strokeWidth="1.5" />
+      <motion.g
+        animate={{ y: [0, -3, 0], rotate: [-2, 2, -2] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "120px 95px" }}
+      >
+        <circle cx="120" cy="95" r="42" fill="#fff8fb" stroke={border} strokeWidth="3" />
+        <circle cx="120" cy="95" r="34" fill={`url(#${gid}-pearlShine)`} />
+        <path
+          d="M120 78 C120 68 105 68 105 78 C105 90 120 100 120 100 C120 100 135 90 135 78 C135 68 120 68 120 78 Z"
+          fill={accent}
+        />
+        <circle cx="108" cy="82" r="3" fill="#fff" opacity="0.55" />
+      </motion.g>
+    </svg>
+  );
+}
+
+function DaisyDuoScene({ accent, border, gid }: SceneProps) {
+  const daisy = (cx: number, cy: number, scale: number, delay: number) => (
+    <motion.g
+      key={`${cx}-${cy}`}
+      animate={{ rotate: [-4, 4, -4], y: [0, -3, 0] }}
+      transition={{ duration: 3 + delay, repeat: Infinity, ease: "easeInOut", delay }}
+      style={{ transformOrigin: `${cx}px ${cy}px` }}
+    >
+      {Array.from({ length: 8 }, (_, i) => {
+        const a = (i * Math.PI) / 4;
+        const px = cx + Math.cos(a) * 18 * scale;
+        const py = cy + Math.sin(a) * 18 * scale;
+        return (
+          <ellipse
+            key={i}
+            cx={px}
+            cy={py}
+            rx={7 * scale}
+            ry={12 * scale}
+            fill="#fffdf5"
+            stroke={border}
+            strokeWidth="1"
+            transform={`rotate(${(i * 45).toFixed(0)} ${px} ${py})`}
+          />
+        );
+      })}
+      <circle cx={cx} cy={cy} r={10 * scale} fill="#ffd166" stroke={accent} strokeWidth="2" />
+    </motion.g>
+  );
+
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-daisyBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff6d8" />
+          <stop offset="100%" stopColor="#e4f0d4" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-daisyBg)`} />
+      <ellipse cx="120" cy="150" rx="110" ry="16" fill="#c5d4a0" opacity="0.75" />
+      <line x1="85" y1="145" x2="85" y2="95" stroke="#6f8a45" strokeWidth="3" />
+      <line x1="155" y1="145" x2="155" y2="88" stroke="#6f8a45" strokeWidth="3" />
+      <ellipse cx="75" cy="120" rx="8" ry="4" fill="#7aab6a" />
+      <ellipse cx="165" cy="115" rx="8" ry="4" fill="#7aab6a" />
+      {daisy(85, 78, 1, 0)}
+      {daisy(155, 70, 1.1, 0.25)}
+      <motion.circle
+        cx="120"
+        cy="40"
+        r="3"
+        fill="#ffd166"
+        animate={{ opacity: [0.3, 1, 0.3] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </svg>
+  );
+}
+
+function IvoryVeilScene({ accent, border, gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-veilBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f7f1e8" />
+          <stop offset="100%" stopColor="#efe6d8" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-veilBg)`} />
+      {[35, 60, 180, 205].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={30 + (i % 2) * 14}
+          r="2.5"
+          fill="#fff"
+          animate={{ opacity: [0.25, 0.95, 0.25], y: [0, -7, 0] }}
+          transition={{ duration: 2.6, repeat: Infinity, delay: i * 0.2 }}
+        />
+      ))}
+      <motion.path
+        d="M70 55 Q120 30 170 55 Q155 110 120 130 Q85 110 70 55 Z"
+        fill="#fffcf8"
+        stroke={border}
+        strokeWidth="2"
+        animate={{ y: [0, -2, 0] }}
+        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <path
+        d="M95 70 C95 58 110 58 120 70 C130 58 145 58 145 70 C145 88 120 105 120 105 C120 105 95 88 95 70 Z"
+        fill="#e8d8c8"
+        opacity="0.55"
+      />
+      <circle cx="100" cy="78" r="7" fill="#f0e4d4" stroke={accent} strokeWidth="1.5" />
+      <circle cx="120" cy="72" r="8" fill="#fff8ee" stroke={accent} strokeWidth="1.5" />
+      <circle cx="140" cy="78" r="7" fill="#f0e4d4" stroke={accent} strokeWidth="1.5" />
+      <circle cx="120" cy="88" r="5" fill="#d4c0a0" />
+      <path d="M55 135 Q120 115 185 135" fill="none" stroke="#e8c98a" strokeWidth="2.5" />
     </svg>
   );
 }

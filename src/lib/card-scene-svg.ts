@@ -209,6 +209,37 @@ export function buildCardSceneSvg(designId: CardDesignId): string {
         ${stars()}
         <ellipse cx="170" cy="120" rx="40" ry="10" fill="#2a3550" opacity=".5"/>`
       );
+    case "pearl-locket":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f3e8f4"/><stop offset="100%" stop-color="#efe4f0"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <line x1="120" y1="18" x2="120" y2="48" stroke="${border}" stroke-width="2"/><circle cx="120" cy="16" r="4" fill="#e8d0e0" stroke="${accent}" stroke-width="1.5"/>
+        <circle cx="120" cy="95" r="42" fill="#fff8fb" stroke="${border}" stroke-width="3"/>
+        ${heart(120, 72, 1, accent)}
+        <circle cx="40" cy="35" r="2.5" fill="#fff"/><circle cx="200" cy="40" r="2.5" fill="#fff"/>`
+      );
+    case "daisy-duo":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff6d8"/><stop offset="100%" stop-color="#e4f0d4"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/><ellipse cx="120" cy="150" rx="110" ry="16" fill="#c5d4a0" opacity=".75"/>
+        <line x1="85" y1="145" x2="85" y2="95" stroke="#6f8a45" stroke-width="3"/><line x1="155" y1="145" x2="155" y2="88" stroke="#6f8a45" stroke-width="3"/>
+        ${daisy(85, 78, border, accent)}${daisy(155, 70, border, accent)}`
+      );
+    case "ivory-veil":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7f1e8"/><stop offset="100%" stop-color="#efe6d8"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <path d="M70 55 Q120 30 170 55 Q155 110 120 130 Q85 110 70 55 Z" fill="#fffcf8" stroke="${border}" stroke-width="2"/>
+        <circle cx="100" cy="78" r="7" fill="#f0e4d4" stroke="${accent}" stroke-width="1.5"/>
+        <circle cx="120" cy="72" r="8" fill="#fff8ee" stroke="${accent}" stroke-width="1.5"/>
+        <circle cx="140" cy="78" r="7" fill="#f0e4d4" stroke="${accent}" stroke-width="1.5"/>
+        <circle cx="120" cy="88" r="5" fill="#d4c0a0"/>
+        <path d="M55 135 Q120 115 185 135" fill="none" stroke="#e8c98a" stroke-width="2.5"/>
+        <circle cx="40" cy="35" r="2.5" fill="#fff"/><circle cx="200" cy="40" r="2.5" fill="#fff"/>`
+      );
     default:
       return buildCardSceneSvg("honey-classic");
   }
@@ -283,6 +314,16 @@ function tulip(x: number, fill: string, border: string) {
   return `<line x1="${x}" y1="145" x2="${x}" y2="90" stroke="#6f8a45" stroke-width="3"/>
   <ellipse cx="${x - 10}" cy="115" rx="8" ry="4" fill="#7aab6a"/>
   <path d="M${x} 55 Q${x - 16} 75 ${x - 10} 90 Q${x} 82 ${x + 10} 90 Q${x + 16} 75 ${x} 55 Z" fill="${fill}" stroke="${border}" stroke-width="1"/>`;
+}
+
+function daisy(cx: number, cy: number, border: string, accent: string) {
+  const petals = Array.from({ length: 8 }, (_, i) => {
+    const a = (i * Math.PI) / 4;
+    const px = cx + Math.cos(a) * 18;
+    const py = cy + Math.sin(a) * 18;
+    return `<ellipse cx="${px}" cy="${py}" rx="7" ry="12" fill="#fffdf5" stroke="${border}" stroke-width="1" transform="rotate(${i * 45} ${px} ${py})"/>`;
+  }).join("");
+  return `${petals}<circle cx="${cx}" cy="${cy}" r="10" fill="#ffd166" stroke="${accent}" stroke-width="2"/>`;
 }
 
 function stars() {

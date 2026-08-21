@@ -167,13 +167,13 @@ function CoverInside({ design }: { design: CardDesign }) {
       }}
     >
       <p
-        className="font-pixel text-[8px] uppercase tracking-widest"
+        className="font-script text-[10px] italic"
         style={{ color: design.muted }}
       >
         inside the cover
       </p>
       <p
-        className="mt-3 font-display text-lg leading-snug"
+        className="mt-3 font-script text-base leading-snug"
         style={{ color: design.accent }}
       >
         {design.title}
@@ -221,16 +221,16 @@ function CardInterior({
           borderColor: design.border,
           backgroundImage: `repeating-linear-gradient(
             transparent,
-            transparent 26px,
-            ${design.border}18 26px,
-            ${design.border}18 27px
+            transparent 22px,
+            ${design.border}18 22px,
+            ${design.border}18 23px
           )`,
-          backgroundPosition: "0 5rem",
+          backgroundPosition: "0 4.5rem",
         }}
       >
         <div className="flex items-start justify-between gap-2">
           <div
-            className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border-2"
+            className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border-2"
             style={{ borderColor: design.border }}
           >
             <div className="h-full w-full scale-150">
@@ -244,7 +244,7 @@ function CardInterior({
             </div>
           </div>
           <span
-            className="rounded-full border px-2.5 py-0.5 font-pixel text-[8px]"
+            className="rounded-full border px-2.5 py-0.5 font-script text-[10px] italic"
             style={{
               borderColor: design.border,
               color: design.accent,
@@ -257,7 +257,7 @@ function CardInterior({
 
         {occasionLabel ? (
           <p
-            className="mt-3 font-pixel text-[8px] uppercase tracking-widest"
+            className="mt-3 font-script text-[11px] italic"
             style={{ color: design.muted }}
           >
             {occasionLabel}
@@ -265,26 +265,26 @@ function CardInterior({
         ) : null}
 
         <h3
-          className="mt-1 font-display text-xl leading-snug sm:text-2xl"
+          className="mt-1 font-script text-lg leading-snug sm:text-xl"
           style={{ color: design.accent }}
         >
           {subject}
         </h3>
 
-        <p className="mt-1 text-sm" style={{ color: design.muted }}>
+        <p className="mt-0.5 font-script text-xs italic" style={{ color: design.muted }}>
           For {recipientName}
         </p>
 
         <p
-          className="mt-4 flex-1 whitespace-pre-wrap text-sm leading-relaxed sm:text-base"
+          className="mt-3 flex-1 whitespace-pre-wrap font-script text-sm leading-relaxed sm:text-[0.95rem]"
           style={{ color: design.ink }}
         >
           {message}
         </p>
 
-        <div className="mt-4 flex items-end justify-end gap-3">
+        <div className="mt-3 flex items-end justify-end gap-3">
           <p
-            className="font-display text-sm"
+            className="font-script text-sm italic"
             style={{ color: design.accent }}
           >
             — {senderName}

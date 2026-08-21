@@ -20,7 +20,10 @@ export type CardDesignId =
   | "tulip-mum"
   | "tie-dad"
   | "honey-classic"
-  | "moon-whisper";
+  | "moon-whisper"
+  | "pearl-locket"
+  | "daisy-duo"
+  | "ivory-veil";
 
 export type CardDesign = {
   id: CardDesignId;
@@ -360,6 +363,54 @@ export const CARD_DESIGNS: CardDesign[] = [
     badge: "thinking of you",
     sparkles: ["🌙", "✦", "✧"],
     vibe: "night",
+  },
+  {
+    id: "pearl-locket",
+    title: "Pearl Locket",
+    blurb: "A soft keepsake for your love",
+    emoji: "🤍",
+    occasion: "love",
+    pageBg: "linear-gradient(165deg,#f3e8f4 0%,#fff8fb 50%,#efe4f0 100%)",
+    cardBg: "#fffbfe",
+    border: "#c9a0b8",
+    accent: "#8a5070",
+    ink: "#3d2a35",
+    muted: "#7a5a68",
+    badge: "always yours",
+    sparkles: ["🤍", "✨", "💍"],
+    vibe: "soft",
+  },
+  {
+    id: "daisy-duo",
+    title: "Daisy Duo",
+    blurb: "Sunshine for your favourite person",
+    emoji: "🌼",
+    occasion: "friendship",
+    pageBg: "linear-gradient(160deg,#fff6d8 0%,#f5f9ec 50%,#e4f0d4 100%)",
+    cardBg: "#fffcf5",
+    border: "#c4b06a",
+    accent: "#6f8a45",
+    ink: "#2f3a22",
+    muted: "#5f6f48",
+    badge: "friends forever",
+    sparkles: ["🌼", "☀️", "💛"],
+    vibe: "garden",
+  },
+  {
+    id: "ivory-veil",
+    title: "Ivory Veil",
+    blurb: "Soft blooms for the big day",
+    emoji: "👰",
+    occasion: "wedding",
+    pageBg: "linear-gradient(160deg,#f7f1e8 0%,#fffcf7 55%,#efe6d8 100%)",
+    cardBg: "#fffcf8",
+    border: "#d4c0a0",
+    accent: "#8b7355",
+    ink: "#3d3228",
+    muted: "#7a6a58",
+    badge: "two become one",
+    sparkles: ["💐", "✨", "🕊️"],
+    vibe: "soft",
   },
 ];
 

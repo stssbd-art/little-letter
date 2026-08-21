@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito, Quicksand, Press_Start_2P } from "next/font/google";
+import { Nunito, Quicksand, Press_Start_2P, Great_Vibes } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { AnimatedBackground } from "@/components/decorations/AnimatedBackground";
 import { Header } from "@/components/layout/Header";
@@ -31,6 +31,13 @@ const quicksand = Quicksand({
 
 const pressStart = Press_Start_2P({
   variable: "--font-pixel",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const greatVibes = Great_Vibes({
+  variable: "--font-script",
   weight: "400",
   subsets: ["latin"],
   display: "swap",
@@ -134,7 +141,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${nunito.variable} ${quicksand.variable} ${pressStart.variable} antialiased`}
+        className={`${nunito.variable} ${quicksand.variable} ${pressStart.variable} ${greatVibes.variable} antialiased`}
       >
         <script
           type="application/ld+json"

@@ -345,6 +345,9 @@ function cardEmailDecor(design: CardDesign): { hero: string; row: string } {
     "tie-dad": { hero: "👔", row: "👔 ⭐ ☕ 👔" },
     "honey-classic": { hero: "💌", row: "✨ ☁️ ⭐ ✨" },
     "moon-whisper": { hero: "🌙", row: "🌙 ⭐ ✨ 🌙" },
+    "pearl-locket": { hero: "🤍", row: "🤍 ✨ 💍 🤍" },
+    "daisy-duo": { hero: "🌼", row: "🌼 ☀️ 💛 🌼" },
+    "ivory-veil": { hero: "👰", row: "💐 ✨ 🕊️ 💐" },
   };
   return byId[design.id] ?? { hero: "💌", row: "✨ 💌 ⭐ ✨" };
 }
@@ -504,13 +507,13 @@ export function buildLetterEmailHtml(
               <p style="margin:0;font-size:11px;letter-spacing:1.5px;color:${design.accent};text-transform:uppercase;">
                 Digital card
               </p>
-              <div style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:${design.accent};margin-top:10px;font-weight:bold;line-height:1.25;">
+              <div style="font-family:'Great Vibes',cursive,Georgia,'Times New Roman',serif;font-size:26px;color:${design.accent};margin-top:10px;font-weight:normal;line-height:1.25;">
                 ${escapeHtml(design.title)}
               </div>
-              <p style="margin:14px 0 0;font-size:15px;color:${design.ink};line-height:1.5;">
+              <p style="margin:14px 0 0;font-size:13px;color:${design.ink};line-height:1.5;font-family:Georgia,serif;font-style:italic;">
                 ${escapeHtml(letter.form.senderName)} sent you a card
               </p>
-              <p style="margin:6px 0 0;font-size:13px;color:${design.muted};">
+              <p style="margin:6px 0 0;font-size:12px;color:${design.muted};font-family:Georgia,serif;font-style:italic;">
                 For ${escapeHtml(letter.form.recipientName)}
               </p>
               <p style="margin:16px 0 0;font-size:14px;color:${design.muted};line-height:1.55;">
@@ -548,17 +551,17 @@ export function buildLetterEmailHtml(
           </tr>
           <tr>
             <td style="padding:22px 24px;background:${design.cardBg};">
-              <h1 style="margin:0 0 6px;font-size:20px;color:${design.accent};font-family:Georgia,serif;">
+              <h1 style="margin:0 0 6px;font-size:22px;color:${design.accent};font-family:'Great Vibes',cursive,Georgia,serif;font-weight:normal;">
                 ${safeSubject}
               </h1>
-              <p style="margin:0 0 16px;font-size:13px;color:${design.muted};">
+              <p style="margin:0 0 16px;font-size:12px;color:${design.muted};font-family:Georgia,serif;font-style:italic;">
                 For ${escapeHtml(letter.form.recipientName)}
               </p>
-              <div style="font-size:15px;line-height:1.75;color:${design.ink};border-top:2px dashed ${design.border};padding-top:16px;font-family:Georgia,'Times New Roman',serif;">
+              <div style="font-size:13px;line-height:1.85;color:${design.ink};border-top:2px dashed ${design.border};padding-top:16px;font-family:Georgia,'Times New Roman',serif;font-style:italic;">
                 ${safeMessage}
               </div>
               ${hasVoiceNote ? voiceNoteHtml() : ""}
-              <p style="margin:20px 0 0;text-align:right;font-family:Georgia,serif;font-size:15px;color:${design.accent};">
+              <p style="margin:20px 0 0;text-align:right;font-family:'Great Vibes',cursive,Georgia,serif;font-size:18px;color:${design.accent};">
                 — ${escapeHtml(letter.form.senderName)}
               </p>
             </td>
@@ -613,6 +616,7 @@ export function buildLetterEmailHtml(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(letter.subject)}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet" />
 </head>
 <body style="margin:0;padding:0;background:#faf4e8;font-family:'Trebuchet MS',Verdana,sans-serif;color:${theme.bodyInk};">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
