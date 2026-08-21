@@ -3,15 +3,19 @@ import { sendLetterEmail } from "@/lib/resend";
 import type { GeneratedLetter } from "@/types";
 import {
   consumeSendAccess,
+  consumeCardSendAccess,
   FREE_LETTERS,
   getSendAccess,
+  getCardSendAccess,
   isValidSenderEmail,
   LETTER_PRICE_LABEL,
+  CARD_PRICE_LABEL,
   normalizeSenderEmail,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
 import { addLetterExample } from "@/lib/shared-examples";
 import { parseVoiceNote } from "@/lib/voice-note";
+import { isCardDesignId } from "@/lib/card-designs";
 
 export const dynamic = "force-dynamic";
 
@@ -46,16 +50,20 @@ export async function POST(request: Request) {
     }
 
     const senderEmail = normalizeSenderEmail(body.form.senderEmail);
-    const access = await getSendAccess(senderEmail);
+    const isCard = Boolean(
+      body.form.cardDesign && isCardDesignId(body.form.cardDesign)
+    );
+    const access = isCard
+      ? await getCardSendAccess(senderEmail)
+      : await getSendAccess(senderEmail);
     if (!access.allowed) {
-      const isCard = Boolean(body.form.cardDesign);
       return NextResponse.json(
         {
           error: isCard
-            ? `Your first ${FREE_LETTERS} cards or letters are free. Extra cards are ${LETTER_PRICE_LABEL} each.`
+            ? `E-cards are ${CARD_PRICE_LABEL} each — there is no free card allowance.`
             : `Your first ${FREE_LETTERS} letters are free. Extra letters are ${LETTER_PRICE_LABEL} each.`,
           requiresPayment: true,
-          price: LETTER_PRICE_LABEL,
+          price: isCard ? CARD_PRICE_LABEL : LETTER_PRICE_LABEL,
           stripeConfigured: isStripeConfigured(),
         },
         { status: 402 }
@@ -82,7 +90,9 @@ export async function POST(request: Request) {
       );
     }
     const result = await sendLetterEmail(letter, voiceNote);
-    const usage = await consumeSendAccess(senderEmail);
+    const usage = isCard
+      ? await consumeCardSendAccess(senderEmail)
+      : await consumeSendAccess(senderEmail);
 
     if (body.shareExample) {
       try {

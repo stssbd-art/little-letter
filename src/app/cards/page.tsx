@@ -8,7 +8,7 @@ import { CARD_DESIGNS } from "@/lib/card-designs";
 export const metadata: Metadata = {
   title: "Send a Digital Greeting Card Online",
   description:
-    "Browse animated digital greeting cards for birthdays, love, thank you, weddings, and more — pick a design, personalise, and email it. First two free · then £0.99.",
+    "Browse animated digital greeting cards for birthdays, love, thank you, weddings, and more — pick a design, personalise, and email it. £1.25 per card.",
   keywords: [
     "send a card online",
     "digital greeting card",
@@ -46,7 +46,7 @@ export default function CardsPage() {
 
       <PageHeader title="Send an e-card">
         Illustrated digital greeting cards — pick a design, write a wish, email
-        it. Flip-open covers · first two free · then £0.99.
+        it. Flip-open covers · £1.25 per card.
       </PageHeader>
 
       <PixelWindow title="card_gallery.exe" icon="🎴">

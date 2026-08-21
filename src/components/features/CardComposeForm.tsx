@@ -168,7 +168,7 @@ export function CardComposeForm({ designId }: Props) {
           <form onSubmit={onSubmit} className="space-y-4">
             <p className="text-sm text-[var(--ll-muted)]">
               {design.blurb}. Fill in the details, then preview &amp; send —
-              same free/paid rules as letters (first two free · then £0.99).
+              each e-card is £1.25 (no free card allowance).
               They’ll get an email with a button to open the animated card on
               the website.
             </p>

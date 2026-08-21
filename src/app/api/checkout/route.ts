@@ -4,6 +4,7 @@ import {
   isDemoMode,
   isValidSenderEmail,
   LETTER_PRICE_LABEL,
+  CARD_PRICE_LABEL,
   mixtapePrice,
   normalizeSenderEmail,
   type CheckoutKind,
@@ -56,6 +57,8 @@ export async function POST(request: Request) {
       }
       if (body?.kind === "mixtape" || returnPath === "/mixtape") {
         kind = "mixtape";
+      } else if (body?.kind === "card") {
+        kind = "card";
       }
       if (typeof body?.trackCount === "number" && body.trackCount > 0) {
         trackCount = Math.floor(body.trackCount);
@@ -94,7 +97,9 @@ export async function POST(request: Request) {
     const price =
       kind === "mixtape"
         ? mixtapePrice(trackCount).label
-        : LETTER_PRICE_LABEL;
+        : kind === "card"
+          ? CARD_PRICE_LABEL
+          : LETTER_PRICE_LABEL;
 
     return NextResponse.json({
       url: session.url,

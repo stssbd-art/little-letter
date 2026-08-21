@@ -187,6 +187,18 @@ export async function consumeLetterForEmail(emailRaw: string) {
   return current;
 }
 
+/** E-cards: paid credit only — never the letter free allowance. */
+export async function consumeCardForEmail(emailRaw: string) {
+  const current = (await readSenderUsage(emailRaw)) ?? emptyRecord();
+  if (current.letterCredits > 0) {
+    current.letterCredits -= 1;
+  } else {
+    throw new Error("No card send credit available for this email.");
+  }
+  await writeSenderUsage(emailRaw, current);
+  return current;
+}
+
 export async function consumeMixtapeForEmail(emailRaw: string) {
   const current = (await readSenderUsage(emailRaw)) ?? emptyRecord();
   if (current.mixFreeUsed < FREE_MIXTAPES) {
@@ -203,7 +215,7 @@ export async function consumeMixtapeForEmail(emailRaw: string) {
 export async function addPaidCreditForEmail(
   emailRaw: string,
   sessionId: string,
-  kind: "letter" | "mixtape"
+  kind: "letter" | "mixtape" | "card"
 ) {
   const current = (await readSenderUsage(emailRaw)) ?? emptyRecord();
   if (current.usedSessionIds.includes(sessionId)) {

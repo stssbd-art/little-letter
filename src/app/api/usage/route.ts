@@ -4,9 +4,11 @@ import {
   addPaidCredit,
   FREE_LETTERS,
   FREE_MIXTAPES,
+  FREE_CARDS,
   isDemoMode,
   isValidSenderEmail,
   LETTER_PRICE_LABEL,
+  CARD_PRICE_LABEL,
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
   mixtapePrice,
@@ -50,6 +52,23 @@ export async function GET(request: Request) {
     });
   }
 
+  if (kind === "card") {
+    const freeLeft = 0;
+    const freeAvailable = demo;
+    const canSend = demo || usage.letterCredits > 0;
+
+    return NextResponse.json({
+      demo,
+      freeAvailable,
+      freeLeft,
+      freeTotal: FREE_CARDS,
+      credits: usage.letterCredits,
+      canSend,
+      price: CARD_PRICE_LABEL,
+      trackedByEmail: Boolean(senderEmail),
+    });
+  }
+
   const freeLeft = demo
     ? FREE_LETTERS
     : Math.max(0, FREE_LETTERS - usage.letterFreeUsed);
@@ -88,9 +107,12 @@ export async function POST(request: Request) {
     }
 
     const { session } = await verifyPaidCheckoutSession(sessionId);
-    const kind = (session.metadata?.kind === "mixtape"
+    const metaKind = session.metadata?.kind;
+    const kind = (metaKind === "mixtape"
       ? "mixtape"
-      : "letter") as CheckoutKind;
+      : metaKind === "card"
+        ? "card"
+        : "letter") as CheckoutKind;
     const metaEmail = session.metadata?.senderEmail?.trim() || "";
     const bodyEmail = body.senderEmail?.trim() || "";
     const senderEmail = isValidSenderEmail(metaEmail)
@@ -111,7 +133,9 @@ export async function POST(request: Request) {
       price:
         kind === "mixtape"
           ? session.metadata?.priceLabel ?? MIX_MULTI_SONG_LABEL
-          : LETTER_PRICE_LABEL,
+          : kind === "card"
+            ? session.metadata?.priceLabel ?? CARD_PRICE_LABEL
+            : LETTER_PRICE_LABEL,
       trackedByEmail: Boolean(senderEmail),
     });
   } catch (err) {

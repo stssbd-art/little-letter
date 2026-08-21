@@ -3,6 +3,8 @@ import { SITE_URL } from "@/lib/constants";
 import {
   LETTER_PRICE_LABEL,
   LETTER_PRICE_PENCE,
+  CARD_PRICE_LABEL,
+  CARD_PRICE_PENCE,
   mixtapePrice,
   type CheckoutKind,
 } from "@/lib/usage";
@@ -29,7 +31,12 @@ export async function createSendCheckoutSession(opts: {
     throw new Error("Stripe is not configured yet.");
   }
 
-  const kind: CheckoutKind = opts.kind === "mixtape" ? "mixtape" : "letter";
+  const kind: CheckoutKind =
+    opts.kind === "mixtape"
+      ? "mixtape"
+      : opts.kind === "card"
+        ? "card"
+        : "letter";
   const returnPath = opts.returnPath ?? "/preview";
   const base = SITE_URL;
   const safePath = returnPath.startsWith("/") ? returnPath : `/${returnPath}`;
@@ -46,12 +53,19 @@ export async function createSendCheckoutSession(opts: {
           name: mix.name,
           description: mix.description,
         }
-      : {
-          pence: LETTER_PRICE_PENCE,
-          label: LETTER_PRICE_LABEL,
-          name: "Little Letter send",
-          description: "Send one extra little letter by email",
-        };
+      : kind === "card"
+        ? {
+            pence: CARD_PRICE_PENCE,
+            label: CARD_PRICE_LABEL,
+            name: "Little Letter e-card",
+            description: "Send one digital greeting card by email",
+          }
+        : {
+            pence: LETTER_PRICE_PENCE,
+            label: LETTER_PRICE_LABEL,
+            name: "Little Letter send",
+            description: "Send one extra little letter by email",
+          };
 
   return stripe.checkout.sessions.create({
     mode: "payment",
@@ -73,7 +87,12 @@ export async function createSendCheckoutSession(opts: {
     ],
     metadata: {
       clientId: opts.clientId ?? "browser",
-      product: kind === "mixtape" ? "little-letter-mixtape" : "little-letter-send",
+      product:
+        kind === "mixtape"
+          ? "little-letter-mixtape"
+          : kind === "card"
+            ? "little-letter-card"
+            : "little-letter-send",
       kind,
       trackCount: String(kind === "mixtape" ? trackCount : 0),
       priceLabel: product.label,
