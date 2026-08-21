@@ -137,12 +137,16 @@ export function AffiliateSideSlide() {
   const stories = AFFILIATE_OFFERS.find((o) => o.id === "social-stories");
   const deanMorris = AFFILIATE_OFFERS.find((o) => o.id === "dean-morris");
   const vintageWine = AFFILIATE_OFFERS.find((o) => o.id === "vintage-wine");
+  const brickZone = AFFILIATE_OFFERS.find((o) => o.id === "brick-zone");
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted || (!cadbury && !stories && !deanMorris && !vintageWine)) {
+  if (
+    !mounted ||
+    (!cadbury && !stories && !deanMorris && !vintageWine && !brickZone)
+  ) {
     return null;
   }
 
@@ -151,7 +155,7 @@ export function AffiliateSideSlide() {
       {cadbury ? (
         <OneSideSlide
           offer={cadbury}
-          top="22%"
+          top="18%"
           tabLabel="CHOCS"
           tabClassName="border-[#6b3a2a] bg-gradient-to-b from-[#8b4a32] to-[#4a2018]"
         />
@@ -159,7 +163,7 @@ export function AffiliateSideSlide() {
       {deanMorris ? (
         <OneSideSlide
           offer={deanMorris}
-          top="40%"
+          top="34%"
           tabLabel="CARDS"
           tabClassName="border-[#4a5a7a] bg-gradient-to-b from-[#5a6a88] to-[#2a3548]"
         />
@@ -167,7 +171,7 @@ export function AffiliateSideSlide() {
       {stories ? (
         <OneSideSlide
           offer={stories}
-          top="58%"
+          top="50%"
           tabLabel="BOOKS"
           tabClassName="border-[#7a4a5a] bg-gradient-to-b from-[#8a4a5a] to-[#4a2030]"
         />
@@ -175,9 +179,17 @@ export function AffiliateSideSlide() {
       {vintageWine ? (
         <OneSideSlide
           offer={vintageWine}
-          top="76%"
+          top="66%"
           tabLabel="WINE"
           tabClassName="border-[#5a2a3a] bg-gradient-to-b from-[#7a3040] to-[#3a1520]"
+        />
+      ) : null}
+      {brickZone ? (
+        <OneSideSlide
+          offer={brickZone}
+          top="82%"
+          tabLabel="BRICKS"
+          tabClassName="border-[#3a6a4a] bg-gradient-to-b from-[#3a7a4a] to-[#1a3a28]"
         />
       ) : null}
     </>,

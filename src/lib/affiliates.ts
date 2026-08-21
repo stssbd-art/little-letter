@@ -105,6 +105,22 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       ctaBg: "bg-[#f0d8e0]/15 group-hover:bg-[#f0d8e0]/25",
     },
   },
+  {
+    id: "brick-zone",
+    href: "https://www.awin1.com/cread.php?awinmid=121692&awinaffid=3048693&ued=https%3A%2F%2Fbrickzonehub.co.uk%2F",
+    label: "Brick Zone Hub",
+    blurb: "Building bricks & creative play sets — shop Brick Zone Hub",
+    emoji: "🧱",
+    tone: {
+      border: "border-[#3a6a4a]/40",
+      bg: "bg-gradient-to-r from-[#1a3a28] via-[#2a5a3a] to-[#3a7a4a]",
+      iconBg: "bg-[#e8f8ec]",
+      muted: "text-[#d0f0d8]/85",
+      title: "text-[#f4fff6]",
+      ctaBorder: "border-[#d0f0d8]/35",
+      ctaBg: "bg-[#d0f0d8]/15 group-hover:bg-[#d0f0d8]/25",
+    },
+  },
 ];
 
 /** Desktop right-edge slides. */
@@ -113,7 +129,8 @@ export const SIDE_SLIDE_OFFERS = AFFILIATE_OFFERS.filter(
     o.id === "cadbury" ||
     o.id === "social-stories" ||
     o.id === "dean-morris" ||
-    o.id === "vintage-wine"
+    o.id === "vintage-wine" ||
+    o.id === "brick-zone"
 );
 
 /** Offers shown in the footer banners (side-only exclusives stay out). */
@@ -121,5 +138,6 @@ export const FOOTER_AFFILIATE_OFFERS = AFFILIATE_OFFERS.filter(
   (o) =>
     o.id !== "social-stories" &&
     o.id !== "dean-morris" &&
-    o.id !== "vintage-wine"
+    o.id !== "vintage-wine" &&
+    o.id !== "brick-zone"
 );
