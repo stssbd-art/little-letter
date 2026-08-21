@@ -11,7 +11,7 @@ import { FortuneCookie } from "@/components/features/FortuneCookie";
 import { VisitorCounter } from "@/components/features/VisitorCounter";
 import { TodaysMood } from "@/components/features/TodaysMood";
 import { Guestbook } from "@/components/features/Guestbook";
-import { SITE_TAGLINE } from "@/lib/constants";
+import { SITE_TAGLINE, SITE_TAGLINE_EXTRA } from "@/lib/constants";
 
 export function HomePage() {
   return (
@@ -21,14 +21,19 @@ export function HomePage() {
         <div className="mt-8">
           <Mascot />
         </div>
-        <motion.p
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-6 max-w-lg text-center font-display text-lg text-[var(--ll-muted)] sm:text-xl"
+          className="mt-6 max-w-xl space-y-3 text-center"
         >
-          {SITE_TAGLINE}
-        </motion.p>
+          <p className="font-display text-lg text-[var(--ll-ink)] sm:text-xl">
+            {SITE_TAGLINE}
+          </p>
+          <p className="font-display text-base text-[var(--ll-muted)] sm:text-lg">
+            {SITE_TAGLINE_EXTRA}
+          </p>
+        </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

@@ -2,7 +2,9 @@ import type { MessageStyle, Occasion, Relationship } from "@/types";
 
 export const SITE_NAME = "Little Letter";
 export const SITE_TAGLINE =
-  "Send a cute letter or romantic mixtape by email — cosy notes for someone you miss.";
+  "Send a sweet little letter or a romantic mixtape straight to their inbox. 💕";
+export const SITE_TAGLINE_EXTRA =
+  "Perfect for sharing cosy thoughts, sweet memories, and a little love with someone you miss. 🎶✨";
 export const SITE_DESCRIPTION =
   "Little Letter helps you send digital birthday cards, occasion wishes, personal letters, and romantic mixtapes by email. Write a warm message for birthdays, weddings, Valentine's, thank you notes, and more — or burn a cassette-style mix. First two letters free · then £0.70.";
 const DEFAULT_SITE_URL = "https://sendlittleletter.vercel.app";
