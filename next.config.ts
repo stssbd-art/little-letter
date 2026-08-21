@@ -25,11 +25,18 @@ const nextConfig: NextConfig = {
     "/api/**/*": ["./public/ecards/**/*"],
   },
   async redirects() {
-    return occasionRedirects.map(([source, destination]) => ({
-      source: `/${source}`,
-      destination: `/${destination}`,
-      permanent: true,
-    }));
+    return [
+      {
+        source: "/refunds",
+        destination: "/terms#refunds",
+        permanent: true,
+      },
+      ...occasionRedirects.map(([source, destination]) => ({
+        source: `/${source}`,
+        destination: `/${destination}`,
+        permanent: true,
+      })),
+    ];
   },
 };
 
