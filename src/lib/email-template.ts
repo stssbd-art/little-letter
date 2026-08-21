@@ -4,7 +4,6 @@ import { getTracksByIds } from "@/lib/tracks";
 import {
   getCardDesign,
   isCardDesignId,
-  type CardDesign,
 } from "@/lib/card-designs";
 
 function escapeHtml(text: string) {
