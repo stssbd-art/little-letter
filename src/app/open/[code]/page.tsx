@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
+    robots: { index: false, follow: false },
     openGraph: {
       title: `${design.emoji} A card for ${card.to}`,
       description: `From ${card.from} · ${design.title}`,

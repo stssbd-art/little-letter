@@ -17,7 +17,10 @@ export function HomePage() {
   return (
     <div className="space-y-14">
       <section className="relative flex min-h-[70vh] flex-col items-center justify-center text-center">
-        <h1 className="sr-only">{SITE_NAME}</h1>
+        <h1 className="sr-only">
+          {SITE_NAME} — send a letter, digital greeting card, or romantic
+          mixtape online by email
+        </h1>
         <Logo size="lg" />
         <div className="mt-8">
           <Mascot />

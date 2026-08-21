@@ -15,6 +15,28 @@ export const metadata: Metadata = {
     "email a love letter",
     "personal letter generator",
   ],
+  openGraph: {
+    title: "Create & Send a Letter Online — Little Letter",
+    description:
+      "Write a heartfelt birthday card, thank-you, or love letter and email it. First two letters free.",
+    url: "/create",
+    type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Create a Little Letter — send a personal letter by email",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Create & Send a Letter Online — Little Letter",
+    description:
+      "Write a heartfelt birthday card, thank-you, or love letter and email it. First two letters free.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function CreatePage() {

@@ -24,6 +24,21 @@ export const metadata: Metadata = {
       "Pick from animated card designs and email a personal wish — like a cosy e-card site.",
     url: "/cards",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Browse digital greeting cards on Little Letter",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Digital Greeting Cards — Little Letter",
+    description:
+      "Pick from animated card designs and email a personal wish — £1.25 per card.",
+    images: ["/opengraph-image"],
   },
 };
 

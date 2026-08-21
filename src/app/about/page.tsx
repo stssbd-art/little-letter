@@ -9,8 +9,23 @@ import { CONTACT_EMAIL } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "About — Send Letters & Mixtapes Online",
   description:
-    "Little Letter is a nostalgic place to send warm email letters and romantic mixtapes that feel handmade.",
+    "Little Letter is a nostalgic place to send warm email letters, digital greeting cards, and romantic mixtapes that feel handmade.",
   alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About Little Letter",
+    description:
+      "A nostalgic place to send warm email letters, digital cards, and romantic mixtapes.",
+    url: "/about",
+    type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "About Little Letter — send letters and mixtapes online",
+      },
+    ],
+  },
 };
 
 const REASONS = [

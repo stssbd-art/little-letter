@@ -39,6 +39,8 @@ export function Mascot({ className = "" }: { className?: string }) {
       className={`relative inline-flex flex-col items-center ${className}`}
       animate={{ y: [0, -8, 0] }}
       transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+      role="img"
+      aria-label="Pip the Envelope, Little Letter’s friendly mascot"
     >
       <div
         className="relative flex h-28 w-28 items-center justify-center rounded-[28px] border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f6d58a] shadow-[6px_6px_0_var(--ll-pink-shadow)] dark:from-[#5c3d1e] dark:to-[#3d2f22]"
@@ -62,7 +64,7 @@ export function Mascot({ className = "" }: { className?: string }) {
           ⭐
         </motion.div>
       </div>
-      <p className="mt-3 font-pixel text-[9px] text-[var(--ll-muted)]">
+      <p className="mt-3 font-pixel text-[9px] text-[var(--ll-muted)]" aria-hidden>
         Pip the Envelope
       </p>
     </motion.div>

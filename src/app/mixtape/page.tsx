@@ -16,6 +16,28 @@ export const metadata: Metadata = {
     "digital cassette mixtape",
     "send love songs by email",
   ],
+  openGraph: {
+    title: "Send a Romantic Mixtape Online — Little Letter",
+    description:
+      "Burn a cassette-style mixtape, add a dedication, and email it. First mixtape free.",
+    url: "/mixtape",
+    type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Send a romantic mixtape online with Little Letter",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Send a Romantic Mixtape Online — Little Letter",
+    description:
+      "Burn a cassette-style mixtape, add a dedication, and email it. First mixtape free.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function MixtapePage() {

@@ -8,8 +8,15 @@ import { CONTACT_EMAIL } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "FAQ — Sending Letters & Mixtapes",
   description:
-    "How to send a letter or mixtape online with Little Letter, pricing, email delivery, and more.",
+    "How to send a letter, digital greeting card, or mixtape online with Little Letter — pricing, email delivery, and more.",
   alternates: { canonical: "/faq" },
+  openGraph: {
+    title: "FAQ — Little Letter",
+    description:
+      "Pricing, free allowances, email delivery, and how to send letters, cards, and mixtapes.",
+    url: "/faq",
+    type: "website",
+  },
 };
 
 const FAQS = [

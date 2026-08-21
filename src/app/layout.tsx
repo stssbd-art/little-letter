@@ -8,10 +8,10 @@ import { EndPageAdGate } from "@/components/ads/EndPageAdGate";
 import { AffiliateBanner } from "@/components/ads/AffiliateBanner";
 import { AffiliateSideSlide } from "@/components/ads/AffiliateSideSlide";
 import {
+  CONTACT_EMAIL,
   SEO_KEYWORDS,
   SITE_DESCRIPTION,
   SITE_NAME,
-  SITE_TAGLINE,
   SITE_URL,
 } from "@/lib/constants";
 import { getAdsenseClientId } from "@/lib/adsense";
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} — Send a Letter or Mixtape Online`,
-    description: SITE_TAGLINE,
+    description: SITE_DESCRIPTION,
     images: ["/opengraph-image"],
   },
   robots: {
@@ -125,24 +125,50 @@ export const viewport: Viewport = {
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: SITE_NAME,
-  url: SITE_URL,
-  description: SITE_DESCRIPTION,
-  applicationCategory: "LifestyleApplication",
-  operatingSystem: "Web",
-  offers: {
-    "@type": "Offer",
-    price: "0.00",
-    priceCurrency: "GBP",
-    description:
-      "First two letters free, then £0.70. First mixtape free, then £0.99 for 1 song or £1.20 for 2+ songs.",
-  },
-  featureList: [
-    "Send a personal letter by email",
-    "Send a romantic mixtape by email",
-    "Cute retro letter design",
-    "Cassette-style mixtape player",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/opengraph-image`,
+      description: SITE_DESCRIPTION,
+      email: CONTACT_EMAIL,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      inLanguage: "en-GB",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+    {
+      "@type": "WebApplication",
+      "@id": `${SITE_URL}/#app`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      applicationCategory: "LifestyleApplication",
+      operatingSystem: "Web",
+      inLanguage: "en-GB",
+      isPartOf: { "@id": `${SITE_URL}/#website` },
+      offers: {
+        "@type": "Offer",
+        price: "0.00",
+        priceCurrency: "GBP",
+        description:
+          "First two letters free, then £0.70. First mixtape free, then £0.99 for 1 song or £1.20 for 2+ songs. Digital greeting cards £1.25 each.",
+      },
+      featureList: [
+        "Send a personal letter by email",
+        "Send a digital greeting card by email",
+        "Send a romantic mixtape by email",
+        "Cute retro letter design",
+        "Cassette-style mixtape player",
+      ],
+    },
   ],
 };
 
@@ -152,7 +178,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-GB" suppressHydrationWarning>
       <body
         className={`${nunito.variable} ${quicksand.variable} ${pressStart.variable} ${greatVibes.variable} antialiased`}
       >

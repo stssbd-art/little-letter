@@ -84,6 +84,7 @@ export function CardsGallery() {
                 href={`/cards/${design.id}`}
                 onClick={() => play("click")}
                 className="group block rounded-2xl outline-offset-4 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ll-pink-deep)]"
+                aria-label={`Personalise and send ${design.title} digital greeting card`}
               >
                 <GreetingCard designId={design.id} compact />
                 <div className="mt-2.5 flex items-start justify-between gap-2 px-1">

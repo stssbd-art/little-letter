@@ -38,12 +38,15 @@ export const SEO_KEYWORDS = [
   "e-card",
   "send a letter online",
   "send mixtape online",
+  "email a letter",
+  "online greeting card",
   "valentines day card",
   "mothers day card",
   "thank you card online",
   "wedding congratulations card",
   "send love letter online",
   "personal email letter",
+  "romantic mixtape",
   "little letter",
 ];
 

@@ -64,6 +64,8 @@ function CardCover({
         background: design.cardBg,
         color: design.ink,
       }}
+      role="img"
+      aria-label={`${design.title} greeting card cover — ${design.blurb}`}
     >
       <div className="relative h-[58%] w-full overflow-hidden">
         <CardSceneArt

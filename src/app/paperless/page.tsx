@@ -6,8 +6,15 @@ import { PageHeader } from "@/components/layout/PageHeader";
 export const metadata: Metadata = {
   title: "Paperless Wishes — Care for the Planet",
   description:
-    "Little Letter spreads paperless wishes — warm digital letters and mixtapes that are softer on the planet than printed cards.",
+    "Little Letter spreads paperless wishes — warm digital letters, greeting cards, and mixtapes that are softer on the planet than printed cards.",
   alternates: { canonical: "/paperless" },
+  openGraph: {
+    title: "Paperless Wishes — Little Letter",
+    description:
+      "Send warm digital letters and mixtapes that are softer on the planet than printed cards.",
+    url: "/paperless",
+    type: "website",
+  },
 };
 
 export default function PaperlessPage() {

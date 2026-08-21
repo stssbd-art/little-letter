@@ -25,6 +25,21 @@ export const metadata: Metadata = {
       "Digital birthday cards, love notes, thank you messages, and more — sent by email.",
     url: "/occasions",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Occasion cards and wishes — Little Letter",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Occasion Cards & Wishes — Little Letter",
+    description:
+      "Digital birthday cards, love notes, thank you messages, and more — sent by email.",
+    images: ["/opengraph-image"],
   },
 };
 
