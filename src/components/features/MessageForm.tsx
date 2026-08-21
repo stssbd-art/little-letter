@@ -27,6 +27,16 @@ export function MessageForm() {
   const [phase, setPhase] = useState<Phase>("form");
   const [error, setError] = useState("");
   const restoredDraft = useRef(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  function scrollLetterIntoView() {
+    // Keep the letter / sealing animation at the top — don't leave the viewport
+    // stuck at the old Generate button after the tall form collapses.
+    const el = rootRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 88;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  }
 
   useEffect(() => {
     const fromUrl = searchParams.get("occasion");
@@ -43,6 +53,12 @@ export function MessageForm() {
       setPhase("draft");
     }
   }, [letter, phase]);
+
+  useEffect(() => {
+    if (phase === "closing" || phase === "draft") {
+      scrollLetterIntoView();
+    }
+  }, [phase]);
 
   const writeMode: LetterWriteMode = form.writeMode === "own" ? "own" : "ai";
 
@@ -159,7 +175,7 @@ export function MessageForm() {
   }
 
   return (
-    <div className="space-y-5">
+    <div ref={rootRef} className="scroll-mt-24 space-y-5">
       <PixelWindow title="create_message.exe" icon="✍️" liftOnHover={false}>
         <AnimatePresence mode="wait">
           {phase === "form" ? (
