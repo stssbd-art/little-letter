@@ -79,7 +79,7 @@ function withLeadingEmoji(emoji: string, subject: string) {
   const trimmed = subject.trim();
   if (trimmed.startsWith(emoji)) return trimmed.slice(0, 120);
   // Avoid stacking if the subject already starts with one of our type emojis
-  const stripped = trimmed.replace(/^[💌✉️💝📼]\s*/u, "");
+  const stripped = trimmed.replace(/^[💌✉️💝📼🎴]\s*/u, "");
   return `${emoji} ${stripped || trimmed}`.slice(0, 120);
 }
 
@@ -87,7 +87,7 @@ function letterSubject(letter: GeneratedLetter) {
   const custom = letter.subject?.trim();
   if (letter.form.cardDesign) {
     const base = custom || `${letter.form.senderName} sent you a card`;
-    return withLeadingEmoji("💌", base);
+    return withLeadingEmoji("🎴", base);
   }
   const base = custom || `A little letter for ${letter.form.recipientName}`;
   return withLeadingEmoji("✉️", base);
