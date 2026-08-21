@@ -32,7 +32,7 @@ const SECTIONS = [
   },
   {
     title: "Third-party services",
-    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Ads may be shown by Google AdSense. Visit counts may be measured with Google Analytics. Affiliate tracking may use Awin (publisher ID 3048693). We may show sponsored affiliate links to brands such as Cadbury Gifts Direct, Social Stories Club, and Happy Days Factory; those partners and Awin have their own privacy policies.`,
+    body: `Email may be sent through Gmail or another configured provider. Music previews may load through YouTube. Ads may be shown by Google AdSense. Visit counts may be measured with Google Analytics. Affiliate tracking may use Awin (publisher ID 3048693). We may show sponsored affiliate links to brands such as Cadbury Gifts Direct, Social Stories Club, Dean Morris Cards, and Happy Days Factory; those partners and Awin have their own privacy policies.`,
   },
   {
     title: "Guestbook",

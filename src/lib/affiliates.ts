@@ -73,14 +73,31 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       ctaBg: "bg-[#d8f0e0]/15 group-hover:bg-[#d8f0e0]/25",
     },
   },
+  {
+    id: "dean-morris",
+    href: "https://www.awin1.com/cread.php?awinmid=28517&awinaffid=3048693&ued=https%3A%2F%2Fdeanmorriscards.co.uk%2F",
+    label: "Dean Morris Cards",
+    blurb: "Funny, heartfelt greeting cards — shop Dean Morris Cards",
+    emoji: "🃏",
+    tone: {
+      border: "border-[#4a5a7a]/40",
+      bg: "bg-gradient-to-r from-[#2a3548] via-[#3d4a68] to-[#5a6a88]",
+      iconBg: "bg-[#e8eef8]",
+      muted: "text-[#d8e4f8]/85",
+      title: "text-[#f4f7ff]",
+      ctaBorder: "border-[#d8e4f8]/35",
+      ctaBg: "bg-[#d8e4f8]/15 group-hover:bg-[#d8e4f8]/25",
+    },
+  },
 ];
 
-/** Cadbury + Social Stories each get their own side slide (not stacked in one panel). */
+/** Desktop right-edge slides (Cadbury, Social Stories, Dean Morris). */
 export const SIDE_SLIDE_OFFERS = AFFILIATE_OFFERS.filter(
-  (o) => o.id === "cadbury" || o.id === "social-stories"
+  (o) =>
+    o.id === "cadbury" || o.id === "social-stories" || o.id === "dean-morris"
 );
 
-/** Offers shown in the footer banners (side-slide exclusives stay out). */
+/** Offers shown in the footer banners (side-only exclusives stay out). */
 export const FOOTER_AFFILIATE_OFFERS = AFFILIATE_OFFERS.filter(
-  (o) => o.id !== "social-stories"
+  (o) => o.id !== "social-stories" && o.id !== "dean-morris"
 );

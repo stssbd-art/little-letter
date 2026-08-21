@@ -130,32 +130,41 @@ function OneSideSlide({
   );
 }
 
-/** Desktop-only right-edge slides (Cadbury + Social Stories). Mobile uses footer banners. */
+/** Desktop-only right-edge slides. Mobile uses footer banners. */
 export function AffiliateSideSlide() {
   const [mounted, setMounted] = useState(false);
   const cadbury = AFFILIATE_OFFERS.find((o) => o.id === "cadbury");
   const stories = AFFILIATE_OFFERS.find((o) => o.id === "social-stories");
+  const deanMorris = AFFILIATE_OFFERS.find((o) => o.id === "dean-morris");
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted || (!cadbury && !stories)) return null;
+  if (!mounted || (!cadbury && !stories && !deanMorris)) return null;
 
   return createPortal(
     <>
       {cadbury ? (
         <OneSideSlide
           offer={cadbury}
-          top="36%"
+          top="28%"
           tabLabel="CHOCS"
           tabClassName="border-[#6b3a2a] bg-gradient-to-b from-[#8b4a32] to-[#4a2018]"
+        />
+      ) : null}
+      {deanMorris ? (
+        <OneSideSlide
+          offer={deanMorris}
+          top="50%"
+          tabLabel="CARDS"
+          tabClassName="border-[#4a5a7a] bg-gradient-to-b from-[#5a6a88] to-[#2a3548]"
         />
       ) : null}
       {stories ? (
         <OneSideSlide
           offer={stories}
-          top="64%"
+          top="72%"
           tabLabel="BOOKS"
           tabClassName="border-[#7a4a5a] bg-gradient-to-b from-[#8a4a5a] to-[#4a2030]"
         />
