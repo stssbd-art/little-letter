@@ -16,6 +16,7 @@ type Props = {
   className?: string;
   compact?: boolean;
   defaultOpen?: boolean;
+  /** When true, cover opens on its own after a short delay. Off by default. */
   autoOpen?: boolean;
 };
 
@@ -40,6 +41,9 @@ function Shimmer({ night }: { night?: boolean }) {
   );
 }
 
+const coverShadow = (border: string) =>
+  `8px 10px 0 ${border}55, 0 22px 36px rgba(61,47,34,0.22), inset 0 1px 0 rgba(255,255,255,0.35)`;
+
 function CardCover({
   design,
   compact,
@@ -53,17 +57,16 @@ function CardCover({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[1.35rem] border-[3px]",
+        "relative overflow-hidden rounded-[1.25rem] border-[4px]",
         compact ? "aspect-[3/4]" : "h-full w-full"
       )}
       style={{
         borderColor: design.border,
-        boxShadow: `6px 8px 0 ${design.border}44, 0 18px 40px rgba(61,47,34,0.14)`,
+        boxShadow: coverShadow(design.border),
         background: design.cardBg,
         color: design.ink,
       }}
     >
-      {/* Scene art — top ~60% */}
       <div className="relative h-[58%] w-full overflow-hidden">
         <CardSceneArt
           designId={design.id}
@@ -81,7 +84,6 @@ function CardCover({
         <Shimmer night={night} />
       </div>
 
-      {/* Title plate */}
       <div
         className={cn(
           "relative flex h-[42%] flex-col items-center justify-center px-4 text-center",
@@ -89,7 +91,6 @@ function CardCover({
         )}
         style={{ background: design.cardBg }}
       >
-        {/* Ribbon */}
         <div
           className={cn(
             "relative mb-2 inline-flex max-w-[95%] items-center justify-center px-4",
@@ -117,8 +118,8 @@ function CardCover({
           </svg>
           <span
             className={cn(
-              "relative z-[1] font-script italic text-white",
-              compact ? "text-sm" : "text-base"
+              "relative z-[1] font-display font-semibold tracking-wide text-white",
+              compact ? "text-xs" : "text-sm"
             )}
           >
             {design.badge}
@@ -127,8 +128,8 @@ function CardCover({
 
         <h3
           className={cn(
-            "font-script leading-tight",
-            compact ? "line-clamp-2 text-2xl" : "text-3xl sm:text-4xl"
+            "font-display font-bold leading-tight",
+            compact ? "line-clamp-2 text-xl" : "text-2xl sm:text-3xl"
           )}
           style={{ color: design.accent }}
         >
@@ -137,8 +138,8 @@ function CardCover({
 
         <p
           className={cn(
-            "mt-1.5 max-w-[16rem] font-script italic leading-snug",
-            compact ? "line-clamp-2 text-sm" : "text-base sm:text-lg"
+            "mt-1.5 max-w-[16rem] font-display leading-snug",
+            compact ? "line-clamp-2 text-xs" : "text-sm sm:text-base"
           )}
           style={{ color: design.muted }}
         >
@@ -146,9 +147,8 @@ function CardCover({
         </p>
       </div>
 
-      {/* Ornate outer frame hint */}
       <div
-        className="pointer-events-none absolute inset-2 rounded-[1.05rem] border"
+        className="pointer-events-none absolute inset-2 rounded-[0.9rem] border-2"
         style={{ borderColor: `${design.border}66` }}
         aria-hidden
       />
@@ -159,21 +159,21 @@ function CardCover({
 function CoverInside({ design }: { design: CardDesign }) {
   return (
     <div
-      className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-[1.35rem] border-[3px] px-6 text-center"
+      className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-[1.25rem] border-[4px] px-6 text-center"
       style={{
         borderColor: design.border,
         background: design.cardBg,
-        boxShadow: `inset 8px 0 18px rgba(61,47,34,0.08)`,
+        boxShadow: `inset 10px 0 22px rgba(61,47,34,0.12)`,
       }}
     >
       <p
-        className="font-script text-sm italic"
+        className="font-display text-xs font-semibold tracking-wide uppercase"
         style={{ color: design.muted }}
       >
         inside the cover
       </p>
       <p
-        className="mt-3 font-script text-2xl leading-snug sm:text-3xl"
+        className="mt-3 font-display text-xl font-bold leading-snug sm:text-2xl"
         style={{ color: design.accent }}
       >
         {design.title}
@@ -207,15 +207,15 @@ function CardInterior({
 
   return (
     <div
-      className="relative flex h-full w-full flex-col overflow-hidden rounded-[1.35rem] border-[3px]"
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-[1.25rem] border-[4px]"
       style={{
         borderColor: design.border,
-        boxShadow: `6px 8px 0 ${design.border}44`,
+        boxShadow: coverShadow(design.border),
         background: design.pageBg,
       }}
     >
       <div
-        className="m-3 flex flex-1 flex-col rounded-2xl border-2 p-4 sm:m-4 sm:p-5"
+        className="m-3 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-2xl border-2 p-4 sm:m-4 sm:p-5"
         style={{
           backgroundColor: design.cardBg,
           borderColor: design.border,
@@ -226,9 +226,12 @@ function CardInterior({
             ${design.border}18 29px
           )`,
           backgroundPosition: "0 5rem",
+          WebkitOverflowScrolling: "touch",
         }}
+        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex shrink-0 items-start justify-between gap-2">
           <div
             className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border-2"
             style={{ borderColor: design.border }}
@@ -244,7 +247,7 @@ function CardInterior({
             </div>
           </div>
           <span
-            className="rounded-full border px-2.5 py-1 font-script text-sm italic"
+            className="rounded-full border px-2.5 py-1 font-display text-xs font-semibold"
             style={{
               borderColor: design.border,
               color: design.accent,
@@ -257,7 +260,7 @@ function CardInterior({
 
         {occasionLabel ? (
           <p
-            className="mt-3 font-script text-base italic"
+            className="mt-3 shrink-0 font-display text-sm"
             style={{ color: design.muted }}
           >
             {occasionLabel}
@@ -265,26 +268,29 @@ function CardInterior({
         ) : null}
 
         <h3
-          className="mt-1 font-script text-2xl leading-snug sm:text-3xl"
+          className="mt-1 shrink-0 font-display text-xl font-bold leading-snug sm:text-2xl"
           style={{ color: design.accent }}
         >
           {subject}
         </h3>
 
-        <p className="mt-1 font-script text-base italic" style={{ color: design.muted }}>
+        <p
+          className="mt-1 shrink-0 font-display text-sm"
+          style={{ color: design.muted }}
+        >
           For {recipientName}
         </p>
 
         <p
-          className="mt-4 flex-1 whitespace-pre-wrap font-script text-lg leading-relaxed sm:text-xl"
+          className="mt-4 whitespace-pre-wrap font-sans text-base leading-relaxed sm:text-[1.05rem] sm:leading-7"
           style={{ color: design.ink }}
         >
           {message}
         </p>
 
-        <div className="mt-4 flex items-end justify-end gap-3">
+        <div className="mt-5 flex shrink-0 items-end justify-end gap-3 pb-1">
           <p
-            className="font-script text-xl italic sm:text-2xl"
+            className="font-display text-lg font-semibold sm:text-xl"
             style={{ color: design.accent }}
           >
             — {senderName}
@@ -305,7 +311,7 @@ export function GreetingCard({
   className,
   compact = false,
   defaultOpen = false,
-  autoOpen = true,
+  autoOpen = false,
 }: Props) {
   const design = getCardDesign(designId);
   const [open, setOpen] = useState(defaultOpen);
@@ -320,10 +326,10 @@ export function GreetingCard({
     return (
       <motion.div
         className={cn("relative w-full", className)}
-        animate={{ y: [0, -3, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ y: [0, -2, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       >
-        <motion.div whileHover={{ y: -6, scale: 1.03 }} className="w-full">
+        <motion.div whileHover={{ y: -4, scale: 1.02 }} className="w-full">
           <CardCover design={design} compact />
         </motion.div>
       </motion.div>
@@ -334,7 +340,7 @@ export function GreetingCard({
     <div className={cn("relative w-full", className)}>
       <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
         <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
-          {open ? "inside your e-card" : "tap the cover to open"}
+          {open ? "scroll inside to read · tap Close when done" : "tap the cover to open"}
         </p>
         <button
           type="button"
@@ -345,22 +351,19 @@ export function GreetingCard({
         </button>
       </div>
 
-      {/* Real greeting card: cover hinged on the left, swings open */}
       <div
         className={cn(
           "relative mx-auto w-full max-w-md overflow-visible transition-[padding] duration-500",
           open ? "pl-[16%] sm:pl-[40%]" : "pl-0"
         )}
-        style={{ perspective: 1600, perspectiveOrigin: "left center" }}
+        style={{ perspective: 1400, perspectiveOrigin: "left center" }}
       >
-        <button
-          type="button"
-          aria-label={open ? "Close e-card" : "Open e-card"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="relative block aspect-[3/4] w-full cursor-pointer border-0 bg-transparent p-0 text-left [transform-style:preserve-3d]"
+        <div
+          className="relative aspect-[3/4] w-full [transform-style:preserve-3d]"
+          role="region"
+          aria-label={open ? "Open e-card" : "Closed e-card"}
         >
-          {/* Right page — message stays put */}
+          {/* Message page — scrollable when open */}
           <div className="absolute inset-0">
             <CardInterior
               design={design}
@@ -372,24 +375,40 @@ export function GreetingCard({
             />
           </div>
 
-          {/* Left-hinged cover */}
+          {/* Cover — click to open/close; ignores pointer when open so message scrolls */}
           <motion.div
-            className="absolute inset-0 z-10 [transform-style:preserve-3d]"
+            className={cn(
+              "absolute inset-0 z-10 [transform-style:preserve-3d]",
+              open ? "pointer-events-none" : "cursor-pointer"
+            )}
             style={{ transformOrigin: "left center" }}
-            animate={{ rotateY: open ? -152 : 0 }}
-            transition={{ type: "spring", stiffness: 70, damping: 14 }}
+            animate={{ rotateY: open ? -158 : 0 }}
+            transition={{ duration: 0.7, ease: [0.33, 1, 0.32, 1] }}
+            onClick={() => {
+              if (!open) setOpen(true);
+            }}
+            role="button"
+            tabIndex={open ? -1 : 0}
+            aria-label="Open e-card"
+            aria-expanded={open}
+            onKeyDown={(e) => {
+              if (open) return;
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setOpen(true);
+              }
+            }}
           >
             <div
               className="absolute inset-0 [backface-visibility:hidden]"
               style={{ WebkitBackfaceVisibility: "hidden" }}
             >
               <CardCover design={design} />
-              {/* Spine shadow while closed / opening */}
               <div
-                className="pointer-events-none absolute inset-y-0 left-0 w-3 rounded-l-[1.35rem]"
+                className="pointer-events-none absolute inset-y-0 left-0 w-4 rounded-l-[1.25rem]"
                 style={{
                   background:
-                    "linear-gradient(90deg, rgba(61,47,34,0.14), transparent)",
+                    "linear-gradient(90deg, rgba(61,47,34,0.22), transparent)",
                 }}
                 aria-hidden
               />
@@ -404,7 +423,7 @@ export function GreetingCard({
               <CoverInside design={design} />
             </div>
           </motion.div>
-        </button>
+        </div>
       </div>
     </div>
   );

@@ -45,7 +45,6 @@ export function OpenCardView({ card, code }: Props) {
         message={card.message}
         senderName={card.from}
         occasionLabel={occasionLabel}
-        autoOpen
       />
 
       <PixelWindow title="share_this_card.lnk" icon="📣" liftOnHover={false}>
