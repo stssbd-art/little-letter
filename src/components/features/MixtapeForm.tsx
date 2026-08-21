@@ -73,6 +73,7 @@ export function MixtapeForm() {
   const indexRef = useRef(0);
   const tracksRef = useRef<MixTrack[]>([]);
   const pendingPlayIdRef = useRef<string | null>(null);
+  const playerReadyRef = useRef(false);
   const [playIndex, setPlayIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [playerReady, setPlayerReady] = useState(false);
@@ -141,10 +142,24 @@ export function MixtapeForm() {
       selected[0]?.youtubeId ||
       "dQw4w9WgXcQ";
 
+    const startPending = () => {
+      const pending = pendingPlayIdRef.current;
+      if (!pending || !playerRef.current) return;
+      pendingPlayIdRef.current = null;
+      try {
+        playerRef.current.loadVideoById(pending);
+        playerRef.current.playVideo();
+        setPlaying(true);
+        setPlayerError("");
+      } catch {
+        setPlayerError("Couldn’t start playback — tap Play on the deck.");
+      }
+    };
+
     const mountPlayer = async () => {
       const container = hostRef.current;
       if (!container) {
-        if (!cancelled && tries++ < 30) {
+        if (!cancelled && tries++ < 40) {
           window.setTimeout(() => void mountPlayer(), 50);
         }
         return;
@@ -154,7 +169,11 @@ export function MixtapeForm() {
         const YT = await loadYouTubeApi();
         if (cancelled) return;
 
-        playerRef.current?.destroy();
+        try {
+          playerRef.current?.destroy();
+        } catch {
+          /* ignore */
+        }
         const mount = document.createElement("div");
         mount.style.width = "100%";
         mount.style.height = "100%";
@@ -174,19 +193,10 @@ export function MixtapeForm() {
           events: {
             onReady: () => {
               if (cancelled) return;
+              playerReadyRef.current = true;
               setPlayerReady(true);
               setPlayerError("");
-              const pending = pendingPlayIdRef.current;
-              if (pending) {
-                pendingPlayIdRef.current = null;
-                try {
-                  playerRef.current?.loadVideoById(pending);
-                  playerRef.current?.playVideo();
-                  setPlaying(true);
-                } catch {
-                  setPlayerError("Couldn’t start playback — tap Play on the deck.");
-                }
-              }
+              startPending();
             },
             onStateChange: (event) => {
               if (cancelled) return;
@@ -202,18 +212,39 @@ export function MixtapeForm() {
                 const next = (indexRef.current + 1) % list.length;
                 setPlayIndex(next);
                 indexRef.current = next;
-                event.target.loadVideoById(list[next]!.youtubeId);
+                try {
+                  event.target.loadVideoById(list[next]!.youtubeId);
+                  event.target.playVideo();
+                } catch {
+                  setPlaying(false);
+                }
               }
             },
             onError: () => {
               if (cancelled) return;
-              setPlayerError("This track couldn’t play — try another song.");
+              setPlayerError("This track couldn’t play — trying the next one.");
               setPlaying(false);
+              const list = tracksRef.current;
+              if (list.length < 2) return;
+              const next = (indexRef.current + 1) % list.length;
+              window.setTimeout(() => {
+                if (cancelled) return;
+                setPlayIndex(next);
+                indexRef.current = next;
+                try {
+                  playerRef.current?.loadVideoById(list[next]!.youtubeId);
+                  playerRef.current?.playVideo();
+                } catch {
+                  /* ignore */
+                }
+              }, 400);
             },
           },
         });
       } catch {
         if (!cancelled) {
+          playerReadyRef.current = false;
+          setPlayerReady(false);
           setPlayerError("Could not load the music player. Check your connection.");
         }
       }
@@ -223,9 +254,16 @@ export function MixtapeForm() {
 
     return () => {
       cancelled = true;
-      playerRef.current?.destroy();
+      pendingPlayIdRef.current = null;
+      playerReadyRef.current = false;
+      try {
+        playerRef.current?.destroy();
+      } catch {
+        /* ignore */
+      }
       playerRef.current = null;
       setPlayerReady(false);
+      setPlaying(false);
     };
     // Mount once for the form session
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -238,12 +276,13 @@ export function MixtapeForm() {
     indexRef.current = next;
     setPlayerError("");
     const player = playerRef.current;
-    if (player && playerReady) {
+    if (player && playerReadyRef.current) {
       try {
         player.loadVideoById(nextTrack.youtubeId);
         player.playVideo();
         setPlaying(true);
       } catch {
+        pendingPlayIdRef.current = nextTrack.youtubeId;
         setPlayerError("Couldn’t switch track — tap Play on the deck.");
       }
     } else {
@@ -698,6 +737,7 @@ export function MixtapeForm() {
             toName={draft.recipientName}
             tracks={selected}
             spinning={playing}
+            loading={!playerReady}
             nowPlaying={selected[playIndex] ?? null}
             className="max-w-none"
             screenRef={hostRef}
@@ -705,7 +745,7 @@ export function MixtapeForm() {
             onStop={stopSelected}
             onPrev={prevSelected}
             onNext={nextSelected}
-            controlsDisabled={!playerReady || selected.length === 0}
+            controlsDisabled={selected.length === 0}
             prevDisabled={selected.length < 2}
             nextDisabled={selected.length < 2}
           >

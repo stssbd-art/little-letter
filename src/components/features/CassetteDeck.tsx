@@ -11,6 +11,7 @@ type CassetteDeckProps = {
   toName: string;
   tracks: MixTrack[];
   spinning?: boolean;
+  loading?: boolean;
   className?: string;
   nowPlaying?: MixTrack | null;
   /** Stable host for the YouTube iframe */
@@ -32,6 +33,7 @@ export function CassetteDeck({
   toName,
   tracks,
   spinning = false,
+  loading = false,
   className,
   nowPlaying,
   screenRef,
@@ -50,6 +52,13 @@ export function CassetteDeck({
   const hasControls = Boolean(onPlay || onStop || onPrev || onNext);
   const showScreen = Boolean(screenRef);
   const current = nowPlaying ?? tracks[0] ?? null;
+  const status = spinning
+    ? "STEREO"
+    : loading
+      ? "LOAD"
+      : showScreen
+        ? "READY"
+        : "STOP";
 
   return (
     <div
@@ -69,9 +78,7 @@ export function CassetteDeck({
           <p className="font-pixel text-[9px] tracking-wide text-[#f6d58a]">
             SIDE A · LITTLE LETTER MIX
           </p>
-          <p className="font-pixel text-[8px] text-[#cbb892]">
-            {spinning ? "STEREO" : showScreen ? "READY" : "STOP"}
-          </p>
+          <p className="font-pixel text-[8px] text-[#cbb892]">{status}</p>
         </div>
 
         <div className="space-y-3 p-3">

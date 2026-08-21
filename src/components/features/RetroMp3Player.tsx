@@ -28,6 +28,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
   const indexRef = useRef(0);
   const tracksRef = useRef<MixTrack[]>(MIX_TRACKS);
   const pendingPlayIdRef = useRef<string | null>(null);
+  const readyRef = useRef(false);
 
   const [tracks, setTracks] = useState<MixTrack[]>(MIX_TRACKS);
   const [index, setIndex] = useState(0);
@@ -82,6 +83,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           events: {
             onReady: () => {
               if (cancelled) return;
+              readyRef.current = true;
               setReady(true);
               setError("");
               const pending = pendingPlayIdRef.current;
@@ -150,6 +152,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
     return () => {
       cancelled = true;
       pendingPlayIdRef.current = null;
+      readyRef.current = false;
       try {
         playerRef.current?.destroy();
       } catch {
@@ -169,7 +172,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
     indexRef.current = next;
     setError("");
     const player = playerRef.current;
-    if (player && ready) {
+    if (player && readyRef.current) {
       try {
         player.loadVideoById(nextTrack.youtubeId);
         player.playVideo();
@@ -236,7 +239,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
     const current = list[indexRef.current] ?? list[0];
     if (!current) return;
     const player = playerRef.current;
-    if (player && ready) {
+    if (player && readyRef.current) {
       try {
         player.playVideo();
         setPlaying(true);
