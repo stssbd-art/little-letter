@@ -6,7 +6,7 @@ import { useSound } from "@/components/providers/SoundProvider";
 
 interface PixelButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "tape" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
 }
 
@@ -28,6 +28,8 @@ export function PixelButton({
       "bg-[linear-gradient(to_bottom,var(--ll-btn-from),var(--ll-btn-to))] text-[var(--ll-btn-text)] border-[var(--ll-btn-to)] shadow-[0_4px_0_var(--ll-pink-shadow)] [text-shadow:0_1px_0_rgba(61,47,34,0.35)]",
     secondary:
       "bg-[linear-gradient(to_bottom,var(--ll-btn-mint-from),var(--ll-btn-mint-to))] text-[var(--ll-btn-mint-text)] border-[var(--ll-btn-mint-to)] shadow-[0_4px_0_var(--ll-mint-shadow)] [text-shadow:0_1px_0_rgba(47,58,30,0.4)]",
+    tape:
+      "bg-[linear-gradient(to_bottom,var(--ll-btn-tape-from),var(--ll-btn-tape-to))] text-[var(--ll-btn-tape-text)] border-[var(--ll-btn-tape-to)] shadow-[0_4px_0_var(--ll-tape-shadow)] [text-shadow:0_1px_0_rgba(61,40,36,0.35)]",
     ghost:
       "bg-white/70 dark:bg-white/10 text-[var(--ll-ink)] border-[var(--ll-lavender)] shadow-[0_3px_0_var(--ll-lavender-shadow)]",
     danger:

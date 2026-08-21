@@ -52,7 +52,7 @@ export function HomePage() {
             </PixelButton>
           </Link>
           <Link href="/mixtape" className="sm:w-auto">
-            <PixelButton size="lg" variant="ghost" className="w-full sm:w-auto">
+            <PixelButton size="lg" variant="tape" className="w-full sm:w-auto">
               📼 Send a Mixtape
             </PixelButton>
           </Link>

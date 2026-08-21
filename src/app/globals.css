@@ -32,6 +32,10 @@
   --ll-btn-mint-from: #c5d4a0;
   --ll-btn-mint-to: #5f7538;
   --ll-btn-mint-text: #fffdf6;
+  --ll-btn-tape-from: #e8b4a8;
+  --ll-btn-tape-to: #9a5a52;
+  --ll-btn-tape-text: #fffdf6;
+  --ll-tape-shadow: #d4a098;
   --background: #faf4e8;
   --foreground: #3d2f22;
   color-scheme: light;
@@ -66,6 +70,10 @@
   --ll-btn-mint-from: #a3b875;
   --ll-btn-mint-to: #4e632c;
   --ll-btn-mint-text: #fffdf6;
+  --ll-btn-tape-from: #c98b82;
+  --ll-btn-tape-to: #7a4540;
+  --ll-btn-tape-text: #fffdf6;
+  --ll-tape-shadow: #3d2a28;
   --background: #1c1610;
   --foreground: #fff8ee;
   color-scheme: dark;
