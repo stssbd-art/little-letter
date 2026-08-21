@@ -34,9 +34,9 @@ export function PixelButton({
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-xs",
-    md: "px-5 py-2.5 text-sm",
-    lg: "px-7 py-3.5 text-base",
+    sm: "min-h-11 min-w-11 px-3 py-2 text-xs",
+    md: "min-h-11 px-5 py-2.5 text-sm",
+    lg: "min-h-12 px-7 py-3.5 text-base",
   };
 
   return (

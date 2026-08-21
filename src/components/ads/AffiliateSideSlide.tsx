@@ -34,13 +34,14 @@ function OneSideSlide({
 
   return (
     <aside
-      className="fixed right-0 z-[200] flex -translate-y-1/2 items-stretch"
+      /* Layout box stays wide while closed; never steal taps from page content */
+      className="pointer-events-none fixed right-0 z-[200] hidden -translate-y-1/2 items-stretch md:flex"
       style={{ top }}
       aria-label={`Sponsored: ${offer.label}`}
     >
       <div
         className={cn(
-          "flex items-stretch transition-transform duration-300 ease-out",
+          "pointer-events-auto flex items-stretch transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "translate-x-[calc(100%-3rem)]"
         )}
       >
@@ -50,7 +51,7 @@ function OneSideSlide({
           aria-expanded={open}
           aria-controls={panelId}
           className={cn(
-            "flex w-12 shrink-0 flex-col items-center justify-center gap-2 rounded-l-2xl border-[3px] border-r-0 py-4 shadow-[4px_4px_0_rgba(61,47,34,0.35)]",
+            "flex min-h-[7.5rem] w-12 shrink-0 flex-col items-center justify-center gap-2 rounded-l-2xl border-[3px] border-r-0 py-4 shadow-[4px_4px_0_rgba(61,47,34,0.35)]",
             tabClassName,
             !open && "animate-pulse"
           )}
@@ -67,9 +68,12 @@ function OneSideSlide({
           id={panelId}
           className={cn(
             "flex w-[min(17.5rem,calc(100vw-3.75rem))] flex-col rounded-l-none rounded-bl-2xl border-[3px] border-l-0 px-3.5 py-3.5 shadow-[4px_4px_0_rgba(61,47,34,0.35)]",
+            /* Closed panel is off-screen — don't let it eat taps under the transform */
+            !open && "pointer-events-none",
             offer.tone.border,
             offer.tone.bg
           )}
+          aria-hidden={!open}
         >
           <p className={cn("font-pixel text-[7px] tracking-widest", offer.tone.muted)}>
             SPONSORED
@@ -111,7 +115,7 @@ function OneSideSlide({
             </span>
             <span
               className={cn(
-                "mt-3 inline-flex rounded-lg border-2 px-3 py-2 font-pixel text-[9px] transition",
+                "mt-3 inline-flex min-h-11 items-center rounded-lg border-2 px-3 py-2 font-pixel text-[9px] transition",
                 offer.tone.title,
                 offer.tone.ctaBorder,
                 offer.tone.ctaBg
@@ -126,7 +130,7 @@ function OneSideSlide({
   );
 }
 
-/** Two separate right-edge slides: Cadbury + Social Stories. */
+/** Desktop-only right-edge slides (Cadbury + Social Stories). Mobile uses footer banners. */
 export function AffiliateSideSlide() {
   const [mounted, setMounted] = useState(false);
   const cadbury = AFFILIATE_OFFERS.find((o) => o.id === "cadbury");
