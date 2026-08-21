@@ -185,7 +185,7 @@ export function Header() {
                   className="block"
                 >
                   <PixelButton size="md" className="w-full whitespace-normal">
-                    ✉️ Create a letter
+                    💌 Create a letter
                   </PixelButton>
                 </Link>
               </div>
@@ -243,7 +243,7 @@ export function Header() {
             {theme === "light" ? "🌙" : "☀️"}
           </PixelButton>
           <Link href="/create" className="sm:block md:hidden">
-            <PixelButton size="sm">✉️ Letter</PixelButton>
+            <PixelButton size="sm">💌 Letter</PixelButton>
           </Link>
           <button
             type="button"

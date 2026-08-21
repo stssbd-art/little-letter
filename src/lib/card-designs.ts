@@ -333,7 +333,7 @@ export const CARD_DESIGNS: CardDesign[] = [
     id: "honey-classic",
     title: "Honey Classic",
     blurb: "The cosy Little Letter look",
-    emoji: "✉️",
+    emoji: "💌",
     occasion: "friendship",
     pageBg: "linear-gradient(160deg,#fff6df 0%,#faf4e8 50%,#f0e4c8 100%)",
     cardBg: "#fffbf2",

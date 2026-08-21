@@ -283,7 +283,7 @@ const SIGN_OFFS = [
   `Hugs (digital but sincere),\n{sender}`,
 ];
 
-const ENDINGS = ["✉️", "✨", "🌟", "🍀", "🎵", "☁️"];
+const ENDINGS = ["💌", "✨", "🌟", "🍀", "🎵", "☁️"];
 
 const ANGLES = [
   "open with a tiny sensory detail (light, weather, a sound)",

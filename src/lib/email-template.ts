@@ -73,7 +73,7 @@ const THEMES: Record<Occasion, FrameTheme> = {
     accent: "#6b4f36",
     badge: "soft hearts enclosed · handle with care",
     tagline: "a little love letter crossed the wires for you",
-    footerIcons: "✉️ ✨ ⭐ 🌈 ☁️",
+    footerIcons: "💌 ✨ ⭐ 🌈 ☁️",
     mission: "If this made your heart flutter, the mission succeeded.",
   },
   friendship: {
@@ -273,7 +273,7 @@ const THEMES: Record<Occasion, FrameTheme> = {
     accent: "#6b4f36",
     badge: "valentine soft · heart enclosed",
     tagline: "a Valentine note made just for you",
-    footerIcons: "✉️ ✨ ⭐ 🌈 ☁️",
+    footerIcons: "💌 ✨ ⭐ 🌈 ☁️",
     mission: "If this made your heart flutter, mission succeeded.",
   },
   "mothers-day": {
@@ -343,10 +343,10 @@ function cardEmailDecor(design: CardDesign): { hero: string; row: string } {
     "valentine-box": { hero: "💝", row: "💝 💕 ✨ 💝" },
     "tulip-mum": { hero: "🌷", row: "🌷 💕 ☀️ 🌷" },
     "tie-dad": { hero: "👔", row: "👔 ⭐ ☕ 👔" },
-    "honey-classic": { hero: "✉️", row: "✨ ☁️ ⭐ ✨" },
+    "honey-classic": { hero: "💌", row: "✨ ☁️ ⭐ ✨" },
     "moon-whisper": { hero: "🌙", row: "🌙 ⭐ ✨ 🌙" },
   };
-  return byId[design.id] ?? { hero: "✉️", row: "✨ ✉️ ⭐ ✨" };
+  return byId[design.id] ?? { hero: "💌", row: "✨ 💌 ⭐ ✨" };
 }
 
 function cardDecorBannerHtml(design: CardDesign) {
@@ -567,7 +567,7 @@ export function buildLetterEmailHtml(
         : `<table role="presentation" width="100%" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
           <tr>
             <td style="background:${theme.headerGrad};padding:18px 22px;text-align:center;">
-              <div style="font-size:22px;letter-spacing:2px;">✨ ✉️ ✨</div>
+              <div style="font-size:22px;letter-spacing:2px;">✨ 💌 ✨</div>
               <div style="font-family:Georgia,serif;font-size:22px;color:${theme.headerInk};margin-top:6px;">Little Letter</div>
               <div style="font-size:12px;color:${theme.headerSub};margin-top:4px;">${theme.tagline}</div>
             </td>
@@ -623,7 +623,7 @@ export function buildLetterEmailHtml(
       <td align="center">
         ${cardBody}
         <p style="margin:18px 0 0;font-size:11px;color:#9ca3af;">
-          ✉️ ${theme.mission}
+          💌 ${theme.mission}
         </p>
         ${whyFooter(letter.form.senderName, theme.accent)}
       </td>

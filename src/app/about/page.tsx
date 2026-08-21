@@ -19,7 +19,7 @@ const REASONS = [
     text: "Because kindness travels better with personality.",
   },
   {
-    icon: "✉️",
+    icon: "💌",
     text: "Because email can still feel like opening a sealed note.",
   },
   {
@@ -71,7 +71,7 @@ export default function AboutPage() {
         </div>
       </PixelWindow>
 
-      <PixelWindow title="a_little_about_me.txt" icon="✉️">
+      <PixelWindow title="a_little_about_me.txt" icon="💌">
         <div className="space-y-3 text-left text-[var(--ll-ink)]">
           <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
             A Little About Me

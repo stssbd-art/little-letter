@@ -90,7 +90,7 @@ function letterSubject(letter: GeneratedLetter) {
     return withLeadingEmoji("💝", base);
   }
   const base = custom || `A little letter for ${letter.form.recipientName}`;
-  return withLeadingEmoji("✉️", base);
+  return withLeadingEmoji("💌", base);
 }
 
 function mixtapeSubject(mix: MixtapePayload) {

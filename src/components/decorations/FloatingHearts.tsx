@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-const HEARTS = ["⭐", "✨", "✉️", "📼"];
+const HEARTS = ["⭐", "✨", "💌", "📼"];
 
 export function FloatingHearts() {
   return (

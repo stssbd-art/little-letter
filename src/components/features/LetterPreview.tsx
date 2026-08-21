@@ -614,10 +614,10 @@ export function LetterPreview() {
                     ? `💝 Send free card (${freeRemaining} left)`
                     : "💝 Send card"
                 : demo
-                  ? "✉️ Send letter (demo)"
+                  ? "💌 Send letter (demo)"
                   : freeLeft
-                    ? `✉️ Send free letter (${freeRemaining} left)`
-                    : "✉️ Send Little Letter"}
+                    ? `💌 Send free letter (${freeRemaining} left)`
+                    : "💌 Send Little Letter"}
           </PixelButton>
         )}
       </div>

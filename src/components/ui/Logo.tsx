@@ -22,7 +22,7 @@ export function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         className={size === "lg" ? "text-4xl sm:text-5xl" : "text-xl"}
       >
-        ✉️
+        💌
       </motion.span>
       <span
         className={`font-pixel leading-relaxed text-[var(--ll-pink-deep)] drop-shadow-[2px_2px_0_var(--ll-pink-glow)] dark:text-[var(--ll-pink)] ${sizes[size]}`}

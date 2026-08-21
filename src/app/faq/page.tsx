@@ -133,7 +133,7 @@ export default function FaqPage() {
 
       <div className="flex justify-start">
         <Link href="/create">
-          <PixelButton>Ready to write? ✉️</PixelButton>
+          <PixelButton>Ready to write? 💌</PixelButton>
         </Link>
       </div>
     </div>

@@ -76,7 +76,7 @@ export function SuccessCelebration() {
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
             className="inline-block"
           >
-            {isMixtape ? "📼" : isCard ? "💝" : "✉️"}
+            {isMixtape ? "📼" : isCard ? "💝" : "💌"}
           </motion.span>
         </motion.div>
 
@@ -165,7 +165,7 @@ export function SuccessCelebration() {
                   resetForm();
                 }}
               >
-                Send another ✉️
+                Send another 💌
               </PixelButton>
             </Link>
           )}

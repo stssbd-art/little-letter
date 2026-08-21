@@ -49,7 +49,7 @@ export default async function WallPage() {
 
       <div className="flex flex-wrap gap-3">
         <Link href="/create">
-          <PixelButton>✉️ Send a letter</PixelButton>
+          <PixelButton>💌 Send a letter</PixelButton>
         </Link>
         <Link href="/mixtape">
           <PixelButton variant="secondary">📼 Send a mixtape</PixelButton>
