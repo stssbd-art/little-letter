@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -93,8 +94,12 @@ export default function PrivacyPage() {
       </PixelWindow>
 
       <div className="flex flex-wrap items-center justify-start gap-3 pt-1">
-        <PixelButton href="/terms" variant="secondary">Terms &amp; Copyright</PixelButton>
-        <PixelButton href="/" variant="ghost">Home</PixelButton>
+        <Link href="/terms">
+          <PixelButton variant="secondary">Terms &amp; Copyright</PixelButton>
+        </Link>
+        <Link href="/">
+          <PixelButton variant="ghost">Home</PixelButton>
+        </Link>
       </div>
     </div>
   );

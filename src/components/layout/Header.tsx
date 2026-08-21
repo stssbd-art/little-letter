@@ -204,14 +204,18 @@ export function Header() {
               </div>
 
               <div className="shrink-0 border-t-2 border-[var(--ll-window-border)] p-4">
-                <PixelButton
+                <Link
                   href="/create"
-                  size="md"
-                  className="w-full whitespace-normal"
-                  onClick={closeMenu}
+                  onClick={() => {
+                    play("click");
+                    closeMenu();
+                  }}
+                  className="block"
                 >
-                  <span aria-hidden>✉️</span> Create a letter
-                </PixelButton>
+                  <PixelButton size="md" className="w-full whitespace-normal">
+                    ✉️ Create a letter
+                  </PixelButton>
+                </Link>
               </div>
             </motion.nav>
           </>
@@ -258,7 +262,7 @@ export function Header() {
             aria-label={muted ? "Unmute sounds" : "Mute sounds"}
             title={muted ? "Unmute" : "Mute"}
           >
-            <span aria-hidden>{muted ? "🔇" : "🔊"}</span>
+            {muted ? "🔇" : "🔊"}
           </PixelButton>
           <PixelButton
             size="sm"
@@ -268,15 +272,11 @@ export function Header() {
               theme === "light" ? "Switch to dark mode" : "Switch to light mode"
             }
           >
-            <span aria-hidden>{theme === "light" ? "🌙" : "☀️"}</span>
+            {theme === "light" ? "🌙" : "☀️"}
           </PixelButton>
-          <PixelButton
-            href="/create"
-            size="sm"
-            className="md:hidden"
-          >
-            <span aria-hidden>✉️</span> Letter
-          </PixelButton>
+          <Link href="/create" className="sm:block md:hidden">
+            <PixelButton size="sm">✉️ Letter</PixelButton>
+          </Link>
           <button
             ref={menuButtonRef}
             type="button"

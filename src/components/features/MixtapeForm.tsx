@@ -31,6 +31,7 @@ import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
 import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import type { MixtapePayload } from "@/types";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import {
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
@@ -657,15 +658,16 @@ export function MixtapeForm() {
   const previewHref = previewMixHref();
 
   const previewMixButton = previewHref ? (
-    <PixelButton
+    <Link
       href={previewHref}
       target="_blank"
       rel="noreferrer"
-      variant="secondary"
       onClick={() => saveMixtapeDraft(draft)}
     >
-      ▶ Preview mix
-    </PixelButton>
+      <PixelButton type="button" variant="secondary">
+        ▶ Preview mix
+      </PixelButton>
+    </Link>
   ) : (
     <PixelButton type="button" variant="secondary" disabled>
       ▶ Preview mix

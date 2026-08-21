@@ -233,8 +233,12 @@ export default function TermsPage() {
       </PixelWindow>
 
       <div className="flex flex-wrap items-center justify-start gap-3 pt-1">
-        <PixelButton href="/privacy" variant="secondary">Privacy Policy</PixelButton>
-        <PixelButton href="/" variant="ghost">Home</PixelButton>
+        <Link href="/privacy">
+          <PixelButton variant="secondary">Privacy Policy</PixelButton>
+        </Link>
+        <Link href="/">
+          <PixelButton variant="ghost">Home</PixelButton>
+        </Link>
       </div>
     </div>
   );

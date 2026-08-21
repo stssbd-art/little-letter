@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
@@ -144,19 +145,33 @@ export function SuccessCelebration() {
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {isMixtape ? (
-            <PixelButton href="/mixtape">Burn another tape 📼</PixelButton>
+            <Link href="/mixtape">
+              <PixelButton>Burn another tape 📼</PixelButton>
+            </Link>
           ) : isCard ? (
-            <PixelButton href="/cards" onClick={() => resetForm()}>
-              Send another card 🎴
-            </PixelButton>
+            <Link href="/cards">
+              <PixelButton
+                onClick={() => {
+                  resetForm();
+                }}
+              >
+                Send another card 🎴
+              </PixelButton>
+            </Link>
           ) : (
-            <PixelButton href="/create" onClick={() => resetForm()}>
-              Send another ✉️
-            </PixelButton>
+            <Link href="/create">
+              <PixelButton
+                onClick={() => {
+                  resetForm();
+                }}
+              >
+                Send another ✉️
+              </PixelButton>
+            </Link>
           )}
-          <PixelButton href="/" variant="ghost">
-            Back home
-          </PixelButton>
+          <Link href="/">
+            <PixelButton variant="ghost">Back home</PixelButton>
+          </Link>
         </div>
       </div>
     </PixelWindow>
