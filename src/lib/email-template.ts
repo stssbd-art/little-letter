@@ -321,6 +321,36 @@ function themeFor(occasion: Occasion): FrameTheme {
   return THEMES[occasion] ?? THEMES["thinking-of-you"];
 }
 
+/** Common inbox-safe emoji for the Open your card button. */
+function cardOpenEmoji(designId: string): string {
+  const byId: Record<string, string> = {
+    "balloon-bash": "🎈",
+    "cake-candles": "🎂",
+    "confetti-pop": "🎊",
+    "blush-hearts": "💕",
+    "rose-garden": "🌹",
+    "starlit-love": "🌙",
+    "buddy-highfive": "🤝",
+    "rainbow-note": "🌈",
+    "clover-luck": "🍀",
+    "sunflower-thanks": "🌻",
+    "sparkler-congrats": "🎉",
+    "soft-sorry": "💙",
+    "wedding-rings": "💒",
+    "cap-toss": "🎓",
+    "promo-rocket": "🚀",
+    "valentine-box": "💝",
+    "tulip-mum": "🌷",
+    "tie-dad": "👔",
+    "honey-classic": "💌",
+    "moon-whisper": "🌙",
+    "pearl-locket": "🤍",
+    "daisy-duo": "🌼",
+    "ivory-veil": "💐",
+  };
+  return byId[designId] ?? "💌";
+}
+
 function themeForLetter(letter: GeneratedLetter): FrameTheme {
   const base = themeFor(letter.form.occasion);
   const designId = letter.form.cardDesign;
@@ -474,8 +504,10 @@ export function buildLetterEmailHtml(
               <table role="presentation" cellspacing="0" cellpadding="0" style="margin:24px auto 0;">
                 <tr>
                   <td style="border-radius:12px;background:${design.accent};">
-                    <a href="${escapeHtml(openUrl)}" style="display:inline-block;padding:14px 28px;font-family:Georgia,serif;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;">
-                      Open your card
+                    <a href="${escapeHtml(openUrl)}" style="display:inline-block;padding:14px 28px;font-family:Georgia,serif;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;line-height:1.35;">
+                      <span style="font-size:20px;line-height:1;vertical-align:middle;">${cardOpenEmoji(design.id)}</span>
+                      &nbsp;Open your card&nbsp;
+                      <span style="font-size:18px;line-height:1;vertical-align:middle;">💌</span>
                     </a>
                   </td>
                 </tr>
