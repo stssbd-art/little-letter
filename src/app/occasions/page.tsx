@@ -80,9 +80,7 @@ export default function OccasionsHubPage() {
       </PixelWindow>
 
       <div className="flex justify-start">
-        <Link href="/create">
-          <PixelButton size="lg">✉️ Create any letter</PixelButton>
-        </Link>
+        <PixelButton href="/create" size="lg">✉️ Create any letter</PixelButton>
       </div>
     </div>
   );

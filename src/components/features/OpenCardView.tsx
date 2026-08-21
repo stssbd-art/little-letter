@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { GreetingCard } from "@/components/features/GreetingCard";
 import { PixelButton } from "@/components/ui/PixelButton";
@@ -56,12 +55,8 @@ export function OpenCardView({ card, code }: Props) {
       </PixelWindow>
 
       <div className="flex flex-wrap justify-center gap-3">
-        <Link href="/cards">
-          <PixelButton>🎴 Send a card back</PixelButton>
-        </Link>
-        <Link href="/">
-          <PixelButton variant="ghost">Home</PixelButton>
-        </Link>
+        <PixelButton href="/cards">🎴 Send a card back</PixelButton>
+        <PixelButton href="/" variant="ghost">Home</PixelButton>
       </div>
     </div>
   );

@@ -1,16 +1,43 @@
 "use client";
 
+import { Children, cloneElement, isValidElement, useId } from "react";
 import { cn } from "@/lib/utils";
 
 interface FieldProps {
   label: string;
   htmlFor: string;
   hint?: string;
+  error?: string;
   children: React.ReactNode;
   className?: string;
 }
 
-export function Field({ label, htmlFor, hint, children, className }: FieldProps) {
+export function Field({
+  label,
+  htmlFor,
+  hint,
+  error,
+  children,
+  className,
+}: FieldProps) {
+  const hintId = useId();
+  const errorId = useId();
+  const describedBy = [hint ? hintId : null, error ? errorId : null]
+    .filter(Boolean)
+    .join(" ");
+
+  const enhanced = Children.map(children, (child) => {
+    if (!isValidElement(child)) return child;
+    return cloneElement(
+      child as React.ReactElement<Record<string, unknown>>,
+      {
+        id: htmlFor,
+        "aria-describedby": describedBy || undefined,
+        "aria-invalid": error ? true : undefined,
+      }
+    );
+  });
+
   return (
     <div className={cn("space-y-1.5", className)}>
       <label
@@ -19,9 +46,16 @@ export function Field({ label, htmlFor, hint, children, className }: FieldProps)
       >
         {label}
       </label>
-      {children}
+      {enhanced}
       {hint ? (
-        <p className="text-xs text-[var(--ll-muted)]">{hint}</p>
+        <p id={hintId} className="text-xs text-[var(--ll-muted)]">
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p id={errorId} role="alert" className="text-xs text-rose-700">
+          {error}
+        </p>
       ) : null}
     </div>
   );

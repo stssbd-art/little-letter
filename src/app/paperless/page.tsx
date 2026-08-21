@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PageHeader } from "@/components/layout/PageHeader";
 
@@ -49,12 +48,8 @@ export default function PaperlessPage() {
             days.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/create">
-              <PixelButton variant="secondary">Send a paperless wish</PixelButton>
-            </Link>
-            <Link href="/mixtape">
-              <PixelButton variant="ghost">Or a mixtape</PixelButton>
-            </Link>
+            <PixelButton href="/create" variant="secondary">Send a paperless wish</PixelButton>
+            <PixelButton href="/mixtape" variant="ghost">Or a mixtape</PixelButton>
           </div>
         </div>
       </section>

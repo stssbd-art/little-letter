@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SharedExamples } from "@/components/features/SharedExamples";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { PixelButton } from "@/components/ui/PixelButton";
@@ -48,12 +47,8 @@ export default async function WallPage() {
       <SharedExamples initialEntries={entries} />
 
       <div className="flex flex-wrap gap-3">
-        <Link href="/create">
-          <PixelButton>✉️ Send a letter</PixelButton>
-        </Link>
-        <Link href="/mixtape">
-          <PixelButton variant="secondary">📼 Send a mixtape</PixelButton>
-        </Link>
+        <PixelButton href="/create">✉️ Send a letter</PixelButton>
+        <PixelButton href="/mixtape" variant="secondary">📼 Send a mixtape</PixelButton>
       </div>
     </div>
   );

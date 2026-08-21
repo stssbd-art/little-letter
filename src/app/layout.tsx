@@ -148,9 +148,19 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <AppProviders>
+          <a
+            href="#main-content"
+            className="absolute left-4 top-4 z-[100] -translate-y-[150%] rounded-xl border-2 border-[var(--ll-lavender-deep)] bg-[var(--ll-window-bg)] px-4 py-2 font-display text-[var(--ll-ink)] shadow-[4px_4px_0_var(--ll-pink-shadow)] focus:translate-y-0 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[var(--ll-lavender-deep)]"
+          >
+            Skip to content
+          </a>
           <AnimatedBackground>
             <Header />
-            <main className="mx-auto min-h-[70vh] max-w-6xl px-4 py-8 sm:py-12">
+            <main
+              id="main-content"
+              tabIndex={-1}
+              className="mx-auto min-h-[70vh] max-w-6xl px-4 py-8 outline-none sm:py-12"
+            >
               {children}
             </main>
             <EndPageAdGate />

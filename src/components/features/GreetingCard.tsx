@@ -293,7 +293,6 @@ export function GreetingCard({
   const [open, setOpen] = useState(defaultOpen);
   const openRef = useRef(open);
   const lockUntil = useRef(0);
-  const pointerStart = useRef<{ x: number; y: number } | null>(null);
 
   openRef.current = open;
 
@@ -323,22 +322,6 @@ export function GreetingCard({
     else openCard();
   }
 
-  function onPointerDown(e: React.PointerEvent) {
-    pointerStart.current = { x: e.clientX, y: e.clientY };
-  }
-
-  function onPointerUp(e: React.PointerEvent) {
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-    const start = pointerStart.current;
-    pointerStart.current = null;
-    if (!start) return;
-    const moved =
-      Math.abs(e.clientX - start.x) > 12 || Math.abs(e.clientY - start.y) > 12;
-    if (moved) return;
-    e.preventDefault();
-    onCardActivate();
-  }
-
   if (compact) {
     return (
       <motion.div
@@ -358,41 +341,27 @@ export function GreetingCard({
       <div className="mb-3 flex items-center justify-between gap-2 px-0.5">
         <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
           {open
-            ? "scroll to read · tap again to close"
-            : "tap the cover to open"}
+            ? "Scroll to read · use Close card when done"
+            : "Open the cover to read your card"}
         </p>
         <button
           type="button"
-          className="font-pixel text-[8px] text-[var(--ll-pink-deep)] underline decoration-dotted underline-offset-2"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onCardActivate();
-          }}
+          className="min-h-11 rounded-md px-2 font-pixel text-[8px] text-[var(--ll-pink-deep)] underline decoration-dotted underline-offset-2"
+          onClick={onCardActivate}
+          aria-expanded={open}
         >
           {open ? "Close card" : "Open card"}
         </button>
       </div>
 
-      {/* Open bifold — real greeting-card spread (tablet+) */}
+      {/* Open bifold — scrollable message, not a button */}
       {open ? (
         <motion.div
           initial={{ opacity: 0.85, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.35, ease: [0.33, 1, 0.32, 1] }}
-          className="mx-auto hidden w-full max-w-5xl touch-manipulation md:block"
-          role="button"
-          tabIndex={0}
-          aria-label="Close e-card"
-          aria-expanded
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              onCardActivate();
-            }
-          }}
+          className="mx-auto hidden w-full max-w-5xl md:block"
+          aria-label="Open e-card"
         >
           <div
             className="grid grid-cols-2 gap-0 overflow-hidden rounded-[1.5rem]"
@@ -429,24 +398,15 @@ export function GreetingCard({
       >
         <div
           className={cn(
-            "relative w-full touch-manipulation [transform-style:preserve-3d]",
-            open ? "aspect-[3/4] min-h-[28rem]" : "aspect-[5/7] min-h-[32rem] sm:min-h-[36rem]"
+            "relative w-full [transform-style:preserve-3d]",
+            open
+              ? "aspect-[3/4] min-h-[28rem]"
+              : "aspect-[5/7] min-h-[32rem] sm:min-h-[36rem]"
           )}
-          role="button"
-          tabIndex={0}
-          aria-label={open ? "Close e-card" : "Open e-card"}
-          aria-expanded={open}
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              onCardActivate();
-            }
-          }}
         >
           <div
             className={cn("absolute inset-0", open ? "z-20" : "z-0")}
+            aria-hidden={!open}
           >
             <CardInterior
               design={design}
@@ -467,6 +427,15 @@ export function GreetingCard({
             transition={{ duration: 0.7, ease: [0.33, 1, 0.32, 1] }}
             aria-hidden={open}
           >
+            {!open ? (
+              <button
+                type="button"
+                className="absolute inset-0 z-30 cursor-pointer border-0 bg-transparent p-0"
+                aria-label="Open e-card"
+                aria-expanded={false}
+                onClick={openCard}
+              />
+            ) : null}
             <div
               className="absolute inset-0 [backface-visibility:hidden]"
               style={{ WebkitBackfaceVisibility: "hidden" }}

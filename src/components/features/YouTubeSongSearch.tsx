@@ -115,6 +115,9 @@ export function YouTubeSongSearch({
 
   return (
     <div className={cn("space-y-2", className)}>
+      <label htmlFor={inputId} className="sr-only">
+        Search YouTube or paste a link
+      </label>
       <div className="flex flex-wrap gap-2">
         <PixelInput
           id={inputId}
@@ -123,6 +126,7 @@ export function YouTubeSongSearch({
           placeholder="Search YouTube or paste a link"
           maxLength={80}
           className="min-w-0 flex-1"
+          aria-label="Search YouTube or paste a link"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -142,7 +146,9 @@ export function YouTubeSongSearch({
       </div>
 
       {error ? (
-        <p className="text-xs text-rose-700">{error}</p>
+        <p className="text-xs text-rose-700" role="alert">
+          {error}
+        </p>
       ) : hint ? (
         <p className="text-xs text-[var(--ll-muted)]">{hint}</p>
       ) : null}

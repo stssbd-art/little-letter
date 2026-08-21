@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Logo } from "@/components/ui/Logo";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { useTheme } from "@/components/providers/ThemeProvider";
@@ -73,8 +73,12 @@ export function Header() {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const { muted, toggleMute, play } = useSound();
+  const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const closeMenu = useCallback(() => setOpen(false), []);
 
@@ -88,14 +92,38 @@ export function Header() {
 
   useEffect(() => {
     if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeMenu();
-    };
+
     document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenu();
+        return;
+      }
+      if (event.key !== "Tab" || !drawerRef.current) return;
+      const focusables = [
+        ...drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        ),
+      ];
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
     window.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKeyDown);
+      menuButtonRef.current?.focus();
     };
   }, [open, closeMenu]);
 
@@ -107,9 +135,9 @@ export function Header() {
           <>
             <motion.button
               type="button"
-              initial={{ opacity: 0 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="fixed inset-0 z-[60] bg-[var(--ll-ink)]/25 backdrop-blur-[2px] md:hidden"
               aria-label="Close menu"
@@ -119,25 +147,27 @@ export function Header() {
               }}
             />
             <motion.nav
+              ref={drawerRef}
               id="mobile-menu"
-              initial={{ x: "100%" }}
+              initial={reduceMotion ? false : { x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              exit={reduceMotion ? undefined : { x: "100%" }}
               transition={{ type: "spring", stiffness: 380, damping: 34 }}
               className={cn(
                 "fixed inset-y-0 right-0 z-[70] flex h-dvh max-h-dvh w-[min(100%,20rem)] flex-col",
                 "border-l-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]",
                 "pb-[env(safe-area-inset-bottom)] shadow-[-8px_0_24px_rgba(0,0,0,0.12)] md:hidden"
               )}
-              aria-label="Mobile"
+              aria-label="Site"
             >
               <div className="flex shrink-0 items-center justify-between border-b-2 border-[var(--ll-window-border)] px-4 py-3">
                 <span className="font-pixel text-[10px] text-[var(--ll-muted)]">
                   Menu
                 </span>
                 <button
+                  ref={closeButtonRef}
                   type="button"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border-2 border-[var(--ll-lavender)] text-[var(--ll-ink)]"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-lg border-2 border-[var(--ll-lavender)] text-[var(--ll-ink)]"
                   onClick={() => {
                     play("click");
                     closeMenu();
@@ -149,45 +179,39 @@ export function Header() {
               </div>
 
               <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain px-4 py-4">
-                {LINKS.map((link, index) => (
-                  <motion.div
-                    key={link.href}
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.04 }}
-                  >
+                {LINKS.map((link) => {
+                  const active = linkIsActive(pathname, link.href);
+                  return (
                     <Link
+                      key={link.href}
                       href={link.href}
+                      aria-current={active ? "page" : undefined}
                       onClick={() => {
                         play("click");
                         closeMenu();
                       }}
                       className={cn(
                         "block rounded-xl px-4 py-3 font-display text-base transition",
-                        linkIsActive(pathname, link.href)
+                        active
                           ? "bg-[var(--ll-pink-soft)] text-[var(--ll-pink-deep)]"
                           : "text-[var(--ll-ink)] hover:bg-white/60 dark:hover:bg-white/10"
                       )}
                     >
                       {link.label}
                     </Link>
-                  </motion.div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="shrink-0 border-t-2 border-[var(--ll-window-border)] p-4">
-                <Link
+                <PixelButton
                   href="/create"
-                  onClick={() => {
-                    play("click");
-                    closeMenu();
-                  }}
-                  className="block"
+                  size="md"
+                  className="w-full whitespace-normal"
+                  onClick={closeMenu}
                 >
-                  <PixelButton size="md" className="w-full whitespace-normal">
-                    ✉️ Create a letter
-                  </PixelButton>
-                </Link>
+                  <span aria-hidden>✉️</span> Create a letter
+                </PixelButton>
               </div>
             </motion.nav>
           </>
@@ -202,21 +226,25 @@ export function Header() {
         <Logo size="sm" />
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
-          {LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => play("click")}
-              className={cn(
-                "rounded-md px-3 py-1.5 font-display text-sm transition",
-                linkIsActive(pathname, link.href)
-                  ? "bg-[var(--ll-pink-soft)] text-[var(--ll-pink-deep)]"
-                  : "text-[var(--ll-ink)] hover:bg-white/60 dark:hover:bg-white/10"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {LINKS.map((link) => {
+            const active = linkIsActive(pathname, link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                onClick={() => play("click")}
+                className={cn(
+                  "rounded-md px-3 py-2 font-display text-sm transition",
+                  active
+                    ? "bg-[var(--ll-pink-soft)] text-[var(--ll-pink-deep)]"
+                    : "text-[var(--ll-ink)] hover:bg-white/60 dark:hover:bg-white/10"
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -230,7 +258,7 @@ export function Header() {
             aria-label={muted ? "Unmute sounds" : "Mute sounds"}
             title={muted ? "Unmute" : "Mute"}
           >
-            {muted ? "🔇" : "🔊"}
+            <span aria-hidden>{muted ? "🔇" : "🔊"}</span>
           </PixelButton>
           <PixelButton
             size="sm"
@@ -240,15 +268,20 @@ export function Header() {
               theme === "light" ? "Switch to dark mode" : "Switch to light mode"
             }
           >
-            {theme === "light" ? "🌙" : "☀️"}
+            <span aria-hidden>{theme === "light" ? "🌙" : "☀️"}</span>
           </PixelButton>
-          <Link href="/create" className="sm:block md:hidden">
-            <PixelButton size="sm">✉️ Letter</PixelButton>
-          </Link>
+          <PixelButton
+            href="/create"
+            size="sm"
+            className="md:hidden"
+          >
+            <span aria-hidden>✉️</span> Letter
+          </PixelButton>
           <button
+            ref={menuButtonRef}
             type="button"
             className={cn(
-              "inline-flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--ll-lavender)]",
+              "inline-flex h-11 w-11 items-center justify-center rounded-xl border-2 border-[var(--ll-lavender)]",
               "bg-white/70 text-[var(--ll-ink)] shadow-[0_3px_0_var(--ll-lavender-shadow)]",
               "transition hover:bg-white/90 dark:bg-white/10 dark:hover:bg-white/15 md:hidden"
             )}
@@ -257,7 +290,7 @@ export function Header() {
               setOpen((value) => !value);
             }}
             aria-expanded={open}
-            aria-controls="mobile-menu"
+            aria-controls={open ? "mobile-menu" : undefined}
             aria-label={open ? "Close menu" : "Open menu"}
           >
             <BurgerIcon open={open} />

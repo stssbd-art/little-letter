@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface PixelWindowProps {
@@ -18,12 +18,16 @@ export function PixelWindow({
   icon = "💌",
   liftOnHover = true,
 }: PixelWindowProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
-      whileHover={liftOnHover ? { y: -4 } : undefined}
+      whileHover={
+        liftOnHover && !reduceMotion ? { y: -4 } : undefined
+      }
       transition={{ duration: 0.35 }}
       className={cn(
         "overflow-hidden rounded-xl border-[3px] border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]",
@@ -35,9 +39,9 @@ export function PixelWindow({
         <span className="text-sm" aria-hidden>
           {icon}
         </span>
-        <h2 className="flex-1 font-pixel text-[10px] leading-relaxed tracking-wide text-[#3d2f22] dark:text-[#f5ecd9] sm:text-[11px]">
+        <p className="m-0 flex-1 font-pixel text-[10px] leading-relaxed tracking-wide text-[#3d2f22] dark:text-[#f5ecd9] sm:text-[11px]">
           {title}
-        </h2>
+        </p>
         <div className="flex gap-1.5" aria-hidden>
           <span className="h-3 w-3 rounded-sm border border-[#8a7a62]/50 bg-[#c5d4a0]" />
           <span className="h-3 w-3 rounded-sm border border-[#8a7a62]/50 bg-[#ffe8a3]" />

@@ -512,8 +512,8 @@ export function LetterPreview() {
 
             <p className="mt-3 text-center text-sm text-[var(--ll-muted)]">
               {open
-                ? "Tap to tuck the letter back inside & seal with love"
-                : "Tap the red heart — the lip opens, then your letter slides out"}
+                ? "Click or press Enter to tuck the letter back inside"
+                : "Click the red heart — the lip opens, then your letter slides out"}
             </p>
           </button>
 
@@ -530,6 +530,8 @@ export function LetterPreview() {
                 : { duration: 0.2 }
             }
             className="w-full overflow-hidden"
+            aria-hidden={!open}
+            inert={!open ? true : undefined}
           >
             <article className="mt-6">
               {currentLetter.form.cardDesign &&

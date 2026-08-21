@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { MixtapePlayer } from "@/components/features/MixtapePlayer";
@@ -57,14 +56,15 @@ export default async function MixPlayPage({ params }: Props) {
         />
       </PixelWindow>
       <div className="flex justify-start gap-3">
-        <Link
+        <PixelButton
           href={`/mixtape?restore=${encodeURIComponent(code.trim())}`}
+          variant="secondary"
         >
-          <PixelButton variant="secondary">Continue editing &amp; send</PixelButton>
-        </Link>
-        <Link href="/">
-          <PixelButton variant="ghost">Home</PixelButton>
-        </Link>
+          Continue editing &amp; send
+        </PixelButton>
+        <PixelButton href="/" variant="ghost">
+          Home
+        </PixelButton>
       </div>
     </div>
   );

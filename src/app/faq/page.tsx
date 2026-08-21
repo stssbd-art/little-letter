@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -132,9 +131,7 @@ export default function FaqPage() {
       </div>
 
       <div className="flex justify-start">
-        <Link href="/create">
-          <PixelButton>Ready to write? ✉️</PixelButton>
-        </Link>
+        <PixelButton href="/create">Ready to write? ✉️</PixelButton>
       </div>
     </div>
   );

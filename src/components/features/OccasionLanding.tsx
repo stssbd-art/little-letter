@@ -118,14 +118,13 @@ export function OccasionLanding({ occasion }: Props) {
       ) : null}
 
       <div className="flex flex-wrap justify-start gap-3">
-        <Link href={`/create?occasion=${occasion.slug}`}>
-          <PixelButton size="lg">
-            {occasion.emoji} Create this {occasion.label.toLowerCase()} letter
-          </PixelButton>
-        </Link>
-        <Link href="/occasions">
-          <PixelButton variant="ghost">All occasions</PixelButton>
-        </Link>
+        <PixelButton href={`/create?occasion=${occasion.slug}`} size="lg">
+          <span aria-hidden>{occasion.emoji}</span> Create this{" "}
+          {occasion.label.toLowerCase()} letter
+        </PixelButton>
+        <PixelButton href="/occasions" variant="ghost">
+          All occasions
+        </PixelButton>
       </div>
 
       <section className="rounded-2xl border-2 border-[var(--ll-lavender)] bg-white/40 p-5 dark:bg-white/5">

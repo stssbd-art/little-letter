@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { Mascot } from "@/components/ui/Logo";
@@ -130,9 +129,7 @@ export default function AboutPage() {
             ))}
           </ul>
           <div className="flex justify-start pt-1">
-            <Link href="/create">
-              <PixelButton>Create your first letter</PixelButton>
-            </Link>
+            <PixelButton href="/create">Create your first letter</PixelButton>
           </div>
         </div>
       </PixelWindow>
