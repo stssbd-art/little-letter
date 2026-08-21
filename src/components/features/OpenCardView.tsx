@@ -21,7 +21,7 @@ export function OpenCardView({ card, code }: Props) {
   const shareUrl = `${SITE_URL}/open/${encodeURIComponent(code)}`;
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}

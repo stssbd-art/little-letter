@@ -126,7 +126,7 @@ export function CardComposeForm({ designId }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/cards"
@@ -139,12 +139,12 @@ export function CardComposeForm({ designId }: Props) {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <motion.div
           initial={{ opacity: 0, y: 14, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: "spring", stiffness: 220, damping: 22 }}
-          className="rounded-3xl border-[3px] p-3 sm:p-4"
+          className="rounded-3xl border-[3px] p-4 sm:p-6"
           style={{
             background: design.pageBg,
             borderColor: design.border,

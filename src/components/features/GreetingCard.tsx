@@ -40,7 +40,7 @@ function Shimmer({ night }: { night?: boolean }) {
 }
 
 const coverShadow = (border: string) =>
-  `8px 10px 0 ${border}55, 0 22px 36px rgba(61,47,34,0.22), inset 0 1px 0 rgba(255,255,255,0.35)`;
+  `10px 14px 0 ${border}55, 0 28px 48px rgba(61,47,34,0.22), inset 0 1px 0 rgba(255,255,255,0.35)`;
 
 function CardCover({
   design,
@@ -55,7 +55,7 @@ function CardCover({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[1.25rem] border-[4px]",
+        "relative overflow-hidden rounded-[1.35rem] border-[4px]",
         compact ? "aspect-[3/4]" : "h-full w-full"
       )}
       style={{
@@ -74,7 +74,7 @@ function CardCover({
           gid={`${clipId}-cover`}
         />
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-10"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-12"
           style={{
             background: `linear-gradient(to top, ${design.cardBg}, transparent)`,
           }}
@@ -84,15 +84,15 @@ function CardCover({
 
       <div
         className={cn(
-          "relative flex h-[42%] flex-col items-center justify-center px-4 text-center",
-          compact ? "pb-2 pt-1" : "pb-4 pt-2"
+          "relative flex h-[42%] flex-col items-center justify-center px-5 text-center",
+          compact ? "pb-2 pt-1" : "pb-6 pt-3"
         )}
         style={{ background: design.cardBg }}
       >
         <div
           className={cn(
-            "relative mb-2 inline-flex max-w-[95%] items-center justify-center px-4",
-            compact ? "min-h-[1.4rem]" : "min-h-[1.85rem]"
+            "relative mb-3 inline-flex max-w-[95%] items-center justify-center px-5",
+            compact ? "min-h-[1.4rem]" : "min-h-[2.1rem]"
           )}
         >
           <svg
@@ -117,7 +117,7 @@ function CardCover({
           <span
             className={cn(
               "relative z-[1] font-display font-semibold tracking-wide text-white",
-              compact ? "text-xs" : "text-sm"
+              compact ? "text-xs" : "text-base"
             )}
           >
             {design.badge}
@@ -127,7 +127,7 @@ function CardCover({
         <h3
           className={cn(
             "font-display font-bold leading-tight",
-            compact ? "line-clamp-2 text-xl" : "text-2xl sm:text-3xl"
+            compact ? "line-clamp-2 text-xl" : "text-3xl sm:text-4xl"
           )}
           style={{ color: design.accent }}
         >
@@ -136,8 +136,8 @@ function CardCover({
 
         <p
           className={cn(
-            "mt-1.5 max-w-[16rem] font-display leading-snug",
-            compact ? "line-clamp-2 text-xs" : "text-sm sm:text-base"
+            "mt-2 max-w-[20rem] font-display leading-snug",
+            compact ? "line-clamp-2 text-xs" : "text-base sm:text-lg"
           )}
           style={{ color: design.muted }}
         >
@@ -146,7 +146,7 @@ function CardCover({
       </div>
 
       <div
-        className="pointer-events-none absolute inset-2 rounded-[0.9rem] border-2"
+        className="pointer-events-none absolute inset-2.5 rounded-[1rem] border-2"
         style={{ borderColor: `${design.border}66` }}
         aria-hidden
       />
@@ -157,26 +157,26 @@ function CardCover({
 function CoverInside({ design }: { design: CardDesign }) {
   return (
     <div
-      className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-[1.25rem] border-[4px] px-6 text-center"
+      className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-[1.35rem] border-[4px] px-8 text-center"
       style={{
         borderColor: design.border,
         background: design.cardBg,
-        boxShadow: `inset 10px 0 22px rgba(61,47,34,0.12)`,
+        boxShadow: `inset 12px 0 28px rgba(61,47,34,0.12)`,
       }}
     >
       <div
-        className="h-px w-16"
+        className="h-px w-20"
         style={{ background: `${design.border}88` }}
         aria-hidden
       />
       <p
-        className="mt-4 font-display text-sm"
+        className="mt-5 font-display text-base sm:text-lg"
         style={{ color: design.muted }}
       >
         for you
       </p>
       <div
-        className="mt-4 h-px w-16"
+        className="mt-5 h-px w-20"
         style={{ background: `${design.border}88` }}
         aria-hidden
       />
@@ -189,17 +189,20 @@ function CardInterior({
   recipientName,
   message,
   senderName,
+  roomy,
 }: {
   design: CardDesign;
   recipientName: string;
   message: string;
   senderName: string;
+  /** Extra space when shown as an open bifold panel */
+  roomy?: boolean;
 }) {
   const gid = useId().replace(/:/g, "");
 
   return (
     <div
-      className="relative flex h-full w-full flex-col overflow-hidden rounded-[1.25rem] border-[4px]"
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-[1.35rem] border-[4px]"
       style={{
         borderColor: design.border,
         boxShadow: coverShadow(design.border),
@@ -207,54 +210,66 @@ function CardInterior({
       }}
     >
       <div
-        className="m-3 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-2xl border-2 p-4 sm:m-4 sm:p-5"
+        className={cn(
+          "m-3 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-2xl border-2 sm:m-5",
+          roomy ? "p-6 sm:p-8" : "p-5 sm:p-6"
+        )}
         style={{
           backgroundColor: design.cardBg,
           borderColor: design.border,
           backgroundImage: `repeating-linear-gradient(
             transparent,
-            transparent 28px,
-            ${design.border}18 28px,
-            ${design.border}18 29px
+            transparent 32px,
+            ${design.border}14 32px,
+            ${design.border}14 33px
           )`,
-          backgroundPosition: "0 5rem",
+          backgroundPosition: "0 6rem",
           WebkitOverflowScrolling: "touch",
         }}
       >
-        <div className="flex shrink-0 items-start justify-between gap-2">
-          <div
-            className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border-2"
-            style={{ borderColor: design.border }}
-          >
-            <div className="h-full w-full scale-150">
-              <CardSceneArt
-                designId={design.id}
-                compact
-                accent={design.accent}
-                border={design.border}
-                gid={`${gid}-in`}
-              />
-            </div>
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 sm:h-14 sm:w-14"
+          style={{ borderColor: design.border }}
+        >
+          <div className="h-full w-full scale-150">
+            <CardSceneArt
+              designId={design.id}
+              compact
+              accent={design.accent}
+              border={design.border}
+              gid={`${gid}-in`}
+            />
           </div>
         </div>
 
         <p
-          className="mt-4 shrink-0 font-display text-base"
+          className={cn(
+            "mt-5 shrink-0 font-display",
+            roomy ? "text-lg sm:text-xl" : "text-base sm:text-lg"
+          )}
           style={{ color: design.muted }}
         >
           For {recipientName}
         </p>
 
         <p
-          className="mt-4 whitespace-pre-wrap font-sans text-base leading-relaxed sm:text-[1.05rem] sm:leading-7"
+          className={cn(
+            "mt-5 flex-1 whitespace-pre-wrap font-sans leading-relaxed",
+            roomy
+              ? "text-lg sm:text-xl sm:leading-8"
+              : "text-base sm:text-lg sm:leading-8"
+          )}
           style={{ color: design.ink }}
         >
           {message}
         </p>
 
-        <div className="mt-5 flex shrink-0 items-end justify-end gap-3 pb-1">
+        <div className="mt-8 flex shrink-0 items-end justify-end gap-3 pb-1">
           <p
-            className="font-display text-lg font-semibold sm:text-xl"
+            className={cn(
+              "font-display font-semibold",
+              roomy ? "text-xl sm:text-2xl" : "text-lg sm:text-xl"
+            )}
             style={{ color: design.accent }}
           >
             — {senderName}
@@ -287,7 +302,6 @@ export function GreetingCard({
   }
 
   function armLock() {
-    // Block duplicate touch + click / double-fires for half a second
     lockUntil.current = Date.now() + 500;
   }
 
@@ -303,7 +317,6 @@ export function GreetingCard({
     setOpen(false);
   }
 
-  /** One intentional tap opens or closes — never both in one gesture. */
   function onCardActivate() {
     if (!canAct()) return;
     if (openRef.current) closeCard();
@@ -321,7 +334,7 @@ export function GreetingCard({
     if (!start) return;
     const moved =
       Math.abs(e.clientX - start.x) > 12 || Math.abs(e.clientY - start.y) > 12;
-    if (moved) return; // scroll / drag — don't toggle
+    if (moved) return;
     e.preventDefault();
     onCardActivate();
   }
@@ -342,7 +355,7 @@ export function GreetingCard({
 
   return (
     <div className={cn("relative w-full", className)}>
-      <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
+      <div className="mb-3 flex items-center justify-between gap-2 px-0.5">
         <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
           {open
             ? "scroll to read · tap again to close"
@@ -361,15 +374,64 @@ export function GreetingCard({
         </button>
       </div>
 
+      {/* Open bifold — real greeting-card spread (tablet+) */}
+      {open ? (
+        <motion.div
+          initial={{ opacity: 0.85, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35, ease: [0.33, 1, 0.32, 1] }}
+          className="mx-auto hidden w-full max-w-5xl touch-manipulation md:block"
+          role="button"
+          tabIndex={0}
+          aria-label="Close e-card"
+          aria-expanded
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onCardActivate();
+            }
+          }}
+        >
+          <div
+            className="grid grid-cols-2 gap-0 overflow-hidden rounded-[1.5rem]"
+            style={{
+              boxShadow: `0 24px 60px rgba(61,47,34,0.18)`,
+              minHeight: "min(70vh, 36rem)",
+            }}
+          >
+            <div className="relative min-h-[28rem] border-r-0">
+              <CardCover design={design} />
+            </div>
+            <div className="relative min-h-[28rem]">
+              <CardInterior
+                design={design}
+                recipientName={recipientName}
+                message={message}
+                senderName={senderName}
+                roomy
+              />
+            </div>
+          </div>
+        </motion.div>
+      ) : null}
+
+      {/* Closed cover, or mobile open with flip */}
       <div
         className={cn(
-          "relative mx-auto w-full max-w-md overflow-visible transition-[padding] duration-500",
-          open ? "pl-[16%] sm:pl-[40%]" : "pl-0"
+          "relative mx-auto w-full overflow-visible",
+          open
+            ? "max-w-[min(100%,26rem)] md:hidden"
+            : "max-w-[min(100%,26rem)] sm:max-w-[30rem] md:max-w-[34rem]"
         )}
-        style={{ perspective: 1400, perspectiveOrigin: "left center" }}
+        style={{ perspective: 1600, perspectiveOrigin: "left center" }}
       >
         <div
-          className="relative aspect-[3/4] w-full touch-manipulation [transform-style:preserve-3d]"
+          className={cn(
+            "relative w-full touch-manipulation [transform-style:preserve-3d]",
+            open ? "aspect-[3/4] min-h-[28rem]" : "aspect-[5/7] min-h-[32rem] sm:min-h-[36rem]"
+          )}
           role="button"
           tabIndex={0}
           aria-label={open ? "Close e-card" : "Open e-card"}
@@ -383,22 +445,18 @@ export function GreetingCard({
             }
           }}
         >
-          {/* Message page — on top when open so it can scroll */}
           <div
-            className={cn(
-              "absolute inset-0",
-              open ? "z-20" : "z-0"
-            )}
+            className={cn("absolute inset-0", open ? "z-20" : "z-0")}
           >
             <CardInterior
               design={design}
               recipientName={recipientName}
               message={message}
               senderName={senderName}
+              roomy
             />
           </div>
 
-          {/* Cover — on top when closed; swings open and yields pointer to message */}
           <motion.div
             className={cn(
               "absolute inset-0 [transform-style:preserve-3d]",
@@ -415,7 +473,7 @@ export function GreetingCard({
             >
               <CardCover design={design} />
               <div
-                className="pointer-events-none absolute inset-y-0 left-0 w-4 rounded-l-[1.25rem]"
+                className="pointer-events-none absolute inset-y-0 left-0 w-5 rounded-l-[1.35rem]"
                 style={{
                   background:
                     "linear-gradient(90deg, rgba(61,47,34,0.22), transparent)",
