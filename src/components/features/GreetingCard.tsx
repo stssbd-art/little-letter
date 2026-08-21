@@ -117,8 +117,8 @@ function CardCover({
           </svg>
           <span
             className={cn(
-              "relative z-[1] font-pixel tracking-wide text-white",
-              compact ? "text-[6px]" : "text-[8px]"
+              "relative z-[1] font-script italic text-white",
+              compact ? "text-[9px]" : "text-xs"
             )}
           >
             {design.badge}
@@ -127,18 +127,18 @@ function CardCover({
 
         <h3
           className={cn(
-            "font-display leading-tight",
-            compact ? "line-clamp-2 text-base" : "text-2xl sm:text-3xl"
+            "font-script leading-tight",
+            compact ? "line-clamp-2 text-lg" : "text-2xl sm:text-3xl"
           )}
-          style={{ color: night ? design.accent : design.accent }}
+          style={{ color: design.accent }}
         >
           {design.title}
         </h3>
 
         <p
           className={cn(
-            "mt-1.5 max-w-[16rem] leading-snug",
-            compact ? "line-clamp-2 text-[10px]" : "text-sm"
+            "mt-1 max-w-[16rem] font-script italic leading-snug",
+            compact ? "line-clamp-2 text-[11px]" : "text-sm"
           )}
           style={{ color: design.muted }}
         >
