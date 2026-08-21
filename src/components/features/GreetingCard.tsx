@@ -164,20 +164,19 @@ function CoverInside({ design }: { design: CardDesign }) {
         boxShadow: `inset 10px 0 22px rgba(61,47,34,0.12)`,
       }}
     >
+      <div
+        className="h-px w-16"
+        style={{ background: `${design.border}88` }}
+        aria-hidden
+      />
       <p
-        className="font-display text-xs font-semibold tracking-wide uppercase"
+        className="mt-4 font-display text-sm"
         style={{ color: design.muted }}
       >
-        inside the cover
-      </p>
-      <p
-        className="mt-3 font-display text-xl font-bold leading-snug sm:text-2xl"
-        style={{ color: design.accent }}
-      >
-        {design.title}
+        for you
       </p>
       <div
-        className="mt-6 h-px w-16"
+        className="mt-4 h-px w-16"
         style={{ background: `${design.border}88` }}
         aria-hidden
       />
@@ -188,19 +187,14 @@ function CoverInside({ design }: { design: CardDesign }) {
 function CardInterior({
   design,
   recipientName,
-  subject,
   message,
   senderName,
-  occasionLabel,
 }: {
   design: CardDesign;
   recipientName: string;
-  subject: string;
   message: string;
   senderName: string;
-  occasionLabel?: string;
 }) {
-  const night = design.vibe === "night";
   const gid = useId().replace(/:/g, "");
 
   return (
@@ -242,36 +236,10 @@ function CardInterior({
               />
             </div>
           </div>
-          <span
-            className="rounded-full border px-2.5 py-1 font-display text-xs font-semibold"
-            style={{
-              borderColor: design.border,
-              color: design.accent,
-              background: night ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.65)",
-            }}
-          >
-            {design.badge}
-          </span>
         </div>
 
-        {occasionLabel ? (
-          <p
-            className="mt-3 shrink-0 font-display text-sm"
-            style={{ color: design.muted }}
-          >
-            {occasionLabel}
-          </p>
-        ) : null}
-
-        <h3
-          className="mt-1 shrink-0 font-display text-xl font-bold leading-snug sm:text-2xl"
-          style={{ color: design.accent }}
-        >
-          {subject}
-        </h3>
-
         <p
-          className="mt-1 shrink-0 font-display text-sm"
+          className="mt-4 shrink-0 font-display text-base"
           style={{ color: design.muted }}
         >
           For {recipientName}
@@ -427,10 +395,8 @@ export function GreetingCard({
             <CardInterior
               design={design}
               recipientName={recipientName}
-              subject={subject}
               message={message}
               senderName={senderName}
-              occasionLabel={occasionLabel}
             />
           </div>
 
