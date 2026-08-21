@@ -1,7 +1,5 @@
 import { sql } from "@vercel/postgres";
-
-const FREE_LETTERS = 2;
-const FREE_MIXTAPES = 1;
+import { FREE_LETTERS, FREE_MIXTAPES } from "@/lib/usage-labels";
 
 export type SenderUsageRecord = {
   letterFreeUsed: number;
@@ -81,6 +79,14 @@ function rowToRecord(row: {
   };
 }
 
+async function ensureSenderRow(email: string) {
+  await sql`
+    INSERT INTO sender_usage (email)
+    VALUES (${email})
+    ON CONFLICT (email) DO NOTHING
+  `;
+}
+
 export async function readSenderUsage(
   emailRaw: string
 ): Promise<SenderUsageRecord | null> {
@@ -117,6 +123,12 @@ export async function writeSenderUsage(
 
   await ensureTable();
   const sessions = usage.usedSessionIds.slice(-30).join(",");
+  const letterFree = Math.max(0, Math.min(FREE_LETTERS, usage.letterFreeUsed));
+  const mixFree = Math.max(0, Math.min(FREE_MIXTAPES, usage.mixFreeUsed));
+  const letterCredits = Math.max(0, usage.letterCredits);
+  const mixCredits = Math.max(0, usage.mixCredits);
+
+  /* Free-used only ever rises (never rewind). Credits are set by atomic consume/pay. */
   await sql`
     INSERT INTO sender_usage (
       email,
@@ -128,17 +140,17 @@ export async function writeSenderUsage(
       updated_at
     ) VALUES (
       ${email},
-      ${Math.max(0, Math.min(FREE_LETTERS, usage.letterFreeUsed))},
-      ${Math.max(0, usage.letterCredits)},
-      ${Math.max(0, Math.min(FREE_MIXTAPES, usage.mixFreeUsed))},
-      ${Math.max(0, usage.mixCredits)},
+      ${letterFree},
+      ${letterCredits},
+      ${mixFree},
+      ${mixCredits},
       ${sessions},
       NOW()
     )
     ON CONFLICT (email) DO UPDATE SET
-      letter_free_used = EXCLUDED.letter_free_used,
+      letter_free_used = GREATEST(sender_usage.letter_free_used, EXCLUDED.letter_free_used),
+      mix_free_used = GREATEST(sender_usage.mix_free_used, EXCLUDED.mix_free_used),
       letter_credits = EXCLUDED.letter_credits,
-      mix_free_used = EXCLUDED.mix_free_used,
       mix_credits = EXCLUDED.mix_credits,
       used_session_ids = EXCLUDED.used_session_ids,
       updated_at = NOW()
@@ -174,42 +186,160 @@ export function mergeSenderIntoCookieUsage<T extends SenderUsageRecord>(
   };
 }
 
+/**
+ * Atomically consume one letter send for this email (free pool first, then paid credit).
+ * Safe against parallel requests — uses SQL WHERE guards.
+ */
 export async function consumeLetterForEmail(emailRaw: string) {
-  const current = (await readSenderUsage(emailRaw)) ?? emptyRecord();
-  if (current.letterFreeUsed < FREE_LETTERS) {
-    current.letterFreeUsed += 1;
-  } else if (current.letterCredits > 0) {
-    current.letterCredits -= 1;
-  } else {
+  if (!hasUsageDatabase()) {
+    throw new Error("Usage database is not configured.");
+  }
+  const email = normalizeSenderEmail(emailRaw);
+  if (!isValidSenderEmail(email)) {
     throw new Error("No send credit available for this email.");
   }
-  await writeSenderUsage(emailRaw, current);
-  return current;
+
+  await ensureTable();
+  await ensureSenderRow(email);
+
+  const free = await sql`
+    UPDATE sender_usage
+    SET
+      letter_free_used = letter_free_used + 1,
+      updated_at = NOW()
+    WHERE email = ${email}
+      AND letter_free_used < ${FREE_LETTERS}
+    RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+  `;
+  if (free.rows[0]) {
+    return rowToRecord(
+      free.rows[0] as {
+        letter_free_used: number;
+        letter_credits: number;
+        mix_free_used: number;
+        mix_credits: number;
+        used_session_ids: string;
+      }
+    );
+  }
+
+  const credit = await sql`
+    UPDATE sender_usage
+    SET
+      letter_credits = letter_credits - 1,
+      updated_at = NOW()
+    WHERE email = ${email}
+      AND letter_credits > 0
+    RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+  `;
+  if (credit.rows[0]) {
+    return rowToRecord(
+      credit.rows[0] as {
+        letter_free_used: number;
+        letter_credits: number;
+        mix_free_used: number;
+        mix_credits: number;
+        used_session_ids: string;
+      }
+    );
+  }
+
+  throw new Error("No send credit available for this email.");
 }
 
-/** E-cards: paid credit only — never the letter free allowance. */
+/** E-cards: paid credit only — never the letter free allowance. Atomic. */
 export async function consumeCardForEmail(emailRaw: string) {
-  const current = (await readSenderUsage(emailRaw)) ?? emptyRecord();
-  if (current.letterCredits > 0) {
-    current.letterCredits -= 1;
-  } else {
+  if (!hasUsageDatabase()) {
+    throw new Error("Usage database is not configured.");
+  }
+  const email = normalizeSenderEmail(emailRaw);
+  if (!isValidSenderEmail(email)) {
     throw new Error("No card send credit available for this email.");
   }
-  await writeSenderUsage(emailRaw, current);
-  return current;
+
+  await ensureTable();
+  await ensureSenderRow(email);
+
+  const credit = await sql`
+    UPDATE sender_usage
+    SET
+      letter_credits = letter_credits - 1,
+      updated_at = NOW()
+    WHERE email = ${email}
+      AND letter_credits > 0
+    RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+  `;
+  if (credit.rows[0]) {
+    return rowToRecord(
+      credit.rows[0] as {
+        letter_free_used: number;
+        letter_credits: number;
+        mix_free_used: number;
+        mix_credits: number;
+        used_session_ids: string;
+      }
+    );
+  }
+
+  throw new Error("No card send credit available for this email.");
 }
 
+/** Atomically consume one mixtape send (free first, then paid credit). */
 export async function consumeMixtapeForEmail(emailRaw: string) {
-  const current = (await readSenderUsage(emailRaw)) ?? emptyRecord();
-  if (current.mixFreeUsed < FREE_MIXTAPES) {
-    current.mixFreeUsed += 1;
-  } else if (current.mixCredits > 0) {
-    current.mixCredits -= 1;
-  } else {
+  if (!hasUsageDatabase()) {
+    throw new Error("Usage database is not configured.");
+  }
+  const email = normalizeSenderEmail(emailRaw);
+  if (!isValidSenderEmail(email)) {
     throw new Error("No mixtape send credit available for this email.");
   }
-  await writeSenderUsage(emailRaw, current);
-  return current;
+
+  await ensureTable();
+  await ensureSenderRow(email);
+
+  const free = await sql`
+    UPDATE sender_usage
+    SET
+      mix_free_used = mix_free_used + 1,
+      updated_at = NOW()
+    WHERE email = ${email}
+      AND mix_free_used < ${FREE_MIXTAPES}
+    RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+  `;
+  if (free.rows[0]) {
+    return rowToRecord(
+      free.rows[0] as {
+        letter_free_used: number;
+        letter_credits: number;
+        mix_free_used: number;
+        mix_credits: number;
+        used_session_ids: string;
+      }
+    );
+  }
+
+  const credit = await sql`
+    UPDATE sender_usage
+    SET
+      mix_credits = mix_credits - 1,
+      updated_at = NOW()
+    WHERE email = ${email}
+      AND mix_credits > 0
+    RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+  `;
+  if (credit.rows[0]) {
+    return rowToRecord(
+      credit.rows[0] as {
+        letter_free_used: number;
+        letter_credits: number;
+        mix_free_used: number;
+        mix_credits: number;
+        used_session_ids: string;
+      }
+    );
+  }
+
+  throw new Error("No mixtape send credit available for this email.");
 }
 
 export async function addPaidCreditForEmail(
@@ -217,13 +347,87 @@ export async function addPaidCreditForEmail(
   sessionId: string,
   kind: "letter" | "mixtape" | "card"
 ) {
-  const current = (await readSenderUsage(emailRaw)) ?? emptyRecord();
+  if (!hasUsageDatabase()) {
+    throw new Error("Usage database is not configured.");
+  }
+  const email = normalizeSenderEmail(emailRaw);
+  if (!isValidSenderEmail(email)) {
+    throw new Error("Invalid sender email.");
+  }
+
+  await ensureTable();
+  await ensureSenderRow(email);
+
+  const current = (await readSenderUsage(email)) ?? emptyRecord();
   if (current.usedSessionIds.includes(sessionId)) {
     return { usage: current, alreadyApplied: true as const };
   }
-  if (kind === "mixtape") current.mixCredits += 1;
-  else current.letterCredits += 1;
-  current.usedSessionIds = [...current.usedSessionIds, sessionId].slice(-30);
-  await writeSenderUsage(emailRaw, current);
-  return { usage: current, alreadyApplied: false as const };
+
+  if (kind === "mixtape") {
+    const updated = await sql`
+      UPDATE sender_usage
+      SET
+        mix_credits = mix_credits + 1,
+        used_session_ids = CASE
+          WHEN used_session_ids = '' OR used_session_ids IS NULL THEN ${sessionId}
+          WHEN position(${sessionId} in used_session_ids) > 0 THEN used_session_ids
+          ELSE used_session_ids || ',' || ${sessionId}
+        END,
+        updated_at = NOW()
+      WHERE email = ${email}
+        AND position(${sessionId} in COALESCE(used_session_ids, '')) = 0
+      RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+    `;
+    if (updated.rows[0]) {
+      return {
+        usage: rowToRecord(
+          updated.rows[0] as {
+            letter_free_used: number;
+            letter_credits: number;
+            mix_free_used: number;
+            mix_credits: number;
+            used_session_ids: string;
+          }
+        ),
+        alreadyApplied: false as const,
+      };
+    }
+    return {
+      usage: (await readSenderUsage(email)) ?? current,
+      alreadyApplied: true as const,
+    };
+  }
+
+  const updated = await sql`
+    UPDATE sender_usage
+    SET
+      letter_credits = letter_credits + 1,
+      used_session_ids = CASE
+        WHEN used_session_ids = '' OR used_session_ids IS NULL THEN ${sessionId}
+        WHEN position(${sessionId} in used_session_ids) > 0 THEN used_session_ids
+        ELSE used_session_ids || ',' || ${sessionId}
+      END,
+      updated_at = NOW()
+    WHERE email = ${email}
+      AND position(${sessionId} in COALESCE(used_session_ids, '')) = 0
+    RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+  `;
+  if (updated.rows[0]) {
+    return {
+      usage: rowToRecord(
+        updated.rows[0] as {
+          letter_free_used: number;
+          letter_credits: number;
+          mix_free_used: number;
+          mix_credits: number;
+          used_session_ids: string;
+        }
+      ),
+      alreadyApplied: false as const,
+    };
+  }
+  return {
+    usage: (await readSenderUsage(email)) ?? current,
+    alreadyApplied: true as const,
+  };
 }

@@ -5,6 +5,7 @@ import {
   FREE_LETTERS,
   FREE_MIXTAPES,
   FREE_CARDS,
+  hasUsageDatabase,
   isDemoMode,
   isValidSenderEmail,
   LETTER_PRICE_LABEL,
@@ -49,6 +50,7 @@ export async function GET(request: Request) {
       priceOneSong: MIX_ONE_SONG_LABEL,
       priceMultiSong: MIX_MULTI_SONG_LABEL,
       trackedByEmail: Boolean(senderEmail),
+      emailDb: hasUsageDatabase(),
     });
   }
 
@@ -66,6 +68,7 @@ export async function GET(request: Request) {
       canSend,
       price: CARD_PRICE_LABEL,
       trackedByEmail: Boolean(senderEmail),
+      emailDb: hasUsageDatabase(),
     });
   }
 
@@ -84,6 +87,7 @@ export async function GET(request: Request) {
     canSend,
     price: LETTER_PRICE_LABEL,
     trackedByEmail: Boolean(senderEmail),
+    emailDb: hasUsageDatabase(),
   });
 }
 

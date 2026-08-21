@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendLetterEmail } from "@/lib/resend";
 import type { GeneratedLetter } from "@/types";
 import {
+  addPaidCredit,
   consumeSendAccess,
   consumeCardSendAccess,
   FREE_LETTERS,
@@ -89,28 +90,67 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const result = await sendLetterEmail(letter, voiceNote);
-    const usage = isCard
-      ? await consumeCardSendAccess(senderEmail)
-      : await consumeSendAccess(senderEmail);
 
-    if (body.shareExample) {
-      try {
-        await addLetterExample(letter);
-      } catch {
-        /* optional — never fail the send */
-      }
+    /* Reserve free/credit slot before emailing so parallel sends cannot overshoot. */
+    let usage;
+    try {
+      usage = isCard
+        ? await consumeCardSendAccess(senderEmail)
+        : await consumeSendAccess(senderEmail);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "No send credit available.";
+      const paymentRequired =
+        message.includes("No send credit") ||
+        message.includes("No card send credit");
+      return NextResponse.json(
+        {
+          error: paymentRequired
+            ? isCard
+              ? `E-cards are ${CARD_PRICE_LABEL} each — there is no free card allowance.`
+              : `Your first ${FREE_LETTERS} letters are free. Extra letters are ${LETTER_PRICE_LABEL} each.`
+            : message,
+          requiresPayment: paymentRequired,
+          price: isCard ? CARD_PRICE_LABEL : LETTER_PRICE_LABEL,
+          stripeConfigured: isStripeConfigured(),
+        },
+        { status: paymentRequired ? 402 : 503 }
+      );
     }
 
-    return NextResponse.json({
-      ok: true,
-      id: result.id,
-      simulated: result.simulated,
-      provider: result.provider,
-      used: access.reason,
-      freeUsed: usage.freeUsed,
-      creditsLeft: usage.credits,
-    });
+    try {
+      const result = await sendLetterEmail(letter, voiceNote);
+
+      if (body.shareExample) {
+        try {
+          await addLetterExample(letter);
+        } catch {
+          /* optional — never fail the send */
+        }
+      }
+
+      return NextResponse.json({
+        ok: true,
+        id: result.id,
+        simulated: result.simulated,
+        provider: result.provider,
+        used: access.reason,
+        freeUsed: usage.freeUsed,
+        creditsLeft: usage.credits,
+      });
+    } catch (err) {
+      /* Slot already consumed; grant a paid credit so the sender is not stranded. */
+      try {
+        await addPaidCredit(
+          `refund-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+          isCard ? "card" : "letter",
+          senderEmail
+        );
+      } catch {
+        /* best-effort refund */
+      }
+      throw err;
+    }
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Could not send the letter.";

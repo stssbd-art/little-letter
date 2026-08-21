@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendMixtapeEmail } from "@/lib/resend";
 import type { MixtapePayload } from "@/types";
 import {
+  addPaidCredit,
   consumeMixtapeSendAccess,
   getMixtapeSendAccess,
   isValidSenderEmail,
@@ -121,26 +122,60 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const result = await sendMixtapeEmail(mix, voiceNote);
-    const usage = await consumeMixtapeSendAccess(senderEmail);
 
-    if (body.shareExample) {
-      try {
-        await addMixtapeExample(mix);
-      } catch {
-        /* optional — never fail the send */
-      }
+    const price = mixtapePrice(trackIds.length);
+    let usage;
+    try {
+      usage = await consumeMixtapeSendAccess(senderEmail);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "No mixtape send credit available.";
+      const paymentRequired = message.includes("No mixtape send credit");
+      return NextResponse.json(
+        {
+          error: paymentRequired
+            ? `Your first mixtape is free. Extra mixtapes are ${MIX_ONE_SONG_LABEL} for 1 song, or ${MIX_MULTI_SONG_LABEL} for 2 or more. This mix is ${price.label} — pay to send.`
+            : message,
+          requiresPayment: paymentRequired,
+          price: price.label,
+          stripeConfigured: isStripeConfigured(),
+        },
+        { status: paymentRequired ? 402 : 503 }
+      );
     }
 
-    return NextResponse.json({
-      ok: true,
-      id: result.id,
-      simulated: result.simulated,
-      provider: result.provider,
-      used: access.reason,
-      mixFreeUsed: usage.mixFreeUsed,
-      creditsLeft: usage.credits,
-    });
+    try {
+      const result = await sendMixtapeEmail(mix, voiceNote);
+
+      if (body.shareExample) {
+        try {
+          await addMixtapeExample(mix);
+        } catch {
+          /* optional — never fail the send */
+        }
+      }
+
+      return NextResponse.json({
+        ok: true,
+        id: result.id,
+        simulated: result.simulated,
+        provider: result.provider,
+        used: access.reason,
+        mixFreeUsed: usage.mixFreeUsed,
+        creditsLeft: usage.credits,
+      });
+    } catch (err) {
+      try {
+        await addPaidCredit(
+          `refund-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+          "mixtape",
+          senderEmail
+        );
+      } catch {
+        /* best-effort refund */
+      }
+      throw err;
+    }
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Could not send the mixtape.";

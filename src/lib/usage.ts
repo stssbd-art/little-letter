@@ -77,6 +77,11 @@ export function paymentsEnabled() {
   return !isDemoMode();
 }
 
+/** Production paid site must persist free/paid usage by email in Postgres. */
+export function requiresEmailUsageDb() {
+  return process.env.NODE_ENV === "production" && !isDemoMode();
+}
+
 const LETTER_FREE_COOKIE = "ll_letter_free_count";
 const LEGACY_FREE_COOKIE = "ll_free_used";
 const LETTER_CREDITS_COOKIE = "ll_letter_credits";
@@ -284,28 +289,29 @@ export async function consumeSendAccess(senderEmail?: string) {
     return usage;
   }
 
+  if (requiresEmailUsageDb() && !hasUsageDatabase()) {
+    throw new Error("Send tracking is temporarily unavailable. Please try again shortly.");
+  }
+
+  /* Email + DB is the source of truth — never fall back to cookies (bypass). */
   if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
-    try {
-      const emailUsage = await consumeLetterForEmail(senderEmail);
-      const next = finalize({
-        letterFreeUsed: emailUsage.letterFreeUsed,
-        letterCredits: emailUsage.letterCredits,
-        mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
-        mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
-        usedSessionIds: Array.from(
-          new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
-        ).slice(-30),
-      });
-      await writeUsage(next, senderEmail);
-      return next;
-    } catch (err) {
-      if (
-        err instanceof Error &&
-        err.message.includes("No send credit available")
-      ) {
-        throw err;
-      }
-    }
+    const emailUsage = await consumeLetterForEmail(senderEmail);
+    const next = finalize({
+      letterFreeUsed: emailUsage.letterFreeUsed,
+      letterCredits: emailUsage.letterCredits,
+      mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
+      mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
+      usedSessionIds: Array.from(
+        new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
+      ).slice(-30),
+    });
+    /* Cookies only — DB already updated atomically. */
+    await writeUsage(next);
+    return next;
+  }
+
+  if (requiresEmailUsageDb()) {
+    throw new Error("Your email is required to track free sends.");
   }
 
   if (usage.letterFreeUsed < FREE_LETTERS) {
@@ -327,31 +333,30 @@ export async function consumeCardSendAccess(senderEmail?: string) {
     return usage;
   }
 
+  if (requiresEmailUsageDb() && !hasUsageDatabase()) {
+    throw new Error("Send tracking is temporarily unavailable. Please try again shortly.");
+  }
+
   if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
-    try {
-      const emailUsage = await consumeCardForEmail(senderEmail);
-      const next = finalize({
-        letterFreeUsed: Math.max(
-          usage.letterFreeUsed,
-          emailUsage.letterFreeUsed
-        ),
-        letterCredits: emailUsage.letterCredits,
-        mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
-        mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
-        usedSessionIds: Array.from(
-          new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
-        ).slice(-30),
-      });
-      await writeUsage(next, senderEmail);
-      return next;
-    } catch (err) {
-      if (
-        err instanceof Error &&
-        err.message.includes("No card send credit available")
-      ) {
-        throw err;
-      }
-    }
+    const emailUsage = await consumeCardForEmail(senderEmail);
+    const next = finalize({
+      letterFreeUsed: Math.max(
+        usage.letterFreeUsed,
+        emailUsage.letterFreeUsed
+      ),
+      letterCredits: emailUsage.letterCredits,
+      mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
+      mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
+      usedSessionIds: Array.from(
+        new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
+      ).slice(-30),
+    });
+    await writeUsage(next);
+    return next;
+  }
+
+  if (requiresEmailUsageDb()) {
+    throw new Error("Your email is required to track card sends.");
   }
 
   if (usage.letterCredits > 0) {
@@ -384,31 +389,30 @@ export async function consumeMixtapeSendAccess(senderEmail?: string) {
     return usage;
   }
 
+  if (requiresEmailUsageDb() && !hasUsageDatabase()) {
+    throw new Error("Send tracking is temporarily unavailable. Please try again shortly.");
+  }
+
   if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
-    try {
-      const emailUsage = await consumeMixtapeForEmail(senderEmail);
-      const next = finalize({
-        letterFreeUsed: Math.max(
-          usage.letterFreeUsed,
-          emailUsage.letterFreeUsed
-        ),
-        letterCredits: Math.max(usage.letterCredits, emailUsage.letterCredits),
-        mixFreeUsed: emailUsage.mixFreeUsed,
-        mixCredits: emailUsage.mixCredits,
-        usedSessionIds: Array.from(
-          new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
-        ).slice(-30),
-      });
-      await writeUsage(next, senderEmail);
-      return next;
-    } catch (err) {
-      if (
-        err instanceof Error &&
-        err.message.includes("No mixtape send credit available")
-      ) {
-        throw err;
-      }
-    }
+    const emailUsage = await consumeMixtapeForEmail(senderEmail);
+    const next = finalize({
+      letterFreeUsed: Math.max(
+        usage.letterFreeUsed,
+        emailUsage.letterFreeUsed
+      ),
+      letterCredits: Math.max(usage.letterCredits, emailUsage.letterCredits),
+      mixFreeUsed: emailUsage.mixFreeUsed,
+      mixCredits: emailUsage.mixCredits,
+      usedSessionIds: Array.from(
+        new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
+      ).slice(-30),
+    });
+    await writeUsage(next);
+    return next;
+  }
+
+  if (requiresEmailUsageDb()) {
+    throw new Error("Your email is required to track free mixtape sends.");
   }
 
   if (usage.mixFreeUsed < FREE_MIXTAPES) {
@@ -446,14 +450,19 @@ export async function addPaidCredit(
       if (!next.usedSessionIds.includes(sessionId)) {
         next.usedSessionIds = [...next.usedSessionIds, sessionId].slice(-30);
       }
-      await writeUsage(next, senderEmail);
+      await writeUsage(next);
       return {
         usage: next,
         alreadyApplied: emailResult.alreadyApplied,
       };
-    } catch {
-      /* fall through */
+    } catch (err) {
+      if (requiresEmailUsageDb()) throw err;
+      /* fall through to cookie credits in local/dev without DB */
     }
+  }
+
+  if (requiresEmailUsageDb()) {
+    throw new Error("Could not apply payment credit for this email.");
   }
 
   if (kind === "mixtape") {
