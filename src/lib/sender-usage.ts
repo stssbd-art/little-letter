@@ -159,10 +159,17 @@ export function mergeSenderIntoCookieUsage<T extends SenderUsageRecord>(
 ): T {
   if (!email) return cookie;
   /*
-   * Free allowances are per email in Postgres — never take the browser cookie’s
-   * free-used count (that would burn a new address after testing with another).
-   * Paid credits can still come from either side.
+   * Free pools: take the worse of cookie vs email so one device can’t keep
+   * claiming free sends by switching addresses. Paid credits: best of either.
    */
+  const letterFreeUsed = Math.min(
+    FREE_LETTERS,
+    Math.max(cookie.letterFreeUsed, email.letterFreeUsed)
+  );
+  const mixFreeUsed = Math.min(
+    FREE_MIXTAPES,
+    Math.max(cookie.mixFreeUsed, email.mixFreeUsed)
+  );
   const letterCredits = Math.max(cookie.letterCredits, email.letterCredits);
   const mixCredits = Math.max(cookie.mixCredits, email.mixCredits);
   const usedSessionIds = Array.from(
@@ -171,9 +178,9 @@ export function mergeSenderIntoCookieUsage<T extends SenderUsageRecord>(
 
   return {
     ...cookie,
-    letterFreeUsed: email.letterFreeUsed,
-    mixFreeUsed: email.mixFreeUsed,
+    letterFreeUsed,
     letterCredits,
+    mixFreeUsed,
     mixCredits,
     usedSessionIds,
   };
@@ -215,6 +222,46 @@ export async function consumeLetterForEmail(emailRaw: string) {
       }
     );
   }
+
+  const credit = await sql`
+    UPDATE sender_usage
+    SET
+      letter_credits = letter_credits - 1,
+      updated_at = NOW()
+    WHERE email = ${email}
+      AND letter_credits > 0
+    RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+  `;
+  if (credit.rows[0]) {
+    return rowToRecord(
+      credit.rows[0] as {
+        letter_free_used: number;
+        letter_credits: number;
+        mix_free_used: number;
+        mix_credits: number;
+        used_session_ids: string;
+      }
+    );
+  }
+
+  throw new Error("No send credit available for this email.");
+}
+
+/**
+ * Paid letter credit only — used when this browser already spent its free pool
+ * so switching emails cannot burn another address’s free allowance.
+ */
+export async function consumeLetterCreditForEmail(emailRaw: string) {
+  if (!hasUsageDatabase()) {
+    throw new Error("Usage database is not configured.");
+  }
+  const email = normalizeSenderEmail(emailRaw);
+  if (!isValidSenderEmail(email)) {
+    throw new Error("No send credit available for this email.");
+  }
+
+  await ensureTable();
+  await ensureSenderRow(email);
 
   const credit = await sql`
     UPDATE sender_usage
@@ -310,6 +357,43 @@ export async function consumeMixtapeForEmail(emailRaw: string) {
       }
     );
   }
+
+  const credit = await sql`
+    UPDATE sender_usage
+    SET
+      mix_credits = mix_credits - 1,
+      updated_at = NOW()
+    WHERE email = ${email}
+      AND mix_credits > 0
+    RETURNING letter_free_used, letter_credits, mix_free_used, mix_credits, used_session_ids
+  `;
+  if (credit.rows[0]) {
+    return rowToRecord(
+      credit.rows[0] as {
+        letter_free_used: number;
+        letter_credits: number;
+        mix_free_used: number;
+        mix_credits: number;
+        used_session_ids: string;
+      }
+    );
+  }
+
+  throw new Error("No mixtape send credit available for this email.");
+}
+
+/** Paid mixtape credit only — when this browser already used its free mixtape. */
+export async function consumeMixtapeCreditForEmail(emailRaw: string) {
+  if (!hasUsageDatabase()) {
+    throw new Error("Usage database is not configured.");
+  }
+  const email = normalizeSenderEmail(emailRaw);
+  if (!isValidSenderEmail(email)) {
+    throw new Error("No mixtape send credit available for this email.");
+  }
+
+  await ensureTable();
+  await ensureSenderRow(email);
 
   const credit = await sql`
     UPDATE sender_usage

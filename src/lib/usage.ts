@@ -3,8 +3,10 @@ import { createHmac, timingSafeEqual } from "crypto";
 import {
   addPaidCreditForEmail,
   consumeLetterForEmail,
+  consumeLetterCreditForEmail,
   consumeCardForEmail,
   consumeMixtapeForEmail,
+  consumeMixtapeCreditForEmail,
   hasUsageDatabase,
   isValidSenderEmail,
   mergeSenderIntoCookieUsage,
@@ -296,9 +298,20 @@ export async function consumeSendAccess(senderEmail?: string) {
 
   /* Email + DB is the source of truth — never fall back to cookies (bypass). */
   if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
-    const emailUsage = await consumeLetterForEmail(senderEmail);
+    const cookie = await readCookieUsage();
+    /*
+     * Same-device rule: if this browser already used its free letters, do not
+     * burn free allowance on a different email — paid credit only.
+     */
+    const emailUsage =
+      cookie.letterFreeUsed >= FREE_LETTERS
+        ? await consumeLetterCreditForEmail(senderEmail)
+        : await consumeLetterForEmail(senderEmail);
     const next = finalize({
-      letterFreeUsed: emailUsage.letterFreeUsed,
+      letterFreeUsed: Math.max(
+        cookie.letterFreeUsed,
+        emailUsage.letterFreeUsed
+      ),
       letterCredits: emailUsage.letterCredits,
       mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
       mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
@@ -395,14 +408,18 @@ export async function consumeMixtapeSendAccess(senderEmail?: string) {
   }
 
   if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
-    const emailUsage = await consumeMixtapeForEmail(senderEmail);
+    const cookie = await readCookieUsage();
+    const emailUsage =
+      cookie.mixFreeUsed >= FREE_MIXTAPES
+        ? await consumeMixtapeCreditForEmail(senderEmail)
+        : await consumeMixtapeForEmail(senderEmail);
     const next = finalize({
       letterFreeUsed: Math.max(
         usage.letterFreeUsed,
         emailUsage.letterFreeUsed
       ),
       letterCredits: Math.max(usage.letterCredits, emailUsage.letterCredits),
-      mixFreeUsed: emailUsage.mixFreeUsed,
+      mixFreeUsed: Math.max(cookie.mixFreeUsed, emailUsage.mixFreeUsed),
       mixCredits: emailUsage.mixCredits,
       usedSessionIds: Array.from(
         new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
