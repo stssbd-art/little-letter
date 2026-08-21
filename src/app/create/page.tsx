@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 export const metadata: Metadata = {
   title: "Create & Send a Birthday Card or Letter Online",
   description:
-    "Create a digital birthday card, occasion wish, or personal letter and email it to someone you care about. First two letters free, then £0.99.",
+    "A few words can mean so much. Write a heartfelt birthday card, thank-you, or love letter — yourself or with help. First two letters free, then £0.99. Add a spoken voice note.",
   alternates: { canonical: "/create" },
   keywords: [
     "birthday card online",
@@ -21,9 +21,18 @@ export default function CreatePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title="Create a Little Letter">
-        Birthday cards, thank you notes, love letters, and more — write it
-        yourself or get help. First two letters free, then £0.99 each. You can
-        add a spoken voice note too.
+        <p className="text-[var(--ll-ink)]">A few words can mean so much.</p>
+        <p className="mt-2">
+          Write a heartfelt birthday card, a sweet thank-you, a love letter, or
+          simply something to brighten their day. Write it yourself or let us
+          help you find the perfect words.
+        </p>
+        <ul className="mt-3 space-y-1.5 text-[var(--ll-ink)]">
+          <li>
+            ✨ Your first 2 letters are free, then just £0.99 each.
+          </li>
+          <li>🎙️ Make it extra special with a personal spoken voice note.</li>
+        </ul>
       </PageHeader>
       <Suspense
         fallback={

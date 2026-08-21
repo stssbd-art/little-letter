@@ -18,9 +18,9 @@ export function PageHeader({
         {title}
       </h1>
       {children ? (
-        <p className="font-display leading-relaxed text-[var(--ll-muted)]">
+        <div className="font-display leading-relaxed text-[var(--ll-muted)]">
           {children}
-        </p>
+        </div>
       ) : null}
     </header>
   );
