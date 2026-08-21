@@ -12,8 +12,6 @@ type SlideProps = {
   offer: AffiliateOffer;
   /** CSS top position, e.g. "38%" / "62%" */
   top: string;
-  /** Start open so the first visit is obvious */
-  defaultOpen?: boolean;
   tabLabel: string;
   tabClassName: string;
 };
@@ -21,12 +19,11 @@ type SlideProps = {
 function OneSideSlide({
   offer,
   top,
-  defaultOpen = false,
   tabLabel,
   tabClassName,
 }: SlideProps) {
   const [mounted, setMounted] = useState(false);
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(false);
   const panelId = useId();
 
   useEffect(() => {
@@ -147,7 +144,6 @@ export function AffiliateSideSlide() {
         <OneSideSlide
           offer={cadbury}
           top="36%"
-          defaultOpen
           tabLabel="CHOCS"
           tabClassName="border-[#6b3a2a] bg-gradient-to-b from-[#8b4a32] to-[#4a2018]"
         />
@@ -156,7 +152,6 @@ export function AffiliateSideSlide() {
         <OneSideSlide
           offer={stories}
           top="64%"
-          defaultOpen={false}
           tabLabel="BOOKS"
           tabClassName="border-[#7a4a5a] bg-gradient-to-b from-[#8a4a5a] to-[#4a2030]"
         />
