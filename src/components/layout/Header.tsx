@@ -17,7 +17,7 @@ const LINKS = [
   { href: "/create", label: "Letter" },
   { href: "/cards", label: "Cards" },
   { href: "/mixtape", label: "Mixtape" },
-  { href: "/wall", label: "Shared" },
+  { href: "/wall", label: "The Wall" },
   { href: "/paperless", label: "Planet" },
   { href: "/faq", label: "FAQ" },
 ];
