@@ -336,14 +336,20 @@ export function LetterPreview() {
                   />
                 </svg>
 
-                {/* Letter sliding out (between back and front) */}
+                {/* Letter — tucked fully under the pocket when sealed; slides up when open */}
                 <motion.div
-                  className="absolute left-1/2 z-[15] w-[82%] -translate-x-1/2 overflow-hidden rounded-md border-2 border-[#d4b896] bg-[#fffdf6] px-3 py-2 shadow-[3px_3px_0_rgba(61,47,34,0.12)]"
+                  className="absolute left-1/2 z-[15] w-[78%] -translate-x-1/2 overflow-hidden rounded-md border-2 border-[#d4b896] bg-[#fffdf6] px-3 py-2 shadow-[3px_3px_0_rgba(61,47,34,0.12)]"
                   initial={false}
                   animate={
                     open
-                      ? { top: "8%", opacity: 1, scale: 1 }
-                      : { top: "38%", opacity: 0.95, scale: 0.98 }
+                      ? { top: "10%", height: "52%", opacity: 1, scale: 1 }
+                      : {
+                          /* Keep wholly below the flap tip (~50%) so it stays inside the pocket */
+                          top: "54%",
+                          height: "38%",
+                          opacity: 1,
+                          scale: 0.98,
+                        }
                   }
                   transition={
                     open
@@ -353,9 +359,8 @@ export function LetterPreview() {
                           stiffness: 160,
                           damping: 16,
                         }
-                      : { duration: 0.28, ease: "easeIn" }
+                      : { duration: 0.32, ease: "easeIn" }
                   }
-                  style={{ height: "54%" }}
                 >
                   <p className="truncate font-pixel text-[8px] text-[#8b5e34]">
                     {currentLetter.subject}
@@ -467,8 +472,8 @@ export function LetterPreview() {
 
             <p className="mt-3 text-center text-sm text-[var(--ll-muted)]">
               {open
-                ? "Tap to tuck the letter back & seal with love"
-                : "Tap the red heart — the lip opens, then your letter pops out"}
+                ? "Tap to tuck the letter back inside & seal with love"
+                : "Tap the red heart — the lip opens, then your letter slides out"}
             </p>
           </button>
 
