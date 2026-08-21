@@ -123,12 +123,10 @@ export async function writeSenderUsage(
 
   await ensureTable();
   const sessions = usage.usedSessionIds.slice(-30).join(",");
-  const letterFree = Math.max(0, Math.min(FREE_LETTERS, usage.letterFreeUsed));
-  const mixFree = Math.max(0, Math.min(FREE_MIXTAPES, usage.mixFreeUsed));
   const letterCredits = Math.max(0, usage.letterCredits);
   const mixCredits = Math.max(0, usage.mixCredits);
 
-  /* Free-used only ever rises (never rewind). Credits are set by atomic consume/pay. */
+  /* Free-used is only raised by consume*ForEmail — never from cookie sync. */
   await sql`
     INSERT INTO sender_usage (
       email,
@@ -140,16 +138,14 @@ export async function writeSenderUsage(
       updated_at
     ) VALUES (
       ${email},
-      ${letterFree},
+      0,
       ${letterCredits},
-      ${mixFree},
+      0,
       ${mixCredits},
       ${sessions},
       NOW()
     )
     ON CONFLICT (email) DO UPDATE SET
-      letter_free_used = GREATEST(sender_usage.letter_free_used, EXCLUDED.letter_free_used),
-      mix_free_used = GREATEST(sender_usage.mix_free_used, EXCLUDED.mix_free_used),
       letter_credits = EXCLUDED.letter_credits,
       mix_credits = EXCLUDED.mix_credits,
       used_session_ids = EXCLUDED.used_session_ids,
@@ -162,14 +158,11 @@ export function mergeSenderIntoCookieUsage<T extends SenderUsageRecord>(
   email: SenderUsageRecord | null
 ): T {
   if (!email) return cookie;
-  const letterFreeUsed = Math.min(
-    FREE_LETTERS,
-    Math.max(cookie.letterFreeUsed, email.letterFreeUsed)
-  );
-  const mixFreeUsed = Math.min(
-    FREE_MIXTAPES,
-    Math.max(cookie.mixFreeUsed, email.mixFreeUsed)
-  );
+  /*
+   * Free allowances are per email in Postgres — never take the browser cookie’s
+   * free-used count (that would burn a new address after testing with another).
+   * Paid credits can still come from either side.
+   */
   const letterCredits = Math.max(cookie.letterCredits, email.letterCredits);
   const mixCredits = Math.max(cookie.mixCredits, email.mixCredits);
   const usedSessionIds = Array.from(
@@ -178,9 +171,9 @@ export function mergeSenderIntoCookieUsage<T extends SenderUsageRecord>(
 
   return {
     ...cookie,
-    letterFreeUsed,
+    letterFreeUsed: email.letterFreeUsed,
+    mixFreeUsed: email.mixFreeUsed,
     letterCredits,
-    mixFreeUsed,
     mixCredits,
     usedSessionIds,
   };

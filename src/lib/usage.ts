@@ -244,10 +244,11 @@ export async function writeUsage(usage: UsageSnapshot, senderEmail?: string) {
 
   if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
     try {
+      /* Credits + payment sessions only — free pools stay untouched here. */
       await writeSenderUsage(senderEmail, {
-        letterFreeUsed: next.letterFreeUsed,
+        letterFreeUsed: 0,
+        mixFreeUsed: 0,
         letterCredits: next.letterCredits,
-        mixFreeUsed: next.mixFreeUsed,
         mixCredits: next.mixCredits,
         usedSessionIds: next.usedSessionIds,
       });
