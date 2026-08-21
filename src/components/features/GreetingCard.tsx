@@ -118,7 +118,7 @@ function CardCover({
           <span
             className={cn(
               "relative z-[1] font-script italic text-white",
-              compact ? "text-[9px]" : "text-xs"
+              compact ? "text-sm" : "text-base"
             )}
           >
             {design.badge}
@@ -128,7 +128,7 @@ function CardCover({
         <h3
           className={cn(
             "font-script leading-tight",
-            compact ? "line-clamp-2 text-lg" : "text-2xl sm:text-3xl"
+            compact ? "line-clamp-2 text-2xl" : "text-3xl sm:text-4xl"
           )}
           style={{ color: design.accent }}
         >
@@ -137,8 +137,8 @@ function CardCover({
 
         <p
           className={cn(
-            "mt-1 max-w-[16rem] font-script italic leading-snug",
-            compact ? "line-clamp-2 text-[11px]" : "text-sm"
+            "mt-1.5 max-w-[16rem] font-script italic leading-snug",
+            compact ? "line-clamp-2 text-sm" : "text-base sm:text-lg"
           )}
           style={{ color: design.muted }}
         >
@@ -167,13 +167,13 @@ function CoverInside({ design }: { design: CardDesign }) {
       }}
     >
       <p
-        className="font-script text-[10px] italic"
+        className="font-script text-sm italic"
         style={{ color: design.muted }}
       >
         inside the cover
       </p>
       <p
-        className="mt-3 font-script text-base leading-snug"
+        className="mt-3 font-script text-2xl leading-snug sm:text-3xl"
         style={{ color: design.accent }}
       >
         {design.title}
@@ -221,16 +221,16 @@ function CardInterior({
           borderColor: design.border,
           backgroundImage: `repeating-linear-gradient(
             transparent,
-            transparent 22px,
-            ${design.border}18 22px,
-            ${design.border}18 23px
+            transparent 28px,
+            ${design.border}18 28px,
+            ${design.border}18 29px
           )`,
-          backgroundPosition: "0 4.5rem",
+          backgroundPosition: "0 5rem",
         }}
       >
         <div className="flex items-start justify-between gap-2">
           <div
-            className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border-2"
+            className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border-2"
             style={{ borderColor: design.border }}
           >
             <div className="h-full w-full scale-150">
@@ -244,7 +244,7 @@ function CardInterior({
             </div>
           </div>
           <span
-            className="rounded-full border px-2.5 py-0.5 font-script text-[10px] italic"
+            className="rounded-full border px-2.5 py-1 font-script text-sm italic"
             style={{
               borderColor: design.border,
               color: design.accent,
@@ -257,7 +257,7 @@ function CardInterior({
 
         {occasionLabel ? (
           <p
-            className="mt-3 font-script text-[11px] italic"
+            className="mt-3 font-script text-base italic"
             style={{ color: design.muted }}
           >
             {occasionLabel}
@@ -265,26 +265,26 @@ function CardInterior({
         ) : null}
 
         <h3
-          className="mt-1 font-script text-lg leading-snug sm:text-xl"
+          className="mt-1 font-script text-2xl leading-snug sm:text-3xl"
           style={{ color: design.accent }}
         >
           {subject}
         </h3>
 
-        <p className="mt-0.5 font-script text-xs italic" style={{ color: design.muted }}>
+        <p className="mt-1 font-script text-base italic" style={{ color: design.muted }}>
           For {recipientName}
         </p>
 
         <p
-          className="mt-3 flex-1 whitespace-pre-wrap font-script text-sm leading-relaxed sm:text-[0.95rem]"
+          className="mt-4 flex-1 whitespace-pre-wrap font-script text-lg leading-relaxed sm:text-xl"
           style={{ color: design.ink }}
         >
           {message}
         </p>
 
-        <div className="mt-3 flex items-end justify-end gap-3">
+        <div className="mt-4 flex items-end justify-end gap-3">
           <p
-            className="font-script text-sm italic"
+            className="font-script text-xl italic sm:text-2xl"
             style={{ color: design.accent }}
           >
             — {senderName}
