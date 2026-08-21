@@ -54,7 +54,7 @@ function CardCover({
     <div
       className={cn(
         "relative overflow-hidden rounded-[1.35rem] border-[3px]",
-        compact ? "aspect-[3/4]" : "aspect-[3/4] w-full max-w-md mx-auto"
+        compact ? "aspect-[3/4]" : "h-full w-full"
       )}
       style={{
         borderColor: design.border,
@@ -156,6 +156,37 @@ function CardCover({
   );
 }
 
+function CoverInside({ design }: { design: CardDesign }) {
+  return (
+    <div
+      className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-[1.35rem] border-[3px] px-6 text-center"
+      style={{
+        borderColor: design.border,
+        background: design.cardBg,
+        boxShadow: `inset 8px 0 18px rgba(61,47,34,0.08)`,
+      }}
+    >
+      <p
+        className="font-pixel text-[8px] uppercase tracking-widest"
+        style={{ color: design.muted }}
+      >
+        inside the cover
+      </p>
+      <p
+        className="mt-3 font-display text-lg leading-snug"
+        style={{ color: design.accent }}
+      >
+        {design.title}
+      </p>
+      <div
+        className="mt-6 h-px w-16"
+        style={{ background: `${design.border}88` }}
+        aria-hidden
+      />
+    </div>
+  );
+}
+
 function CardInterior({
   design,
   recipientName,
@@ -176,7 +207,7 @@ function CardInterior({
 
   return (
     <div
-      className="relative mx-auto flex aspect-[3/4] w-full max-w-md flex-col overflow-hidden rounded-[1.35rem] border-[3px]"
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-[1.35rem] border-[3px]"
       style={{
         borderColor: design.border,
         boxShadow: `6px 8px 0 ${design.border}44`,
@@ -303,41 +334,34 @@ export function GreetingCard({
     <div className={cn("relative w-full", className)}>
       <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
         <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
-          {open ? "inside your e-card" : "tap to open e-card"}
+          {open ? "inside your e-card" : "tap the cover to open"}
         </p>
         <button
           type="button"
           className="font-pixel text-[8px] text-[var(--ll-pink-deep)] underline decoration-dotted underline-offset-2"
           onClick={() => setOpen((v) => !v)}
         >
-          {open ? "Show cover" : "Open card"}
+          {open ? "Close card" : "Open card"}
         </button>
       </div>
 
-      <div style={{ perspective: 1400 }} className="w-full">
-        <motion.button
+      {/* Real greeting card: cover hinged on the left, swings open */}
+      <div
+        className={cn(
+          "relative mx-auto w-full max-w-md overflow-visible transition-[padding] duration-500",
+          open ? "pl-[16%] sm:pl-[40%]" : "pl-0"
+        )}
+        style={{ perspective: 1600, perspectiveOrigin: "left center" }}
+      >
+        <button
           type="button"
           aria-label={open ? "Close e-card" : "Open e-card"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="relative mx-auto block w-full max-w-md cursor-pointer border-0 bg-transparent p-0 text-left [transform-style:preserve-3d]"
-          animate={{ rotateY: open ? 180 : 0 }}
-          transition={{ type: "spring", stiffness: 110, damping: 16 }}
+          className="relative block aspect-[3/4] w-full cursor-pointer border-0 bg-transparent p-0 text-left [transform-style:preserve-3d]"
         >
-          <div
-            className="w-full [backface-visibility:hidden]"
-            style={{ WebkitBackfaceVisibility: "hidden" }}
-          >
-            <CardCover design={design} />
-          </div>
-
-          <div
-            className="absolute inset-0 w-full [backface-visibility:hidden]"
-            style={{
-              transform: "rotateY(180deg)",
-              WebkitBackfaceVisibility: "hidden",
-            }}
-          >
+          {/* Right page — message stays put */}
+          <div className="absolute inset-0">
             <CardInterior
               design={design}
               recipientName={recipientName}
@@ -347,7 +371,40 @@ export function GreetingCard({
               occasionLabel={occasionLabel}
             />
           </div>
-        </motion.button>
+
+          {/* Left-hinged cover */}
+          <motion.div
+            className="absolute inset-0 z-10 [transform-style:preserve-3d]"
+            style={{ transformOrigin: "left center" }}
+            animate={{ rotateY: open ? -152 : 0 }}
+            transition={{ type: "spring", stiffness: 70, damping: 14 }}
+          >
+            <div
+              className="absolute inset-0 [backface-visibility:hidden]"
+              style={{ WebkitBackfaceVisibility: "hidden" }}
+            >
+              <CardCover design={design} />
+              {/* Spine shadow while closed / opening */}
+              <div
+                className="pointer-events-none absolute inset-y-0 left-0 w-3 rounded-l-[1.35rem]"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(61,47,34,0.14), transparent)",
+                }}
+                aria-hidden
+              />
+            </div>
+            <div
+              className="absolute inset-0 [backface-visibility:hidden]"
+              style={{
+                transform: "rotateY(180deg)",
+                WebkitBackfaceVisibility: "hidden",
+              }}
+            >
+              <CoverInside design={design} />
+            </div>
+          </motion.div>
+        </button>
       </div>
     </div>
   );
