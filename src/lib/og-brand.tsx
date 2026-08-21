@@ -38,10 +38,38 @@ export async function createBrandOpenGraphImage() {
   const kicker = "FOR SOMEONE YOU MISS";
   const fontBlob = `${logoText}${headline}${sub}${kicker}0123456789£.·`;
 
-  const [pixelFont, displayFont] = await Promise.all([
-    loadGoogleFont("Press+Start+2P", fontBlob, 400),
-    loadGoogleFont("Quicksand", fontBlob, 600),
-  ]);
+  let fonts:
+    | {
+        name: string;
+        data: ArrayBuffer;
+        style: "normal";
+        weight: 400 | 600;
+      }[]
+    | undefined;
+
+  try {
+    const [pixelFont, displayFont] = await Promise.all([
+      loadGoogleFont("Press+Start+2P", fontBlob, 400),
+      loadGoogleFont("Quicksand", fontBlob, 600),
+    ]);
+    fonts = [
+      {
+        name: "Pixel",
+        data: pixelFont,
+        style: "normal",
+        weight: 400,
+      },
+      {
+        name: "Display",
+        data: displayFont,
+        style: "normal",
+        weight: 600,
+      },
+    ];
+  } catch {
+    // Still return a preview if Google Fonts is unreachable.
+    fonts = undefined;
+  }
 
   return new ImageResponse(
     (
@@ -237,7 +265,7 @@ export async function createBrandOpenGraphImage() {
                   borderRadius: 16,
                   border: "3px solid #8b5e34",
                   background:
-                    "linear-gradient(180deg, #f6d58a 0%, #8b5e34 100%)",
+                    "linear-gradient(180deg, #ffe8a3 0%, #d2a35a 100%)",
                   color: "#fffdf6",
                   fontFamily: "Display",
                   fontSize: 20,
@@ -251,9 +279,9 @@ export async function createBrandOpenGraphImage() {
                   alignItems: "center",
                   padding: "12px 22px",
                   borderRadius: 16,
-                  border: "3px solid #6f8a45",
+                  border: "3px solid #8fa85a",
                   background:
-                    "linear-gradient(180deg, #c5d4a0 0%, #5f7538 100%)",
+                    "linear-gradient(180deg, #d7e3b8 0%, #8fa85a 100%)",
                   color: "#fffdf6",
                   fontFamily: "Display",
                   fontSize: 20,
@@ -269,20 +297,7 @@ export async function createBrandOpenGraphImage() {
     {
       ...ogSize,
       emoji: "twemoji",
-      fonts: [
-        {
-          name: "Pixel",
-          data: pixelFont,
-          style: "normal",
-          weight: 400,
-        },
-        {
-          name: "Display",
-          data: displayFont,
-          style: "normal",
-          weight: 600,
-        },
-      ],
+      fonts,
     }
   );
 }

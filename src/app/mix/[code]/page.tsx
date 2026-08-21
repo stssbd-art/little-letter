@@ -23,11 +23,35 @@ async function resolveMix(code: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { code } = await params;
   const mix = await resolveMix(code);
+  if (!mix) {
+    return { title: "Mixtape" };
+  }
+  const title = `${mix.title} · Mixtape`;
+  const description = `A playable mixtape for ${mix.to} from ${mix.from}`;
+  const url = `${SITE_URL}/mix/${encodeURIComponent(code.trim())}`;
   return {
-    title: mix ? `${mix.title} · Mixtape` : "Mixtape",
-    description: mix
-      ? `A playable mixtape for ${mix.to} from ${mix.from}`
-      : "Play a Little Letter mixtape",
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      images: [
+        {
+          url: `${SITE_URL}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${SITE_URL}/twitter-image`],
+    },
   };
 }
 
