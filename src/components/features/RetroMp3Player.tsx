@@ -27,6 +27,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
   const playerRef = useRef<YtPlayer | null>(null);
   const indexRef = useRef(0);
   const tracksRef = useRef<MixTrack[]>(MIX_TRACKS);
+  const pendingPlayIdRef = useRef<string | null>(null);
 
   const [tracks, setTracks] = useState<MixTrack[]>(MIX_TRACKS);
   const [index, setIndex] = useState(0);
@@ -44,16 +45,29 @@ export function RetroMp3Player({ className }: { className?: string }) {
   }, [tracks]);
 
   useEffect(() => {
-    if (!hostRef.current) return;
     let cancelled = false;
-    const mount = hostRef.current;
+    let tries = 0;
 
-    void (async () => {
+    const mountPlayer = async () => {
+      const container = hostRef.current;
+      if (!container) {
+        if (!cancelled && tries++ < 40) {
+          window.setTimeout(() => void mountPlayer(), 50);
+        }
+        return;
+      }
+
       try {
         const YT = await loadYouTubeApi();
-        if (cancelled || !mount) return;
+        if (cancelled) return;
 
         playerRef.current?.destroy();
+        // Stable wrapper: YT replaces the inner node, not our React ref host.
+        const mount = document.createElement("div");
+        mount.style.width = "100%";
+        mount.style.height = "100%";
+        container.replaceChildren(mount);
+
         playerRef.current = new YT.Player(mount, {
           videoId: MIX_TRACKS[0]!.youtubeId,
           width: "100%",
@@ -67,9 +81,19 @@ export function RetroMp3Player({ className }: { className?: string }) {
           },
           events: {
             onReady: () => {
-              if (!cancelled) {
-                setReady(true);
-                setError("");
+              if (cancelled) return;
+              setReady(true);
+              setError("");
+              const pending = pendingPlayIdRef.current;
+              if (pending) {
+                pendingPlayIdRef.current = null;
+                try {
+                  playerRef.current?.loadVideoById(pending);
+                  playerRef.current?.playVideo();
+                  setPlaying(true);
+                } catch {
+                  setError("Couldn’t start playback — tap Play.");
+                }
               }
             },
             onStateChange: (event) => {
@@ -83,28 +107,57 @@ export function RetroMp3Player({ className }: { className?: string }) {
                 const next = (indexRef.current + 1) % list.length;
                 setIndex(next);
                 indexRef.current = next;
-                event.target.loadVideoById(list[next]!.youtubeId);
+                try {
+                  event.target.loadVideoById(list[next]!.youtubeId);
+                  event.target.playVideo();
+                } catch {
+                  setPlaying(false);
+                }
               }
             },
             onError: () => {
               if (cancelled) return;
               setError("This track couldn’t play — try Next.");
               setPlaying(false);
+              const list = tracksRef.current;
+              if (list.length < 2) return;
+              const next = (indexRef.current + 1) % list.length;
+              window.setTimeout(() => {
+                if (cancelled) return;
+                setIndex(next);
+                indexRef.current = next;
+                try {
+                  playerRef.current?.loadVideoById(list[next]!.youtubeId);
+                  playerRef.current?.playVideo();
+                } catch {
+                  /* ignore */
+                }
+              }, 400);
             },
           },
         });
       } catch {
         if (!cancelled) {
           setError("Could not load the music player. Check your connection.");
+          // Allow a retry by clearing the shared API promise failure path
+          setReady(false);
         }
       }
-    })();
+    };
+
+    void mountPlayer();
 
     return () => {
       cancelled = true;
-      playerRef.current?.destroy();
+      pendingPlayIdRef.current = null;
+      try {
+        playerRef.current?.destroy();
+      } catch {
+        /* ignore */
+      }
       playerRef.current = null;
       setReady(false);
+      setPlaying(false);
     };
   }, []);
 
@@ -122,8 +175,11 @@ export function RetroMp3Player({ className }: { className?: string }) {
         player.playVideo();
         setPlaying(true);
       } catch {
+        pendingPlayIdRef.current = nextTrack.youtubeId;
         setError("Couldn’t switch track — try Play again.");
       }
+    } else {
+      pendingPlayIdRef.current = nextTrack.youtubeId;
     }
   }
 
@@ -175,27 +231,33 @@ export function RetroMp3Player({ className }: { className?: string }) {
   }
 
   function playMix() {
-    const player = playerRef.current;
-    if (!player || !ready) return;
     play("click");
-    try {
-      player.playVideo();
-      setPlaying(true);
-    } catch {
-      selectTrack(index);
+    const list = tracksRef.current;
+    const current = list[indexRef.current] ?? list[0];
+    if (!current) return;
+    const player = playerRef.current;
+    if (player && ready) {
+      try {
+        player.playVideo();
+        setPlaying(true);
+      } catch {
+        playTrackAt(list, indexRef.current);
+      }
+    } else {
+      pendingPlayIdRef.current = current.youtubeId;
+      setError("");
     }
   }
 
   function stopMix() {
     const player = playerRef.current;
-    if (!player || !ready) return;
     play("click");
     try {
-      player.pauseVideo();
-      setPlaying(false);
+      player?.pauseVideo();
     } catch {
-      setPlaying(false);
+      /* ignore */
     }
+    setPlaying(false);
   }
 
   return (
@@ -268,7 +330,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
             onClick={() =>
               selectTrack((index - 1 + tracks.length) % tracks.length)
             }
-            disabled={!ready || tracks.length < 2}
+            disabled={tracks.length < 2}
           >
             ⏮
           </button>
@@ -277,7 +339,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
             aria-label="Play"
             className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#f6d58a] text-base text-[#3d2f22] disabled:opacity-50"
             onClick={playMix}
-            disabled={!ready || playing}
+            disabled={playing && ready}
           >
             ▶
           </button>
@@ -286,7 +348,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
             aria-label="Stop"
             className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-base text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={stopMix}
-            disabled={!ready || !playing}
+            disabled={!playing}
           >
             ■
           </button>
@@ -295,7 +357,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
             aria-label="Next track"
             className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-sm text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={() => selectTrack((index + 1) % tracks.length)}
-            disabled={!ready || tracks.length < 2}
+            disabled={tracks.length < 2}
           >
             ⏭
           </button>
