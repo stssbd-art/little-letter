@@ -89,15 +89,37 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       ctaBg: "bg-[#d8e4f8]/15 group-hover:bg-[#d8e4f8]/25",
     },
   },
+  {
+    id: "vintage-wine",
+    href: "https://tidd.ly/4xUTqOJ",
+    label: "Vintage Wine Gifts",
+    blurb: "Anniversary vintage wine & port gifts — Vintage Wine Gifts",
+    emoji: "🍷",
+    tone: {
+      border: "border-[#5a2a3a]/40",
+      bg: "bg-gradient-to-r from-[#3a1520] via-[#5a2030] to-[#7a3040]",
+      iconBg: "bg-[#f8e8ec]",
+      muted: "text-[#f0d8e0]/85",
+      title: "text-[#fff5f8]",
+      ctaBorder: "border-[#f0d8e0]/35",
+      ctaBg: "bg-[#f0d8e0]/15 group-hover:bg-[#f0d8e0]/25",
+    },
+  },
 ];
 
-/** Desktop right-edge slides (Cadbury, Social Stories, Dean Morris). */
+/** Desktop right-edge slides. */
 export const SIDE_SLIDE_OFFERS = AFFILIATE_OFFERS.filter(
   (o) =>
-    o.id === "cadbury" || o.id === "social-stories" || o.id === "dean-morris"
+    o.id === "cadbury" ||
+    o.id === "social-stories" ||
+    o.id === "dean-morris" ||
+    o.id === "vintage-wine"
 );
 
 /** Offers shown in the footer banners (side-only exclusives stay out). */
 export const FOOTER_AFFILIATE_OFFERS = AFFILIATE_OFFERS.filter(
-  (o) => o.id !== "social-stories" && o.id !== "dean-morris"
+  (o) =>
+    o.id !== "social-stories" &&
+    o.id !== "dean-morris" &&
+    o.id !== "vintage-wine"
 );

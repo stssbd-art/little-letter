@@ -136,19 +136,22 @@ export function AffiliateSideSlide() {
   const cadbury = AFFILIATE_OFFERS.find((o) => o.id === "cadbury");
   const stories = AFFILIATE_OFFERS.find((o) => o.id === "social-stories");
   const deanMorris = AFFILIATE_OFFERS.find((o) => o.id === "dean-morris");
+  const vintageWine = AFFILIATE_OFFERS.find((o) => o.id === "vintage-wine");
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted || (!cadbury && !stories && !deanMorris)) return null;
+  if (!mounted || (!cadbury && !stories && !deanMorris && !vintageWine)) {
+    return null;
+  }
 
   return createPortal(
     <>
       {cadbury ? (
         <OneSideSlide
           offer={cadbury}
-          top="28%"
+          top="22%"
           tabLabel="CHOCS"
           tabClassName="border-[#6b3a2a] bg-gradient-to-b from-[#8b4a32] to-[#4a2018]"
         />
@@ -156,7 +159,7 @@ export function AffiliateSideSlide() {
       {deanMorris ? (
         <OneSideSlide
           offer={deanMorris}
-          top="50%"
+          top="40%"
           tabLabel="CARDS"
           tabClassName="border-[#4a5a7a] bg-gradient-to-b from-[#5a6a88] to-[#2a3548]"
         />
@@ -164,9 +167,17 @@ export function AffiliateSideSlide() {
       {stories ? (
         <OneSideSlide
           offer={stories}
-          top="72%"
+          top="58%"
           tabLabel="BOOKS"
           tabClassName="border-[#7a4a5a] bg-gradient-to-b from-[#8a4a5a] to-[#4a2030]"
+        />
+      ) : null}
+      {vintageWine ? (
+        <OneSideSlide
+          offer={vintageWine}
+          top="76%"
+          tabLabel="WINE"
+          tabClassName="border-[#5a2a3a] bg-gradient-to-b from-[#7a3040] to-[#3a1520]"
         />
       ) : null}
     </>,
