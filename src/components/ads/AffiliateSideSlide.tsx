@@ -128,9 +128,13 @@ function OneSideSlide({
   );
 }
 
-/** Right-edge sponsored slides on desktop and mobile (compact tabs on phones). */
+const MOBILE_MAX = 2;
+const MOBILE_TOPS = ["36%", "62%"] as const;
+
+/** Right-edge sponsored slides — all on desktop, two on mobile. */
 export function AffiliateSideSlide() {
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const cadbury = AFFILIATE_OFFERS.find((o) => o.id === "cadbury");
   const stories = AFFILIATE_OFFERS.find((o) => o.id === "social-stories");
@@ -140,6 +144,11 @@ export function AffiliateSideSlide() {
 
   useEffect(() => {
     setMounted(true);
+    const mq = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
 
   const slides = [
@@ -192,13 +201,20 @@ export function AffiliateSideSlide() {
     (s): s is NonNullable<typeof s> => Boolean(s)
   );
 
-  if (!mounted || slides.length === 0) {
+  const visibleSlides = isMobile
+    ? slides.slice(0, MOBILE_MAX).map((slide, i) => ({
+        ...slide,
+        top: MOBILE_TOPS[i] ?? slide.top,
+      }))
+    : slides;
+
+  if (!mounted || visibleSlides.length === 0) {
     return null;
   }
 
   return createPortal(
     <>
-      {slides.map((slide) => (
+      {visibleSlides.map((slide) => (
         <OneSideSlide
           key={slide.offer.id}
           offer={slide.offer}
