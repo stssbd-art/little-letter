@@ -16,25 +16,25 @@ import { SITE_NAME, SITE_TAGLINE, SITE_TAGLINE_EXTRA } from "@/lib/constants";
 export function HomePage() {
   return (
     <div className="space-y-14">
-      <section className="relative flex min-h-[70vh] flex-col items-center justify-center text-center">
+      <section className="relative flex min-h-[min(70vh,40rem)] flex-col items-center justify-center text-center">
         <h1 className="sr-only">
           {SITE_NAME} — send a letter, digital greeting card, or romantic
           mixtape online by email
         </h1>
         <Logo size="lg" />
-        <div className="mt-8">
+        <div className="mt-5 sm:mt-8">
           <Mascot />
         </div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-6 max-w-xl space-y-3 text-center"
+          className="mt-5 max-w-xl space-y-2 px-1 text-center sm:mt-6 sm:space-y-3"
         >
-          <p className="font-display text-lg text-[var(--ll-ink)] sm:text-xl">
+          <p className="font-display text-base text-[var(--ll-ink)] sm:text-xl">
             {SITE_TAGLINE}
           </p>
-          <p className="font-display text-base text-[var(--ll-muted)] sm:text-lg">
+          <p className="font-display text-sm text-[var(--ll-muted)] sm:text-lg">
             {SITE_TAGLINE_EXTRA}
           </p>
         </motion.div>
@@ -42,7 +42,7 @@ export function HomePage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="mt-8 flex w-full max-w-lg flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center"
+          className="mt-6 flex w-full max-w-md flex-col items-stretch gap-2.5 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-3"
         >
           <Link href="/create" className="sm:w-auto">
             <PixelButton size="lg" className="w-full sm:w-auto">

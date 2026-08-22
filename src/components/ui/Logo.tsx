@@ -5,9 +5,9 @@ import Link from "next/link";
 
 export function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   const sizes = {
-    sm: "text-sm sm:text-base",
+    sm: "text-[11px] sm:text-base",
     md: "text-xl sm:text-2xl",
-    lg: "text-3xl sm:text-5xl",
+    lg: "text-2xl sm:text-5xl",
   };
 
   return (
@@ -20,7 +20,9 @@ export function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
         aria-hidden
         animate={{ y: [0, -3, 0], rotate: [0, -6, 6, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className={size === "lg" ? "text-4xl sm:text-5xl" : "text-xl"}
+        className={
+          size === "lg" ? "text-3xl sm:text-5xl" : size === "sm" ? "text-lg" : "text-xl"
+        }
       >
         💌
       </motion.span>
@@ -43,7 +45,7 @@ export function Mascot({ className = "" }: { className?: string }) {
       aria-label="Pip the Envelope, Little Letter’s friendly mascot"
     >
       <div
-        className="relative flex h-28 w-28 items-center justify-center rounded-[28px] border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f6d58a] shadow-[6px_6px_0_var(--ll-pink-shadow)] dark:from-[#5c3d1e] dark:to-[#3d2f22]"
+        className="relative flex h-24 w-24 items-center justify-center rounded-[24px] border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f6d58a] shadow-[6px_6px_0_var(--ll-pink-shadow)] sm:h-28 sm:w-28 sm:rounded-[28px] dark:from-[#5c3d1e] dark:to-[#3d2f22]"
         aria-hidden
       >
         <div className="absolute left-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />

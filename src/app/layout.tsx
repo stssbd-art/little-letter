@@ -198,7 +198,7 @@ export default function RootLayout({
             <main
               id="main-content"
               tabIndex={-1}
-              className="mx-auto min-h-[70vh] max-w-6xl px-4 py-8 outline-none sm:py-12"
+              className="mx-auto min-h-[70vh] max-w-6xl px-3 py-6 outline-none sm:px-4 sm:py-12"
             >
               {children}
             </main>
