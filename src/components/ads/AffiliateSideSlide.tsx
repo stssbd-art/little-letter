@@ -14,6 +14,8 @@ type SlideProps = {
   top: string;
   tabLabel: string;
   tabClassName: string;
+  open: boolean;
+  onToggle: () => void;
 };
 
 function OneSideSlide({
@@ -21,45 +23,41 @@ function OneSideSlide({
   top,
   tabLabel,
   tabClassName,
+  open,
+  onToggle,
 }: SlideProps) {
-  const [mounted, setMounted] = useState(false);
-  const [open, setOpen] = useState(false);
   const panelId = useId();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
     <aside
       /* Layout box stays wide while closed; never steal taps from page content */
-      className="pointer-events-none fixed right-0 z-[200] hidden -translate-y-1/2 items-stretch md:flex"
+      className="pointer-events-none fixed right-0 z-[200] flex -translate-y-1/2 items-stretch"
       style={{ top }}
       aria-label={`Sponsored: ${offer.label}`}
     >
       <div
         className={cn(
           "pointer-events-auto flex items-stretch transition-transform duration-300 ease-out",
-          open ? "translate-x-0" : "translate-x-[calc(100%-3rem)]"
+          open
+            ? "translate-x-0"
+            : "translate-x-[calc(100%-2.5rem)] md:translate-x-[calc(100%-3rem)]"
         )}
       >
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={onToggle}
           aria-expanded={open}
           aria-controls={panelId}
           className={cn(
-            "flex min-h-[7.5rem] w-12 shrink-0 flex-col items-center justify-center gap-2 rounded-l-2xl border-[3px] border-r-0 py-4 shadow-[4px_4px_0_rgba(61,47,34,0.35)]",
+            "flex min-h-[5.25rem] w-10 shrink-0 flex-col items-center justify-center gap-1.5 rounded-l-2xl border-[3px] border-r-0 py-3 shadow-[4px_4px_0_rgba(61,47,34,0.35)] md:min-h-[7.5rem] md:w-12 md:gap-2 md:py-4",
             tabClassName,
             !open && "animate-pulse"
           )}
         >
-          <span className="text-2xl leading-none" aria-hidden>
+          <span className="text-xl leading-none md:text-2xl" aria-hidden>
             {offer.emoji}
           </span>
-          <span className="font-pixel text-[7px] tracking-[0.2em] text-[#fff6df] [writing-mode:vertical-rl] rotate-180">
+          <span className="font-pixel text-[6px] tracking-[0.15em] text-[#fff6df] [writing-mode:vertical-rl] rotate-180 md:text-[7px] md:tracking-[0.2em]">
             {open ? "CLOSE" : tabLabel}
           </span>
         </button>
@@ -67,7 +65,7 @@ function OneSideSlide({
         <div
           id={panelId}
           className={cn(
-            "flex w-[min(17.5rem,calc(100vw-3.75rem))] flex-col rounded-l-none rounded-bl-2xl border-[3px] border-l-0 px-3.5 py-3.5 shadow-[4px_4px_0_rgba(61,47,34,0.35)]",
+            "flex w-[min(17.5rem,calc(100vw-3.25rem))] flex-col rounded-l-none rounded-bl-2xl border-[3px] border-l-0 px-3.5 py-3.5 shadow-[4px_4px_0_rgba(61,47,34,0.35)] md:w-[min(17.5rem,calc(100vw-3.75rem))]",
             /* Closed panel is off-screen — don't let it eat taps under the transform */
             !open && "pointer-events-none",
             offer.tone.border,
@@ -130,9 +128,10 @@ function OneSideSlide({
   );
 }
 
-/** Desktop-only right-edge slides. Mobile uses footer banners. */
+/** Right-edge sponsored slides on desktop and mobile (compact tabs on phones). */
 export function AffiliateSideSlide() {
   const [mounted, setMounted] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
   const cadbury = AFFILIATE_OFFERS.find((o) => o.id === "cadbury");
   const stories = AFFILIATE_OFFERS.find((o) => o.id === "social-stories");
   const deanMorris = AFFILIATE_OFFERS.find((o) => o.id === "dean-morris");
@@ -143,55 +142,77 @@ export function AffiliateSideSlide() {
     setMounted(true);
   }, []);
 
-  if (
-    !mounted ||
-    (!cadbury && !stories && !deanMorris && !vintageWine && !brickZone)
-  ) {
+  const slides = [
+    cadbury
+      ? {
+          offer: cadbury,
+          top: "16%",
+          tabLabel: "CHOCS",
+          tabClassName:
+            "border-[#6b3a2a] bg-gradient-to-b from-[#8b4a32] to-[#4a2018]",
+        }
+      : null,
+    deanMorris
+      ? {
+          offer: deanMorris,
+          top: "32%",
+          tabLabel: "CARDS",
+          tabClassName:
+            "border-[#4a5a7a] bg-gradient-to-b from-[#5a6a88] to-[#2a3548]",
+        }
+      : null,
+    stories
+      ? {
+          offer: stories,
+          top: "48%",
+          tabLabel: "BOOKS",
+          tabClassName:
+            "border-[#7a4a5a] bg-gradient-to-b from-[#8a4a5a] to-[#4a2030]",
+        }
+      : null,
+    vintageWine
+      ? {
+          offer: vintageWine,
+          top: "64%",
+          tabLabel: "WINE",
+          tabClassName:
+            "border-[#5a2a3a] bg-gradient-to-b from-[#7a3040] to-[#3a1520]",
+        }
+      : null,
+    brickZone
+      ? {
+          offer: brickZone,
+          top: "80%",
+          tabLabel: "BRICKS",
+          tabClassName:
+            "border-[#3a6a4a] bg-gradient-to-b from-[#3a7a4a] to-[#1a3a28]",
+        }
+      : null,
+  ].filter(
+    (s): s is NonNullable<typeof s> => Boolean(s)
+  );
+
+  if (!mounted || slides.length === 0) {
     return null;
   }
 
   return createPortal(
     <>
-      {cadbury ? (
+      {slides.map((slide) => (
         <OneSideSlide
-          offer={cadbury}
-          top="18%"
-          tabLabel="CHOCS"
-          tabClassName="border-[#6b3a2a] bg-gradient-to-b from-[#8b4a32] to-[#4a2018]"
+          key={slide.offer.id}
+          offer={slide.offer}
+          top={slide.top}
+          tabLabel={slide.tabLabel}
+          tabClassName={slide.tabClassName}
+          open={openId === slide.offer.id}
+          onToggle={() =>
+            setOpenId((id) =>
+              id === slide.offer.id ? null : slide.offer.id
+            )
+          }
         />
-      ) : null}
-      {deanMorris ? (
-        <OneSideSlide
-          offer={deanMorris}
-          top="34%"
-          tabLabel="CARDS"
-          tabClassName="border-[#4a5a7a] bg-gradient-to-b from-[#5a6a88] to-[#2a3548]"
-        />
-      ) : null}
-      {stories ? (
-        <OneSideSlide
-          offer={stories}
-          top="50%"
-          tabLabel="BOOKS"
-          tabClassName="border-[#7a4a5a] bg-gradient-to-b from-[#8a4a5a] to-[#4a2030]"
-        />
-      ) : null}
-      {vintageWine ? (
-        <OneSideSlide
-          offer={vintageWine}
-          top="66%"
-          tabLabel="WINE"
-          tabClassName="border-[#5a2a3a] bg-gradient-to-b from-[#7a3040] to-[#3a1520]"
-        />
-      ) : null}
-      {brickZone ? (
-        <OneSideSlide
-          offer={brickZone}
-          top="82%"
-          tabLabel="BRICKS"
-          tabClassName="border-[#3a6a4a] bg-gradient-to-b from-[#3a7a4a] to-[#1a3a28]"
-        />
-      ) : null}
+      ))}
     </>,
     document.body
   );
