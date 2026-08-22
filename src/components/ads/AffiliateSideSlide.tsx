@@ -10,19 +10,22 @@ import { cn } from "@/lib/utils";
 
 type SlideProps = {
   offer: AffiliateOffer;
-  /** CSS top position, e.g. "38%" / "62%" */
-  top: string;
   tabLabel: string;
   tabClassName: string;
+  /** Tailwind top classes, e.g. "top-[36%] lg:top-[16%]" */
+  topClassName: string;
+  /** When false, slide is desktop/tablet-large only (hidden on phones). */
+  showOnMobile: boolean;
   open: boolean;
   onToggle: () => void;
 };
 
 function OneSideSlide({
   offer,
-  top,
   tabLabel,
   tabClassName,
+  topClassName,
+  showOnMobile,
   open,
   onToggle,
 }: SlideProps) {
@@ -31,8 +34,11 @@ function OneSideSlide({
   return (
     <aside
       /* Layout box stays wide while closed; never steal taps from page content */
-      className="pointer-events-none fixed right-0 z-[200] flex -translate-y-1/2 items-stretch"
-      style={{ top }}
+      className={cn(
+        "pointer-events-none fixed right-0 z-[200] -translate-y-1/2 items-stretch",
+        topClassName,
+        showOnMobile ? "flex" : "hidden lg:flex"
+      )}
       aria-label={`Sponsored: ${offer.label}`}
     >
       <div
@@ -40,7 +46,7 @@ function OneSideSlide({
           "pointer-events-auto flex items-stretch transition-transform duration-300 ease-out",
           open
             ? "translate-x-0"
-            : "translate-x-[calc(100%-2.5rem)] md:translate-x-[calc(100%-3rem)]"
+            : "translate-x-[calc(100%-2.5rem)] lg:translate-x-[calc(100%-3rem)]"
         )}
       >
         <button
@@ -49,15 +55,15 @@ function OneSideSlide({
           aria-expanded={open}
           aria-controls={panelId}
           className={cn(
-            "flex min-h-[5.25rem] w-10 shrink-0 flex-col items-center justify-center gap-1.5 rounded-l-2xl border-[3px] border-r-0 py-3 shadow-[4px_4px_0_rgba(61,47,34,0.35)] md:min-h-[7.5rem] md:w-12 md:gap-2 md:py-4",
+            "flex min-h-[5.25rem] w-10 shrink-0 flex-col items-center justify-center gap-1.5 rounded-l-2xl border-[3px] border-r-0 py-3 shadow-[4px_4px_0_rgba(61,47,34,0.35)] lg:min-h-[7.5rem] lg:w-12 lg:gap-2 lg:py-4",
             tabClassName,
             !open && "animate-pulse"
           )}
         >
-          <span className="text-xl leading-none md:text-2xl" aria-hidden>
+          <span className="text-xl leading-none lg:text-2xl" aria-hidden>
             {offer.emoji}
           </span>
-          <span className="font-pixel text-[6px] tracking-[0.15em] text-[#fff6df] [writing-mode:vertical-rl] rotate-180 md:text-[7px] md:tracking-[0.2em]">
+          <span className="font-pixel text-[6px] tracking-[0.15em] text-[#fff6df] [writing-mode:vertical-rl] rotate-180 lg:text-[7px] lg:tracking-[0.2em]">
             {open ? "CLOSE" : tabLabel}
           </span>
         </button>
@@ -65,8 +71,7 @@ function OneSideSlide({
         <div
           id={panelId}
           className={cn(
-            "flex w-[min(17.5rem,calc(100vw-3.25rem))] flex-col rounded-l-none rounded-bl-2xl border-[3px] border-l-0 px-3.5 py-3.5 shadow-[4px_4px_0_rgba(61,47,34,0.35)] md:w-[min(17.5rem,calc(100vw-3.75rem))]",
-            /* Closed panel is off-screen — don't let it eat taps under the transform */
+            "flex w-[min(17.5rem,calc(100vw-3.25rem))] flex-col rounded-l-none rounded-bl-2xl border-[3px] border-l-0 px-3.5 py-3.5 shadow-[4px_4px_0_rgba(61,47,34,0.35)] lg:w-[min(17.5rem,calc(100vw-3.75rem))]",
             !open && "pointer-events-none",
             offer.tone.border,
             offer.tone.bg
@@ -128,13 +133,9 @@ function OneSideSlide({
   );
 }
 
-const MOBILE_MAX = 2;
-const MOBILE_TOPS = ["36%", "62%"] as const;
-
-/** Right-edge sponsored slides — all on desktop, two on mobile. */
+/** Right-edge slides: 2 on phone/tablet, all five on large desktops. */
 export function AffiliateSideSlide() {
   const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const cadbury = AFFILIATE_OFFERS.find((o) => o.id === "cadbury");
   const stories = AFFILIATE_OFFERS.find((o) => o.id === "social-stories");
@@ -144,18 +145,14 @@ export function AffiliateSideSlide() {
 
   useEffect(() => {
     setMounted(true);
-    const mq = window.matchMedia("(max-width: 767px)");
-    const sync = () => setIsMobile(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
   }, []);
 
   const slides = [
     cadbury
       ? {
           offer: cadbury,
-          top: "16%",
+          showOnMobile: true,
+          topClassName: "top-[36%] lg:top-[16%]",
           tabLabel: "CHOCS",
           tabClassName:
             "border-[#6b3a2a] bg-gradient-to-b from-[#8b4a32] to-[#4a2018]",
@@ -164,7 +161,8 @@ export function AffiliateSideSlide() {
     deanMorris
       ? {
           offer: deanMorris,
-          top: "32%",
+          showOnMobile: true,
+          topClassName: "top-[62%] lg:top-[32%]",
           tabLabel: "CARDS",
           tabClassName:
             "border-[#4a5a7a] bg-gradient-to-b from-[#5a6a88] to-[#2a3548]",
@@ -173,7 +171,8 @@ export function AffiliateSideSlide() {
     stories
       ? {
           offer: stories,
-          top: "48%",
+          showOnMobile: false,
+          topClassName: "lg:top-[48%]",
           tabLabel: "BOOKS",
           tabClassName:
             "border-[#7a4a5a] bg-gradient-to-b from-[#8a4a5a] to-[#4a2030]",
@@ -182,7 +181,8 @@ export function AffiliateSideSlide() {
     vintageWine
       ? {
           offer: vintageWine,
-          top: "64%",
+          showOnMobile: false,
+          topClassName: "lg:top-[64%]",
           tabLabel: "WINE",
           tabClassName:
             "border-[#5a2a3a] bg-gradient-to-b from-[#7a3040] to-[#3a1520]",
@@ -191,7 +191,8 @@ export function AffiliateSideSlide() {
     brickZone
       ? {
           offer: brickZone,
-          top: "80%",
+          showOnMobile: false,
+          topClassName: "lg:top-[80%]",
           tabLabel: "BRICKS",
           tabClassName:
             "border-[#3a6a4a] bg-gradient-to-b from-[#3a7a4a] to-[#1a3a28]",
@@ -201,24 +202,18 @@ export function AffiliateSideSlide() {
     (s): s is NonNullable<typeof s> => Boolean(s)
   );
 
-  const visibleSlides = isMobile
-    ? slides.slice(0, MOBILE_MAX).map((slide, i) => ({
-        ...slide,
-        top: MOBILE_TOPS[i] ?? slide.top,
-      }))
-    : slides;
-
-  if (!mounted || visibleSlides.length === 0) {
+  if (!mounted || slides.length === 0) {
     return null;
   }
 
   return createPortal(
     <>
-      {visibleSlides.map((slide) => (
+      {slides.map((slide) => (
         <OneSideSlide
           key={slide.offer.id}
           offer={slide.offer}
-          top={slide.top}
+          topClassName={slide.topClassName}
+          showOnMobile={slide.showOnMobile}
           tabLabel={slide.tabLabel}
           tabClassName={slide.tabClassName}
           open={openId === slide.offer.id}
