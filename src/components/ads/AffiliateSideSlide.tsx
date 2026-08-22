@@ -12,13 +12,13 @@ type SlideProps = {
   offer: AffiliateOffer;
   tabLabel: string;
   tabClassName: string;
-  /** Tailwind top classes, e.g. "top-[16%]" */
   topClassName: string;
   open: boolean;
   onToggle: () => void;
 };
 
-function OneSideSlide({
+/** Full desktop right-edge slide (large screens only). */
+function DesktopSideSlide({
   offer,
   tabLabel,
   tabClassName,
@@ -30,7 +30,6 @@ function OneSideSlide({
 
   return (
     <aside
-      /* Desktop/tablet-large only — phones use the bottom banner instead */
       className={cn(
         "pointer-events-none fixed right-0 z-[200] hidden -translate-y-1/2 items-stretch lg:flex",
         topClassName
@@ -40,9 +39,7 @@ function OneSideSlide({
       <div
         className={cn(
           "pointer-events-auto flex items-stretch transition-transform duration-300 ease-out",
-          open
-            ? "translate-x-0"
-            : "translate-x-[calc(100%-3rem)]"
+          open ? "translate-x-0" : "translate-x-[calc(100%-2.75rem)]"
         )}
       >
         <button
@@ -51,15 +48,15 @@ function OneSideSlide({
           aria-expanded={open}
           aria-controls={panelId}
           className={cn(
-            "flex min-h-[7.5rem] w-12 shrink-0 flex-col items-center justify-center gap-2 rounded-l-2xl border-[3px] border-r-0 py-4 shadow-[4px_4px_0_rgba(61,47,34,0.35)]",
+            "flex min-h-[6.5rem] w-11 shrink-0 flex-col items-center justify-center gap-1.5 rounded-l-xl border-[3px] border-r-0 py-3 shadow-[3px_3px_0_rgba(61,47,34,0.3)]",
             tabClassName,
             !open && "animate-pulse"
           )}
         >
-          <span className="text-2xl leading-none" aria-hidden>
+          <span className="text-xl leading-none" aria-hidden>
             {offer.emoji}
           </span>
-          <span className="font-pixel text-[7px] tracking-[0.2em] text-[#fff6df] [writing-mode:vertical-rl] rotate-180">
+          <span className="font-pixel text-[6px] tracking-[0.18em] text-[#fff6df] [writing-mode:vertical-rl] rotate-180">
             {open ? "CLOSE" : tabLabel}
           </span>
         </button>
@@ -67,69 +64,144 @@ function OneSideSlide({
         <div
           id={panelId}
           className={cn(
-            "flex w-[min(17.5rem,calc(100vw-3.75rem))] flex-col rounded-l-none rounded-bl-2xl border-[3px] border-l-0 px-3.5 py-3.5 shadow-[4px_4px_0_rgba(61,47,34,0.35)]",
+            "flex w-[min(16rem,calc(100vw-3.5rem))] flex-col rounded-l-none rounded-bl-xl border-[3px] border-l-0 px-3 py-3 shadow-[3px_3px_0_rgba(61,47,34,0.3)]",
             !open && "pointer-events-none",
             offer.tone.border,
             offer.tone.bg
           )}
           aria-hidden={!open}
         >
-          <p className={cn("font-pixel text-[7px] tracking-widest", offer.tone.muted)}>
-            SPONSORED
-          </p>
-          <a
-            href={offer.href}
-            target="_blank"
-            rel="sponsored noopener noreferrer"
-            className="mt-2 block"
-          >
-            <span className="flex items-start gap-2.5">
-              <span
-                className={cn(
-                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-3xl shadow-inner",
-                  offer.tone.iconBg
-                )}
-                aria-hidden
-              >
-                {offer.emoji}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span
-                  className={cn(
-                    "block font-display text-base leading-snug",
-                    offer.tone.title
-                  )}
-                >
-                  {offer.label}
-                </span>
-                <span
-                  className={cn(
-                    "mt-1 block text-xs leading-snug",
-                    offer.tone.muted
-                  )}
-                >
-                  {offer.blurb}
-                </span>
-              </span>
-            </span>
-            <span
-              className={cn(
-                "mt-3 inline-flex min-h-11 items-center rounded-lg border-2 px-3 py-2 font-pixel text-[9px] transition",
-                offer.tone.title,
-                offer.tone.ctaBorder,
-                offer.tone.ctaBg
-              )}
-            >
-              SHOP NOW →
-            </span>
-          </a>
+          <OfferBody offer={offer} compact />
         </div>
       </div>
     </aside>
   );
 }
 
-/** Right-edge slides — large screens only (phones use AffiliateBanner). */
+/** Tiny emoji chips for phones — two only, small so they don’t dominate the screen. */
+function MobileChip({
+  offer,
+  tabClassName,
+  topClassName,
+  open,
+  onToggle,
+}: Omit<SlideProps, "tabLabel">) {
+  const panelId = useId();
+
+  return (
+    <aside
+      className={cn(
+        "pointer-events-none fixed right-0 z-[200] flex -translate-y-1/2 items-stretch lg:hidden",
+        topClassName
+      )}
+      aria-label={`Sponsored: ${offer.label}`}
+    >
+      <div
+        className={cn(
+          "pointer-events-auto flex items-stretch transition-transform duration-300 ease-out",
+          open ? "translate-x-0" : "translate-x-[calc(100%-2.25rem)]"
+        )}
+      >
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={panelId}
+          className={cn(
+            "flex h-11 w-9 shrink-0 items-center justify-center rounded-l-lg border-2 border-r-0 shadow-[2px_2px_0_rgba(61,47,34,0.28)]",
+            tabClassName,
+            !open && "animate-pulse"
+          )}
+        >
+          <span className="text-lg leading-none" aria-hidden>
+            {open ? "✕" : offer.emoji}
+          </span>
+        </button>
+
+        <div
+          id={panelId}
+          className={cn(
+            "flex w-[min(13.5rem,calc(100vw-3rem))] flex-col rounded-l-none rounded-bl-lg border-2 border-l-0 px-2.5 py-2.5 shadow-[2px_2px_0_rgba(61,47,34,0.28)]",
+            !open && "pointer-events-none",
+            offer.tone.border,
+            offer.tone.bg
+          )}
+          aria-hidden={!open}
+        >
+          <OfferBody offer={offer} compact />
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function OfferBody({
+  offer,
+  compact,
+}: {
+  offer: AffiliateOffer;
+  compact?: boolean;
+}) {
+  return (
+    <>
+      <p className={cn("font-pixel text-[6px] tracking-widest", offer.tone.muted)}>
+        SPONSORED
+      </p>
+      <a
+        href={offer.href}
+        target="_blank"
+        rel="sponsored noopener noreferrer"
+        className="mt-1.5 block"
+      >
+        <span className="flex items-start gap-2">
+          <span
+            className={cn(
+              "flex shrink-0 items-center justify-center rounded-lg shadow-inner",
+              compact ? "h-9 w-9 text-xl" : "h-11 w-11 text-2xl",
+              offer.tone.iconBg
+            )}
+            aria-hidden
+          >
+            {offer.emoji}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span
+              className={cn(
+                "block font-display leading-snug",
+                compact ? "text-sm" : "text-base",
+                offer.tone.title
+              )}
+            >
+              {offer.label}
+            </span>
+            <span
+              className={cn(
+                "mt-0.5 block leading-snug",
+                compact ? "text-[11px]" : "text-xs",
+                offer.tone.muted
+              )}
+            >
+              {offer.blurb}
+            </span>
+          </span>
+        </span>
+        <span
+          className={cn(
+            "mt-2 inline-flex items-center rounded-md border px-2.5 py-1.5 font-pixel text-[8px] transition",
+            compact ? "min-h-9" : "min-h-10 border-2",
+            offer.tone.title,
+            offer.tone.ctaBorder,
+            offer.tone.ctaBg
+          )}
+        >
+          SHOP →
+        </span>
+      </a>
+    </>
+  );
+}
+
+/** Side affiliate: 2 tiny chips on mobile, full tabs on large desktops. */
 export function AffiliateSideSlide() {
   const [mounted, setMounted] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -143,7 +215,7 @@ export function AffiliateSideSlide() {
     setMounted(true);
   }, []);
 
-  const slides = [
+  const desktopSlides = [
     cadbury
       ? {
           offer: cadbury,
@@ -191,23 +263,42 @@ export function AffiliateSideSlide() {
       : null,
   ].filter((s): s is NonNullable<typeof s> => Boolean(s));
 
-  if (!mounted || slides.length === 0) {
+  const mobileSlides = desktopSlides.slice(0, 2).map((slide, i) => ({
+    ...slide,
+    topClassName: i === 0 ? "top-[42%]" : "top-[58%]",
+  }));
+
+  if (!mounted || desktopSlides.length === 0) {
     return null;
   }
 
   return createPortal(
     <>
-      {slides.map((slide) => (
-        <OneSideSlide
-          key={slide.offer.id}
+      {mobileSlides.map((slide) => (
+        <MobileChip
+          key={`m-${slide.offer.id}`}
+          offer={slide.offer}
+          topClassName={slide.topClassName}
+          tabClassName={slide.tabClassName}
+          open={openId === `m-${slide.offer.id}`}
+          onToggle={() =>
+            setOpenId((id) =>
+              id === `m-${slide.offer.id}` ? null : `m-${slide.offer.id}`
+            )
+          }
+        />
+      ))}
+      {desktopSlides.map((slide) => (
+        <DesktopSideSlide
+          key={`d-${slide.offer.id}`}
           offer={slide.offer}
           topClassName={slide.topClassName}
           tabLabel={slide.tabLabel}
           tabClassName={slide.tabClassName}
-          open={openId === slide.offer.id}
+          open={openId === `d-${slide.offer.id}`}
           onToggle={() =>
             setOpenId((id) =>
-              id === slide.offer.id ? null : slide.offer.id
+              id === `d-${slide.offer.id}` ? null : `d-${slide.offer.id}`
             )
           }
         />
