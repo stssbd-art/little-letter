@@ -45,12 +45,13 @@ export function Mascot({ className = "" }: { className?: string }) {
       aria-label="Pip the Envelope, Little Letter’s friendly mascot"
     >
       <div
-        className="relative flex h-24 w-24 items-center justify-center rounded-[24px] border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f6d58a] shadow-[6px_6px_0_var(--ll-pink-shadow)] sm:h-28 sm:w-28 sm:rounded-[28px] dark:from-[#5c3d1e] dark:to-[#3d2f22]"
+        className="relative flex h-28 w-28 items-center justify-center overflow-visible rounded-[28px] border-4 border-[var(--ll-pink-deep)] bg-gradient-to-b from-[#fff6df] to-[#f6d58a] shadow-[6px_6px_0_var(--ll-pink-shadow)] dark:from-[#5c3d1e] dark:to-[#3d2f22]"
         aria-hidden
       >
-        <div className="absolute left-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />
-        <div className="absolute right-7 top-10 h-3 w-3 rounded-sm bg-[var(--ll-ink)]" />
-        <div className="absolute bottom-9 left-1/2 h-2 w-6 -translate-x-1/2 rounded-full bg-[var(--ll-pink-deep)]" />
+        {/* Percent-based so eyes stay visible at any face size */}
+        <div className="absolute left-[22%] top-[34%] h-[12%] w-[12%] rounded-sm bg-[var(--ll-ink)]" />
+        <div className="absolute right-[22%] top-[34%] h-[12%] w-[12%] rounded-sm bg-[var(--ll-ink)]" />
+        <div className="absolute bottom-[28%] left-1/2 h-[7%] w-[22%] -translate-x-1/2 rounded-full bg-[var(--ll-pink-deep)]" />
         <motion.div
           className="absolute -right-2 -top-2 text-lg"
           animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
