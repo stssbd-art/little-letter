@@ -418,7 +418,7 @@ export function LetterPreview() {
                   }
                 >
                   <p
-                    className="truncate font-pixel text-[7px]"
+                    className="truncate font-display text-[9px] leading-snug"
                     style={{ color: stationery.accent }}
                   >
                     {currentLetter.subject}

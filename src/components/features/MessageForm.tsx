@@ -501,7 +501,7 @@ export function MessageForm() {
                       setLetter({ ...letter, subject: e.target.value })
                     }
                     maxLength={120}
-                    className="border-black/10 bg-white/70 font-pixel text-[11px] dark:bg-black/20"
+                    className="border-black/10 bg-white/70 font-display text-sm leading-snug dark:bg-black/20"
                   />
                 </Field>
                 <Field

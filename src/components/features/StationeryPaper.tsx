@@ -115,7 +115,7 @@ export function StationeryPaper({
       <div className={cn(compact ? "p-3" : "p-5", showChrome && "pt-3")}>
         {subject ? (
           <p
-            className="mb-2 font-pixel text-[10px]"
+            className="mb-2 break-words font-display text-sm font-semibold leading-snug sm:mb-2.5 sm:text-base"
             style={{ color: stationery.accent }}
           >
             {subject}
