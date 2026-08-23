@@ -17,6 +17,7 @@ import { isStripeConfigured } from "@/lib/stripe";
 import { addLetterExample } from "@/lib/shared-examples";
 import { parseVoiceNote } from "@/lib/voice-note";
 import { isCardDesignId } from "@/lib/card-designs";
+import { isLetterStationeryId } from "@/lib/letter-stationery";
 
 export const dynamic = "force-dynamic";
 
@@ -77,6 +78,12 @@ export async function POST(request: Request) {
       form: {
         ...body.form,
         senderEmail,
+        stationery:
+          body.form.stationery && isLetterStationeryId(body.form.stationery)
+            ? body.form.stationery
+            : body.form.cardDesign
+              ? undefined
+              : "classic-honey",
       },
       createdAt: body.createdAt || new Date().toISOString(),
     };

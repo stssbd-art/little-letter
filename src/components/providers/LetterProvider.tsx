@@ -12,6 +12,7 @@ import {
 import type { GeneratedLetter, LetterFormData } from "@/types";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
+import { isLetterStationeryId } from "@/lib/letter-stationery";
 
 const defaultForm: LetterFormData = {
   recipientName: "",
@@ -26,6 +27,7 @@ const defaultForm: LetterFormData = {
   ownSubject: "",
   ownMessage: "",
   cardDesign: undefined,
+  stationery: "classic-honey",
 };
 
 interface LetterContextValue {
@@ -63,6 +65,11 @@ export function LetterProvider({ children }: { children: ReactNode }) {
               parsed.form.cardDesign && isCardDesignId(parsed.form.cardDesign)
                 ? parsed.form.cardDesign
                 : undefined,
+            stationery:
+              parsed.form.stationery &&
+              isLetterStationeryId(parsed.form.stationery)
+                ? parsed.form.stationery
+                : "classic-honey",
           });
         if (parsed.letter) setLetter(parsed.letter);
       }

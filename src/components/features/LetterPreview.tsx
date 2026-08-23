@@ -14,7 +14,9 @@ import { useSound } from "@/components/providers/SoundProvider";
 import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import { OCCASIONS } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
+import { getLetterStationery } from "@/lib/letter-stationery";
 import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
+import { cn } from "@/lib/utils";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
@@ -155,9 +157,34 @@ export function LetterPreview() {
   }
 
   const currentLetter = letter;
+  const stationery = getLetterStationery(currentLetter.form.stationery);
   const isCard =
     Boolean(currentLetter.form.cardDesign) &&
     isCardDesignId(currentLetter.form.cardDesign ?? "");
+  const decorGlyph =
+    stationery.decor === "lace"
+      ? "Lace"
+      : stationery.decor === "deco"
+        ? "◆"
+        : stationery.decor === "roses"
+          ? "🌹"
+          : stationery.decor === "retro"
+            ? "🌼"
+            : stationery.decor === "story"
+              ? "⭐"
+              : stationery.decor === "botanical"
+                ? "🌿"
+                : stationery.decor === "hearts"
+                  ? "♡"
+                  : stationery.decor === "cake"
+                    ? "🎂"
+                    : stationery.decor === "birds"
+                      ? "🕊️"
+                      : stationery.decor === "toys"
+                        ? "🧸"
+                        : stationery.decor === "holly"
+                          ? "🎄"
+                          : null;
 
   async function sendLetter() {
     if (!hasAcceptedTerms()) {
@@ -335,23 +362,34 @@ export function LetterPreview() {
             aria-label={open ? "Close letter" : "Open letter"}
           >
             <div
-              className="relative mx-auto w-full max-w-sm overflow-visible pt-10"
+              className="relative mx-auto w-full max-w-sm overflow-hidden pt-10"
               style={{ perspective: 1200 }}
             >
-              <div className="relative aspect-[8/5] w-full overflow-visible">
+              <div className="relative aspect-[8/5] w-full overflow-hidden">
                 {/* Envelope body */}
                 <svg
                   className="absolute inset-0 z-10 h-full w-full"
                   viewBox="0 0 320 200"
                   preserveAspectRatio="none"
                   aria-hidden
-                  style={{ filter: "drop-shadow(5px 7px 0 rgba(139,94,52,0.28))" }}
+                  style={{
+                    filter: `drop-shadow(5px 7px 0 ${stationery.envelopeStroke}46)`,
+                  }}
                 >
                   <defs>
                     <linearGradient id="ll-env-back" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#fff6df" />
-                      <stop offset="55%" stopColor="#f6d58a" />
-                      <stop offset="100%" stopColor="#e4b05a" />
+                      <stop
+                        offset="0%"
+                        stopColor={stationery.envelopeBack[0]}
+                      />
+                      <stop
+                        offset="55%"
+                        stopColor={stationery.envelopeBack[1]}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor={stationery.envelopeBack[2]}
+                      />
                     </linearGradient>
                   </defs>
                   <rect
@@ -361,20 +399,81 @@ export function LetterPreview() {
                     height="192"
                     rx="14"
                     fill="url(#ll-env-back)"
-                    stroke="#8b5e34"
+                    stroke={stationery.envelopeStroke}
                     strokeWidth="4"
                   />
                 </svg>
 
+                {/* Postage stamp + postmark (letters only) */}
+                {!isCard ? (
+                  <div
+                    className="pointer-events-none absolute right-3 top-3 z-[25] flex flex-col items-end gap-1"
+                    aria-hidden
+                  >
+                    <div
+                      className="relative flex h-14 w-11 flex-col items-center justify-center rounded-sm border-2 border-dashed px-0.5 text-center shadow-[2px_2px_0_rgba(61,47,34,0.2)]"
+                      style={{
+                        background: stationery.stampColors.bg,
+                        borderColor: stationery.stampColors.border,
+                        color: stationery.stampColors.ink,
+                      }}
+                    >
+                      <span className="text-sm leading-none">
+                        {stationery.emoji}
+                      </span>
+                      <span className="mt-0.5 font-pixel text-[6px] leading-none tracking-wide">
+                        {stationery.stampLabel}
+                      </span>
+                      <svg
+                        className="pointer-events-none absolute -left-3 -top-2 h-10 w-10 opacity-70"
+                        viewBox="0 0 40 40"
+                        aria-hidden
+                      >
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="14"
+                          fill="none"
+                          stroke={stationery.postmarkColor}
+                          strokeWidth="1.5"
+                          strokeDasharray="2 2"
+                        />
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="9"
+                          fill="none"
+                          stroke={stationery.postmarkColor}
+                          strokeWidth="1"
+                        />
+                        <text
+                          x="20"
+                          y="22"
+                          textAnchor="middle"
+                          fontSize="5"
+                          fill={stationery.postmarkColor}
+                          fontFamily="monospace"
+                        >
+                          POST
+                        </text>
+                      </svg>
+                    </div>
+                  </div>
+                ) : null}
+
                 {/* Letter — fully under the pocket when sealed; slides up when open */}
                 <motion.div
-                  className="absolute left-1/2 z-[15] w-[72%] -translate-x-1/2 overflow-hidden rounded-sm border border-[#e2c9a0] bg-[#fffdf8] px-2.5 py-1.5 shadow-[2px_2px_0_rgba(61,47,34,0.1)]"
+                  className="absolute left-1/2 z-[15] w-[72%] -translate-x-1/2 overflow-hidden rounded-sm px-2.5 py-1.5 shadow-[2px_2px_0_rgba(61,47,34,0.1)]"
+                  style={{
+                    border: `1px solid ${stationery.paperBorder}`,
+                    background: stationery.paperBg,
+                    color: stationery.ink,
+                  }}
                   initial={false}
                   animate={
                     open
                       ? { top: "8%", height: "54%", opacity: 1, scale: 1 }
                       : {
-                          /* Below pocket V (~59%) so nothing peeks out when sealed */
                           top: "64%",
                           height: "28%",
                           opacity: 1,
@@ -392,13 +491,22 @@ export function LetterPreview() {
                       : { duration: 0.3, ease: "easeIn" }
                   }
                 >
-                  <p className="truncate font-pixel text-[7px] text-[#8b5e34]">
+                  <p
+                    className="truncate font-pixel text-[7px]"
+                    style={{ color: stationery.accent }}
+                  >
                     {currentLetter.subject}
                   </p>
-                  <p className="mt-0.5 truncate text-[10px] text-[#7a654f]">
+                  <p
+                    className="mt-0.5 truncate text-[10px]"
+                    style={{ color: stationery.muted }}
+                  >
                     For {currentLetter.form.recipientName}
                   </p>
-                  <p className="mt-0.5 line-clamp-2 text-left text-[10px] leading-snug text-[#3d2f22]">
+                  <p
+                    className="mt-0.5 line-clamp-2 text-left text-[10px] leading-snug"
+                    style={{ color: stationery.ink }}
+                  >
                     {currentLetter.message}
                   </p>
                 </motion.div>
@@ -412,12 +520,24 @@ export function LetterPreview() {
                 >
                   <defs>
                     <linearGradient id="ll-env-front" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f3cb72" />
-                      <stop offset="100%" stopColor="#d9a045" />
+                      <stop
+                        offset="0%"
+                        stopColor={stationery.envelopeFront[0]}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor={stationery.envelopeFront[1]}
+                      />
                     </linearGradient>
-                    <linearGradient id="ll-env-pocket-shade" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="rgba(139,94,52,0.12)" />
-                      <stop offset="100%" stopColor="rgba(139,94,52,0)" />
+                    <linearGradient
+                      id="ll-env-pocket-shade"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor="rgba(61,47,34,0.12)" />
+                      <stop offset="100%" stopColor="rgba(61,47,34,0)" />
                     </linearGradient>
                     <clipPath id="ll-env-front-face">
                       <rect x="6" y="6" width="308" height="188" rx="12" />
@@ -435,7 +555,7 @@ export function LetterPreview() {
                     <path
                       d="M6 122 L160 102 L314 122"
                       fill="none"
-                      stroke="#8b5e34"
+                      stroke={stationery.envelopeStroke}
                       strokeWidth="2.5"
                       strokeLinejoin="round"
                       strokeLinecap="round"
@@ -467,19 +587,28 @@ export function LetterPreview() {
                   >
                     <defs>
                       <linearGradient id="ll-env-flap" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#fff8e8" />
-                        <stop offset="100%" stopColor="#f0c96a" />
+                        <stop
+                          offset="0%"
+                          stopColor={stationery.envelopeFlap[0]}
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor={stationery.envelopeFlap[1]}
+                        />
                       </linearGradient>
                       <clipPath id="ll-env-flap-face">
                         <rect x="6" y="6" width="308" height="188" rx="12" />
                       </clipPath>
                     </defs>
                     <g clipPath={open ? undefined : "url(#ll-env-flap-face)"}>
-                      <path d="M6 6 H314 L160 102 Z" fill="url(#ll-env-flap)" />
+                      <path
+                        d="M6 6 H314 L160 102 Z"
+                        fill="url(#ll-env-flap)"
+                      />
                       <path
                         d="M6 6 L160 102 L314 6"
                         fill="none"
-                        stroke="#8b5e34"
+                        stroke={stationery.envelopeStroke}
                         strokeWidth="2.5"
                         strokeLinejoin="round"
                         strokeLinecap="round"
@@ -502,7 +631,7 @@ export function LetterPreview() {
                         className="select-none text-4xl leading-none drop-shadow-[0_3px_0_rgba(120,20,40,0.35)] sm:text-5xl"
                         aria-hidden
                       >
-                        ❤️
+                        {stationery.sealEmoji}
                       </span>
                     </motion.div>
                   </div>
@@ -513,7 +642,7 @@ export function LetterPreview() {
             <p className="mt-3 text-center text-sm text-[var(--ll-muted)]">
               {open
                 ? "Click or press Enter to tuck the letter back inside"
-                : "Click the red heart — the lip opens, then your letter slides out"}
+                : "Click the seal — the lip opens, then your letter slides out"}
             </p>
           </button>
 
@@ -549,17 +678,53 @@ export function LetterPreview() {
                   }
                 />
               ) : (
-                <div className="rounded-2xl border-2 border-[var(--ll-lavender)] bg-white/90 p-5 dark:bg-white/10">
-                  <p className="font-pixel text-[10px] text-[var(--ll-pink-deep)]">
+                <div
+                  className={cn(
+                    "relative overflow-hidden rounded-2xl border-2 p-5",
+                    stationery.fontClass
+                  )}
+                  style={{
+                    background: stationery.paperBg,
+                    borderColor: stationery.paperBorder,
+                    color: stationery.ink,
+                    backgroundImage:
+                      "radial-gradient(rgba(61,47,34,0.04) 0.6px, transparent 0.6px)",
+                    backgroundSize: "6px 6px",
+                  }}
+                >
+                  {decorGlyph ? (
+                    <span
+                      className="pointer-events-none absolute right-3 top-3 text-lg opacity-70"
+                      aria-hidden
+                    >
+                      {decorGlyph === "Lace" ? "✦" : decorGlyph}
+                    </span>
+                  ) : null}
+                  <p
+                    className="font-pixel text-[10px]"
+                    style={{ color: stationery.accent }}
+                  >
                     {currentLetter.subject}
                   </p>
-                  <p className="mt-1 text-xs text-[var(--ll-muted)]">
+                  <p
+                    className="mt-1 text-xs"
+                    style={{ color: stationery.muted }}
+                  >
                     To: {currentLetter.form.recipientName} &lt;
                     {currentLetter.form.recipientEmail}&gt;
                   </p>
-                  <div className="mt-4 whitespace-pre-wrap text-left font-display text-base leading-relaxed text-[var(--ll-ink)]">
+                  <div
+                    className="mt-4 whitespace-pre-wrap text-left text-base leading-relaxed"
+                    style={{ color: stationery.ink }}
+                  >
                     {currentLetter.message}
                   </div>
+                  <p
+                    className="mt-4 font-pixel text-[8px] tracking-wide"
+                    style={{ color: stationery.muted }}
+                  >
+                    {stationery.era} · {stationery.title}
+                  </p>
                 </div>
               )}
             </article>

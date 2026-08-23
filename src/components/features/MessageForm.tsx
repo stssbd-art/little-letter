@@ -12,6 +12,10 @@ import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
 import { isOccasionSlug } from "@/lib/occasion-seo";
+import {
+  stationeryForOccasion,
+  type LetterStationeryId,
+} from "@/lib/letter-stationery";
 import type { LetterWriteMode, MessageStyle, Occasion } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -267,6 +271,48 @@ export function MessageForm() {
                       </span>
                     </PixelCard>
                   ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
+                  Stationery
+                </p>
+                <p className="mb-2 text-xs text-[var(--ll-muted)]">
+                  Pick a vintage paper & envelope look. Classic Honey is the
+                  original Little Letter style.
+                </p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {stationeryForOccasion(form.occasion).map((s) => {
+                    const selected =
+                      (form.stationery ?? "classic-honey") === s.id;
+                    return (
+                      <PixelCard
+                        key={s.id}
+                        as="button"
+                        selected={selected}
+                        onClick={() => {
+                          play("click");
+                          setForm({
+                            stationery: s.id as LetterStationeryId,
+                          });
+                        }}
+                        className="flex flex-col items-start gap-1 py-2.5 text-left"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <span className="text-base" aria-hidden>
+                            {s.emoji}
+                          </span>
+                          <span className="font-display text-xs text-[var(--ll-ink)]">
+                            {s.title}
+                          </span>
+                        </span>
+                        <span className="line-clamp-2 text-[10px] leading-snug text-[var(--ll-muted)]">
+                          {s.era} · {s.blurb}
+                        </span>
+                      </PixelCard>
+                    );
+                  })}
                 </div>
               </div>
 

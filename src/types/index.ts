@@ -33,6 +33,8 @@ export type LetterWriteMode = "ai" | "own";
 
 export type { CardDesignId } from "@/lib/card-designs";
 import type { CardDesignId } from "@/lib/card-designs";
+export type { LetterStationeryId } from "@/lib/letter-stationery";
+import type { LetterStationeryId } from "@/lib/letter-stationery";
 
 export interface LetterFormData {
   recipientName: string;
@@ -50,6 +52,8 @@ export interface LetterFormData {
   ownMessage: string;
   /** Set when sending from the Cards gallery flow */
   cardDesign?: CardDesignId;
+  /** Vintage paper / envelope look (letters only; ignored for cards) */
+  stationery?: LetterStationeryId;
 }
 
 export interface GeneratedLetter {

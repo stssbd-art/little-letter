@@ -5,6 +5,10 @@ import {
   getCardDesign,
   isCardDesignId,
 } from "@/lib/card-designs";
+import {
+  getLetterStationery,
+  isLetterStationeryId,
+} from "@/lib/letter-stationery";
 
 function escapeHtml(text: string) {
   return text
@@ -354,28 +358,60 @@ function cardOpenEmoji(designId: string): string {
 function themeForLetter(letter: GeneratedLetter): FrameTheme {
   const base = themeFor(letter.form.occasion);
   const designId = letter.form.cardDesign;
-  if (!designId || !isCardDesignId(designId)) return base;
-  const design = getCardDesign(designId);
-  return {
-    ...base,
-    pageBg: design.pageBg,
-    cardBg: design.cardBg,
-    border: design.border,
-    shadow: design.border,
-    headerGrad: `linear-gradient(90deg,${design.border},${design.accent})`,
-    headerInk: design.ink,
-    headerSub: design.muted,
-    badgeBg: design.cardBg,
-    badgeBorder: design.border,
-    badgeInk: design.accent,
-    titleInk: design.accent,
-    bodyInk: design.ink,
-    msgBorder: design.border,
-    accent: design.accent,
-    badge: design.badge,
-    tagline: design.blurb,
-    footerIcons: design.sparkles.join(" "),
-  };
+  if (designId && isCardDesignId(designId)) {
+    const design = getCardDesign(designId);
+    return {
+      ...base,
+      pageBg: design.pageBg,
+      cardBg: design.cardBg,
+      border: design.border,
+      shadow: design.border,
+      headerGrad: `linear-gradient(90deg,${design.border},${design.accent})`,
+      headerInk: design.ink,
+      headerSub: design.muted,
+      badgeBg: design.cardBg,
+      badgeBorder: design.border,
+      badgeInk: design.accent,
+      titleInk: design.accent,
+      bodyInk: design.ink,
+      msgBorder: design.border,
+      accent: design.accent,
+      badge: design.badge,
+      tagline: design.blurb,
+      footerIcons: design.sparkles.join(" "),
+    };
+  }
+
+  const stationeryId = letter.form.stationery;
+  if (
+    stationeryId &&
+    isLetterStationeryId(stationeryId) &&
+    stationeryId !== "classic-honey"
+  ) {
+    const s = getLetterStationery(stationeryId);
+    return {
+      ...base,
+      pageBg: s.paperBg,
+      cardBg: s.paperBg,
+      border: s.paperBorder,
+      shadow: s.envelopeStroke,
+      headerGrad: `linear-gradient(90deg,${s.envelopeBack[1]},${s.envelopeFront[0]})`,
+      headerInk: s.ink,
+      headerSub: s.muted,
+      badgeBg: s.stampColors.bg,
+      badgeBorder: s.stampColors.border,
+      badgeInk: s.stampColors.ink,
+      titleInk: s.accent,
+      bodyInk: s.ink,
+      msgBorder: s.paperBorder,
+      accent: s.accent,
+      badge: `${s.emoji} ${s.title} · ${s.era}`,
+      tagline: s.blurb,
+      footerIcons: `${s.emoji} ✉️ ${s.sealEmoji}`,
+    };
+  }
+
+  return base;
 }
 
 function whyFooter(senderName: string, accent: string) {
@@ -473,6 +509,21 @@ export function buildLetterEmailHtml(
       : null;
   const label = design?.title ?? meta?.label ?? "Note";
   const theme = themeForLetter(letter);
+  const stationery =
+    !design &&
+    letter.form.stationery &&
+    isLetterStationeryId(letter.form.stationery) &&
+    letter.form.stationery !== "classic-honey"
+      ? getLetterStationery(letter.form.stationery)
+      : null;
+  const stationeryStampHtml = stationery
+    ? `<div style="margin:10px auto 0;display:inline-block;border:2px dashed ${stationery.stampColors.border};background:${stationery.stampColors.bg};color:${stationery.stampColors.ink};padding:8px 10px;border-radius:4px;font-size:11px;letter-spacing:0.5px;transform:rotate(-3deg);">
+        <div style="font-size:16px;line-height:1;">${stationery.emoji}</div>
+        <div style="margin-top:3px;font-family:Georgia,serif;font-weight:bold;">${escapeHtml(stationery.stampLabel)}</div>
+        <div style="margin-top:2px;font-size:9px;opacity:0.8;">${escapeHtml(stationery.era)}</div>
+      </div>`
+    : "";
+
   const safeMessage = escapeHtml(letter.message).replace(/\n/g, "<br />");
   const safeSubject = escapeHtml(letter.subject);
   const preheader = `${letter.form.senderName} sent you a ${design ? "digital card" : `${(meta?.label ?? "note").toLowerCase()} letter`} on Little Letter.`;
@@ -554,6 +605,7 @@ export function buildLetterEmailHtml(
               <div style="display:inline-block;background:${theme.badgeBg};border:2px dashed ${theme.badgeBorder};border-radius:12px;padding:8px 14px;font-size:13px;color:${theme.badgeInk};">
                 ${theme.badge}
               </div>
+              ${stationeryStampHtml}
             </td>
           </tr>
           <tr>
