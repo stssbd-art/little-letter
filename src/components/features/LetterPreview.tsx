@@ -342,10 +342,13 @@ export function LetterPreview() {
             aria-label={open ? "Close letter" : "Open letter"}
           >
             <div
-              className="relative mx-auto w-full max-w-sm overflow-hidden pt-10"
-              style={{ perspective: 1200 }}
+              className="relative mx-auto w-full max-w-sm overflow-visible pt-10"
+              style={{ perspective: 1200, transformStyle: "preserve-3d" }}
             >
-              <div className="relative aspect-[8/5] w-full overflow-hidden">
+              <div
+                className="relative aspect-[8/5] w-full overflow-visible"
+                style={{ transformStyle: "preserve-3d" }}
+              >
                 {/* Envelope body */}
                 <svg
                   className="absolute inset-0 z-10 h-full w-full"
@@ -383,21 +386,6 @@ export function LetterPreview() {
                     strokeWidth="4"
                   />
                 </svg>
-
-                {/* Postage stamp + postmark (letters only) */}
-                {!isCard ? (
-                  <div
-                    className="pointer-events-none absolute right-2.5 top-2.5 z-[25]"
-                    aria-hidden
-                  >
-                    <PostageStamp
-                      emoji={stationery.emoji}
-                      label={stationery.stampLabel}
-                      colors={stationery.stampColors}
-                      postmarkColor={stationery.postmarkColor}
-                    />
-                  </div>
-                ) : null}
 
                 {/* Letter — fully under the pocket when sealed; slides up when open */}
                 <motion.div
@@ -574,6 +562,29 @@ export function LetterPreview() {
                     </motion.div>
                   </div>
                 </motion.div>
+
+                {/*
+                  Postage stamp — top-right, above the flap (translateZ beats the
+                  flap’s preserve-3d stacking). Like a real posted letter.
+                */}
+                {!isCard ? (
+                  <div
+                    className="pointer-events-none absolute right-[2.5%] top-[3.5%] z-[60]"
+                    style={{
+                      transform: "translateZ(48px) rotate(5deg)",
+                      transformStyle: "preserve-3d",
+                    }}
+                    aria-hidden
+                  >
+                    <PostageStamp
+                      emoji={stationery.emoji}
+                      label={stationery.stampLabel}
+                      colors={stationery.stampColors}
+                      postmarkColor={stationery.postmarkColor}
+                      className="drop-shadow-[3px_3px_0_rgba(61,47,34,0.28)]"
+                    />
+                  </div>
+                ) : null}
               </div>
             </div>
 

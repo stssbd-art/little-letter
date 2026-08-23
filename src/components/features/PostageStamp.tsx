@@ -61,7 +61,7 @@ export function PostageStamp({
   return (
     <div
       className={className}
-      style={{ transform: "rotate(7deg)" }}
+      style={{ transform: "rotate(4deg)" }}
       aria-hidden
     >
       <div className="relative">
