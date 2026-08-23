@@ -7,7 +7,6 @@ import {
 } from "@/lib/card-designs";
 import {
   getLetterStationery,
-  isLetterStationeryId,
 } from "@/lib/letter-stationery";
 
 function escapeHtml(text: string) {
@@ -382,36 +381,45 @@ function themeForLetter(letter: GeneratedLetter): FrameTheme {
     };
   }
 
-  const stationeryId = letter.form.stationery;
-  if (
-    stationeryId &&
-    isLetterStationeryId(stationeryId) &&
-    stationeryId !== "classic-honey"
-  ) {
-    const s = getLetterStationery(stationeryId);
-    return {
-      ...base,
-      pageBg: s.paperBg,
-      cardBg: s.paperBg,
-      border: s.paperBorder,
-      shadow: s.envelopeStroke,
-      headerGrad: `linear-gradient(90deg,${s.envelopeBack[1]},${s.envelopeFront[0]})`,
-      headerInk: s.ink,
-      headerSub: s.muted,
-      badgeBg: s.stampColors.bg,
-      badgeBorder: s.stampColors.border,
-      badgeInk: s.stampColors.ink,
-      titleInk: s.accent,
-      bodyInk: s.ink,
-      msgBorder: s.paperBorder,
-      accent: s.accent,
-      badge: `${s.emoji} ${s.title} · ${s.era}`,
-      tagline: s.blurb,
-      footerIcons: `${s.emoji} ✉️ ${s.sealEmoji}`,
-    };
-  }
+  /* Letters always pick up stationery colours (classic-honey included). */
+  const s = getLetterStationery(letter.form.stationery);
+  return {
+    ...base,
+    pageBg: `linear-gradient(180deg,${s.envelopeBack[0]} 0%,#faf4e8 45%,${s.envelopeFront[1]}33 100%)`,
+    cardBg: s.paperBg,
+    border: s.envelopeStroke,
+    shadow: s.envelopeFront[1],
+    headerGrad: `linear-gradient(90deg,${s.envelopeBack[0]},${s.envelopeBack[1]},${s.envelopeFront[0]})`,
+    headerInk: s.ink,
+    headerSub: s.muted,
+    badgeBg: s.stampColors.bg,
+    badgeBorder: s.stampColors.border,
+    badgeInk: s.stampColors.ink,
+    titleInk: s.accent,
+    bodyInk: s.ink,
+    msgBorder: s.paperBorder,
+    accent: s.accent,
+    badge:
+      s.id === "classic-honey"
+        ? base.badge
+        : `${s.emoji} ${s.title} · ${s.era}`,
+    tagline: s.id === "classic-honey" ? base.tagline : s.blurb,
+    footerIcons: `${s.emoji} ✉️ ${s.sealEmoji} ✨`,
+  };
+}
 
-  return base;
+/** Email-safe perforated postage stamp (matches the preview stamp). */
+function postageStampHtml(letter: GeneratedLetter) {
+  const s = getLetterStationery(letter.form.stationery);
+  return `<div style="display:inline-block;transform:rotate(-6deg);vertical-align:top;">
+    <div style="position:relative;width:58px;padding:6px 5px 5px;background:${s.stampColors.bg};color:${s.stampColors.ink};border:2px solid ${s.stampColors.border};box-shadow:2px 2px 0 rgba(61,47,34,0.16);font-family:Georgia,'Times New Roman',serif;text-align:center;background-image:radial-gradient(circle at 0 0,transparent 3px,${s.stampColors.bg} 3.5px),radial-gradient(circle at 100% 0,transparent 3px,${s.stampColors.bg} 3.5px),radial-gradient(circle at 0 100%,transparent 3px,${s.stampColors.bg} 3.5px),radial-gradient(circle at 100% 100%,transparent 3px,${s.stampColors.bg} 3.5px);background-size:10px 10px;background-position:-5px -5px,-5px -5px,-5px -5px,-5px -5px;">
+      <div style="border:1px solid ${s.stampColors.border};padding:4px 3px 3px;">
+        <div style="font-size:7px;letter-spacing:0.8px;opacity:0.85;">LITTLE LETTER</div>
+        <div style="margin:4px auto;width:34px;height:28px;line-height:28px;background:#fffef8;border:1px solid ${s.stampColors.border};font-size:16px;">${s.emoji}</div>
+        <div style="font-size:11px;font-weight:bold;letter-spacing:0.3px;">${escapeHtml(s.stampLabel)}</div>
+      </div>
+    </div>
+  </div>`;
 }
 
 function whyFooter(senderName: string, accent: string) {
@@ -509,24 +517,9 @@ export function buildLetterEmailHtml(
       : null;
   const label = design?.title ?? meta?.label ?? "Note";
   const theme = themeForLetter(letter);
-  const stationery =
-    !design &&
-    letter.form.stationery &&
-    isLetterStationeryId(letter.form.stationery) &&
-    letter.form.stationery !== "classic-honey"
-      ? getLetterStationery(letter.form.stationery)
-      : null;
-  const stationeryStampHtml = stationery
-    ? `<div style="margin:12px auto 0;display:inline-block;transform:rotate(-4deg);vertical-align:top;">
-        <div style="position:relative;width:56px;padding:6px 5px 5px;background:${stationery.stampColors.bg};color:${stationery.stampColors.ink};border:2px solid ${stationery.stampColors.border};box-shadow:2px 2px 0 rgba(61,47,34,0.18);font-family:Georgia,'Times New Roman',serif;text-align:center;background-image:radial-gradient(circle at 0 0,transparent 3px,${stationery.stampColors.bg} 3.5px),radial-gradient(circle at 100% 0,transparent 3px,${stationery.stampColors.bg} 3.5px),radial-gradient(circle at 0 100%,transparent 3px,${stationery.stampColors.bg} 3.5px),radial-gradient(circle at 100% 100%,transparent 3px,${stationery.stampColors.bg} 3.5px);background-size:10px 10px;background-position:-5px -5px,-5px -5px,-5px -5px,-5px -5px;">
-          <div style="border:1px solid ${stationery.stampColors.border};padding:4px 3px 3px;">
-            <div style="font-size:7px;letter-spacing:0.8px;opacity:0.85;">LITTLE LETTER</div>
-            <div style="margin:4px auto;width:34px;height:28px;line-height:28px;background:#fffef8;border:1px solid ${stationery.stampColors.border};font-size:16px;">${stationery.emoji}</div>
-            <div style="font-size:11px;font-weight:bold;letter-spacing:0.3px;">${escapeHtml(stationery.stampLabel)}</div>
-          </div>
-        </div>
-      </div>`
-    : "";
+  const stationery = !design
+    ? getLetterStationery(letter.form.stationery)
+    : null;
 
   const safeMessage = escapeHtml(letter.message).replace(/\n/g, "<br />");
   const safeSubject = escapeHtml(letter.subject);
@@ -597,42 +590,75 @@ export function buildLetterEmailHtml(
             </td>
           </tr>
         </table>`
-      : `<table role="presentation" width="100%" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
+      : `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
           <tr>
-            <td style="background:${theme.headerGrad};padding:18px 22px;text-align:center;">
-              <div style="font-family:Georgia,serif;font-size:22px;color:${theme.headerInk};">Little Letter</div>
+            <td style="background:${theme.headerGrad};padding:16px 22px 14px;text-align:center;">
+              <div style="font-size:20px;letter-spacing:3px;line-height:1;">✨ 💌 ✨</div>
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:${theme.headerInk};margin-top:6px;font-weight:bold;">Little Letter</div>
               <div style="font-size:12px;color:${theme.headerSub};margin-top:4px;">${theme.tagline}</div>
             </td>
           </tr>
           <tr>
-            <td style="padding:24px 26px 8px;text-align:center;">
-              <div style="display:inline-block;background:${theme.badgeBg};border:2px dashed ${theme.badgeBorder};border-radius:12px;padding:8px 14px;font-size:13px;color:${theme.badgeInk};">
-                ${theme.badge}
-              </div>
-              ${stationeryStampHtml}
+            <td style="padding:18px 22px 0;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="vertical-align:top;padding-right:12px;">
+                    <div style="display:inline-block;background:${theme.badgeBg};border:2px dashed ${theme.badgeBorder};border-radius:12px;padding:7px 12px;font-size:12px;color:${theme.badgeInk};line-height:1.35;">
+                      ${theme.badge}
+                    </div>
+                    <p style="margin:10px 0 0;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:${theme.accent};">
+                      ${escapeHtml(label)} letter
+                    </p>
+                  </td>
+                  <td style="width:70px;text-align:right;vertical-align:top;">
+                    ${postageStampHtml(letter)}
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <tr>
-            <td style="padding:12px 28px 8px;">
-              <p style="margin:0 0 4px;font-size:11px;letter-spacing:1px;color:${theme.accent};text-transform:uppercase;">
-                ${escapeHtml(label)} · category frame
-              </p>
-              <h1 style="margin:0 0 14px;font-size:20px;color:${theme.titleInk};font-family:Georgia,serif;">
-                For ${escapeHtml(letter.form.recipientName)}
+            <td style="padding:14px 22px 8px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-bottom:2px dotted ${theme.msgBorder};padding-bottom:10px;margin-bottom:4px;">
+                <tr>
+                  <td style="font-size:12px;color:${theme.headerSub};line-height:1.55;">
+                    <span style="opacity:0.75;">To</span>
+                    <strong style="color:${theme.bodyInk};"> ${escapeHtml(letter.form.recipientName)}</strong>
+                    <span style="opacity:0.55;"> · </span>
+                    <span style="opacity:0.75;">From</span>
+                    <strong style="color:${theme.bodyInk};"> ${escapeHtml(letter.form.senderName)}</strong>
+                  </td>
+                </tr>
+              </table>
+              <h1 style="margin:12px 0 14px;font-size:20px;line-height:1.35;color:${theme.titleInk};font-family:Georgia,'Times New Roman',serif;">
+                ${safeSubject}
               </h1>
-              <div style="font-size:15px;line-height:1.7;color:${theme.bodyInk};background:#fff;border:2px solid ${theme.msgBorder};border-radius:14px;padding:20px;">
-                ${safeMessage}
+              <div style="font-size:15px;line-height:1.8;color:${theme.bodyInk};background:#fffef9;border:2px solid ${theme.msgBorder};border-radius:14px;padding:22px 20px;font-family:Georgia,'Times New Roman',serif;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.7);">
+                ${
+                  /^(dear|hi|hello|hey)\b/i.test(letter.message.trim())
+                    ? ""
+                    : `<p style="margin:0 0 12px;font-size:13px;color:${theme.headerSub};font-style:italic;">
+                  Dear ${escapeHtml(letter.form.recipientName)},
+                </p>`
+                }
+                <div style="margin:0;">${safeMessage}</div>
+                <p style="margin:22px 0 0;text-align:right;font-size:16px;color:${theme.accent};">
+                  ${stationery ? stationery.sealEmoji : "💌"}
+                </p>
+                <p style="margin:4px 0 0;text-align:right;font-size:15px;color:${theme.accent};">
+                  — ${escapeHtml(letter.form.senderName)}
+                </p>
               </div>
               ${hasVoiceNote ? voiceNoteHtml() : ""}
             </td>
           </tr>
           <tr>
-            <td style="padding:18px 28px 28px;text-align:center;">
-              <p style="margin:14px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
-                Sent with care from <strong style="color:${theme.accent};">${escapeHtml(letter.form.senderName)}</strong><br />
-                via Little Letter — cosy notes for cosy people
+            <td style="padding:16px 22px 24px;text-align:center;">
+              <div style="font-size:18px;letter-spacing:5px;line-height:1.4;">${theme.footerIcons}</div>
+              <p style="margin:12px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
+                Sent with care via Little Letter — cosy notes for cosy people
               </p>
-              <p style="margin:12px 0 0;font-size:11px;color:#8a7a62;line-height:1.5;">
+              <p style="margin:10px 0 0;font-size:11px;color:#8a7a62;line-height:1.5;">
                 Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
               </p>
             </td>
@@ -655,7 +681,7 @@ export function buildLetterEmailHtml(
       <td align="center">
         ${cardBody}
         <p style="margin:18px 0 0;font-size:11px;color:#9ca3af;">
-          ✉️ ${theme.mission}
+          💌 ${theme.mission}
         </p>
         ${whyFooter(letter.form.senderName, theme.accent)}
       </td>
