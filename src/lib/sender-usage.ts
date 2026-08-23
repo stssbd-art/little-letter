@@ -1,4 +1,4 @@
-import { sql } from "@vercel/postgres";
+import { hasDatabase, sql } from "@/lib/db";
 import { FREE_LETTERS, FREE_MIXTAPES } from "@/lib/usage-labels";
 
 export type SenderUsageRecord = {
@@ -18,11 +18,7 @@ export function isValidSenderEmail(email: string) {
 }
 
 export function hasUsageDatabase() {
-  return Boolean(
-    process.env.POSTGRES_URL ||
-      process.env.POSTGRES_PRISMA_URL ||
-      process.env.DATABASE_URL
-  );
+  return hasDatabase();
 }
 
 let ensured = false;

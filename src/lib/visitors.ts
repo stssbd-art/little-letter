@@ -1,14 +1,6 @@
-import { sql } from "@vercel/postgres";
+import { hasDatabase, sql } from "@/lib/db";
 
 const STARTING_COUNT = 12_847;
-
-function hasDatabase() {
-  return Boolean(
-    process.env.POSTGRES_URL ||
-      process.env.POSTGRES_PRISMA_URL ||
-      process.env.DATABASE_URL
-  );
-}
 
 let ensured = false;
 let memoryCount = STARTING_COUNT;
@@ -33,7 +25,7 @@ async function ensureTable() {
 export async function getVisitorCount(): Promise<number> {
   if (!hasDatabase()) return memoryCount;
   await ensureTable();
-  const { rows } = await sql`
+  const { rows } = await sql<{ value: string | number }>`
     SELECT value FROM site_stats WHERE key = 'visitor_count' LIMIT 1
   `;
   const value = Number(rows[0]?.value);
@@ -46,7 +38,7 @@ export async function bumpVisitorCount(): Promise<number> {
     return memoryCount;
   }
   await ensureTable();
-  const { rows } = await sql`
+  const { rows } = await sql<{ value: string | number }>`
     UPDATE site_stats
     SET value = value + 1, updated_at = NOW()
     WHERE key = 'visitor_count'
