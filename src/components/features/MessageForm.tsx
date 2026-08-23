@@ -291,8 +291,8 @@ export function MessageForm() {
                   Stationery
                 </p>
                 <p className="mb-2 text-xs text-[var(--ll-muted)]">
-                  Pick a vintage paper & stamp look. The envelope stays the
-                  classic cream & gold Little Letter colour.
+                  Pick a vintage paper look. The stamp sits on the cream & gold
+                  envelope — not on the letter itself.
                 </p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {stationeryForOccasion(form.occasion).map((s) => {

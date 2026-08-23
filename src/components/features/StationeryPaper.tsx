@@ -1,7 +1,6 @@
 "use client";
 
 import type { LetterStationery } from "@/lib/letter-stationery";
-import { PostageStamp } from "@/components/features/PostageStamp";
 import { cn } from "@/lib/utils";
 
 const DECOR_GLYPH: Record<LetterStationery["decor"], string | null> = {
@@ -24,7 +23,7 @@ type Props = {
   subject?: string;
   children: React.ReactNode;
   className?: string;
-  /** Show stamp + era ribbon (default true) */
+  /** Show era ribbon (default true). Stamp lives on the envelope only. */
   showChrome?: boolean;
   /** Compact for draft editor */
   compact?: boolean;
@@ -73,33 +72,21 @@ export function StationeryPaper({
       {showChrome ? (
         <>
           <div
-            className={cn(
-              "flex items-center justify-between gap-2 border-b px-3",
-              compact ? "py-2" : "py-2.5"
-            )}
+            className={cn("border-b px-3", compact ? "py-2" : "py-2.5")}
             style={{ borderColor: `${stationery.paperBorder}99` }}
           >
-            <div className="min-w-0">
-              <p
-                className="font-pixel text-[8px] tracking-wide"
-                style={{ color: stationery.accent }}
-              >
-                {stationery.emoji} {stationery.title}
-              </p>
-              <p
-                className="truncate text-[10px]"
-                style={{ color: stationery.muted }}
-              >
-                {stationery.era} stationery
-              </p>
-            </div>
-            <PostageStamp
-              emoji={stationery.emoji}
-              label={stationery.stampLabel}
-              colors={stationery.stampColors}
-              postmarkColor={stationery.postmarkColor}
-              className="shrink-0 scale-75 origin-top-right"
-            />
+            <p
+              className="font-pixel text-[8px] tracking-wide"
+              style={{ color: stationery.accent }}
+            >
+              {stationery.emoji} {stationery.title}
+            </p>
+            <p
+              className="truncate text-[10px]"
+              style={{ color: stationery.muted }}
+            >
+              {stationery.era} stationery
+            </p>
           </div>
           {glyph ? (
             <span

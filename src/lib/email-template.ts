@@ -408,19 +408,7 @@ function themeForLetter(letter: GeneratedLetter): FrameTheme {
   };
 }
 
-/** Email-safe perforated postage stamp (matches the preview stamp). */
-function postageStampHtml(letter: GeneratedLetter) {
-  const s = getLetterStationery(letter.form.stationery);
-  return `<div style="display:inline-block;transform:rotate(-6deg);vertical-align:top;">
-    <div style="position:relative;width:58px;padding:6px 5px 5px;background:${s.stampColors.bg};color:${s.stampColors.ink};border:2px solid ${s.stampColors.border};box-shadow:2px 2px 0 rgba(61,47,34,0.16);font-family:Georgia,'Times New Roman',serif;text-align:center;background-image:radial-gradient(circle at 0 0,transparent 3px,${s.stampColors.bg} 3.5px),radial-gradient(circle at 100% 0,transparent 3px,${s.stampColors.bg} 3.5px),radial-gradient(circle at 0 100%,transparent 3px,${s.stampColors.bg} 3.5px),radial-gradient(circle at 100% 100%,transparent 3px,${s.stampColors.bg} 3.5px);background-size:10px 10px;background-position:-5px -5px,-5px -5px,-5px -5px,-5px -5px;">
-      <div style="border:1px solid ${s.stampColors.border};padding:4px 3px 3px;">
-        <div style="font-size:7px;letter-spacing:0.8px;opacity:0.85;">LITTLE LETTER</div>
-        <div style="margin:4px auto;width:34px;height:28px;line-height:28px;background:#fffef8;border:1px solid ${s.stampColors.border};font-size:16px;">${s.emoji}</div>
-        <div style="font-size:11px;font-weight:bold;letter-spacing:0.3px;">${escapeHtml(s.stampLabel)}</div>
-      </div>
-    </div>
-  </div>`;
-}
+/** Removed from letter body — postage stamps belong on the envelope only. */
 
 function whyFooter(senderName: string, accent: string) {
   return `<p style="margin:18px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
@@ -600,21 +588,12 @@ export function buildLetterEmailHtml(
           </tr>
           <tr>
             <td style="padding:18px 22px 0;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td style="vertical-align:top;padding-right:12px;">
-                    <div style="display:inline-block;background:${theme.badgeBg};border:2px dashed ${theme.badgeBorder};border-radius:12px;padding:7px 12px;font-size:12px;color:${theme.badgeInk};line-height:1.35;">
-                      ${theme.badge}
-                    </div>
-                    <p style="margin:10px 0 0;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:${theme.accent};">
-                      ${escapeHtml(label)} letter
-                    </p>
-                  </td>
-                  <td style="width:70px;text-align:right;vertical-align:top;">
-                    ${postageStampHtml(letter)}
-                  </td>
-                </tr>
-              </table>
+              <div style="display:inline-block;background:${theme.badgeBg};border:2px dashed ${theme.badgeBorder};border-radius:12px;padding:7px 12px;font-size:12px;color:${theme.badgeInk};line-height:1.35;">
+                ${theme.badge}
+              </div>
+              <p style="margin:10px 0 0;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:${theme.accent};">
+                ${escapeHtml(label)} letter
+              </p>
             </td>
           </tr>
           <tr>
