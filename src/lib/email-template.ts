@@ -408,8 +408,6 @@ function themeForLetter(letter: GeneratedLetter): FrameTheme {
   };
 }
 
-/** Removed from letter body — postage stamps belong on the envelope only. */
-
 function whyFooter(senderName: string, accent: string) {
   return `<p style="margin:18px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
     You received this because <strong>${escapeHtml(senderName)}</strong> sent you a personal note with
