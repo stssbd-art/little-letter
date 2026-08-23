@@ -9,12 +9,14 @@ import { PixelButton } from "@/components/ui/PixelButton";
 import { TermsAcceptance } from "@/components/features/TermsAcceptance";
 import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
 import { GreetingCard } from "@/components/features/GreetingCard";
+import { StationeryPaper } from "@/components/features/StationeryPaper";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import { OCCASIONS } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
 import { getLetterStationery } from "@/lib/letter-stationery";
+import { PostageStamp } from "@/components/features/PostageStamp";
 import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +35,7 @@ type UsageInfo = {
 export function LetterPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { letter, setLetter } = useLetter();
+  const { letter, setLetter, form } = useLetter();
   const { play } = useSound();
   const [open, setOpen] = useState(false);
   const [sending, setSending] = useState(false);
@@ -157,34 +159,12 @@ export function LetterPreview() {
   }
 
   const currentLetter = letter;
-  const stationery = getLetterStationery(currentLetter.form.stationery);
+  const stationery = getLetterStationery(
+    currentLetter.form.stationery ?? form.stationery
+  );
   const isCard =
     Boolean(currentLetter.form.cardDesign) &&
     isCardDesignId(currentLetter.form.cardDesign ?? "");
-  const decorGlyph =
-    stationery.decor === "lace"
-      ? "Lace"
-      : stationery.decor === "deco"
-        ? "◆"
-        : stationery.decor === "roses"
-          ? "🌹"
-          : stationery.decor === "retro"
-            ? "🌼"
-            : stationery.decor === "story"
-              ? "⭐"
-              : stationery.decor === "botanical"
-                ? "🌿"
-                : stationery.decor === "hearts"
-                  ? "♡"
-                  : stationery.decor === "cake"
-                    ? "🎂"
-                    : stationery.decor === "birds"
-                      ? "🕊️"
-                      : stationery.decor === "toys"
-                        ? "🧸"
-                        : stationery.decor === "holly"
-                          ? "🎄"
-                          : null;
 
   async function sendLetter() {
     if (!hasAcceptedTerms()) {
@@ -407,57 +387,15 @@ export function LetterPreview() {
                 {/* Postage stamp + postmark (letters only) */}
                 {!isCard ? (
                   <div
-                    className="pointer-events-none absolute right-3 top-3 z-[25] flex flex-col items-end gap-1"
+                    className="pointer-events-none absolute right-2.5 top-2.5 z-[25]"
                     aria-hidden
                   >
-                    <div
-                      className="relative flex h-14 w-11 flex-col items-center justify-center rounded-sm border-2 border-dashed px-0.5 text-center shadow-[2px_2px_0_rgba(61,47,34,0.2)]"
-                      style={{
-                        background: stationery.stampColors.bg,
-                        borderColor: stationery.stampColors.border,
-                        color: stationery.stampColors.ink,
-                      }}
-                    >
-                      <span className="text-sm leading-none">
-                        {stationery.emoji}
-                      </span>
-                      <span className="mt-0.5 font-pixel text-[6px] leading-none tracking-wide">
-                        {stationery.stampLabel}
-                      </span>
-                      <svg
-                        className="pointer-events-none absolute -left-3 -top-2 h-10 w-10 opacity-70"
-                        viewBox="0 0 40 40"
-                        aria-hidden
-                      >
-                        <circle
-                          cx="20"
-                          cy="20"
-                          r="14"
-                          fill="none"
-                          stroke={stationery.postmarkColor}
-                          strokeWidth="1.5"
-                          strokeDasharray="2 2"
-                        />
-                        <circle
-                          cx="20"
-                          cy="20"
-                          r="9"
-                          fill="none"
-                          stroke={stationery.postmarkColor}
-                          strokeWidth="1"
-                        />
-                        <text
-                          x="20"
-                          y="22"
-                          textAnchor="middle"
-                          fontSize="5"
-                          fill={stationery.postmarkColor}
-                          fontFamily="monospace"
-                        >
-                          POST
-                        </text>
-                      </svg>
-                    </div>
+                    <PostageStamp
+                      emoji={stationery.emoji}
+                      label={stationery.stampLabel}
+                      colors={stationery.stampColors}
+                      postmarkColor={stationery.postmarkColor}
+                    />
                   </div>
                 ) : null}
 
@@ -642,8 +580,16 @@ export function LetterPreview() {
             <p className="mt-3 text-center text-sm text-[var(--ll-muted)]">
               {open
                 ? "Click or press Enter to tuck the letter back inside"
-                : "Click the seal — the lip opens, then your letter slides out"}
+                : `Click the seal — ${stationery.title} envelope opens, then your letter slides out`}
             </p>
+            {!isCard ? (
+              <p
+                className="mt-1 text-center font-pixel text-[8px] tracking-wide"
+                style={{ color: stationery.accent }}
+              >
+                {stationery.emoji} {stationery.title} · {stationery.era}
+              </p>
+            ) : null}
           </button>
 
           <motion.div
@@ -678,36 +624,12 @@ export function LetterPreview() {
                   }
                 />
               ) : (
-                <div
-                  className={cn(
-                    "relative overflow-hidden rounded-2xl border-2 p-5",
-                    stationery.fontClass
-                  )}
-                  style={{
-                    background: stationery.paperBg,
-                    borderColor: stationery.paperBorder,
-                    color: stationery.ink,
-                    backgroundImage:
-                      "radial-gradient(rgba(61,47,34,0.04) 0.6px, transparent 0.6px)",
-                    backgroundSize: "6px 6px",
-                  }}
+                <StationeryPaper
+                  stationery={stationery}
+                  subject={currentLetter.subject}
                 >
-                  {decorGlyph ? (
-                    <span
-                      className="pointer-events-none absolute right-3 top-3 text-lg opacity-70"
-                      aria-hidden
-                    >
-                      {decorGlyph === "Lace" ? "✦" : decorGlyph}
-                    </span>
-                  ) : null}
                   <p
-                    className="font-pixel text-[10px]"
-                    style={{ color: stationery.accent }}
-                  >
-                    {currentLetter.subject}
-                  </p>
-                  <p
-                    className="mt-1 text-xs"
+                    className="text-xs"
                     style={{ color: stationery.muted }}
                   >
                     To: {currentLetter.form.recipientName} &lt;
@@ -720,12 +642,12 @@ export function LetterPreview() {
                     {currentLetter.message}
                   </div>
                   <p
-                    className="mt-4 font-pixel text-[8px] tracking-wide"
-                    style={{ color: stationery.muted }}
+                    className="mt-5 text-right font-script text-lg"
+                    style={{ color: stationery.accent }}
                   >
-                    {stationery.era} · {stationery.title}
+                    — {currentLetter.form.senderName}
                   </p>
-                </div>
+                </StationeryPaper>
               )}
             </article>
           </motion.div>

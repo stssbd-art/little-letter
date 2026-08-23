@@ -517,10 +517,14 @@ export function buildLetterEmailHtml(
       ? getLetterStationery(letter.form.stationery)
       : null;
   const stationeryStampHtml = stationery
-    ? `<div style="margin:10px auto 0;display:inline-block;border:2px dashed ${stationery.stampColors.border};background:${stationery.stampColors.bg};color:${stationery.stampColors.ink};padding:8px 10px;border-radius:4px;font-size:11px;letter-spacing:0.5px;transform:rotate(-3deg);">
-        <div style="font-size:16px;line-height:1;">${stationery.emoji}</div>
-        <div style="margin-top:3px;font-family:Georgia,serif;font-weight:bold;">${escapeHtml(stationery.stampLabel)}</div>
-        <div style="margin-top:2px;font-size:9px;opacity:0.8;">${escapeHtml(stationery.era)}</div>
+    ? `<div style="margin:12px auto 0;display:inline-block;transform:rotate(-4deg);vertical-align:top;">
+        <div style="position:relative;width:56px;padding:6px 5px 5px;background:${stationery.stampColors.bg};color:${stationery.stampColors.ink};border:2px solid ${stationery.stampColors.border};box-shadow:2px 2px 0 rgba(61,47,34,0.18);font-family:Georgia,'Times New Roman',serif;text-align:center;background-image:radial-gradient(circle at 0 0,transparent 3px,${stationery.stampColors.bg} 3.5px),radial-gradient(circle at 100% 0,transparent 3px,${stationery.stampColors.bg} 3.5px),radial-gradient(circle at 0 100%,transparent 3px,${stationery.stampColors.bg} 3.5px),radial-gradient(circle at 100% 100%,transparent 3px,${stationery.stampColors.bg} 3.5px);background-size:10px 10px;background-position:-5px -5px,-5px -5px,-5px -5px,-5px -5px;">
+          <div style="border:1px solid ${stationery.stampColors.border};padding:4px 3px 3px;">
+            <div style="font-size:7px;letter-spacing:0.8px;opacity:0.85;">LITTLE LETTER</div>
+            <div style="margin:4px auto;width:34px;height:28px;line-height:28px;background:#fffef8;border:1px solid ${stationery.stampColors.border};font-size:16px;">${stationery.emoji}</div>
+            <div style="font-size:11px;font-weight:bold;letter-spacing:0.3px;">${escapeHtml(stationery.stampLabel)}</div>
+          </div>
+        </div>
       </div>`
     : "";
 

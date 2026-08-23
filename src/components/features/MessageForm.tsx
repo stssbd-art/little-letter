@@ -13,11 +13,13 @@ import { useSound } from "@/components/providers/SoundProvider";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
 import { isOccasionSlug } from "@/lib/occasion-seo";
 import {
+  getLetterStationery,
   stationeryForOccasion,
   type LetterStationeryId,
 } from "@/lib/letter-stationery";
 import type { LetterWriteMode, MessageStyle, Occasion } from "@/types";
 import { cn } from "@/lib/utils";
+import { StationeryPaper } from "@/components/features/StationeryPaper";
 
 type Phase = "form" | "draft" | "flying";
 
@@ -166,7 +168,17 @@ export function MessageForm() {
       return;
     }
     setError("");
-    setLetter({ ...letter, subject, message });
+    /* Keep the latest stationery choice on the letter before preview. */
+    setLetter({
+      ...letter,
+      subject,
+      message,
+      form: {
+        ...letter.form,
+        ...form,
+        stationery: form.stationery ?? letter.form.stationery ?? "classic-honey",
+      },
+    });
     play("click");
     setPhase("flying");
     play("whoosh");
@@ -279,8 +291,8 @@ export function MessageForm() {
                   Stationery
                 </p>
                 <p className="mb-2 text-xs text-[var(--ll-muted)]">
-                  Pick a vintage paper & envelope look. Classic Honey is the
-                  original Little Letter style.
+                  Pick a vintage paper & stamp look. The envelope stays the
+                  classic cream & gold Little Letter colour.
                 </p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {stationeryForOccasion(form.occasion).map((s) => {
@@ -470,11 +482,17 @@ export function MessageForm() {
                   Your letter
                 </p>
                 <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                  Edit anything you like here, then continue to the envelope.
+                  Edit anything you like — shown on your chosen stationery.
+                  Then continue to the envelope.
                 </p>
               </div>
 
-              <div className="rounded-2xl border-2 border-[#d4b896] bg-[#fffdf6] p-4 shadow-[4px_4px_0_rgba(61,47,34,0.1)] dark:bg-[#2a2118]">
+              <StationeryPaper
+                stationery={getLetterStationery(
+                  letter.form.stationery ?? form.stationery
+                )}
+                compact
+              >
                 <Field label="Subject" htmlFor="draftSubject">
                   <PixelInput
                     id="draftSubject"
@@ -483,7 +501,7 @@ export function MessageForm() {
                       setLetter({ ...letter, subject: e.target.value })
                     }
                     maxLength={120}
-                    className="border-[#e2c9a0] bg-white/80 font-pixel text-[11px] dark:bg-[#1f1812]"
+                    className="border-black/10 bg-white/70 font-pixel text-[11px] dark:bg-black/20"
                   />
                 </Field>
                 <Field
@@ -499,10 +517,10 @@ export function MessageForm() {
                       setLetter({ ...letter, message: e.target.value })
                     }
                     maxLength={4000}
-                    className="min-h-[240px] border-[#e2c9a0] bg-white/80 font-display text-base leading-relaxed dark:bg-[#1f1812]"
+                    className="min-h-[240px] border-black/10 bg-white/70 font-display text-base leading-relaxed dark:bg-black/20"
                   />
                 </Field>
-              </div>
+              </StationeryPaper>
 
               {error ? (
                 <p
