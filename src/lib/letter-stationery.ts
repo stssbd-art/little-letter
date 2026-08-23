@@ -210,7 +210,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
   {
     id: "vintage-valentine",
     title: "Vintage Valentine",
-    blurb: "Hearts, ribbons & antique postmarks (cream envelope)",
+    blurb: "Hearts, ribbons & antique postmarks on cream paper",
     emoji: "💘",
     era: "Valentine",
     occasionHints: ["valentines-day", "love"],
