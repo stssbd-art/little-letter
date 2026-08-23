@@ -99,7 +99,7 @@ function MobileChip({
       <div
         className={cn(
           "pointer-events-auto flex items-stretch transition-transform duration-300 ease-out",
-          open ? "translate-x-0" : "translate-x-[calc(100%-2.25rem)]"
+          open ? "translate-x-0" : "translate-x-[calc(100%-2rem)]"
         )}
       >
         <button
@@ -108,12 +108,12 @@ function MobileChip({
           aria-expanded={open}
           aria-controls={panelId}
           className={cn(
-            "flex h-11 w-9 shrink-0 items-center justify-center rounded-l-lg border-2 border-r-0 shadow-[2px_2px_0_rgba(61,47,34,0.28)]",
+            "flex h-9 w-8 shrink-0 items-center justify-center rounded-l-md border-2 border-r-0 shadow-[2px_2px_0_rgba(61,47,34,0.28)]",
             tabClassName,
             !open && "animate-pulse"
           )}
         >
-          <span className="text-lg leading-none" aria-hidden>
+          <span className="text-base leading-none" aria-hidden>
             {open ? "✕" : offer.emoji}
           </span>
         </button>
@@ -121,7 +121,7 @@ function MobileChip({
         <div
           id={panelId}
           className={cn(
-            "flex w-[min(13.5rem,calc(100vw-3rem))] flex-col rounded-l-none rounded-bl-lg border-2 border-l-0 px-2.5 py-2.5 shadow-[2px_2px_0_rgba(61,47,34,0.28)]",
+            "flex w-[min(12rem,calc(100vw-2.75rem))] flex-col rounded-l-none rounded-bl-lg border-2 border-l-0 px-2 py-2 shadow-[2px_2px_0_rgba(61,47,34,0.28)]",
             !open && "pointer-events-none",
             offer.tone.border,
             offer.tone.bg

@@ -21,10 +21,10 @@ const EXPLORE = [
 
 export function Footer() {
   return (
-    <footer className="relative z-10 mt-16 border-t-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]/80">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:grid-cols-3 sm:items-start sm:gap-8">
-        <div className="space-y-2.5">
-          <p className="font-pixel text-[11px] leading-relaxed text-[var(--ll-pink-deep)]">
+    <footer className="relative z-10 mt-10 border-t-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]/80 sm:mt-16">
+      <div className="mx-auto grid max-w-6xl gap-6 px-2.5 py-6 sm:grid-cols-3 sm:items-start sm:gap-8 sm:px-4 sm:py-10">
+        <div className="space-y-2">
+          <p className="font-pixel text-[10px] leading-relaxed text-[var(--ll-pink-deep)] sm:text-[11px]">
             {SITE_NAME}
           </p>
           <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
@@ -73,8 +73,8 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-[var(--ll-lavender)]/50 px-4 py-4">
-        <p className="flex flex-wrap items-center justify-start gap-x-2 gap-y-1 text-left text-xs leading-relaxed text-[var(--ll-muted)]">
+      <div className="border-t border-[var(--ll-lavender)]/50 px-2.5 py-3 sm:px-4 sm:py-4">
+        <p className="flex flex-wrap items-center justify-start gap-x-2 gap-y-1 text-left text-[11px] leading-relaxed text-[var(--ll-muted)] sm:text-xs">
           <span>
             © {YEAR} {SITE_NAME}
           </span>

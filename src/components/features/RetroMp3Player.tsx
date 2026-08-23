@@ -266,30 +266,30 @@ export function RetroMp3Player({ className }: { className?: string }) {
   return (
     <section
       className={cn(
-        "mp3-shell overflow-hidden rounded-[22px] border-[3px] border-[#8a7a62] bg-gradient-to-b from-[#efe6d4] to-[#d8cdb6]",
-        "shadow-[inset_0_1px_0_rgba(255,255,255,0.65),6px_8px_0_rgba(61,47,34,0.18)]",
+        "mp3-shell overflow-hidden rounded-[16px] border-[3px] border-[#8a7a62] bg-gradient-to-b from-[#efe6d4] to-[#d8cdb6] sm:rounded-[22px]",
+        "shadow-[inset_0_1px_0_rgba(255,255,255,0.65),4px_6px_0_rgba(61,47,34,0.18)] sm:shadow-[inset_0_1px_0_rgba(255,255,255,0.65),6px_8px_0_rgba(61,47,34,0.18)]",
         "dark:from-[#2a2218] dark:to-[#1c1610] dark:border-[#5c4a34]",
         className
       )}
     >
-      <div className="flex items-center justify-between border-b border-[#b9a888]/70 px-3 py-2 dark:border-[#5c4a34]">
-        <p className="font-pixel text-[9px] tracking-wide text-[#5c4a34] dark:text-[#e6c98a]">
+      <div className="flex items-center justify-between border-b border-[#b9a888]/70 px-2.5 py-1.5 sm:px-3 sm:py-2 dark:border-[#5c4a34]">
+        <p className="font-pixel text-[8px] tracking-wide text-[#5c4a34] sm:text-[9px] dark:text-[#e6c98a]">
           LL-PLAYER LOVE
         </p>
-        <p className="font-pixel text-[8px] text-[#8a7a62]">
+        <p className="font-pixel text-[7px] text-[#8a7a62] sm:text-[8px]">
           {!ready ? "LOAD" : playing ? "STEREO" : "READY"}
         </p>
       </div>
 
-      <div className="space-y-3 p-3">
-        <div className="lcd-screen rounded-md border-2 border-[#3d2f22] bg-[#1a2e1a] px-3 py-3 text-[#8fef7a] shadow-[inset_0_0_18px_rgba(0,0,0,0.55)]">
-          <div className="flex items-start justify-between gap-3">
+      <div className="space-y-2.5 p-2.5 sm:space-y-3 sm:p-3">
+        <div className="lcd-screen rounded-md border-2 border-[#3d2f22] bg-[#1a2e1a] px-2.5 py-2 text-[#8fef7a] shadow-[inset_0_0_18px_rgba(0,0,0,0.55)] sm:px-3 sm:py-3">
+          <div className="flex items-start justify-between gap-2 sm:gap-3">
             <div className="min-w-0">
-              <p className="font-pixel text-[8px] opacity-80">NOW PLAYING · LOVE MIX</p>
-              <p className="mt-1 truncate font-pixel text-[10px] leading-relaxed">
+              <p className="font-pixel text-[7px] opacity-80 sm:text-[8px]">NOW PLAYING · LOVE MIX</p>
+              <p className="mt-0.5 truncate font-pixel text-[9px] leading-relaxed sm:mt-1 sm:text-[10px]">
                 {track.title}
               </p>
-              <p className="mt-1 truncate font-pixel text-[8px] opacity-80">
+              <p className="mt-0.5 truncate font-pixel text-[7px] opacity-80 sm:mt-1 sm:text-[8px]">
                 {track.artist}
                 {track.year ? ` · ${track.year}` : ""}
               </p>
@@ -301,11 +301,11 @@ export function RetroMp3Player({ className }: { className?: string }) {
                   ? { repeat: Infinity, duration: 2.4, ease: "linear" }
                   : { duration: 0.2 }
               }
-              className="mt-0.5 size-8 shrink-0 rounded-full border-2 border-[#8fef7a]/50 bg-[#0f1c0f]"
+              className="mt-0.5 size-6 shrink-0 rounded-full border-2 border-[#8fef7a]/50 bg-[#0f1c0f] sm:size-8"
             />
           </div>
 
-          <p className="mt-3 border-t border-[#8fef7a]/20 pt-2 font-pixel text-[7px] leading-relaxed text-[#8fef7a]/80">
+          <p className="mt-2 border-t border-[#8fef7a]/20 pt-1.5 font-pixel text-[6px] leading-relaxed text-[#8fef7a]/80 sm:mt-3 sm:pt-2 sm:text-[7px]">
             Search YouTube · play · send a mixtape
           </p>
         </div>
@@ -325,11 +325,11 @@ export function RetroMp3Player({ className }: { className?: string }) {
           <div ref={hostRef} className="h-full w-full" />
         </div>
 
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2">
           <button
             type="button"
             aria-label="Previous track"
-            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-sm text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
+            className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-xs text-[#5c4a34] sm:h-10 sm:w-10 sm:text-sm dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={() =>
               selectTrack((index - 1 + tracks.length) % tracks.length)
             }
@@ -340,7 +340,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           <button
             type="button"
             aria-label="Play"
-            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#f6d58a] text-base text-[#3d2f22] disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#f6d58a] text-sm text-[#3d2f22] sm:h-11 sm:w-11 sm:text-base disabled:opacity-50"
             onClick={playMix}
             disabled={playing && ready}
           >
@@ -349,7 +349,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           <button
             type="button"
             aria-label="Stop"
-            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-base text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-sm text-[#5c4a34] sm:h-11 sm:w-11 sm:text-base dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={stopMix}
             disabled={!playing}
           >
@@ -358,7 +358,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
           <button
             type="button"
             aria-label="Next track"
-            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-sm text-[#5c4a34] dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
+            className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#8a7a62] bg-[#fff6df] text-xs text-[#5c4a34] sm:h-10 sm:w-10 sm:text-sm dark:bg-[#322a22] dark:text-[#e6c98a] disabled:opacity-50"
             onClick={() => selectTrack((index + 1) % tracks.length)}
             disabled={tracks.length < 2}
           >

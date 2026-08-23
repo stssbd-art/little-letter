@@ -226,7 +226,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-1.5 px-2.5 py-2 sm:gap-3 sm:px-4 sm:py-3">
         <div className="min-w-0 shrink">
           <Logo size="sm" />
         </div>
@@ -253,11 +253,11 @@ export function Header() {
           })}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <PixelButton
             size="sm"
             variant="ghost"
-            className="!min-h-9 !min-w-9 !px-0 !py-0 text-base sm:!min-h-10 sm:!min-w-10"
+            className="!min-h-8 !min-w-8 !px-0 !py-0 text-sm sm:!min-h-10 sm:!min-w-10 sm:text-base"
             onClick={() => {
               toggleMute();
               if (muted) play("click");
@@ -270,7 +270,7 @@ export function Header() {
           <PixelButton
             size="sm"
             variant="ghost"
-            className="!min-h-9 !min-w-9 !px-0 !py-0 text-base sm:!min-h-10 sm:!min-w-10"
+            className="!min-h-8 !min-w-8 !px-0 !py-0 text-sm sm:!min-h-10 sm:!min-w-10 sm:text-base"
             onClick={toggleTheme}
             aria-label={
               theme === "light" ? "Switch to dark mode" : "Switch to light mode"
@@ -282,8 +282,8 @@ export function Header() {
             ref={menuButtonRef}
             type="button"
             className={cn(
-              "inline-flex h-9 w-9 items-center justify-center rounded-xl border-2 border-[var(--ll-lavender)] sm:h-10 sm:w-10",
-              "bg-white/70 text-[var(--ll-ink)] shadow-[0_3px_0_var(--ll-lavender-shadow)]",
+              "inline-flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--ll-lavender)] sm:h-10 sm:w-10 sm:rounded-xl",
+              "bg-white/70 text-[var(--ll-ink)] shadow-[0_2px_0_var(--ll-lavender-shadow)] sm:shadow-[0_3px_0_var(--ll-lavender-shadow)]",
               "transition hover:bg-white/90 dark:bg-white/10 dark:hover:bg-white/15 md:hidden"
             )}
             onClick={() => {
