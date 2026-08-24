@@ -38,5 +38,7 @@ export function mixtapePrice(trackCount: number) {
 }
 
 export function isDemoMode() {
-  return process.env.DEMO_MODE?.trim() === "true";
+  // Temporary free testing — set back to env-only when ready for real charges.
+  if (process.env.DEMO_MODE?.trim() === "false") return false;
+  return true;
 }
