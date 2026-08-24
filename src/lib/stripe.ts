@@ -1,22 +1,41 @@
 import Stripe from "stripe";
 import { SITE_URL } from "@/lib/constants";
 import {
-  LETTER_PRICE_LABEL,
-  LETTER_PRICE_PENCE,
   CARD_PRICE_LABEL,
   CARD_PRICE_PENCE,
+  LETTER_PRICE_LABEL,
+  LETTER_PRICE_PENCE,
   mixtapePrice,
   type CheckoutKind,
-} from "@/lib/usage";
+} from "@/lib/usage-labels";
+
+let stripeSingleton: Stripe | null = null;
 
 export function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  return new Stripe(key);
+  if (!stripeSingleton) {
+    stripeSingleton = new Stripe(key, {
+      // Prefer failing fast over multi-second retry stalls on checkout.
+      maxNetworkRetries: 1,
+      timeout: 12_000,
+      typescript: true,
+    });
+  }
+  return stripeSingleton;
 }
 
 export function isStripeConfigured() {
   return Boolean(process.env.STRIPE_SECRET_KEY);
+}
+
+function priceIdFor(kind: CheckoutKind, trackCount: number): string | undefined {
+  if (kind === "letter") return process.env.STRIPE_PRICE_LETTER?.trim() || undefined;
+  if (kind === "card") return process.env.STRIPE_PRICE_CARD?.trim() || undefined;
+  if (trackCount <= 1) {
+    return process.env.STRIPE_PRICE_MIX_ONE?.trim() || undefined;
+  }
+  return process.env.STRIPE_PRICE_MIX_MULTI?.trim() || undefined;
 }
 
 export async function createSendCheckoutSession(opts: {
@@ -67,13 +86,10 @@ export async function createSendCheckoutSession(opts: {
             description: "Send one extra little letter by email",
           };
 
-  return stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: senderEmail || undefined,
-    success_url: `${base}${safePath}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${base}${safePath}?cancelled=1`,
-    line_items: [
-      {
+  const priceId = priceIdFor(kind, trackCount);
+  const lineItem: Stripe.Checkout.SessionCreateParams.LineItem = priceId
+    ? { quantity: 1, price: priceId }
+    : {
         quantity: 1,
         price_data: {
           currency: "gbp",
@@ -83,8 +99,16 @@ export async function createSendCheckoutSession(opts: {
             description: product.description,
           },
         },
-      },
-    ],
+      };
+
+  return stripe.checkout.sessions.create({
+    mode: "payment",
+    // Skip slow automatic payment-method discovery — card (+ wallets) is enough.
+    payment_method_types: ["card"],
+    customer_email: senderEmail || undefined,
+    success_url: `${base}${safePath}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${base}${safePath}?cancelled=1`,
+    line_items: [lineItem],
     metadata: {
       clientId: opts.clientId ?? "browser",
       product:

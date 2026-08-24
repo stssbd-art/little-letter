@@ -36,6 +36,7 @@ import {
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
 } from "@/lib/usage-labels";
+import { getCheckoutUrl, prefetchCheckout } from "@/lib/checkout-client";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
@@ -402,6 +403,16 @@ export function MixtapeForm() {
   }, [draft.trackIds.length, draft.senderEmail]);
 
   useEffect(() => {
+    if (!needsPayment || !draft.senderEmail.trim()) return;
+    prefetchCheckout({
+      returnPath: "/mixtape",
+      kind: "mixtape",
+      trackCount: Math.max(1, draft.trackIds.length),
+      senderEmail: draft.senderEmail.trim(),
+    });
+  }, [needsPayment, draft.senderEmail, draft.trackIds.length]);
+
+  useEffect(() => {
     const sessionId = searchParams.get("session_id");
     const paid = searchParams.get("paid");
     const cancelled = searchParams.get("cancelled");
@@ -647,19 +658,13 @@ export function MixtapeForm() {
     setError("");
     play("click");
     try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          returnPath: "/mixtape",
-          kind: "mixtape",
-          trackCount: Math.max(1, current.trackIds.length),
-          senderEmail: current.senderEmail.trim(),
-        }),
+      const url = await getCheckoutUrl({
+        returnPath: "/mixtape",
+        kind: "mixtape",
+        trackCount: Math.max(1, current.trackIds.length),
+        senderEmail: current.senderEmail.trim(),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Could not start payment");
-      window.location.href = data.url as string;
+      window.location.href = url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not start payment");
       setPaying(false);

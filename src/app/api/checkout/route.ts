@@ -1,16 +1,22 @@
 import { NextResponse } from "next/server";
 import { createSendCheckoutSession, isStripeConfigured } from "@/lib/stripe";
 import {
-  isDemoMode,
-  isValidSenderEmail,
-  LETTER_PRICE_LABEL,
   CARD_PRICE_LABEL,
+  isDemoMode,
+  LETTER_PRICE_LABEL,
   mixtapePrice,
-  normalizeSenderEmail,
   type CheckoutKind,
-} from "@/lib/usage";
+} from "@/lib/usage-labels";
 
 export const dynamic = "force-dynamic";
+
+function normalizeSenderEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
+function isValidSenderEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeSenderEmail(email));
+}
 
 export async function POST(request: Request) {
   try {

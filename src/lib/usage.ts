@@ -18,9 +18,9 @@ import {
   FREE_LETTERS,
   FREE_MIXTAPES,
   LETTER_PRICE_LABEL,
-  CARD_PRICE_LABEL,
-  MIX_MULTI_SONG_LABEL,
-  MIX_ONE_SONG_LABEL,
+  LETTER_PRICE_PENCE,
+  isDemoMode,
+  type CheckoutKind,
 } from "@/lib/usage-labels";
 
 export {
@@ -31,49 +31,18 @@ export {
   CARD_PRICE_LABEL,
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
+  LETTER_PRICE_PENCE,
+  CARD_PRICE_PENCE,
+  MIX_ONE_SONG_PENCE,
+  MIX_MULTI_SONG_PENCE,
+  mixtapePrice,
+  isDemoMode,
+  type CheckoutKind,
 } from "@/lib/usage-labels";
-
-/** Letters: first 2 free, then £0.70 each */
-export const LETTER_PRICE_PENCE = 70;
-
-/** E-cards: no free sends — £1.25 each */
-export const CARD_PRICE_PENCE = 125;
-
-/** Mixtapes: first one free, then £0.99 for 1 song, £1.20 for 2+ songs */
-export const MIX_ONE_SONG_PENCE = 99;
-export const MIX_MULTI_SONG_PENCE = 120;
 
 /** @deprecated use LETTER_PRICE_* — kept for older imports during transition */
 export const SEND_PRICE_LABEL = LETTER_PRICE_LABEL;
 export const SEND_PRICE_PENCE = LETTER_PRICE_PENCE;
-
-export type CheckoutKind = "letter" | "mixtape" | "card";
-
-export function mixtapePrice(trackCount: number) {
-  const count = Math.max(0, Math.floor(trackCount));
-  if (count <= 1) {
-    return {
-      pence: MIX_ONE_SONG_PENCE,
-      label: MIX_ONE_SONG_LABEL,
-      name: "Little Letter mixtape (1 song)",
-      description: "Send a one-song mixtape by email",
-    };
-  }
-  return {
-    pence: MIX_MULTI_SONG_PENCE,
-    label: MIX_MULTI_SONG_LABEL,
-    name: "Little Letter mixtape (multi-song)",
-    description: "Send a multi-song mixtape by email",
-  };
-}
-
-/**
- * Payments are on unless DEMO_MODE=true is set (temporary testing only).
- * Do not set DEMO_MODE on production once testing is finished.
- */
-export function isDemoMode() {
-  return process.env.DEMO_MODE?.trim() === "true";
-}
 
 export function paymentsEnabled() {
   return !isDemoMode();

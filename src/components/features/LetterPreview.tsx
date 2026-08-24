@@ -18,6 +18,7 @@ import { isCardDesignId } from "@/lib/card-designs";
 import { getLetterStationery } from "@/lib/letter-stationery";
 import { PostageStamp } from "@/components/features/PostageStamp";
 import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
+import { getCheckoutUrl, prefetchCheckout } from "@/lib/checkout-client";
 import { cn } from "@/lib/utils";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
@@ -98,6 +99,22 @@ export function LetterPreview() {
     void refreshUsage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letter?.form?.senderEmail, letter?.form?.cardDesign]);
+
+  useEffect(() => {
+    if (!needsPayment || !letter?.form?.senderEmail?.trim()) return;
+    const isCardUsage =
+      Boolean(letter.form.cardDesign) &&
+      isCardDesignId(letter.form.cardDesign ?? "");
+    prefetchCheckout({
+      returnPath: "/preview",
+      kind: isCardUsage ? "card" : "letter",
+      senderEmail: letter.form.senderEmail.trim(),
+    });
+  }, [
+    needsPayment,
+    letter?.form?.senderEmail,
+    letter?.form?.cardDesign,
+  ]);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
@@ -246,18 +263,12 @@ export function LetterPreview() {
     setError("");
     play("click");
     try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          returnPath: "/preview",
-          kind: isCard ? "card" : "letter",
-          senderEmail: currentLetter.form.senderEmail?.trim(),
-        }),
+      const url = await getCheckoutUrl({
+        returnPath: "/preview",
+        kind: isCard ? "card" : "letter",
+        senderEmail: currentLetter.form.senderEmail?.trim() ?? "",
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Could not start payment");
-      window.location.href = data.url as string;
+      window.location.href = url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not start payment");
       setPaying(false);
