@@ -1,7 +1,8 @@
-import type { Occasion } from "@/types";
+import type { MessageStyle, Occasion } from "@/types";
 
 /**
  * Vintage letter stationery — paper, stamp & postmark.
+ * Each look also carries a writing voice (merged Style + Stationery picker).
  * Envelope colour is always the classic cream/gold Little Letter look.
  */
 
@@ -64,6 +65,8 @@ export type LetterStationery = {
   decor: LetterStationeryDecor;
   /** Soft accent used in email theme merge */
   accent: string;
+  /** Writing voice applied when this look is chosen (replaces separate Style picker) */
+  writingStyle: MessageStyle;
 };
 
 export const LETTER_STATIONERY: LetterStationery[] = [
@@ -86,6 +89,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(139,94,52,0.55)",
     decor: "none",
     accent: "#8b5e34",
+    writingStyle: "cute",
   },
   {
     id: "victorian-romance",
@@ -106,6 +110,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(60,40,30,0.55)",
     decor: "lace",
     accent: "#6b4550",
+    writingStyle: "romantic",
   },
   {
     id: "art-deco-1920s",
@@ -126,6 +131,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(40,40,40,0.55)",
     decor: "deco",
     accent: "#8a7a40",
+    writingStyle: "poetic",
   },
   {
     id: "love-letter-1950s",
@@ -146,6 +152,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(120,50,60,0.5)",
     decor: "roses",
     accent: "#a34d62",
+    writingStyle: "romantic",
   },
   {
     id: "nostalgia-1970s",
@@ -166,6 +173,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(100,60,30,0.5)",
     decor: "retro",
     accent: "#b07040",
+    writingStyle: "funny",
   },
   {
     id: "storybook",
@@ -186,6 +194,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(60,80,100,0.5)",
     decor: "story",
     accent: "#5070a0",
+    writingStyle: "whimsical",
   },
   {
     id: "cottagecore",
@@ -206,6 +215,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(70,80,40,0.5)",
     decor: "botanical",
     accent: "#6a8040",
+    writingStyle: "cute",
   },
   {
     id: "vintage-valentine",
@@ -226,6 +236,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(140,30,40,0.5)",
     decor: "hearts",
     accent: "#c04050",
+    writingStyle: "romantic",
   },
   {
     id: "birthday-vintage",
@@ -246,6 +257,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(139,94,52,0.55)",
     decor: "cake",
     accent: "#b85c38",
+    writingStyle: "funny",
   },
   {
     id: "thank-you-friendship",
@@ -266,6 +278,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(90,110,50,0.5)",
     decor: "birds",
     accent: "#6f8a45",
+    writingStyle: "encouraging",
   },
   {
     id: "childhood-nostalgia",
@@ -286,6 +299,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(130,80,40,0.5)",
     decor: "toys",
     accent: "#c07040",
+    writingStyle: "whimsical",
   },
   {
     id: "christmas-vintage",
@@ -306,6 +320,7 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(40,60,40,0.55)",
     decor: "holly",
     accent: "#2a5a40",
+    writingStyle: "cute",
   },
 ];
 
@@ -338,4 +353,11 @@ export function stationeryForOccasion(
   const matched = rest.filter((s) => s.occasionHints.includes(occasion));
   const others = rest.filter((s) => !s.occasionHints.includes(occasion));
   return [classic, ...matched, ...others];
+}
+
+/** Writing voice bundled with a stationery look. */
+export function writingStyleForStationery(
+  id: string | undefined | null
+): MessageStyle {
+  return getLetterStationery(id).writingStyle;
 }

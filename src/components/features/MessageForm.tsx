@@ -10,14 +10,14 @@ import { Field, PixelInput, PixelSelect, PixelTextarea } from "@/components/ui/P
 import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
-import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
+import { OCCASIONS, RELATIONSHIPS } from "@/lib/constants";
 import { isOccasionSlug } from "@/lib/occasion-seo";
 import {
   getLetterStationery,
   stationeryForOccasion,
   type LetterStationeryId,
 } from "@/lib/letter-stationery";
-import type { LetterWriteMode, MessageStyle, Occasion } from "@/types";
+import type { LetterWriteMode, Occasion } from "@/types";
 import { cn } from "@/lib/utils";
 import { StationeryPaper, StationerySwatch } from "@/components/features/StationeryPaper";
 
@@ -65,11 +65,28 @@ export function MessageForm() {
   }, [phase]);
 
   const writeMode: LetterWriteMode = form.writeMode === "own" ? "own" : "ai";
+  const selectedStationery = getLetterStationery(form.stationery);
+
+  /* Keep AI voice in sync with the chosen look (old drafts may diverge). */
+  useEffect(() => {
+    if (form.style !== selectedStationery.writingStyle) {
+      setForm({ style: selectedStationery.writingStyle });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync when stationery id changes
+  }, [form.stationery, selectedStationery.writingStyle]);
 
   function setWriteMode(mode: LetterWriteMode) {
     play("click");
     setForm({ writeMode: mode });
     setError("");
+  }
+
+  function formWithLookVoice() {
+    return {
+      ...form,
+      stationery: selectedStationery.id,
+      style: selectedStationery.writingStyle,
+    };
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -94,14 +111,15 @@ export function MessageForm() {
         setLetter({
           subject,
           message,
-          form: { ...form, writeMode: "own" },
+          form: { ...formWithLookVoice(), writeMode: "own" },
           createdAt: new Date().toISOString(),
         });
       } else {
+        const payload = { ...formWithLookVoice(), writeMode: "ai" as const };
         const res = await fetch("/api/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, writeMode: "ai" }),
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -111,7 +129,7 @@ export function MessageForm() {
         setLetter({
           subject: data.subject,
           message: data.message,
-          form: { ...form, writeMode: "ai" },
+          form: payload,
           createdAt: new Date().toISOString(),
         });
       }
@@ -133,10 +151,11 @@ export function MessageForm() {
     setRegenerating(true);
     play("click");
     try {
+      const payload = { ...formWithLookVoice(), writeMode: "ai" as const };
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, writeMode: "ai" }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not regenerate");
@@ -144,7 +163,7 @@ export function MessageForm() {
         ...letter,
         subject: data.subject,
         message: data.message,
-        form: { ...form, writeMode: "ai" },
+        form: payload,
         createdAt: new Date().toISOString(),
       });
       play("sparkle");
@@ -175,8 +194,7 @@ export function MessageForm() {
       message,
       form: {
         ...letter.form,
-        ...form,
-        stationery: form.stationery ?? letter.form.stationery ?? "classic-honey",
+        ...formWithLookVoice(),
       },
     });
     play("click");
@@ -185,8 +203,6 @@ export function MessageForm() {
     await new Promise((r) => setTimeout(r, 900));
     router.push("/preview");
   }
-
-  const selectedStationery = getLetterStationery(form.stationery);
 
   return (
     <div ref={rootRef} className="scroll-mt-24 space-y-5">
@@ -290,11 +306,12 @@ export function MessageForm() {
 
               <div>
                 <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
-                  Stationery
+                  Look &amp; voice
                 </p>
                 <p className="mb-2 text-xs text-[var(--ll-muted)]">
-                  Pick a nostalgic paper look — each style has its own pattern,
-                  borders, and ornaments. Preview updates below.
+                  {writeMode === "ai"
+                    ? "One pick for paper look and writing tone — preview updates below."
+                    : "Pick the paper look for your letter — preview updates below."}
                 </p>
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                   {stationeryForOccasion(form.occasion).map((s) => {
@@ -309,6 +326,7 @@ export function MessageForm() {
                           play("click");
                           setForm({
                             stationery: s.id as LetterStationeryId,
+                            style: s.writingStyle,
                           });
                         }}
                       />
@@ -318,6 +336,16 @@ export function MessageForm() {
                 <div className="mt-3">
                   <p className="mb-2 font-pixel text-[8px] tracking-wide text-[var(--ll-muted)]">
                     Live paper preview
+                    {writeMode === "ai" ? (
+                      <>
+                        {" "}
+                        ·{" "}
+                        <span className="capitalize text-[var(--ll-pink-deep)]">
+                          {selectedStationery.writingStyle}
+                        </span>{" "}
+                        voice
+                      </>
+                    ) : null}
                   </p>
                   <StationeryPaper
                     stationery={selectedStationery}
@@ -343,32 +371,6 @@ export function MessageForm() {
 
               {writeMode === "ai" ? (
                 <>
-                  <div>
-                    <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
-                      Style
-                    </p>
-                    <div className="grid gap-2 sm:grid-cols-3">
-                      {STYLES.map((s) => (
-                        <PixelCard
-                          key={s.value}
-                          as="button"
-                          selected={form.style === s.value}
-                          onClick={() => {
-                            play("click");
-                            setForm({ style: s.value as MessageStyle });
-                          }}
-                        >
-                          <p className="text-left font-display text-sm text-[var(--ll-ink)]">
-                            {s.label}
-                          </p>
-                          <p className="mt-1 text-left text-xs text-[var(--ll-muted)]">
-                            {s.description}
-                          </p>
-                        </PixelCard>
-                      ))}
-                    </div>
-                  </div>
-
                   <Field
                     label="Custom notes (optional)"
                     htmlFor="customNote"

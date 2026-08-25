@@ -52,7 +52,7 @@ export interface LetterFormData {
   ownMessage: string;
   /** Set when sending from the Cards gallery flow */
   cardDesign?: CardDesignId;
-  /** Vintage paper / envelope look (letters only; ignored for cards) */
+  /** Vintage paper look — also sets AI writing voice (see writingStyle on stationery) */
   stationery?: LetterStationeryId;
 }
 
