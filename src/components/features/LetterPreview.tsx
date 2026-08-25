@@ -38,7 +38,7 @@ export function LetterPreview() {
   const searchParams = useSearchParams();
   const { letter, setLetter, form } = useLetter();
   const { play } = useSound();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [sending, setSending] = useState(false);
   const [flying, setFlying] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -601,8 +601,8 @@ export function LetterPreview() {
 
             <p className="mt-3 text-center text-sm text-[var(--ll-muted)]">
               {open
-                ? "Click or press Enter to tuck the letter back inside"
-                : `Click the seal — ${stationery.title} envelope opens, then your letter slides out`}
+                ? "Your styled letter is open below — click the envelope to tuck it back"
+                : `Click the seal — then your ${stationery.title} letter slides out`}
             </p>
             {!isCard ? (
               <p

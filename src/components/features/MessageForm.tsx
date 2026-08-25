@@ -19,7 +19,7 @@ import {
 } from "@/lib/letter-stationery";
 import type { LetterWriteMode, MessageStyle, Occasion } from "@/types";
 import { cn } from "@/lib/utils";
-import { StationeryPaper } from "@/components/features/StationeryPaper";
+import { StationeryPaper, StationerySwatch } from "@/components/features/StationeryPaper";
 
 type Phase = "form" | "draft" | "flying";
 
@@ -186,6 +186,8 @@ export function MessageForm() {
     router.push("/preview");
   }
 
+  const selectedStationery = getLetterStationery(form.stationery);
+
   return (
     <div ref={rootRef} className="scroll-mt-24 space-y-5">
       <PixelWindow title="create_message.exe" icon="✍️" liftOnHover={false}>
@@ -291,40 +293,51 @@ export function MessageForm() {
                   Stationery
                 </p>
                 <p className="mb-2 text-xs text-[var(--ll-muted)]">
-                  Pick a vintage paper look. The stamp sits on the cream & gold
-                  envelope — not on the letter itself.
+                  Pick a nostalgic paper look — each style has its own pattern,
+                  borders, and ornaments. Preview updates below.
                 </p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                   {stationeryForOccasion(form.occasion).map((s) => {
                     const selected =
                       (form.stationery ?? "classic-honey") === s.id;
                     return (
-                      <PixelCard
+                      <StationerySwatch
                         key={s.id}
-                        as="button"
+                        stationery={s}
                         selected={selected}
-                        onClick={() => {
+                        onSelect={() => {
                           play("click");
                           setForm({
                             stationery: s.id as LetterStationeryId,
                           });
                         }}
-                        className="flex flex-col items-start gap-1 py-2.5 text-left"
-                      >
-                        <span className="flex items-center gap-1.5">
-                          <span className="text-base" aria-hidden>
-                            {s.emoji}
-                          </span>
-                          <span className="font-display text-xs text-[var(--ll-ink)]">
-                            {s.title}
-                          </span>
-                        </span>
-                        <span className="line-clamp-2 text-[10px] leading-snug text-[var(--ll-muted)]">
-                          {s.era} · {s.blurb}
-                        </span>
-                      </PixelCard>
+                      />
                     );
                   })}
+                </div>
+                <div className="mt-3">
+                  <p className="mb-2 font-pixel text-[8px] tracking-wide text-[var(--ll-muted)]">
+                    Live paper preview
+                  </p>
+                  <StationeryPaper
+                    stationery={selectedStationery}
+                    compact
+                    subject="Your letter will look like this"
+                  >
+                    <p
+                      className="text-xs leading-relaxed"
+                      style={{ color: selectedStationery.muted }}
+                    >
+                      Soft paper, vintage ornaments, and the era you chose —
+                      this is what they’ll open after the envelope.
+                    </p>
+                    <p
+                      className="mt-3 text-right font-script text-base"
+                      style={{ color: selectedStationery.accent }}
+                    >
+                      — with love
+                    </p>
+                  </StationeryPaper>
                 </div>
               </div>
 
