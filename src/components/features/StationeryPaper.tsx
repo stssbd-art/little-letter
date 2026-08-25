@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import type { LetterStationery } from "@/lib/letter-stationery";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ function StationeryArt({
   border: string;
   compact?: boolean;
 }) {
+  const uid = useId().replace(/:/g, "");
   const size = compact ? "text-lg" : "text-2xl sm:text-3xl";
 
   if (decor === "none") {
@@ -52,16 +54,17 @@ function StationeryArt({
   }
 
   if (decor === "lace") {
+    const pid = `ll-lace-${uid}`;
     return (
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
           <defs>
-            <pattern id="ll-lace" width="24" height="24" patternUnits="userSpaceOnUse">
+            <pattern id={pid} width="24" height="24" patternUnits="userSpaceOnUse">
               <circle cx="12" cy="12" r="8" fill="none" stroke={accent} strokeWidth="1.2" opacity="0.35" />
               <circle cx="12" cy="12" r="3" fill={accent} opacity="0.2" />
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill="url(#ll-lace)" />
+          <rect width="100%" height="100%" fill={`url(#${pid})`} />
           <rect
             x="3%"
             y="3%"
