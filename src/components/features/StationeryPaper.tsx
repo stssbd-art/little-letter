@@ -133,29 +133,24 @@ function StationeryArt({
     );
   }
 
-  if (decor === "retro") {
+  if (decor === "berries") {
     return (
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         <div
-          className="absolute inset-x-0 top-0 h-10 sm:h-12"
+          className="absolute inset-0 opacity-40"
           style={{
-            background: `repeating-linear-gradient(90deg, #e8a060 0 18px, #f0c878 18px 36px, #d47850 36px 54px)`,
-            opacity: 0.85,
+            backgroundImage: `radial-gradient(circle at 18% 22%, #ffe0e8 0 28px, transparent 29px),
+              radial-gradient(circle at 82% 18%, #fff 0 22px, transparent 23px),
+              radial-gradient(circle at 70% 70%, #ffe8ee 0 34px, transparent 35px),
+              radial-gradient(circle at 25% 78%, #fff 0 20px, transparent 21px)`,
           }}
         />
-        <div
-          className="absolute inset-x-0 bottom-0 h-8"
-          style={{
-            background: `repeating-linear-gradient(90deg, #d47850 0 16px, #e8a060 16px 32px)`,
-            opacity: 0.75,
-          }}
-        />
-        <span className={cn("absolute left-3 top-12", size)}>🌼</span>
-        <span className={cn("absolute right-3 top-14", size)}>🌻</span>
-        <span className={cn("absolute bottom-10 left-4", size)}>✌️</span>
-        <span className={cn("absolute bottom-10 right-4", size)}>🌈</span>
-        <span className="absolute left-1/2 top-11 -translate-x-1/2 font-pixel text-[8px] tracking-wide text-[#6a4020] sm:top-12 sm:text-[9px]">
-          1970s FLOWER POWER
+        <span className={cn("absolute left-3 top-3", size)}>🍓</span>
+        <span className={cn("absolute right-3 top-4", size)}>☁️</span>
+        <span className={cn("absolute bottom-4 left-4", size)}>🌸</span>
+        <span className={cn("absolute bottom-4 right-3", size)}>✨</span>
+        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-xs opacity-85 sm:text-sm">
+          strawberry cloud mail
         </span>
       </div>
     );
@@ -292,35 +287,30 @@ function StationeryArt({
         <span className={cn("absolute bottom-3 left-3", size)}>⭐</span>
         <span className={cn("absolute bottom-3 right-2", size)}>🌟</span>
         <span className="absolute left-1/2 top-2 -translate-x-1/2 text-xs opacity-85 sm:text-sm">
-          childhood keepsake
+          teddy starlight
         </span>
       </div>
     );
   }
 
-  if (decor === "holly") {
+  if (decor === "moon") {
     return (
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         <div
-          className="absolute inset-x-0 top-0 h-9"
+          className="absolute inset-0 opacity-50"
           style={{
-            background: `linear-gradient(90deg, #2a5a40, #8b3a3a, #2a5a40)`,
-            opacity: 0.85,
+            backgroundImage: `radial-gradient(circle at 78% 16%, #fff8d8 0 26px, transparent 28px),
+              radial-gradient(circle at 18% 28%, #e8e4f8 0 14px, transparent 15px),
+              radial-gradient(circle at 30% 72%, #ddd8f4 0 10px, transparent 11px),
+              radial-gradient(circle at 70% 78%, #ebe6fa 0 12px, transparent 13px)`,
           }}
         />
-        <div
-          className="absolute inset-x-0 bottom-0 h-7"
-          style={{
-            background: `linear-gradient(90deg, #8b3a3a, #2a5a40, #8b3a3a)`,
-            opacity: 0.8,
-          }}
-        />
-        <span className={cn("absolute left-2 top-10 text-white drop-shadow", size)}>🎄</span>
-        <span className={cn("absolute right-2 top-10", size)}>❄️</span>
-        <span className={cn("absolute bottom-8 left-3", size)}>⭐</span>
-        <span className={cn("absolute bottom-8 right-3", size)}>🎄</span>
-        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-[10px] font-semibold tracking-wide text-[#fff8f0] sm:text-xs">
-          ✶ vintage christmas post ✶
+        <span className={cn("absolute left-3 top-3", size)}>🫖</span>
+        <span className={cn("absolute right-3 top-3", size)}>🌙</span>
+        <span className={cn("absolute bottom-4 left-4", size)}>⭐</span>
+        <span className={cn("absolute bottom-4 right-3", size)}>✨</span>
+        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-xs opacity-85 sm:text-sm">
+          moonlit tea · soft twilight
         </span>
       </div>
     );
@@ -339,8 +329,8 @@ function paperWash(stationery: LetterStationery): string {
       return `linear-gradient(135deg, #f4efe4 0%, #e8dfc8 50%, #f0e8d4 100%)`;
     case "roses":
       return `linear-gradient(180deg, #fff5f2, #ffe8e4 40%, #fff8f6)`;
-    case "retro":
-      return `linear-gradient(180deg, #faf0d8, #f5e0b8 45%, #f8e8c8)`;
+    case "berries":
+      return `linear-gradient(180deg, #fff6f8, #ffe8ee 45%, #fff8fa)`;
     case "story":
       return `linear-gradient(180deg, #f8fbff, #eef4fa 50%, #f7fafc)`;
     case "botanical":
@@ -353,8 +343,8 @@ function paperWash(stationery: LetterStationery): string {
       return `linear-gradient(180deg, #f8faf2, #eef4e4 50%, #f5f8ee)`;
     case "toys":
       return `linear-gradient(180deg, #fff8f0, #ffe8d4 45%, #fff4e8)`;
-    case "holly":
-      return `linear-gradient(180deg, #faf8f4, #f0f4ee 40%, #faf6f0)`;
+    case "moon":
+      return `linear-gradient(180deg, #f7f5fc, #ebe8f8 45%, #f5f3fa)`;
     default:
       return `linear-gradient(180deg, ${stationery.paperBg}, #fff6df 55%, ${stationery.paperBg})`;
   }

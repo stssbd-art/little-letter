@@ -18,28 +18,34 @@ export type LetterStationeryId =
   | "victorian-romance"
   | "art-deco-1920s"
   | "love-letter-1950s"
-  | "nostalgia-1970s"
+  | "strawberry-cloud"
   | "storybook"
   | "cottagecore"
   | "vintage-valentine"
   | "birthday-vintage"
   | "thank-you-friendship"
   | "childhood-nostalgia"
-  | "christmas-vintage";
+  | "moonlit-tea";
 
 export type LetterStationeryDecor =
   | "none"
   | "lace"
   | "deco"
   | "roses"
-  | "retro"
+  | "berries"
   | "story"
   | "botanical"
   | "hearts"
   | "cake"
   | "birds"
   | "toys"
-  | "holly";
+  | "moon";
+
+/** Old picker IDs → current looks (saved drafts still open). */
+const LEGACY_STATIONERY_IDS: Record<string, LetterStationeryId> = {
+  "nostalgia-1970s": "strawberry-cloud",
+  "christmas-vintage": "moonlit-tea",
+};
 
 export type LetterStationery = {
   id: LetterStationeryId;
@@ -155,30 +161,30 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     writingStyle: "romantic",
   },
   {
-    id: "nostalgia-1970s",
-    title: "1970s Nostalgia",
-    blurb: "Warm retro paper & faded flower power",
-    emoji: "🌼",
-    era: "1970s",
+    id: "strawberry-cloud",
+    title: "Strawberry Cloud",
+    blurb: "Puffy clouds, tiny berries & candy-pink daydreams",
+    emoji: "🍓",
+    era: "Daydream",
     occasionHints: ["friendship", "thinking-of-you", "thank-you", "birthday"],
-    paperBg: "#faf0d8",
-    paperBorder: "#c47840",
-    ink: "#4a3020",
-    muted: "#8a6040",
+    paperBg: "#fff6f8",
+    paperBorder: "#e8a8b4",
+    ink: "#5a3040",
+    muted: "#9a6070",
     fontClass: "font-display",
     ...CLASSIC_ENVELOPE,
-    sealEmoji: "✌️",
-    stampLabel: "8p",
-    stampColors: { bg: "#faf0d8", ink: "#6a4020", border: "#6a4020" },
-    postmarkColor: "rgba(100,60,30,0.5)",
-    decor: "retro",
-    accent: "#b07040",
-    writingStyle: "funny",
+    sealEmoji: "☁️",
+    stampLabel: "♡",
+    stampColors: { bg: "#fff0f4", ink: "#c05068", border: "#c05068" },
+    postmarkColor: "rgba(192,80,104,0.45)",
+    decor: "berries",
+    accent: "#d4687a",
+    writingStyle: "cute",
   },
   {
     id: "storybook",
-    title: "Old Storybook",
-    blurb: "Whimsical animals, clouds & hand-drawn charm",
+    title: "Storybook Sky",
+    blurb: "Clouds, stars & once-upon-a-letter charm",
     emoji: "📖",
     era: "Storybook",
     occasionHints: ["birthday", "friendship", "thinking-of-you", "good-luck"],
@@ -219,8 +225,8 @@ export const LETTER_STATIONERY: LetterStationery[] = [
   },
   {
     id: "vintage-valentine",
-    title: "Vintage Valentine",
-    blurb: "Hearts, ribbons & antique postmarks on cream paper",
+    title: "Soft Valentine",
+    blurb: "Hearts, ribbons & a blush of cream paper",
     emoji: "💘",
     era: "Valentine",
     occasionHints: ["valentines-day", "love"],
@@ -240,10 +246,10 @@ export const LETTER_STATIONERY: LetterStationery[] = [
   },
   {
     id: "birthday-vintage",
-    title: "Birthday Vintage",
-    blurb: "Tiny cakes, candles & a special birthday stamp",
+    title: "Party Cake",
+    blurb: "Tiny cakes, balloons & sprinkle-day cheer",
     emoji: "🎂",
-    era: "Birthday",
+    era: "Party",
     occasionHints: ["birthday"],
     paperBg: "#fffaf0",
     paperBorder: "#e8a05a",
@@ -261,8 +267,8 @@ export const LETTER_STATIONERY: LetterStationery[] = [
   },
   {
     id: "thank-you-friendship",
-    title: "Thank You / Friendship",
-    blurb: "Birds, little envelopes & warm nostalgic notes",
+    title: "Friendship Post",
+    blurb: "Little birds, tiny envelopes & warm thank-yous",
     emoji: "🕊️",
     era: "Friendship",
     occasionHints: ["thank-you", "friendship", "thinking-of-you"],
@@ -282,10 +288,10 @@ export const LETTER_STATIONERY: LetterStationery[] = [
   },
   {
     id: "childhood-nostalgia",
-    title: "Childhood Nostalgia",
-    blurb: "Teddy bears, toys, stars & tiny houses",
+    title: "Teddy Starlight",
+    blurb: "Teddy bears, tiny stars & soft playroom magic",
     emoji: "🧸",
-    era: "Childhood",
+    era: "Playroom",
     occasionHints: ["birthday", "friendship", "thinking-of-you", "good-luck"],
     paperBg: "#fff8f0",
     paperBorder: "#e8a878",
@@ -302,25 +308,25 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     writingStyle: "whimsical",
   },
   {
-    id: "christmas-vintage",
-    title: "Christmas Vintage",
-    blurb: "Holly, snowflakes & old Christmas postcards",
-    emoji: "🎄",
-    era: "Christmas",
-    occasionHints: ["thinking-of-you", "love", "friendship", "thank-you"],
-    paperBg: "#faf8f4",
-    paperBorder: "#2a5a40",
-    ink: "#2a3028",
-    muted: "#5a6848",
+    id: "moonlit-tea",
+    title: "Moonlit Tea",
+    blurb: "Warm tea, sleepy stars & a soft twilight glow",
+    emoji: "🫖",
+    era: "Twilight",
+    occasionHints: ["thinking-of-you", "love", "friendship", "thank-you", "good-luck"],
+    paperBg: "#f7f5fc",
+    paperBorder: "#a8a4c8",
+    ink: "#3a3858",
+    muted: "#6e6a90",
     fontClass: "font-script",
     ...CLASSIC_ENVELOPE,
-    sealEmoji: "❄️",
-    stampLabel: "XMAS",
-    stampColors: { bg: "#fff8f0", ink: "#2a5a40", border: "#2a5a40" },
-    postmarkColor: "rgba(40,60,40,0.55)",
-    decor: "holly",
-    accent: "#2a5a40",
-    writingStyle: "cute",
+    sealEmoji: "🌙",
+    stampLabel: "☾",
+    stampColors: { bg: "#f0eef8", ink: "#5a5688", border: "#5a5688" },
+    postmarkColor: "rgba(90,86,136,0.45)",
+    decor: "moon",
+    accent: "#6b6f9e",
+    writingStyle: "whimsical",
   },
 ];
 
@@ -328,17 +334,23 @@ const BY_ID = Object.fromEntries(
   LETTER_STATIONERY.map((s) => [s.id, s])
 ) as Record<LetterStationeryId, LetterStationery>;
 
-export function isLetterStationeryId(
-  value: string
-): value is LetterStationeryId {
-  return value in BY_ID;
+export function isLetterStationeryId(value: string): boolean {
+  return value in BY_ID || value in LEGACY_STATIONERY_IDS;
+}
+
+export function resolveLetterStationeryId(
+  id: string | undefined | null
+): LetterStationeryId {
+  if (!id) return "classic-honey";
+  if (id in LEGACY_STATIONERY_IDS) return LEGACY_STATIONERY_IDS[id]!;
+  if (id in BY_ID) return id as LetterStationeryId;
+  return "classic-honey";
 }
 
 export function getLetterStationery(
   id: string | undefined | null
 ): LetterStationery {
-  const base =
-    id && isLetterStationeryId(id) ? BY_ID[id] : BY_ID["classic-honey"];
+  const base = BY_ID[resolveLetterStationeryId(id)];
   /* Always keep the cream/gold envelope — themes only change paper & stamp. */
   return { ...base, ...CLASSIC_ENVELOPE };
 }

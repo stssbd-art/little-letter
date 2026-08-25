@@ -12,7 +12,7 @@ import {
 import type { GeneratedLetter, LetterFormData } from "@/types";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
-import { isLetterStationeryId } from "@/lib/letter-stationery";
+import { resolveLetterStationeryId } from "@/lib/letter-stationery";
 
 const defaultForm: LetterFormData = {
   recipientName: "",
@@ -65,11 +65,7 @@ export function LetterProvider({ children }: { children: ReactNode }) {
               parsed.form.cardDesign && isCardDesignId(parsed.form.cardDesign)
                 ? parsed.form.cardDesign
                 : undefined,
-            stationery:
-              parsed.form.stationery &&
-              isLetterStationeryId(parsed.form.stationery)
-                ? parsed.form.stationery
-                : "classic-honey",
+            stationery: resolveLetterStationeryId(parsed.form.stationery),
           });
         if (parsed.letter) setLetter(parsed.letter);
       }

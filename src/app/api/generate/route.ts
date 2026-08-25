@@ -3,7 +3,7 @@ import { generateLetterMessage } from "@/lib/openai";
 import type { LetterFormData } from "@/types";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
-import { isLetterStationeryId } from "@/lib/letter-stationery";
+import { resolveLetterStationeryId } from "@/lib/letter-stationery";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -63,10 +63,7 @@ export async function POST(request: Request) {
         body.cardDesign && isCardDesignId(body.cardDesign)
           ? body.cardDesign
           : undefined,
-      stationery:
-        body.stationery && isLetterStationeryId(body.stationery)
-          ? body.stationery
-          : "classic-honey",
+      stationery: resolveLetterStationeryId(body.stationery),
     };
 
     const result = await generateLetterMessage(form);
