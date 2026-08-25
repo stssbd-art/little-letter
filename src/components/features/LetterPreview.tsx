@@ -16,6 +16,7 @@ import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
 import { OCCASIONS } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
 import { getLetterStationery } from "@/lib/letter-stationery";
+import { breakAfterLetterGreeting } from "@/lib/letter-format";
 import { PostageStamp } from "@/components/features/PostageStamp";
 import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
 import { getCheckoutUrl, prefetchCheckout } from "@/lib/checkout-client";
@@ -661,7 +662,7 @@ export function LetterPreview() {
                     className="mt-4 whitespace-pre-wrap text-left text-base leading-relaxed"
                     style={{ color: stationery.ink }}
                   >
-                    {currentLetter.message}
+                    {breakAfterLetterGreeting(currentLetter.message)}
                   </div>
                   <p
                     className="mt-5 text-right font-script text-lg"

@@ -2,6 +2,7 @@ import { randomInt } from "crypto";
 import OpenAI from "openai";
 import type { LetterFormData } from "@/types";
 import { OCCASIONS, STYLES } from "@/lib/constants";
+import { breakAfterLetterGreeting } from "@/lib/letter-format";
 
 function getClient() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -372,6 +373,7 @@ Rules:
 - 80–140 words
 - No marketing language, no “Little Letter”, no slogans, no hashtags
 - No emojis
+- If the message opens with “Dear {name},”, put a blank line after that greeting before the rest of the letter
 - Include a simple sign-off from ${form.senderName}
 - Return JSON with keys: subject, message
 - Subject should be a normal personal email subject (not promotional)`;
@@ -402,7 +404,7 @@ Rules:
 
     return {
       subject: parsed.subject,
-      message: parsed.message,
+      message: breakAfterLetterGreeting(parsed.message),
     };
   } catch {
     return buildFallbackMessage(form);

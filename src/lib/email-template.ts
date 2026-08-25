@@ -12,6 +12,7 @@ import {
   STATIONERY_EMAIL_FONT_STYLE,
   buildStationeryLetterCardHtml,
 } from "@/lib/email-stationery";
+import { breakAfterLetterGreeting } from "@/lib/letter-format";
 
 function escapeHtml(text: string) {
   return text
@@ -460,7 +461,7 @@ export function buildLetterEmailText(
   return [
     `Little Letter for ${letter.form.recipientName}`,
     "",
-    letter.message,
+    breakAfterLetterGreeting(letter.message),
     hasVoiceNote ? "\nA voice note is attached to this email.\n" : "",
     `— ${letter.form.senderName}`,
     "",
@@ -512,11 +513,17 @@ export function buildLetterEmailHtml(
     ? getLetterStationery(letter.form.stationery)
     : null;
 
-  const safeMessage = escapeHtml(letter.message).replace(/\n/g, "<br />");
+  const formattedMessage = breakAfterLetterGreeting(letter.message);
+  const safeMessage = escapeHtml(formattedMessage).replace(/\n/g, "<br />");
   const safeSubject = escapeHtml(letter.subject);
   const preheader = `${letter.form.senderName} sent you a ${design ? "digital card" : `${(meta?.label ?? "note").toLowerCase()} letter`} on Little Letter.`;
 
   const openUrl = opts?.openUrl?.trim() || "";
+
+  const brandMark = `<a href="${escapeHtml(SITE_URL)}" style="display:inline-block;text-decoration:none;color:#8b5e34;margin:0 0 18px;">
+          <span style="font-size:22px;line-height:1;vertical-align:middle;">💌</span>
+          <span style="font-family:'Press Start 2P',Quicksand,Nunito,'Trebuchet MS',Verdana,sans-serif;font-size:11px;letter-spacing:0.5px;line-height:1.6;vertical-align:middle;margin-left:8px;color:#8b5e34;">Little Letter</span>
+        </a>`;
 
   // Digital cards: plain open-on-web teaser (full animated card is on the website)
   const cardBody =
@@ -585,7 +592,7 @@ export function buildLetterEmailHtml(
           stationery: stationery ?? getLetterStationery(letter.form.stationery),
           subject: letter.subject,
           messageHtml: safeMessage,
-          messageText: letter.message,
+          messageText: formattedMessage,
           recipientName: letter.form.recipientName,
           recipientEmail: letter.form.recipientEmail,
           senderName: letter.form.senderName,
@@ -607,6 +614,7 @@ export function buildLetterEmailHtml(
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:linear-gradient(180deg,#faf4e8 0%,#fffbf2 50%,#faf4e8 100%);padding:32px 12px;">
     <tr>
       <td align="center">
+        ${brandMark}
         ${cardBody}
         <p style="margin:18px 0 0;font-size:11px;color:#9ca3af;">
           💌 ${theme.mission}
