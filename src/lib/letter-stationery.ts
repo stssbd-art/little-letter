@@ -15,7 +15,7 @@ export const CLASSIC_ENVELOPE = {
 };
 export type LetterStationeryId =
   | "classic-honey"
-  | "victorian-romance"
+  | "cherry-blossom"
   | "art-deco-1920s"
   | "love-letter-1950s"
   | "strawberry-cloud"
@@ -29,7 +29,7 @@ export type LetterStationeryId =
 
 export type LetterStationeryDecor =
   | "none"
-  | "lace"
+  | "blossom"
   | "deco"
   | "roses"
   | "berries"
@@ -45,6 +45,7 @@ export type LetterStationeryDecor =
 const LEGACY_STATIONERY_IDS: Record<string, LetterStationeryId> = {
   "nostalgia-1970s": "strawberry-cloud",
   "christmas-vintage": "moonlit-tea",
+  "victorian-romance": "cherry-blossom",
 };
 
 export type LetterStationery = {
@@ -98,24 +99,24 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     writingStyle: "cute",
   },
   {
-    id: "victorian-romance",
-    title: "Victorian Romance",
-    blurb: "Cream paper, lace borders & antique stamps",
-    emoji: "🥀",
-    era: "Victorian",
-    occasionHints: ["love", "wedding", "valentines-day", "mothers-day"],
-    paperBg: "#faf3e6",
-    paperBorder: "#8b6f4e",
-    ink: "#3a2a1c",
-    muted: "#7a6048",
+    id: "cherry-blossom",
+    title: "Cherry Blossom",
+    blurb: "Soft petals, spring air & a whisper of pink",
+    emoji: "🌸",
+    era: "Spring",
+    occasionHints: ["love", "wedding", "valentines-day", "mothers-day", "thinking-of-you"],
+    paperBg: "#fff8fb",
+    paperBorder: "#e8a8b8",
+    ink: "#4a3040",
+    muted: "#9a7080",
     fontClass: "font-script",
     ...CLASSIC_ENVELOPE,
-    sealEmoji: "🖤",
-    stampLabel: "1d",
-    stampColors: { bg: "#f7ecd8", ink: "#5c3030", border: "#5c3030" },
-    postmarkColor: "rgba(60,40,30,0.55)",
-    decor: "lace",
-    accent: "#6b4550",
+    sealEmoji: "💮",
+    stampLabel: "春",
+    stampColors: { bg: "#fff0f4", ink: "#c07088", border: "#c07088" },
+    postmarkColor: "rgba(192,112,136,0.45)",
+    decor: "blossom",
+    accent: "#c07088",
     writingStyle: "romantic",
   },
   {

@@ -53,36 +53,27 @@ function StationeryArt({
     );
   }
 
-  if (decor === "lace") {
-    const pid = `ll-lace-${uid}`;
+  if (decor === "blossom") {
     return (
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
-          <defs>
-            <pattern id={pid} width="24" height="24" patternUnits="userSpaceOnUse">
-              <circle cx="12" cy="12" r="8" fill="none" stroke={accent} strokeWidth="1.2" opacity="0.35" />
-              <circle cx="12" cy="12" r="3" fill={accent} opacity="0.2" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill={`url(#${pid})`} />
-          <rect
-            x="3%"
-            y="3%"
-            width="94%"
-            height="94%"
-            fill="none"
-            stroke={border}
-            strokeWidth="2"
-            strokeDasharray="6 4"
-            opacity="0.55"
-          />
-        </svg>
-        <span className={cn("absolute left-2 top-3", size)}>🥀</span>
-        <span className={cn("absolute right-2 top-3", size)}>🥀</span>
-        <span className={cn("absolute bottom-3 left-2", size)}>✿</span>
-        <span className={cn("absolute bottom-3 right-2", size)}>✿</span>
-        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-sm opacity-80 sm:text-base">
-          ❦ · Victorian lace · ❦
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-45"
+          style={{
+            backgroundImage: `radial-gradient(circle at 16% 18%, #ffe4ec 0 18px, transparent 19px),
+              radial-gradient(circle at 84% 14%, #fff 0 14px, transparent 15px),
+              radial-gradient(circle at 72% 62%, #ffe8f0 0 22px, transparent 23px),
+              radial-gradient(circle at 28% 72%, #ffd6e4 0 12px, transparent 13px),
+              radial-gradient(circle at 50% 40%, ${accent}22 0 40px, transparent 41px)`,
+          }}
+        />
+        <span className={cn("absolute left-3 top-3", size)}>🌸</span>
+        <span className={cn("absolute right-3 top-4", size)}>🌸</span>
+        <span className={cn("absolute bottom-3 left-3", size)}>💮</span>
+        <span className={cn("absolute bottom-4 right-3", size)}>✨</span>
+        <span className="absolute left-[22%] top-[48%] text-3xl opacity-15 sm:text-4xl">✿</span>
+        <span className="absolute right-[18%] top-[58%] text-2xl opacity-10">✿</span>
+        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-xs opacity-85 sm:text-sm">
+          cherry blossom · soft spring
         </span>
       </div>
     );
@@ -323,8 +314,8 @@ function paperWash(stationery: LetterStationery): string {
   const a = stationery.accent;
   const b = stationery.paperBorder;
   switch (stationery.decor) {
-    case "lace":
-      return `radial-gradient(ellipse at 50% 0%, ${a}33, transparent 55%), linear-gradient(180deg, #faf3e6, #f3e6d0)`;
+    case "blossom":
+      return `radial-gradient(ellipse at 50% 0%, ${a}28, transparent 55%), linear-gradient(180deg, #fff8fb, #ffe8f0 45%, #fff6fa)`;
     case "deco":
       return `linear-gradient(135deg, #f4efe4 0%, #e8dfc8 50%, #f0e8d4 100%)`;
     case "roses":

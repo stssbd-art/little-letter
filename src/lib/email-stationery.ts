@@ -30,8 +30,8 @@ export function stationeryPixelStack() {
 export function stationeryPaperWash(stationery: LetterStationery): string {
   const a = stationery.accent;
   switch (stationery.decor) {
-    case "lace":
-      return `radial-gradient(ellipse at 50% 0%, ${a}33, transparent 55%), linear-gradient(180deg, #faf3e6, #f3e6d0)`;
+    case "blossom":
+      return `radial-gradient(ellipse at 50% 0%, ${a}28, transparent 55%), linear-gradient(180deg, #fff8fb, #ffe8f0 45%, #fff6fa)`;
     case "deco":
       return `linear-gradient(135deg, #f4efe4 0%, #e8dfc8 50%, #f0e8d4 100%)`;
     case "roses":
@@ -60,8 +60,8 @@ export function stationeryPaperWash(stationery: LetterStationery): string {
 /** Lace-circle watermark like StationeryArt on the site (CSS-only for inbox support). */
 function decorPattern(decor: LetterStationeryDecor, accent: string, border: string): string {
   switch (decor) {
-    case "lace":
-      return `radial-gradient(circle at 12px 12px, transparent 3px, ${accent}33 3.5px, ${accent}22 7px, transparent 8px)`;
+    case "blossom":
+      return `radial-gradient(circle at 16% 18%, #ffe4ec 0 18px, transparent 19px), radial-gradient(circle at 84% 14%, #fff 0 14px, transparent 15px), radial-gradient(circle at 72% 62%, #ffe8f0 0 22px, transparent 23px), radial-gradient(circle at 28% 72%, #ffd6e4 0 12px, transparent 13px)`;
     case "roses":
       return `repeating-linear-gradient(transparent, transparent 26px, ${border}55 26px, ${border}55 27px)`;
     case "story":
@@ -80,7 +80,6 @@ function decorPattern(decor: LetterStationeryDecor, accent: string, border: stri
 }
 
 function decorPatternSize(decor: LetterStationeryDecor): string {
-  if (decor === "lace") return "24px 24px";
   if (decor === "roses" || decor === "story") return "100% 27px";
   if (decor === "toys") return "24px 24px";
   return "auto";
@@ -96,8 +95,8 @@ type DecorBits = {
 
 function decorBits(decor: LetterStationeryDecor): DecorBits {
   switch (decor) {
-    case "lace":
-      return { caption: "❦ · Victorian lace · ❦", tl: "🥀", tr: "🥀", bl: "✿", br: "✿" };
+    case "blossom":
+      return { caption: "cherry blossom · soft spring", tl: "🌸", tr: "🌸", bl: "💮", br: "✨" };
     case "deco":
       return { caption: "1920 · ART DECO · GLAM", tl: "◆", tr: "◆", bl: "◇", br: "◇" };
     case "roses":
