@@ -9,7 +9,7 @@ import {
   getLetterStationery,
 } from "@/lib/letter-stationery";
 import {
-  STATIONERY_EMAIL_FONT_LINKS,
+  STATIONERY_EMAIL_FONT_STYLE,
   buildStationeryLetterCardHtml,
 } from "@/lib/email-stationery";
 
@@ -587,10 +587,9 @@ export function buildLetterEmailHtml(
           messageHtml: safeMessage,
           messageText: letter.message,
           recipientName: letter.form.recipientName,
+          recipientEmail: letter.form.recipientEmail,
           senderName: letter.form.senderName,
-          occasionLabel: label,
           hasVoiceNote,
-          brandTagline: theme.tagline,
         });
 
   return `<!DOCTYPE html>
@@ -599,7 +598,7 @@ export function buildLetterEmailHtml(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(letter.subject)}</title>
-  ${STATIONERY_EMAIL_FONT_LINKS}
+  ${STATIONERY_EMAIL_FONT_STYLE}
 </head>
 <body style="margin:0;padding:0;background:#faf4e8;font-family:Quicksand,Nunito,'Trebuchet MS',Verdana,sans-serif;color:#3d2f22;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">

@@ -6,7 +6,7 @@ export function stationeryFontStack(
 ): string {
   switch (fontClass) {
     case "font-script":
-      return "'Great Vibes','Segoe Script','Apple Chancery',Georgia,cursive";
+      return "'Great Vibes','Segoe Script','Apple Chancery','Brush Script MT',cursive";
     case "font-pixel":
       return "'Press Start 2P','Courier New',Courier,monospace";
     default:
@@ -19,7 +19,7 @@ export function stationeryDisplayStack() {
 }
 
 export function stationeryScriptStack() {
-  return "'Great Vibes','Segoe Script','Apple Chancery',Georgia,cursive";
+  return "'Great Vibes','Segoe Script','Apple Chancery','Brush Script MT',cursive";
 }
 
 export function stationeryPixelStack() {
@@ -55,6 +55,35 @@ export function stationeryPaperWash(stationery: LetterStationery): string {
     default:
       return `linear-gradient(180deg, ${stationery.paperBg}, #fff6df 55%, ${stationery.paperBg})`;
   }
+}
+
+/** Lace-circle watermark like StationeryArt on the site (CSS-only for inbox support). */
+function decorPattern(decor: LetterStationeryDecor, accent: string, border: string): string {
+  switch (decor) {
+    case "lace":
+      return `radial-gradient(circle at 12px 12px, transparent 3px, ${accent}33 3.5px, ${accent}22 7px, transparent 8px)`;
+    case "roses":
+      return `repeating-linear-gradient(transparent, transparent 26px, ${border}55 26px, ${border}55 27px)`;
+    case "story":
+      return `repeating-linear-gradient(transparent, transparent 28px, ${border}66 28px, ${border}66 29px)`;
+    case "toys":
+      return `repeating-linear-gradient(45deg, ${accent}55 0 12px, transparent 12px 24px)`;
+    case "berries":
+      return `radial-gradient(circle at 18% 22%, #ffe0e8 0 28px, transparent 29px), radial-gradient(circle at 82% 18%, #fff 0 22px, transparent 23px), radial-gradient(circle at 70% 70%, #ffe8ee 0 34px, transparent 35px)`;
+    case "hearts":
+      return `radial-gradient(circle at 20% 25%, ${accent}55 0 6px, transparent 7px), radial-gradient(circle at 80% 22%, ${accent}44 0 5px, transparent 6px)`;
+    case "moon":
+      return `radial-gradient(circle at 78% 16%, #fff8d8 0 26px, transparent 28px), radial-gradient(circle at 18% 28%, #e8e4f8 0 14px, transparent 15px)`;
+    default:
+      return "none";
+  }
+}
+
+function decorPatternSize(decor: LetterStationeryDecor): string {
+  if (decor === "lace") return "24px 24px";
+  if (decor === "roses" || decor === "story") return "100% 27px";
+  if (decor === "toys") return "24px 24px";
+  return "auto";
 }
 
 type DecorBits = {
@@ -105,18 +134,16 @@ export type StationeryLetterEmailParts = {
   stationery: LetterStationery;
   subject: string;
   messageHtml: string;
-  /** Raw message text — used to avoid duplicating an existing greeting */
   messageText: string;
   recipientName: string;
+  recipientEmail: string;
   senderName: string;
-  occasionLabel: string;
   hasVoiceNote?: boolean;
-  brandTagline: string;
 };
 
 /**
- * Email-safe HTML that mirrors StationeryPaper on the website:
- * paper wash, decor corners, caption, chrome strip, fonts, dashed letter box.
+ * Mirrors StationeryPaper on /preview — same chrome, lace/pattern, script body.
+ * No separate “Little Letter” brand strip inside the paper (that’s only site chrome).
  */
 export function buildStationeryLetterCardHtml(
   parts: StationeryLetterEmailParts
@@ -128,14 +155,14 @@ export function buildStationeryLetterCardHtml(
   const scriptFont = stationeryScriptStack();
   const pixelFont = stationeryPixelStack();
   const wash = stationeryPaperWash(s);
-  const messageSize = s.fontClass === "font-pixel" ? "13px" : "16px";
-  const messageLine = s.fontClass === "font-script" ? "1.9" : "1.75";
-
-  const greeting = /^(dear|hi|hello|hey)\b/i.test(parts.messageText.trim())
-    ? ""
-    : `<p style="margin:0 0 12px;font-size:14px;color:${s.muted};font-style:italic;font-family:${displayFont};">
-        Dear ${escapeHtml(parts.recipientName)},
-      </p>`;
+  const pattern = decorPattern(s.decor, s.accent, s.paperBorder);
+  const patternSize = decorPatternSize(s.decor);
+  const layeredBg =
+    pattern === "none"
+      ? wash
+      : `${pattern}, ${wash}`;
+  const messageSize = s.fontClass === "font-pixel" ? "13px" : s.fontClass === "font-script" ? "22px" : "16px";
+  const messageLine = s.fontClass === "font-script" ? "1.85" : "1.75";
 
   const voice = parts.hasVoiceNote
     ? `<div style="margin-top:14px;padding:12px 14px;background:${s.stampColors.bg};border:2px dashed ${s.stampColors.border};border-radius:12px;font-size:13px;line-height:1.5;color:${s.ink};font-family:${displayFont};">
@@ -143,73 +170,65 @@ export function buildStationeryLetterCardHtml(
       </div>`
     : "";
 
-  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border:4px solid ${s.paperBorder};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${s.paperBorder};">
+  /*
+   * Structure matches StationeryPaper:
+   * outer border → patterned paper → caption → corners + chrome → subject → dashed letter body
+   */
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border:3px solid ${s.paperBorder};border-radius:16px;overflow:hidden;box-shadow:6px 8px 0 rgba(61,47,34,0.16);">
   <tr>
-    <td style="background-color:${s.paperBg};background-image:${wash};padding:10px;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:2px solid ${s.paperBorder};border-radius:14px;background-color:transparent;">
+    <td style="background-color:${s.paperBg};background-image:${layeredBg};background-size:${pattern === "none" ? "auto" : patternSize}, cover;padding:14px 12px 12px;">
+      <!-- inner dashed frame (site inset border) -->
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:2px dashed ${s.paperBorder};border-radius:12px;">
         <tr>
-          <td style="padding:10px 14px 0;text-align:center;">
-            <p style="margin:0;font-size:12px;letter-spacing:0.4px;color:${s.accent};font-family:${displayFont};opacity:0.9;">
+          <td style="padding:12px 14px 0;text-align:center;">
+            <p style="margin:0;font-size:13px;color:${s.accent};font-family:${displayFont};opacity:0.85;">
               ${escapeHtml(bits.caption)}
             </p>
           </td>
         </tr>
         <tr>
-          <td style="padding:8px 12px 0;">
+          <td style="padding:10px 10px 0;">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
               <tr>
-                <td style="width:36px;font-size:22px;line-height:1;vertical-align:top;">${bits.tl}</td>
-                <td style="text-align:center;vertical-align:middle;">
-                  <div style="font-size:20px;letter-spacing:3px;line-height:1;color:${s.accent};">${s.emoji} ${s.sealEmoji} ${s.emoji}</div>
-                  <div style="font-family:${displayFont};font-size:24px;font-weight:700;color:${s.accent};margin-top:6px;">Little Letter</div>
-                  <div style="font-family:${displayFont};font-size:12px;color:${s.muted};margin-top:4px;">${escapeHtml(parts.brandTagline)}</div>
+                <td style="width:28px;font-size:20px;line-height:1;vertical-align:top;">${bits.tl}</td>
+                <td style="vertical-align:middle;padding:0 4px;">
+                  <!-- chrome strip — same as StationeryPaper -->
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:2px solid ${s.paperBorder};border-radius:10px;background-color:rgba(255,255,255,0.72);">
+                    <tr>
+                      <td style="padding:10px 12px;">
+                        <p style="margin:0;font-family:${pixelFont};font-size:10px;letter-spacing:0.8px;color:${s.accent};line-height:1.45;">
+                          ${s.emoji} ${escapeHtml(s.title)}
+                        </p>
+                        <p style="margin:5px 0 0;font-family:${displayFont};font-size:11px;color:${s.muted};line-height:1.4;">
+                          ${escapeHtml(s.era)} · ${escapeHtml(s.blurb)}
+                        </p>
+                      </td>
+                      <td style="width:44px;text-align:center;font-size:24px;padding-right:8px;vertical-align:middle;">${s.sealEmoji}</td>
+                    </tr>
+                  </table>
                 </td>
-                <td style="width:36px;font-size:22px;line-height:1;text-align:right;vertical-align:top;">${bits.tr}</td>
+                <td style="width:28px;font-size:20px;line-height:1;text-align:right;vertical-align:top;">${bits.tr}</td>
               </tr>
             </table>
           </td>
         </tr>
         <tr>
-          <td style="padding:14px 16px 0;">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:2px solid ${s.paperBorder};border-radius:10px;background:rgba(255,255,255,0.72);">
-              <tr>
-                <td style="padding:10px 12px;">
-                  <p style="margin:0;font-family:${pixelFont};font-size:9px;letter-spacing:0.6px;color:${s.accent};line-height:1.4;">
-                    ${s.emoji} ${escapeHtml(s.title)}
-                  </p>
-                  <p style="margin:4px 0 0;font-family:${displayFont};font-size:11px;color:${s.muted};line-height:1.4;">
-                    ${escapeHtml(s.era)} · ${escapeHtml(s.blurb)}
-                  </p>
-                </td>
-                <td style="width:40px;text-align:center;font-size:22px;padding-right:10px;">${s.sealEmoji}</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:14px 16px 0;">
-            <p style="margin:0;font-family:${displayFont};font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:${s.accent};">
-              ${escapeHtml(parts.occasionLabel)} letter
-            </p>
-            <p style="margin:8px 0 0;font-family:${displayFont};font-size:12px;color:${s.muted};line-height:1.55;">
-              <span style="opacity:0.8;">To</span>
-              <strong style="color:${s.ink};"> ${escapeHtml(parts.recipientName)}</strong>
-              <span style="opacity:0.5;"> · </span>
-              <span style="opacity:0.8;">From</span>
-              <strong style="color:${s.ink};"> ${escapeHtml(parts.senderName)}</strong>
-            </p>
-            <h1 style="margin:12px 0 0;font-family:${displayFont};font-size:20px;line-height:1.35;font-weight:700;color:${s.accent};">
+          <td style="padding:16px 18px 6px;">
+            <p style="margin:0;font-family:${displayFont};font-size:16px;font-weight:700;line-height:1.35;color:${s.accent};">
               ${escapeHtml(parts.subject)}
-            </h1>
+            </p>
           </td>
         </tr>
         <tr>
-          <td style="padding:14px 16px 8px;">
-            <div style="border:2px dashed ${s.paperBorder};border-radius:14px;background:rgba(255,255,255,0.55);padding:18px 16px;font-family:${bodyFont};font-size:${messageSize};line-height:${messageLine};color:${s.ink};">
-              ${greeting}
-              <div style="margin:0;">${parts.messageHtml}</div>
-              <p style="margin:20px 0 0;text-align:right;font-size:18px;color:${s.accent};">${s.sealEmoji}</p>
-              <p style="margin:2px 0 0;text-align:right;font-family:${scriptFont};font-size:22px;color:${s.accent};line-height:1.2;">
+          <td style="padding:8px 18px 14px;">
+            <div style="border:1px dashed ${s.paperBorder};border-radius:12px;background-color:rgba(255,255,255,0.55);padding:18px 16px;">
+              <p style="margin:0;font-family:${displayFont};font-size:12px;color:${s.muted};line-height:1.5;">
+                To: ${escapeHtml(parts.recipientName)} &lt;${escapeHtml(parts.recipientEmail)}&gt;
+              </p>
+              <div style="margin:16px 0 0;font-family:${bodyFont};font-size:${messageSize};line-height:${messageLine};color:${s.ink};">
+                ${parts.messageHtml}
+              </div>
+              <p style="margin:22px 0 0;text-align:right;font-family:${scriptFont};font-size:26px;color:${s.accent};line-height:1.15;">
                 — ${escapeHtml(parts.senderName)}
               </p>
             </div>
@@ -217,12 +236,12 @@ export function buildStationeryLetterCardHtml(
           </td>
         </tr>
         <tr>
-          <td style="padding:6px 12px 12px;">
+          <td style="padding:0 10px 12px;">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
               <tr>
-                <td style="width:36px;font-size:20px;line-height:1;">${bits.bl}</td>
-                <td style="text-align:center;font-size:16px;letter-spacing:5px;color:${s.accent};">${s.emoji} ✉️ ${s.sealEmoji}</td>
-                <td style="width:36px;font-size:20px;line-height:1;text-align:right;">${bits.br}</td>
+                <td style="width:28px;font-size:18px;line-height:1;">${bits.bl}</td>
+                <td style="text-align:center;font-size:12px;color:${s.muted};font-family:${displayFont};">&nbsp;</td>
+                <td style="width:28px;font-size:18px;line-height:1;text-align:right;">${bits.br}</td>
               </tr>
             </table>
           </td>
@@ -233,6 +252,8 @@ export function buildStationeryLetterCardHtml(
 </table>`;
 }
 
-export const STATIONERY_EMAIL_FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+/** Prefer @import inside <style> — more clients keep it than bare <link>. */
+export const STATIONERY_EMAIL_FONT_STYLE = `<style type="text/css">
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Press+Start+2P&family=Quicksand:wght@500;600;700&display=swap');
+</style>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Press+Start+2P&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />`;
