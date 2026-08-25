@@ -381,16 +381,16 @@ function themeForLetter(letter: GeneratedLetter): FrameTheme {
     };
   }
 
-  /* Letters always pick up stationery colours (classic-honey included). */
+  /* Letters use stationery paper colours end-to-end (not the cream envelope). */
   const s = getLetterStationery(letter.form.stationery);
   return {
     ...base,
-    pageBg: `linear-gradient(180deg,${s.envelopeBack[0]} 0%,#faf4e8 45%,${s.envelopeFront[1]}33 100%)`,
+    pageBg: `linear-gradient(180deg,${s.stampColors.bg} 0%,${s.paperBg} 42%,${s.stampColors.bg} 100%)`,
     cardBg: s.paperBg,
-    border: s.envelopeStroke,
-    shadow: s.envelopeFront[1],
-    headerGrad: `linear-gradient(90deg,${s.envelopeBack[0]},${s.envelopeBack[1]},${s.envelopeFront[0]})`,
-    headerInk: s.ink,
+    border: s.paperBorder,
+    shadow: s.paperBorder,
+    headerGrad: `linear-gradient(180deg,${s.stampColors.bg} 0%,${s.paperBg} 100%)`,
+    headerInk: s.accent,
     headerSub: s.muted,
     badgeBg: s.stampColors.bg,
     badgeBorder: s.stampColors.border,
@@ -408,13 +408,13 @@ function themeForLetter(letter: GeneratedLetter): FrameTheme {
   };
 }
 
-function whyFooter(senderName: string, accent: string) {
-  return `<p style="margin:18px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
+function whyFooter(senderName: string, accent: string, muted = "#8a7a62") {
+  return `<p style="margin:18px 0 0;font-size:11px;color:${muted};line-height:1.6;max-width:520px;">
     You received this because <strong>${escapeHtml(senderName)}</strong> sent you a personal note with
     <a href="${escapeHtml(SITE_URL)}" style="color:${accent};">Little Letter</a>.
     This is a one-off message, not a mailing list.
   </p>
-  <p style="margin:10px 0 0;font-size:11px;color:#8a7a62;line-height:1.6;max-width:520px;">
+  <p style="margin:10px 0 0;font-size:11px;color:${muted};line-height:1.6;max-width:520px;">
     <strong style="color:${accent};">Please don’t reply to this email</strong> — replies won’t reach
     ${escapeHtml(senderName)}. This is a no-reply delivery from Little Letter.
   </p>`;
@@ -423,8 +423,8 @@ function whyFooter(senderName: string, accent: string) {
 const NO_REPLY_TEXT =
   "Please don’t reply to this email — replies won’t reach the sender. This is a no-reply delivery from Little Letter.";
 
-function voiceNoteHtml() {
-  return `<div style="margin-top:16px;padding:12px 14px;background:#fff6df;border:2px dashed #d2a35a;border-radius:12px;font-size:13px;line-height:1.5;color:#5c3d1e;">
+function voiceNoteHtml(accent = "#8b5e34", bg = "#fff6df", ink = "#5c3d1e") {
+  return `<div style="margin-top:16px;padding:12px 14px;background:${bg};border:2px dashed ${accent};border-radius:12px;font-size:13px;line-height:1.5;color:${ink};">
     🎙️ A voice note is attached — open the audio file in this email to hear it.
   </div>`;
 }
@@ -578,14 +578,14 @@ export function buildLetterEmailHtml(
         </table>`
       : `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
           <tr>
-            <td style="background:${theme.headerGrad};padding:16px 22px 14px;text-align:center;">
+            <td style="background:${theme.headerGrad};padding:16px 22px 14px;text-align:center;border-bottom:2px solid ${theme.border};">
               <div style="font-size:20px;letter-spacing:3px;line-height:1;">✨ 💌 ✨</div>
               <div style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:${theme.headerInk};margin-top:6px;font-weight:bold;">Little Letter</div>
               <div style="font-size:12px;color:${theme.headerSub};margin-top:4px;">${theme.tagline}</div>
             </td>
           </tr>
           <tr>
-            <td style="padding:18px 22px 0;">
+            <td style="padding:18px 22px 0;background:${theme.cardBg};">
               <div style="display:inline-block;background:${theme.badgeBg};border:2px dashed ${theme.badgeBorder};border-radius:12px;padding:7px 12px;font-size:12px;color:${theme.badgeInk};line-height:1.35;">
                 ${theme.badge}
               </div>
@@ -595,7 +595,7 @@ export function buildLetterEmailHtml(
             </td>
           </tr>
           <tr>
-            <td style="padding:14px 22px 8px;">
+            <td style="padding:14px 22px 8px;background:${theme.cardBg};">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-bottom:2px dotted ${theme.msgBorder};padding-bottom:10px;margin-bottom:4px;">
                 <tr>
                   <td style="font-size:12px;color:${theme.headerSub};line-height:1.55;">
@@ -610,7 +610,7 @@ export function buildLetterEmailHtml(
               <h1 style="margin:12px 0 14px;font-size:20px;line-height:1.35;color:${theme.titleInk};font-family:Georgia,'Times New Roman',serif;">
                 ${safeSubject}
               </h1>
-              <div style="font-size:15px;line-height:1.8;color:${theme.bodyInk};background:#fffef9;border:2px solid ${theme.msgBorder};border-radius:14px;padding:22px 20px;font-family:Georgia,'Times New Roman',serif;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.7);">
+              <div style="font-size:15px;line-height:1.8;color:${theme.bodyInk};background:${theme.badgeBg};border:2px solid ${theme.msgBorder};border-radius:14px;padding:22px 20px;font-family:Georgia,'Times New Roman',serif;">
                 ${
                   /^(dear|hi|hello|hey)\b/i.test(letter.message.trim())
                     ? ""
@@ -626,16 +626,24 @@ export function buildLetterEmailHtml(
                   — ${escapeHtml(letter.form.senderName)}
                 </p>
               </div>
-              ${hasVoiceNote ? voiceNoteHtml() : ""}
+              ${
+                hasVoiceNote
+                  ? voiceNoteHtml(
+                      theme.accent,
+                      theme.badgeBg,
+                      theme.bodyInk
+                    )
+                  : ""
+              }
             </td>
           </tr>
           <tr>
-            <td style="padding:16px 22px 24px;text-align:center;">
+            <td style="padding:16px 22px 24px;text-align:center;background:${theme.cardBg};">
               <div style="font-size:18px;letter-spacing:5px;line-height:1.4;">${theme.footerIcons}</div>
-              <p style="margin:12px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
-                Sent with care via Little Letter — cosy notes for cosy people
+              <p style="margin:12px 0 0;font-size:12px;color:${theme.headerSub};line-height:1.5;">
+                Sent with care via <strong style="color:${theme.accent};">Little Letter</strong> — cosy notes for cosy people
               </p>
-              <p style="margin:10px 0 0;font-size:11px;color:#8a7a62;line-height:1.5;">
+              <p style="margin:10px 0 0;font-size:11px;color:${theme.headerSub};line-height:1.5;">
                 Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
               </p>
             </td>
@@ -649,7 +657,7 @@ export function buildLetterEmailHtml(
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(letter.subject)}</title>
 </head>
-<body style="margin:0;padding:0;background:#faf4e8;font-family:'Trebuchet MS',Verdana,sans-serif;color:${theme.bodyInk};">
+<body style="margin:0;padding:0;background:${theme.cardBg};font-family:'Trebuchet MS',Verdana,sans-serif;color:${theme.bodyInk};">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
     ${escapeHtml(preheader)}
   </div>
@@ -657,10 +665,10 @@ export function buildLetterEmailHtml(
     <tr>
       <td align="center">
         ${cardBody}
-        <p style="margin:18px 0 0;font-size:11px;color:#9ca3af;">
+        <p style="margin:18px 0 0;font-size:11px;color:${theme.headerSub};">
           💌 ${theme.mission}
         </p>
-        ${whyFooter(letter.form.senderName, theme.accent)}
+        ${whyFooter(letter.form.senderName, theme.accent, theme.headerSub)}
       </td>
     </tr>
   </table>
