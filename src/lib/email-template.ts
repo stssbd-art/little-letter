@@ -381,15 +381,16 @@ function themeForLetter(letter: GeneratedLetter): FrameTheme {
     };
   }
 
-  /* Page outside stays brand cream; letter box + “Little Letter” match stationery. */
+  /* One letter box: logo + title + subtitle use stationery colours. Cream only outside. */
   const s = getLetterStationery(letter.form.stationery);
   return {
     ...base,
-    /* base.pageBg / mission stay for the cream surround */
+    pageBg: "linear-gradient(180deg,#faf4e8 0%,#fffbf2 50%,#faf4e8 100%)",
     cardBg: s.paperBg,
     border: s.paperBorder,
     shadow: s.paperBorder,
-    headerGrad: `linear-gradient(180deg,${s.stampColors.bg} 0%,${s.paperBg} 100%)`,
+    /* Same paper colour as the rest of the letter — no extra gold/cream band */
+    headerGrad: s.paperBg,
     headerInk: s.accent,
     headerSub: s.muted,
     badgeBg: s.stampColors.bg,
@@ -578,10 +579,10 @@ export function buildLetterEmailHtml(
         </table>`
       : `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
           <tr>
-            <td style="background:${theme.headerGrad};padding:16px 22px 14px;text-align:center;border-bottom:2px solid ${theme.border};">
-              <div style="font-size:20px;letter-spacing:3px;line-height:1;">✨ 💌 ✨</div>
-              <div style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:${theme.headerInk};margin-top:6px;font-weight:bold;">Little Letter</div>
-              <div style="font-size:12px;color:${theme.headerSub};margin-top:4px;">${theme.tagline}</div>
+            <td style="background:${theme.cardBg};padding:18px 22px 12px;text-align:center;border-bottom:2px solid ${theme.border};">
+              <div style="font-size:22px;letter-spacing:4px;line-height:1;color:${theme.accent};">${stationery ? `${stationery.emoji} ${stationery.sealEmoji} ${stationery.emoji}` : "✨ 💌 ✨"}</div>
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:${theme.accent};margin-top:8px;font-weight:bold;">Little Letter</div>
+              <div style="font-size:12px;color:${theme.headerSub};margin-top:5px;">${theme.tagline}</div>
             </td>
           </tr>
           <tr>
