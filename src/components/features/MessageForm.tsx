@@ -310,8 +310,8 @@ export function MessageForm() {
                 </p>
                 <p className="mb-2 text-xs text-[var(--ll-muted)]">
                   {writeMode === "ai"
-                    ? "One pick for paper look and writing tone — preview updates below."
-                    : "Pick the paper look for your letter — preview updates below."}
+                    ? "One pick for paper look and writing tone."
+                    : "Pick the paper look for your letter."}
                 </p>
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                   {stationeryForOccasion(form.occasion).map((s) => {
@@ -333,101 +333,9 @@ export function MessageForm() {
                     );
                   })}
                 </div>
-                <div className="mt-3">
-                  <p className="mb-2 font-pixel text-[8px] tracking-wide text-[var(--ll-muted)]">
-                    Live paper preview
-                    {writeMode === "ai" ? (
-                      <>
-                        {" "}
-                        ·{" "}
-                        <span className="capitalize text-[var(--ll-pink-deep)]">
-                          {selectedStationery.writingStyle}
-                        </span>{" "}
-                        voice
-                      </>
-                    ) : null}
-                  </p>
-                  <StationeryPaper
-                    stationery={selectedStationery}
-                    compact
-                    subject="Your letter will look like this"
-                  >
-                    <p
-                      className="text-xs leading-relaxed"
-                      style={{ color: selectedStationery.muted }}
-                    >
-                      Soft paper, vintage ornaments, and the era you chose —
-                      this is what they’ll open after the envelope.
-                    </p>
-                    <p
-                      className="mt-3 text-right font-script text-base"
-                      style={{ color: selectedStationery.accent }}
-                    >
-                      — with love
-                    </p>
-                  </StationeryPaper>
-                </div>
               </div>
 
-              {writeMode === "ai" ? (
-                <>
-                  <Field
-                    label="Custom notes (optional)"
-                    htmlFor="customNote"
-                    hint="Little details make the magic personal."
-                  >
-                    <PixelTextarea
-                      id="customNote"
-                      value={form.customNote}
-                      onChange={(e) => setForm({ customNote: e.target.value })}
-                      placeholder="Mention their new kitten, the rainy walk, the joke only you two get..."
-                      maxLength={500}
-                    />
-                  </Field>
-                </>
-              ) : (
-                <>
-                  <Field
-                    label="Subject"
-                    htmlFor="ownSubject"
-                    hint="Optional — defaults to “Hi [their name]”."
-                  >
-                    <PixelInput
-                      id="ownSubject"
-                      value={form.ownSubject}
-                      onChange={(e) => setForm({ ownSubject: e.target.value })}
-                      placeholder={`Hi ${form.recipientName.trim() || "there"}`}
-                      maxLength={120}
-                    />
-                  </Field>
-                  <Field
-                    label="Your letter"
-                    htmlFor="ownMessage"
-                    hint="Write naturally — this is what they’ll read."
-                  >
-                    <PixelTextarea
-                      id="ownMessage"
-                      required
-                      value={form.ownMessage}
-                      onChange={(e) => setForm({ ownMessage: e.target.value })}
-                      placeholder={`Dear ${form.recipientName.trim() || "friend"},\n\nI just wanted to say…\n\nLove,\n${form.senderName.trim() || "me"}`}
-                      maxLength={4000}
-                      className="min-h-[220px]"
-                    />
-                  </Field>
-                </>
-              )}
-
-              {error ? (
-                <p
-                  role="alert"
-                  className="rounded-xl border-2 border-rose-300 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-950/40 dark:text-rose-200"
-                >
-                  {error}
-                </p>
-              ) : null}
-
-              <div className="space-y-3 border-t-2 border-[var(--ll-lavender)]/60 pt-4">
+              <div className="space-y-3">
                 <p className="font-display text-sm text-[var(--ll-ink)]">
                   How do you want to write it?
                 </p>
@@ -446,7 +354,7 @@ export function MessageForm() {
                       ✨ Help me write it
                     </p>
                     <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                      AI drafts a warm letter from your notes.
+                      AI drafts a warm letter from your notes on the paper.
                     </p>
                   </button>
                   <button
@@ -463,11 +371,129 @@ export function MessageForm() {
                       ✍️ I&apos;ll write it myself
                     </p>
                     <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                      Your own words — no AI.
+                      Your own words on the paper — no AI.
                     </p>
                   </button>
                 </div>
+              </div>
 
+              <div>
+                <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
+                  {writeMode === "ai" ? "Notes on your paper" : "Write on your paper"}
+                </p>
+                <p className="mb-2 text-xs text-[var(--ll-muted)]">
+                  {writeMode === "ai" ? (
+                    <>
+                      Type details here — they show on the{" "}
+                      <span className="capitalize text-[var(--ll-pink-deep)]">
+                        {selectedStationery.writingStyle}
+                      </span>{" "}
+                      stationery and guide the letter.
+                    </>
+                  ) : (
+                    "This is exactly what they’ll see on the letter."
+                  )}
+                </p>
+                <StationeryPaper
+                  stationery={selectedStationery}
+                  compact
+                  subject={
+                    writeMode === "own"
+                      ? undefined
+                      : `For ${form.recipientName.trim() || "…"}`
+                  }
+                >
+                  {writeMode === "ai" ? (
+                    <>
+                      <label htmlFor="customNote" className="sr-only">
+                        Custom notes for the letter
+                      </label>
+                      <textarea
+                        id="customNote"
+                        value={form.customNote}
+                        onChange={(e) => setForm({ customNote: e.target.value })}
+                        placeholder="Mention their new kitten, the rainy walk, the joke only you two get…"
+                        maxLength={500}
+                        rows={5}
+                        className={cn(
+                          "w-full resize-y bg-transparent text-sm leading-relaxed outline-none",
+                          "placeholder:opacity-55",
+                          selectedStationery.fontClass
+                        )}
+                        style={{ color: selectedStationery.ink }}
+                      />
+                      <p
+                        className="mt-3 text-right font-script text-base"
+                        style={{ color: selectedStationery.accent }}
+                      >
+                        — {form.senderName.trim() || "with love"}
+                      </p>
+                    </>
+                  ) : (
+                    <div className="space-y-3">
+                      <div>
+                        <label
+                          htmlFor="ownSubject"
+                          className="mb-1 block font-pixel text-[8px] tracking-wide"
+                          style={{ color: selectedStationery.accent }}
+                        >
+                          Subject
+                        </label>
+                        <input
+                          id="ownSubject"
+                          value={form.ownSubject}
+                          onChange={(e) =>
+                            setForm({ ownSubject: e.target.value })
+                          }
+                          placeholder={`Hi ${form.recipientName.trim() || "there"}`}
+                          maxLength={120}
+                          className="w-full bg-transparent font-display text-sm font-semibold outline-none placeholder:opacity-50"
+                          style={{ color: selectedStationery.accent }}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="ownMessage" className="sr-only">
+                          Your letter
+                        </label>
+                        <textarea
+                          id="ownMessage"
+                          required
+                          value={form.ownMessage}
+                          onChange={(e) =>
+                            setForm({ ownMessage: e.target.value })
+                          }
+                          placeholder={`Dear ${form.recipientName.trim() || "friend"},\n\nI just wanted to say…\n\nLove,\n${form.senderName.trim() || "me"}`}
+                          maxLength={4000}
+                          rows={8}
+                          className={cn(
+                            "min-h-[180px] w-full resize-y bg-transparent text-sm leading-relaxed outline-none",
+                            "placeholder:opacity-55",
+                            selectedStationery.fontClass
+                          )}
+                          style={{ color: selectedStationery.ink }}
+                        />
+                      </div>
+                      <p
+                        className="text-right font-script text-base"
+                        style={{ color: selectedStationery.accent }}
+                      >
+                        — {form.senderName.trim() || "you"}
+                      </p>
+                    </div>
+                  )}
+                </StationeryPaper>
+              </div>
+
+              {error ? (
+                <p
+                  role="alert"
+                  className="rounded-xl border-2 border-rose-300 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-950/40 dark:text-rose-200"
+                >
+                  {error}
+                </p>
+              ) : null}
+
+              <div className="border-t-2 border-[var(--ll-lavender)]/60 pt-4">
                 <PixelButton
                   type="submit"
                   size="lg"
