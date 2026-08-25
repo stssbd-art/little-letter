@@ -8,6 +8,10 @@ import {
 import {
   getLetterStationery,
 } from "@/lib/letter-stationery";
+import {
+  STATIONERY_EMAIL_FONT_LINKS,
+  buildStationeryLetterCardHtml,
+} from "@/lib/email-stationery";
 
 function escapeHtml(text: string) {
   return text
@@ -577,79 +581,17 @@ export function buildLetterEmailHtml(
             </td>
           </tr>
         </table>`
-      : `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:${theme.cardBg};border:4px solid ${theme.border};border-radius:18px;overflow:hidden;box-shadow:0 8px 0 ${theme.shadow};">
-          <tr>
-            <td style="background:${theme.cardBg};padding:18px 22px 12px;text-align:center;border-bottom:2px solid ${theme.border};">
-              <div style="font-size:22px;letter-spacing:4px;line-height:1;color:${theme.accent};">${stationery ? `${stationery.emoji} ${stationery.sealEmoji} ${stationery.emoji}` : "✨ 💌 ✨"}</div>
-              <div style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:${theme.accent};margin-top:8px;font-weight:bold;">Little Letter</div>
-              <div style="font-size:12px;color:${theme.headerSub};margin-top:5px;">${theme.tagline}</div>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:18px 22px 0;background:${theme.cardBg};">
-              <div style="display:inline-block;background:${theme.badgeBg};border:2px dashed ${theme.badgeBorder};border-radius:12px;padding:7px 12px;font-size:12px;color:${theme.badgeInk};line-height:1.35;">
-                ${theme.badge}
-              </div>
-              <p style="margin:10px 0 0;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:${theme.accent};">
-                ${escapeHtml(label)} letter
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:14px 22px 8px;background:${theme.cardBg};">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-bottom:2px dotted ${theme.msgBorder};padding-bottom:10px;margin-bottom:4px;">
-                <tr>
-                  <td style="font-size:12px;color:${theme.headerSub};line-height:1.55;">
-                    <span style="opacity:0.75;">To</span>
-                    <strong style="color:${theme.bodyInk};"> ${escapeHtml(letter.form.recipientName)}</strong>
-                    <span style="opacity:0.55;"> · </span>
-                    <span style="opacity:0.75;">From</span>
-                    <strong style="color:${theme.bodyInk};"> ${escapeHtml(letter.form.senderName)}</strong>
-                  </td>
-                </tr>
-              </table>
-              <h1 style="margin:12px 0 14px;font-size:20px;line-height:1.35;color:${theme.titleInk};font-family:Georgia,'Times New Roman',serif;">
-                ${safeSubject}
-              </h1>
-              <div style="font-size:15px;line-height:1.8;color:${theme.bodyInk};background:${theme.badgeBg};border:2px solid ${theme.msgBorder};border-radius:14px;padding:22px 20px;font-family:Georgia,'Times New Roman',serif;">
-                ${
-                  /^(dear|hi|hello|hey)\b/i.test(letter.message.trim())
-                    ? ""
-                    : `<p style="margin:0 0 12px;font-size:13px;color:${theme.headerSub};font-style:italic;">
-                  Dear ${escapeHtml(letter.form.recipientName)},
-                </p>`
-                }
-                <div style="margin:0;">${safeMessage}</div>
-                <p style="margin:22px 0 0;text-align:right;font-size:16px;color:${theme.accent};">
-                  ${stationery ? stationery.sealEmoji : "💌"}
-                </p>
-                <p style="margin:4px 0 0;text-align:right;font-size:15px;color:${theme.accent};">
-                  — ${escapeHtml(letter.form.senderName)}
-                </p>
-              </div>
-              ${
-                hasVoiceNote
-                  ? voiceNoteHtml(
-                      theme.accent,
-                      theme.badgeBg,
-                      theme.bodyInk
-                    )
-                  : ""
-              }
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:16px 22px 24px;text-align:center;background:${theme.cardBg};">
-              <div style="font-size:18px;letter-spacing:5px;line-height:1.4;">${theme.footerIcons}</div>
-              <p style="margin:12px 0 0;font-size:12px;color:${theme.headerSub};line-height:1.5;">
-                Sent with care via <strong style="color:${theme.accent};">Little Letter</strong> — cosy notes for cosy people
-              </p>
-              <p style="margin:10px 0 0;font-size:11px;color:${theme.headerSub};line-height:1.5;">
-                Please don’t reply to this email — replies won’t reach ${escapeHtml(letter.form.senderName)}.
-              </p>
-            </td>
-          </tr>
-        </table>`;
+      : buildStationeryLetterCardHtml({
+          stationery: stationery ?? getLetterStationery(letter.form.stationery),
+          subject: letter.subject,
+          messageHtml: safeMessage,
+          messageText: letter.message,
+          recipientName: letter.form.recipientName,
+          senderName: letter.form.senderName,
+          occasionLabel: label,
+          hasVoiceNote,
+          brandTagline: theme.tagline,
+        });
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -657,12 +599,13 @@ export function buildLetterEmailHtml(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(letter.subject)}</title>
+  ${STATIONERY_EMAIL_FONT_LINKS}
 </head>
-<body style="margin:0;padding:0;background:#faf4e8;font-family:'Trebuchet MS',Verdana,sans-serif;color:#3d2f22;">
+<body style="margin:0;padding:0;background:#faf4e8;font-family:Quicksand,Nunito,'Trebuchet MS',Verdana,sans-serif;color:#3d2f22;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
     ${escapeHtml(preheader)}
   </div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${theme.pageBg};padding:32px 12px;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:linear-gradient(180deg,#faf4e8 0%,#fffbf2 50%,#faf4e8 100%);padding:32px 12px;">
     <tr>
       <td align="center">
         ${cardBody}
