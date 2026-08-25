@@ -507,7 +507,6 @@ export function buildLetterEmailHtml(
     letter.form.cardDesign && isCardDesignId(letter.form.cardDesign)
       ? getCardDesign(letter.form.cardDesign)
       : null;
-  const label = design?.title ?? meta?.label ?? "Note";
   const theme = themeForLetter(letter);
   const stationery = !design
     ? getLetterStationery(letter.form.stationery)

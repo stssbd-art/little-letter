@@ -1,6 +1,5 @@
 "use client";
 
-import { useId } from "react";
 import type { LetterStationery } from "@/lib/letter-stationery";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +24,6 @@ function StationeryArt({
   border: string;
   compact?: boolean;
 }) {
-  const uid = useId().replace(/:/g, "");
   const size = compact ? "text-lg" : "text-2xl sm:text-3xl";
 
   if (decor === "none") {
@@ -312,7 +310,6 @@ function StationeryArt({
 
 function paperWash(stationery: LetterStationery): string {
   const a = stationery.accent;
-  const b = stationery.paperBorder;
   switch (stationery.decor) {
     case "blossom":
       return `radial-gradient(ellipse at 50% 0%, ${a}28, transparent 55%), linear-gradient(180deg, #fff8fb, #ffe8f0 45%, #fff6fa)`;

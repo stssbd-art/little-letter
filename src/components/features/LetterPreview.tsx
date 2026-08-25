@@ -20,7 +20,6 @@ import { breakAfterLetterGreeting } from "@/lib/letter-format";
 import { PostageStamp } from "@/components/features/PostageStamp";
 import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
 import { getCheckoutUrl, prefetchCheckout } from "@/lib/checkout-client";
-import { cn } from "@/lib/utils";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
