@@ -12,10 +12,13 @@ import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { useEasterEggs } from "@/components/providers/EasterEggProvider";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/constants";
+import { formatScheduledAt } from "@/lib/schedule-datetime";
 
 export function SuccessCelebration() {
   const searchParams = useSearchParams();
   const kind = searchParams.get("kind");
+  const isScheduled = searchParams.get("scheduled") === "1";
+  const scheduledAtParam = searchParams.get("at");
   const isMixtape = kind === "mixtape";
   const { letter, resetForm } = useLetter();
   const isCard = kind === "card" || Boolean(letter?.form.cardDesign);
@@ -26,6 +29,20 @@ export function SuccessCelebration() {
     to: string;
     from: string;
   } | null>(null);
+  const [scheduledAt, setScheduledAt] = useState<string | null>(
+    scheduledAtParam
+  );
+
+  useEffect(() => {
+    if (scheduledAtParam) return;
+    if (!isScheduled) return;
+    try {
+      const raw = sessionStorage.getItem("little-letter-last-scheduled-at");
+      if (raw) setScheduledAt(raw);
+    } catch {
+      /* ignore */
+    }
+  }, [isScheduled, scheduledAtParam]);
 
   useEffect(() => {
     if (!isMixtape) return;
@@ -76,7 +93,7 @@ export function SuccessCelebration() {
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
             className="inline-block"
           >
-            {isMixtape ? "📼" : isCard ? "🎴" : "✉️"}
+            {isMixtape ? "📼" : isCard ? "🎴" : isScheduled ? "🕐" : "✉️"}
           </motion.span>
         </motion.div>
 
@@ -108,15 +125,23 @@ export function SuccessCelebration() {
           {isMixtape
             ? "Your mixtape is on its way."
             : isCard
-              ? "Your card is on its way."
-              : "Your little letter has been sent."}
+              ? isScheduled
+                ? "Your card is scheduled."
+                : "Your card is on its way."
+              : isScheduled
+                ? "Your letter is scheduled."
+                : "Your little letter has been sent."}
         </p>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-[var(--ll-muted)]">
           {isMixtape
             ? "They’ll get an email with a Play link for your cassette mix."
             : isCard
-              ? "They’ll get an email with a button to open the animated card on the website."
-              : "Your little message is flying through the internet... Hopefully it lands with a smile."}
+              ? isScheduled
+                ? "We’ll email the card at the time you picked — no need to come back."
+                : "They’ll get an email with a button to open the animated card on the website."
+              : isScheduled
+                ? "We’ll deliver your letter at the time you picked — no need to come back."
+                : "Your little message is flying through the internet... Hopefully it lands with a smile."}
         </p>
         {isMixtape && mixMeta ? (
           <p className="mt-3 text-xs text-[var(--ll-muted)]">
@@ -125,7 +150,9 @@ export function SuccessCelebration() {
         ) : null}
         {!isMixtape && letter ? (
           <p className="mt-3 text-xs text-[var(--ll-muted)]">
-            On its way to {letter.form.recipientName}
+            {isScheduled && scheduledAt
+              ? `Scheduled for ${formatScheduledAt(scheduledAt)} · to ${letter.form.recipientName}`
+              : `On its way to ${letter.form.recipientName}`}
           </p>
         ) : null}
 

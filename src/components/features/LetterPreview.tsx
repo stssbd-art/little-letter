@@ -20,6 +20,11 @@ import { breakAfterLetterGreeting } from "@/lib/letter-format";
 import { PostageStamp } from "@/components/features/PostageStamp";
 import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
 import { getCheckoutUrl, prefetchCheckout } from "@/lib/checkout-client";
+import {
+  defaultScheduleValue,
+  maxScheduleValue,
+  minScheduleValue,
+} from "@/lib/schedule-datetime";
 
 const TERMS_STORAGE_KEY = "little-letter-accepted-terms";
 
@@ -47,6 +52,8 @@ export function LetterPreview() {
   const [needsPayment, setNeedsPayment] = useState(false);
   const [shareExample, setShareExample] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [scheduleLater, setScheduleLater] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState(defaultScheduleValue);
 
   useEffect(() => {
     try {
@@ -182,6 +189,69 @@ export function LetterPreview() {
   const isCard =
     Boolean(currentLetter.form.cardDesign) &&
     isCardDesignId(currentLetter.form.cardDesign ?? "");
+
+  async function scheduleLetter() {
+    if (!hasAcceptedTerms()) {
+      setError("Please agree to the Terms, Privacy Policy, and Refund Policy before scheduling.");
+      return;
+    }
+    if (
+      !currentLetter.form.senderEmail?.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentLetter.form.senderEmail.trim())
+    ) {
+      setError("Your email is missing — go back and add it so we can track free sends.");
+      return;
+    }
+    if (!scheduledAt.trim()) {
+      setError("Pick a date and time to send later.");
+      return;
+    }
+
+    setSending(true);
+    setError("");
+    try {
+      const voiceNote = await loadVoicePayload("letter");
+      const res = await fetch("/api/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...currentLetter,
+          shareExample,
+          voiceNote,
+          scheduledAt: new Date(scheduledAt).toISOString(),
+        }),
+      });
+      const data = await res.json();
+
+      if (res.status === 402) {
+        setNeedsPayment(true);
+        setError(
+          data.error ??
+            (isCard
+              ? `Payment required — e-cards are ${CARD_PRICE_LABEL} each.`
+              : "Payment required for extra letters.")
+        );
+        setSending(false);
+        return;
+      }
+      if (!res.ok) throw new Error(data.error ?? "Failed to schedule");
+
+      await clearVoiceBlob("letter");
+      play("success");
+      const when = data.scheduledAt as string;
+      try {
+        sessionStorage.setItem("little-letter-last-scheduled-at", when);
+      } catch {
+        /* ignore */
+      }
+      const qs = new URLSearchParams({ scheduled: "1", at: when });
+      if (isCard) qs.set("kind", "card");
+      router.push(`/success?${qs.toString()}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not schedule letter");
+      setSending(false);
+    }
+  }
 
   async function sendLetter() {
     if (!hasAcceptedTerms()) {
@@ -700,6 +770,40 @@ export function LetterPreview() {
         </span>
       </label>
 
+      {!needsPayment || demo ? (
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">
+          <input
+            type="checkbox"
+            className="mt-1 h-4 w-4 accent-[#8b5e34]"
+            checked={scheduleLater}
+            onChange={(e) => {
+              setScheduleLater(e.target.checked);
+              if (e.target.checked && !scheduledAt) {
+                setScheduledAt(defaultScheduleValue());
+              }
+            }}
+          />
+          <span className="w-full">
+            <span className="block font-display text-sm text-[var(--ll-ink)]">
+              Send later
+            </span>
+            <span className="mt-0.5 block text-xs text-[var(--ll-muted)]">
+              Pick a date and time — we&apos;ll email it for you automatically.
+            </span>
+            {scheduleLater ? (
+              <input
+                type="datetime-local"
+                value={scheduledAt}
+                min={minScheduleValue()}
+                max={maxScheduleValue()}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                className="mt-3 w-full rounded-lg border-2 border-[var(--ll-lavender)] bg-white/90 px-3 py-2 text-sm text-[var(--ll-ink)] outline-none focus:border-[var(--ll-pink-deep)] dark:bg-[#2a2118]"
+              />
+            ) : null}
+          </span>
+        </label>
+      ) : null}
+
       <TermsAcceptance
         checked={acceptedTerms}
         onChange={updateAcceptedTerms}
@@ -783,20 +887,26 @@ export function LetterPreview() {
         ) : (
           <PixelButton
             size="lg"
-            onClick={sendLetter}
+            onClick={scheduleLater ? scheduleLetter : sendLetter}
             disabled={sending || paying || !acceptedTerms}
           >
             {sending || paying
-              ? "Sending..."
-              : isCard
-                ? demo
-                  ? "🎴 Send card (demo)"
-                  : "🎴 Send card"
-                : demo
-                  ? "✉️ Send letter (demo)"
-                  : freeLeft
-                    ? `✉️ Send free letter (${freeRemaining} left)`
-                    : "✉️ Send Little Letter"}
+              ? scheduleLater
+                ? "Scheduling..."
+                : "Sending..."
+              : scheduleLater
+                ? isCard
+                  ? "🕐 Schedule card"
+                  : "🕐 Schedule letter"
+                : isCard
+                  ? demo
+                    ? "🎴 Send card (demo)"
+                    : "🎴 Send card"
+                  : demo
+                    ? "✉️ Send letter (demo)"
+                    : freeLeft
+                      ? `✉️ Send free letter (${freeRemaining} left)`
+                      : "✉️ Send Little Letter"}
           </PixelButton>
         )}
       </div>
