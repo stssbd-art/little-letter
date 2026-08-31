@@ -244,11 +244,12 @@ export function MessageForm() {
   }
 
   return (
-    <div ref={rootRef} className="scroll-mt-24 space-y-5">
+    <div ref={rootRef} className="scroll-mt-24 space-y-5 pb-28">
       <PixelWindow title="create_message.exe" icon="✍️" liftOnHover={false}>
         <AnimatePresence mode="wait">
           {phase === "form" ? (
             <motion.form
+              id="ll-create-form"
               key="form"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -739,32 +740,64 @@ export function MessageForm() {
         </AnimatePresence>
       </PixelWindow>
 
-      {/* Always-visible continue bar (outside overflow-hidden window) */}
-      {letter && phase !== "flying" ? (
-        <div className="sticky bottom-3 z-40 rounded-2xl border-[3px] border-[var(--ll-pink-deep)] bg-[#fff6df]/95 p-3 shadow-[0_10px_30px_rgba(61,47,34,0.28)] backdrop-blur-sm dark:bg-[#2a2118]/95">
-          <PixelButton
-            size="lg"
-            type="button"
-            className="w-full"
-            onClick={() => {
-              if (phase === "form") {
-                const nextLetter = {
-                  ...letter,
-                  form: {
-                    ...letter.form,
-                    ...formWithLookVoice(),
-                    writeMode,
-                  },
-                };
-                setLetter(nextLetter);
-                void goToPreview(nextLetter);
-              } else {
-                void goToPreview();
-              }
-            }}
-          >
-            Next → Preview envelope
-          </PixelButton>
+      {/* Fixed viewport continue bar — always on screen while creating */}
+      {phase === "form" || phase === "draft" ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[300]">
+          <div className="pointer-events-auto border-t-[3px] border-[var(--ll-pink-deep)] bg-[#fff6df]/98 px-3 py-3 shadow-[0_-10px_28px_rgba(61,47,34,0.28)] backdrop-blur-md dark:bg-[#1a1510]/98 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <div className="mx-auto max-w-3xl">
+              {phase === "draft" && letter ? (
+                <PixelButton
+                  size="lg"
+                  type="button"
+                  className="w-full text-base"
+                  onClick={() => void goToPreview()}
+                >
+                  Next → Preview envelope
+                </PixelButton>
+              ) : letter && writeMode === "ai" ? (
+                <PixelButton
+                  size="lg"
+                  type="button"
+                  className="w-full text-base"
+                  onClick={() => {
+                    const nextLetter = {
+                      ...letter,
+                      form: {
+                        ...letter.form,
+                        ...formWithLookVoice(),
+                        writeMode: "ai" as const,
+                      },
+                    };
+                    setLetter(nextLetter);
+                    void goToPreview(nextLetter);
+                  }}
+                >
+                  Next → Preview envelope
+                </PixelButton>
+              ) : (
+                <PixelButton
+                  size="lg"
+                  type="button"
+                  disabled={loading}
+                  className="w-full text-base"
+                  onClick={() => {
+                    const formEl = document.getElementById(
+                      "ll-create-form"
+                    ) as HTMLFormElement | null;
+                    formEl?.requestSubmit();
+                  }}
+                >
+                  {loading
+                    ? writeMode === "own"
+                      ? "Opening preview…"
+                      : "Writing…"
+                    : writeMode === "own"
+                      ? "Next → Preview envelope"
+                      : "✨ Generate Little Letter"}
+                </PixelButton>
+              )}
+            </div>
+          </div>
         </div>
       ) : null}
 
