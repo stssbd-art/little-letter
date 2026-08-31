@@ -103,23 +103,8 @@ export function MessageForm() {
 
     try {
       if (writeMode === "own") {
-        const message = form.ownMessage.trim();
-        if (message.length < 8) {
-          throw new Error("Write a little more — at least a short note.");
-        }
-        if (message.length > 4000) {
-          throw new Error("Letter is a bit long — keep it under 4000 characters.");
-        }
-        const subject =
-          form.ownSubject.trim() ||
-          `Hi ${form.recipientName.trim() || "there"}`;
-
-        setLetter({
-          subject,
-          message,
-          form: { ...formWithLookVoice(), writeMode: "own" },
-          createdAt: letter?.createdAt || new Date().toISOString(),
-        });
+        const built = buildOwnLetter();
+        setLetter(built);
       } else if (letter) {
         setLetter({
           ...letter,
@@ -218,6 +203,64 @@ export function MessageForm() {
     await new Promise((r) => setTimeout(r, 900));
     router.push("/preview");
   }
+
+  function buildOwnLetter() {
+    const message = form.ownMessage.trim();
+    if (message.length < 8) {
+      throw new Error("Write a little more — at least a short note.");
+    }
+    if (message.length > 4000) {
+      throw new Error("Letter is a bit long — keep it under 4000 characters.");
+    }
+    if (
+      !form.recipientName.trim() ||
+      !form.recipientEmail.trim() ||
+      !form.senderName.trim() ||
+      !form.senderEmail.trim()
+    ) {
+      throw new Error("Fill in names and emails above first.");
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.recipientEmail.trim())) {
+      throw new Error("Check the recipient email address.");
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.senderEmail.trim())) {
+      throw new Error("Check your email address.");
+    }
+    const subject =
+      form.ownSubject.trim() ||
+      `Hi ${form.recipientName.trim() || "there"}`;
+    return {
+      subject,
+      message,
+      form: { ...formWithLookVoice(), writeMode: "own" as const },
+      createdAt: letter?.createdAt || new Date().toISOString(),
+    };
+  }
+
+  async function onNextFromForm() {
+    play("click");
+    setError("");
+    try {
+      if (writeMode === "own") {
+        const built = buildOwnLetter();
+        setLetter(built);
+        await goToPreview(built);
+        return;
+      }
+      if (!letter) {
+        setError("Generate your letter first, then tap Next.");
+        return;
+      }
+      await goToPreview(letter);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    }
+  }
+
+  const canPressNext =
+    writeMode === "own"
+      ? form.ownMessage.trim().length >= 8 && !loading
+      : Boolean(letter) && !loading;
 
   return (
     <div ref={rootRef} className="scroll-mt-24 space-y-5">
@@ -512,12 +555,8 @@ export function MessageForm() {
                 <PixelButton
                   type="button"
                   size="lg"
-                  disabled={!letter || loading}
-                  onClick={() => {
-                    if (!letter) return;
-                    play("click");
-                    void goToPreview(letter);
-                  }}
+                  disabled={!canPressNext}
+                  onClick={() => void onNextFromForm()}
                 >
                   Next →
                 </PixelButton>
