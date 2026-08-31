@@ -80,6 +80,23 @@ export async function loadVoicePayload(
   return blobToVoicePayload(blob);
 }
 
+/** Never block Send on a stuck IndexedDB read. */
+export async function loadVoicePayloadSafe(
+  kind: VoiceKind,
+  timeoutMs = 2500
+): Promise<VoiceNotePayload | null> {
+  try {
+    return await Promise.race([
+      loadVoicePayload(kind),
+      new Promise<null>((resolve) => {
+        setTimeout(() => resolve(null), timeoutMs);
+      }),
+    ]);
+  } catch {
+    return null;
+  }
+}
+
 export async function blobToVoicePayload(blob: Blob): Promise<VoiceNotePayload> {
   if (blob.size > MAX_VOICE_BYTES) {
     throw new Error("Voice note is too large. Keep it under a minute.");

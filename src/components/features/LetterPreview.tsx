@@ -12,7 +12,7 @@ import { GreetingCard } from "@/components/features/GreetingCard";
 import { StationeryPaper } from "@/components/features/StationeryPaper";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
-import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
+import { clearVoiceBlob, loadVoicePayloadSafe } from "@/lib/voice-note-client";
 import { OCCASIONS } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
 import { getLetterStationery } from "@/lib/letter-stationery";
@@ -221,7 +221,7 @@ export function LetterPreview() {
     setSending(true);
     setError("");
     try {
-      const voiceNote = await loadVoicePayload("letter");
+      const voiceNote = await loadVoicePayloadSafe("letter");
       const res = await fetch("/api/schedule", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -279,13 +279,20 @@ export function LetterPreview() {
     setSending(true);
     setError("");
     try {
-      const voiceNote = await loadVoicePayload("letter");
-      const res = await fetch("/api/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...currentLetter, shareExample, voiceNote }),
-        signal: AbortSignal.timeout(35_000),
-      });
+      const voiceNote = await loadVoicePayloadSafe("letter");
+      const controller = new AbortController();
+      const abortTimer = setTimeout(() => controller.abort(), 35_000);
+      let res: Response;
+      try {
+        res = await fetch("/api/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...currentLetter, shareExample, voiceNote }),
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(abortTimer);
+      }
       let data: {
         error?: string;
         demo?: boolean;
@@ -344,7 +351,16 @@ export function LetterPreview() {
       router.push(isCard ? "/success?kind=card" : "/success");
     } catch (err) {
       setFlying(false);
-      setError(err instanceof Error ? err.message : "Could not send letter");
+      const aborted =
+        err instanceof Error &&
+        (err.name === "AbortError" || /aborted|timed out/i.test(err.message));
+      setError(
+        aborted
+          ? "Send timed out. Please try again — any used credit should be restored automatically."
+          : err instanceof Error
+            ? err.message
+            : "Could not send letter"
+      );
       setSending(false);
     }
   }

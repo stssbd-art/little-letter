@@ -46,7 +46,61 @@ function getGmailTransport() {
       connectionTimeout: MAIL_TIMEOUT_MS,
       greetingTimeout: MAIL_TIMEOUT_MS,
       socketTimeout: MAIL_TIMEOUT_MS,
+      // Prefer IPv4 — IPv6 from some serverless regions hangs on smtp.gmail.com.
+      family: 4,
+    } as nodemailer.TransportOptions),
+  };
+}
+
+async function sendViaGmailSmtp(opts: {
+  to: string;
+  bcc?: string;
+  subject: string;
+  text: string;
+  html: string;
+  senderName?: string;
+  attachment?: ReturnType<typeof voiceNoteToAttachment>;
+  inlineImages: InlineImageAttachment[];
+}): Promise<SendResult> {
+  const gmail = getGmailTransport();
+  if (!gmail) {
+    throw new Error("Gmail SMTP is not configured.");
+  }
+  const mailAttachments = [
+    ...opts.inlineImages.map((img) => ({
+      filename: img.filename,
+      content: img.content,
+      contentType: img.contentType,
+      cid: img.cid,
+      contentDisposition: "inline" as const,
+    })),
+    ...(opts.attachment
+      ? [
+          {
+            filename: opts.attachment.filename,
+            content: opts.attachment.content,
+            contentType: opts.attachment.contentType,
+          },
+        ]
+      : []),
+  ];
+  const info = await withMailTimeout(
+    gmail.transporter.sendMail({
+      from: brandedFrom(gmail.user, opts.senderName),
+      to: opts.to,
+      bcc: opts.bcc,
+      subject: opts.subject,
+      text: opts.text,
+      html: opts.html,
+      replyTo: gmail.user,
+      attachments: mailAttachments.length ? mailAttachments : undefined,
     }),
+    "Gmail"
+  );
+  return {
+    id: info.messageId || `gmail-${Date.now()}`,
+    simulated: false,
+    provider: "gmail",
   };
 }
 
@@ -190,50 +244,30 @@ async function deliverEmail(opts: {
         "Gmail"
       );
       return { id, simulated: false, provider: "gmail-api" };
-    } catch (err) {
-      throw friendlyMailError(err);
+    } catch (apiErr) {
+      /* Fall through to SMTP when API token is expired / hanging. */
+      if (!getGmailTransport()) {
+        throw friendlyMailError(apiErr);
+      }
+      console.warn(
+        "[Little Letter] Gmail API send failed; trying SMTP fallback:",
+        apiErr instanceof Error ? apiErr.message : apiErr
+      );
     }
   }
 
-  const gmail = getGmailTransport();
-  if (gmail) {
+  if (getGmailTransport()) {
     try {
-      const mailAttachments = [
-        ...inlineImages.map((img) => ({
-          filename: img.filename,
-          content: img.content,
-          contentType: img.contentType,
-          cid: img.cid,
-          contentDisposition: "inline" as const,
-        })),
-        ...(attachment
-          ? [
-              {
-                filename: attachment.filename,
-                content: attachment.content,
-                contentType: attachment.contentType,
-              },
-            ]
-          : []),
-      ];
-      const info = await withMailTimeout(
-        gmail.transporter.sendMail({
-          from: brandedFrom(gmail.user, opts.senderName),
-          to: opts.to,
-          bcc,
-          subject: opts.subject,
-          text: opts.text,
-          html: opts.html,
-          replyTo: gmail.user,
-          attachments: mailAttachments.length ? mailAttachments : undefined,
-        }),
-        "Gmail"
-      );
-      return {
-        id: info.messageId || `gmail-${Date.now()}`,
-        simulated: false,
-        provider: "gmail",
-      };
+      return await sendViaGmailSmtp({
+        to: opts.to,
+        bcc,
+        subject: opts.subject,
+        text: opts.text,
+        html: opts.html,
+        senderName: opts.senderName,
+        attachment,
+        inlineImages,
+      });
     } catch (err) {
       throw friendlyMailError(err);
     }

@@ -28,7 +28,7 @@ import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
 import { YouTubeSongSearch } from "@/components/features/YouTubeSongSearch";
 import { TermsAcceptance } from "@/components/features/TermsAcceptance";
 import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
-import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
+import { clearVoiceBlob, loadVoicePayloadSafe } from "@/lib/voice-note-client";
 import type { MixtapePayload } from "@/types";
 import { cn } from "@/lib/utils";
 import Link from "next/link";

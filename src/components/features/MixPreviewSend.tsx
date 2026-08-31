@@ -15,7 +15,7 @@ import {
   saveMixtapeDraft,
   type MixtapeDraft,
 } from "@/lib/mixtape-draft";
-import { clearVoiceBlob, loadVoicePayload } from "@/lib/voice-note-client";
+import { clearVoiceBlob, loadVoicePayloadSafe } from "@/lib/voice-note-client";
 import type { MixShare } from "@/lib/mixtape-link";
 import type { MixtapePayload } from "@/types";
 import { MIX_ONE_SONG_LABEL } from "@/lib/usage-labels";
@@ -170,7 +170,7 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
     };
 
     try {
-      const voiceNote = await loadVoicePayload("mixtape");
+      const voiceNote = await loadVoicePayloadSafe("mixtape");
       const res = await fetch("/api/send-mixtape", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
