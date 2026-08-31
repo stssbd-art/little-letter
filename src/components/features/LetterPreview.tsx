@@ -158,8 +158,19 @@ export function LetterPreview() {
             throw new Error(verifyData.error ?? "Could not verify payment");
           }
           await refreshUsage();
-          // sendLetter navigates to /success — stay there
-          await sendLetter();
+          let wantLater = false;
+          try {
+            wantLater =
+              sessionStorage.getItem("little-letter-schedule-later") === "1";
+            sessionStorage.removeItem("little-letter-schedule-later");
+          } catch {
+            /* ignore */
+          }
+          if (wantLater) {
+            await scheduleLetter();
+          } else {
+            await sendLetter();
+          }
         } catch (err) {
           setError(err instanceof Error ? err.message : "Payment verify failed");
           setPaying(false);
@@ -333,6 +344,20 @@ export function LetterPreview() {
     setError("");
     play("click");
     try {
+      try {
+        sessionStorage.setItem(
+          "little-letter-schedule-later",
+          scheduleLater ? "1" : "0"
+        );
+        if (scheduleLater && scheduledAt) {
+          sessionStorage.setItem(
+            "little-letter-last-scheduled-at",
+            new Date(scheduledAt).toISOString()
+          );
+        }
+      } catch {
+        /* ignore */
+      }
       const url = await getCheckoutUrl({
         returnPath: "/preview",
         kind: isCard ? "card" : "letter",
@@ -770,45 +795,87 @@ export function LetterPreview() {
         </span>
       </label>
 
-      {!needsPayment || demo ? (
-        <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/50 px-3 py-3 dark:bg-white/5">
-          <input
-            type="checkbox"
-            className="mt-1 h-4 w-4 accent-[#8b5e34]"
-            checked={scheduleLater}
-            onChange={(e) => {
-              setScheduleLater(e.target.checked);
-              if (e.target.checked && !scheduledAt) {
-                setScheduledAt(defaultScheduleValue());
-              }
-            }}
-          />
-          <span className="w-full">
-            <span className="block font-display text-sm text-[var(--ll-ink)]">
-              Send later
-            </span>
-            <span className="mt-0.5 block text-xs text-[var(--ll-muted)]">
-              Pick a date and time — we&apos;ll email it for you automatically.
-            </span>
-            {scheduleLater ? (
-              <input
-                type="datetime-local"
-                value={scheduledAt}
-                min={minScheduleValue()}
-                max={maxScheduleValue()}
-                onChange={(e) => setScheduledAt(e.target.value)}
-                className="mt-3 w-full rounded-lg border-2 border-[var(--ll-lavender)] bg-white/90 px-3 py-2 text-sm text-[var(--ll-ink)] outline-none focus:border-[var(--ll-pink-deep)] dark:bg-[#2a2118]"
-              />
-            ) : null}
-          </span>
-        </label>
-      ) : null}
-
       <TermsAcceptance
         checked={acceptedTerms}
         onChange={updateAcceptedTerms}
         id="letter-accept-terms"
       />
+
+      <div className="rounded-2xl border-[3px] border-[var(--ll-pink-deep)] bg-[#fff6df]/80 px-4 py-4 shadow-[4px_4px_0_rgba(139,94,52,0.18)] dark:bg-[#2a2118]/80">
+        <p className="font-pixel text-[9px] tracking-wide text-[var(--ll-pink-deep)] sm:text-[10px]">
+          When should it arrive?
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              play("click");
+              setScheduleLater(false);
+            }}
+            className={`rounded-xl border-2 px-3 py-3 text-left transition ${
+              !scheduleLater
+                ? "border-[var(--ll-pink-deep)] bg-[#f6d58a] shadow-[2px_2px_0_rgba(139,94,52,0.25)]"
+                : "border-[var(--ll-lavender)] bg-white/70 dark:bg-white/5"
+            }`}
+          >
+            <span className="block text-lg" aria-hidden>
+              ✉️
+            </span>
+            <span className="mt-1 block font-display text-sm font-semibold text-[var(--ll-ink)]">
+              Send now
+            </span>
+            <span className="mt-0.5 block text-[11px] text-[var(--ll-muted)]">
+              Emails right away
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              play("click");
+              setScheduleLater(true);
+              if (!scheduledAt) setScheduledAt(defaultScheduleValue());
+            }}
+            className={`rounded-xl border-2 px-3 py-3 text-left transition ${
+              scheduleLater
+                ? "border-[var(--ll-pink-deep)] bg-[#f6d58a] shadow-[2px_2px_0_rgba(139,94,52,0.25)]"
+                : "border-[var(--ll-lavender)] bg-white/70 dark:bg-white/5"
+            }`}
+          >
+            <span className="block text-lg" aria-hidden>
+              🕐
+            </span>
+            <span className="mt-1 block font-display text-sm font-semibold text-[var(--ll-ink)]">
+              Send later
+            </span>
+            <span className="mt-0.5 block text-[11px] text-[var(--ll-muted)]">
+              Pick a date &amp; time
+            </span>
+          </button>
+        </div>
+        {scheduleLater ? (
+          <div className="mt-3">
+            <label
+              htmlFor="letter-schedule-at"
+              className="mb-1.5 block text-xs font-medium text-[var(--ll-muted)]"
+            >
+              Delivery date &amp; time
+            </label>
+            <input
+              id="letter-schedule-at"
+              type="datetime-local"
+              value={scheduledAt}
+              min={minScheduleValue()}
+              max={maxScheduleValue()}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              className="w-full rounded-xl border-2 border-[var(--ll-pink-deep)] bg-white px-3 py-2.5 text-sm text-[var(--ll-ink)] outline-none focus:ring-2 focus:ring-[var(--ll-pink-glow)] dark:bg-[#1a1510]"
+            />
+            <p className="mt-1.5 text-[11px] text-[var(--ll-muted)]">
+              We&apos;ll send it automatically — no need to come back. Up to 30
+              days ahead.
+            </p>
+          </div>
+        ) : null}
+      </div>
 
       <div className="flex flex-wrap gap-3">
         <PixelButton
@@ -880,9 +947,13 @@ export function LetterPreview() {
           >
             {paying
               ? "Opening checkout..."
-              : isCard
-                ? `💳 Pay ${priceLabel} & send card`
-                : `💳 Pay ${priceLabel} & send`}
+              : scheduleLater
+                ? isCard
+                  ? `💳 Pay ${priceLabel} & schedule card`
+                  : `💳 Pay ${priceLabel} & schedule`
+                : isCard
+                  ? `💳 Pay ${priceLabel} & send card`
+                  : `💳 Pay ${priceLabel} & send`}
           </PixelButton>
         ) : (
           <PixelButton
