@@ -70,16 +70,6 @@ export function MessageForm() {
     }
   }, [phase]);
 
-  useEffect(() => {
-    if (phase !== "draft" || !letter) return;
-    const id = window.setTimeout(() => {
-      document
-        .getElementById("letter-next-btn")
-        ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }, 120);
-    return () => window.clearTimeout(id);
-  }, [phase, letter]);
-
   const writeMode: LetterWriteMode = form.writeMode === "own" ? "own" : "ai";
   const selectedStationery = getLetterStationery(form.stationery);
 
@@ -124,58 +114,44 @@ export function MessageForm() {
           form.ownSubject.trim() ||
           `Hi ${form.recipientName.trim() || "there"}`;
 
-        const nextLetter = {
+        setLetter({
           subject,
           message,
-          form: { ...formWithLookVoice(), writeMode: "own" as const },
+          form: { ...formWithLookVoice(), writeMode: "own" },
           createdAt: letter?.createdAt || new Date().toISOString(),
-        };
-        setLetter(nextLetter);
-        restoredDraft.current = true;
-        setLoading(false);
-        if (editingDetails) router.replace("/create");
-        /* Own letters go straight to preview — no buried Next step. */
-        await goToPreview(nextLetter);
-        return;
-      }
-
-      if (letter) {
-        /* Editing details after preview — keep the written letter, update names/look only. */
-        const nextLetter = {
+        });
+      } else if (letter) {
+        setLetter({
           ...letter,
-          form: { ...formWithLookVoice(), writeMode: "ai" as const },
-        };
-        setLetter(nextLetter);
-        play("sparkle");
-        restoredDraft.current = true;
-        setPhase("draft");
-        setLoading(false);
-        if (editingDetails) router.replace("/create");
-        return;
-      }
+          form: { ...formWithLookVoice(), writeMode: "ai" },
+        });
+      } else {
+        const payload = { ...formWithLookVoice(), writeMode: "ai" as const };
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error ?? "Could not generate letter");
+        }
 
-      const payload = { ...formWithLookVoice(), writeMode: "ai" as const };
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error ?? "Could not generate letter");
+        setLetter({
+          subject: data.subject,
+          message: data.message,
+          form: payload,
+          createdAt: new Date().toISOString(),
+        });
       }
-
-      setLetter({
-        subject: data.subject,
-        message: data.message,
-        form: payload,
-        createdAt: new Date().toISOString(),
-      });
 
       play("sparkle");
       restoredDraft.current = true;
       setPhase("draft");
       setLoading(false);
+      if (editingDetails) {
+        router.replace("/create");
+      }
     } catch (err) {
       setPhase("form");
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -244,12 +220,11 @@ export function MessageForm() {
   }
 
   return (
-    <div ref={rootRef} className="scroll-mt-24 space-y-5 pb-28">
+    <div ref={rootRef} className="scroll-mt-24 space-y-5">
       <PixelWindow title="create_message.exe" icon="✍️" liftOnHover={false}>
         <AnimatePresence mode="wait">
           {phase === "form" ? (
             <motion.form
-              id="ll-create-form"
               key="form"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -533,46 +508,32 @@ export function MessageForm() {
                 </p>
               ) : null}
 
-              <div className="flex flex-col gap-3 border-t-2 border-[var(--ll-lavender)]/60 pt-4 sm:flex-row sm:flex-wrap">
-                {letter && writeMode === "ai" ? (
-                  <PixelButton
-                    type="button"
-                    size="lg"
-                    className="w-full sm:w-auto"
-                    onClick={() => {
-                      play("click");
-                      setError("");
-                      const nextLetter = {
-                        ...letter,
-                        form: {
-                          ...letter.form,
-                          ...formWithLookVoice(),
-                          writeMode: "ai" as const,
-                        },
-                      };
-                      setLetter(nextLetter);
-                      restoredDraft.current = true;
-                      if (editingDetails) router.replace("/create");
-                      void goToPreview(nextLetter);
-                    }}
-                  >
-                    Next → Preview envelope
-                  </PixelButton>
-                ) : null}
+              <div className="flex flex-wrap items-center gap-3 border-t-2 border-[var(--ll-lavender)]/60 pt-4">
+                <PixelButton
+                  type="button"
+                  size="lg"
+                  disabled={!letter || loading}
+                  onClick={() => {
+                    if (!letter) return;
+                    play("click");
+                    void goToPreview(letter);
+                  }}
+                >
+                  Next →
+                </PixelButton>
                 <PixelButton
                   type="submit"
                   size="lg"
                   disabled={loading}
-                  className="w-full sm:w-auto"
                 >
                   {loading
                     ? writeMode === "own"
-                      ? "Opening preview…"
+                      ? "Preparing…"
                       : letter
                         ? "Saving…"
                         : "Writing…"
                     : writeMode === "own"
-                      ? "Next → Preview envelope"
+                      ? "✉️ Put in letter box"
                       : letter
                         ? "💾 Keep letter & save details"
                         : "✨ Generate Little Letter"}
@@ -622,23 +583,13 @@ export function MessageForm() {
             >
               <div>
                 <p className="font-display text-sm text-[var(--ll-ink)]">
-                  Your letter is ready
+                  Your letter
                 </p>
                 <p className="mt-1 text-xs text-[var(--ll-muted)]">
-                  Tap Next to open the envelope preview. You can still edit the
-                  text below.
+                  Edit anything you like — shown on your chosen stationery.
+                  Then continue to the envelope.
                 </p>
               </div>
-
-              <PixelButton
-                id="letter-next-btn"
-                size="lg"
-                type="button"
-                onClick={() => void goToPreview()}
-                className="w-full text-base"
-              >
-                Next → Preview envelope
-              </PixelButton>
 
               <StationeryPaper
                 stationery={getLetterStationery(
@@ -684,7 +635,14 @@ export function MessageForm() {
                 </p>
               ) : null}
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="flex flex-wrap items-center gap-3">
+                <PixelButton
+                  size="lg"
+                  type="button"
+                  onClick={() => void goToPreview()}
+                >
+                  Next →
+                </PixelButton>
                 <PixelButton
                   variant="ghost"
                   type="button"
@@ -706,14 +664,6 @@ export function MessageForm() {
                     {regenerating ? "Rewriting…" : "✨ Regenerate"}
                   </PixelButton>
                 ) : null}
-                <PixelButton
-                  size="lg"
-                  type="button"
-                  onClick={() => void goToPreview()}
-                  className="w-full sm:ml-auto sm:w-auto"
-                >
-                  Next → Preview envelope
-                </PixelButton>
               </div>
             </motion.div>
           ) : (
@@ -739,67 +689,6 @@ export function MessageForm() {
           )}
         </AnimatePresence>
       </PixelWindow>
-
-      {/* Fixed viewport continue bar — always on screen while creating */}
-      {phase === "form" || phase === "draft" ? (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[300]">
-          <div className="pointer-events-auto border-t-[3px] border-[var(--ll-pink-deep)] bg-[#fff6df]/98 px-3 py-3 shadow-[0_-10px_28px_rgba(61,47,34,0.28)] backdrop-blur-md dark:bg-[#1a1510]/98 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-            <div className="mx-auto max-w-3xl">
-              {phase === "draft" && letter ? (
-                <PixelButton
-                  size="lg"
-                  type="button"
-                  className="w-full text-base"
-                  onClick={() => void goToPreview()}
-                >
-                  Next → Preview envelope
-                </PixelButton>
-              ) : letter && writeMode === "ai" ? (
-                <PixelButton
-                  size="lg"
-                  type="button"
-                  className="w-full text-base"
-                  onClick={() => {
-                    const nextLetter = {
-                      ...letter,
-                      form: {
-                        ...letter.form,
-                        ...formWithLookVoice(),
-                        writeMode: "ai" as const,
-                      },
-                    };
-                    setLetter(nextLetter);
-                    void goToPreview(nextLetter);
-                  }}
-                >
-                  Next → Preview envelope
-                </PixelButton>
-              ) : (
-                <PixelButton
-                  size="lg"
-                  type="button"
-                  disabled={loading}
-                  className="w-full text-base"
-                  onClick={() => {
-                    const formEl = document.getElementById(
-                      "ll-create-form"
-                    ) as HTMLFormElement | null;
-                    formEl?.requestSubmit();
-                  }}
-                >
-                  {loading
-                    ? writeMode === "own"
-                      ? "Opening preview…"
-                      : "Writing…"
-                    : writeMode === "own"
-                      ? "Next → Preview envelope"
-                      : "✨ Generate Little Letter"}
-                </PixelButton>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       {phase === "form" || phase === "draft" ? (
         <VoiceNoteRecorder kind="letter" />
