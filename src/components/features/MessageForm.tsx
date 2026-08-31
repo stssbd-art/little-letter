@@ -34,6 +34,7 @@ export function MessageForm() {
   const [error, setError] = useState("");
   const restoredDraft = useRef(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const editingDetails = searchParams.get("edit") === "details";
 
   function scrollLetterIntoView() {
     const el = rootRef.current;
@@ -51,12 +52,17 @@ export function MessageForm() {
   }, [searchParams]);
 
   // If a draft letter already exists (e.g. browser back), show the letter box again.
+  // Coming from Preview "Edit details" stays on the form so names/emails can change.
   useEffect(() => {
+    if (editingDetails) {
+      restoredDraft.current = true;
+      return;
+    }
     if (letter && !restoredDraft.current && phase === "form") {
       restoredDraft.current = true;
       setPhase("draft");
     }
-  }, [letter, phase]);
+  }, [letter, phase, editingDetails]);
 
   useEffect(() => {
     if (phase === "draft" || phase === "flying") {
@@ -112,7 +118,13 @@ export function MessageForm() {
           subject,
           message,
           form: { ...formWithLookVoice(), writeMode: "own" },
-          createdAt: new Date().toISOString(),
+          createdAt: letter?.createdAt || new Date().toISOString(),
+        });
+      } else if (letter) {
+        /* Editing details after preview — keep the written letter, update names/look only. */
+        setLetter({
+          ...letter,
+          form: { ...formWithLookVoice(), writeMode: "ai" },
         });
       } else {
         const payload = { ...formWithLookVoice(), writeMode: "ai" as const };
@@ -138,6 +150,9 @@ export function MessageForm() {
       restoredDraft.current = true;
       setPhase("draft");
       setLoading(false);
+      if (editingDetails) {
+        router.replace("/create");
+      }
     } catch (err) {
       setPhase("form");
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -503,10 +518,14 @@ export function MessageForm() {
                   {loading
                     ? writeMode === "own"
                       ? "Preparing…"
-                      : "Writing…"
+                      : letter
+                        ? "Saving…"
+                        : "Writing…"
                     : writeMode === "own"
                       ? "✉️ Put in letter box"
-                      : "✨ Generate Little Letter"}
+                      : letter
+                        ? "💾 Keep letter & save details"
+                        : "✨ Generate Little Letter"}
                 </PixelButton>
               </div>
             </motion.form>

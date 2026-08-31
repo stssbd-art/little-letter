@@ -41,7 +41,7 @@ type UsageInfo = {
 export function LetterPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { letter, setLetter, form } = useLetter();
+  const { letter, setLetter, setForm, form } = useLetter();
   const { play } = useSound();
   const [open, setOpen] = useState(true);
   const [sending, setSending] = useState(false);
@@ -882,11 +882,22 @@ export function LetterPreview() {
           variant="ghost"
           onClick={() => {
             const design = currentLetter.form.cardDesign;
-            setLetter(null);
+            /* Keep the written letter — only jump back to edit names / look. */
+            setForm({
+              ...currentLetter.form,
+              ownSubject:
+                currentLetter.form.writeMode === "own"
+                  ? currentLetter.subject
+                  : form.ownSubject,
+              ownMessage:
+                currentLetter.form.writeMode === "own"
+                  ? currentLetter.message
+                  : form.ownMessage,
+            });
             if (design && isCardDesignId(design)) {
               router.push(`/cards/${design}`);
             } else {
-              router.push("/create");
+              router.push("/create?edit=details");
             }
           }}
         >
