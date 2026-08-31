@@ -27,6 +27,9 @@ function getResend() {
   return new Resend(apiKey);
 }
 
+/** Keep serverless sends from hanging until the platform 504s (and eating credits). */
+const MAIL_TIMEOUT_MS = 20_000;
+
 function getGmailTransport() {
   const user = process.env.GMAIL_USER?.trim();
   const pass = process.env.GMAIL_APP_PASSWORD?.replace(/\s+/g, "");
@@ -40,8 +43,33 @@ function getGmailTransport() {
       secure: false,
       requireTLS: true,
       auth: { user, pass },
+      connectionTimeout: MAIL_TIMEOUT_MS,
+      greetingTimeout: MAIL_TIMEOUT_MS,
+      socketTimeout: MAIL_TIMEOUT_MS,
     }),
   };
+}
+
+function withMailTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(
+        new Error(
+          `Email send timed out while talking to ${label}. Please try Send again in a moment.`
+        )
+      );
+    }, MAIL_TIMEOUT_MS);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
 }
 
 function extractEmail(from: string): string {
@@ -148,16 +176,19 @@ async function deliverEmail(opts: {
 
   if (isGmailApiConfigured()) {
     try {
-      const id = await sendViaGmailApi({
-        to: opts.to,
-        bcc,
-        from: brandedFrom(process.env.GMAIL_USER!.trim(), opts.senderName),
-        subject: opts.subject,
-        text: opts.text,
-        html: opts.html,
-        attachment,
-        inlineImages,
-      });
+      const id = await withMailTimeout(
+        sendViaGmailApi({
+          to: opts.to,
+          bcc,
+          from: brandedFrom(process.env.GMAIL_USER!.trim(), opts.senderName),
+          subject: opts.subject,
+          text: opts.text,
+          html: opts.html,
+          attachment,
+          inlineImages,
+        }),
+        "Gmail"
+      );
       return { id, simulated: false, provider: "gmail-api" };
     } catch (err) {
       throw friendlyMailError(err);
@@ -185,16 +216,19 @@ async function deliverEmail(opts: {
             ]
           : []),
       ];
-      const info = await gmail.transporter.sendMail({
-        from: brandedFrom(gmail.user, opts.senderName),
-        to: opts.to,
-        bcc,
-        subject: opts.subject,
-        text: opts.text,
-        html: opts.html,
-        replyTo: gmail.user,
-        attachments: mailAttachments.length ? mailAttachments : undefined,
-      });
+      const info = await withMailTimeout(
+        gmail.transporter.sendMail({
+          from: brandedFrom(gmail.user, opts.senderName),
+          to: opts.to,
+          bcc,
+          subject: opts.subject,
+          text: opts.text,
+          html: opts.html,
+          replyTo: gmail.user,
+          attachments: mailAttachments.length ? mailAttachments : undefined,
+        }),
+        "Gmail"
+      );
       return {
         id: info.messageId || `gmail-${Date.now()}`,
         simulated: false,
@@ -225,16 +259,19 @@ async function deliverEmail(opts: {
           ]
         : []),
     ];
-    const { data, error } = await resend.emails.send({
-      from: verified.from,
-      to: opts.to,
-      bcc: bcc ? [bcc] : undefined,
-      subject: opts.subject,
-      text: opts.text,
-      html: opts.html,
-      replyTo: verified.replyTo,
-      attachments: mailAttachments.length ? mailAttachments : undefined,
-    });
+    const { data, error } = await withMailTimeout(
+      resend.emails.send({
+        from: verified.from,
+        to: opts.to,
+        bcc: bcc ? [bcc] : undefined,
+        subject: opts.subject,
+        text: opts.text,
+        html: opts.html,
+        replyTo: verified.replyTo,
+        attachments: mailAttachments.length ? mailAttachments : undefined,
+      }),
+      "Resend"
+    );
     if (error) throw new Error(error.message);
     return {
       id: data?.id ?? `sent-${Date.now()}`,

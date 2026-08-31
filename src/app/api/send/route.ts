@@ -20,6 +20,8 @@ import { isCardDesignId } from "@/lib/card-designs";
 import { resolveLetterStationeryId } from "@/lib/letter-stationery";
 
 export const dynamic = "force-dynamic";
+/** Fail before platform 504 so the catch path can refund a consumed credit. */
+export const maxDuration = 30;
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

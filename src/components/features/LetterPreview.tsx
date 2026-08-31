@@ -284,8 +284,22 @@ export function LetterPreview() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...currentLetter, shareExample, voiceNote }),
+        signal: AbortSignal.timeout(35_000),
       });
-      const data = await res.json();
+      let data: {
+        error?: string;
+        demo?: boolean;
+        canSend?: boolean;
+      } = {};
+      try {
+        data = (await res.json()) as typeof data;
+      } catch {
+        throw new Error(
+          res.status === 504 || res.status >= 500
+            ? "Send timed out. Please try again — any used credit should be restored automatically."
+            : "Could not send letter. Please try again."
+        );
+      }
 
       if (res.status === 402) {
         const qs = new URLSearchParams({ t: String(Date.now()) });

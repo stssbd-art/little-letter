@@ -22,6 +22,7 @@ import { addMixtapeExample } from "@/lib/shared-examples";
 import { parseVoiceNote } from "@/lib/voice-note";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
