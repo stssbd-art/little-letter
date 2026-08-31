@@ -70,6 +70,16 @@ export function MessageForm() {
     }
   }, [phase]);
 
+  useEffect(() => {
+    if (phase !== "draft" || !letter) return;
+    const id = window.setTimeout(() => {
+      document
+        .getElementById("letter-next-btn")
+        ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 120);
+    return () => window.clearTimeout(id);
+  }, [phase, letter]);
+
   const writeMode: LetterWriteMode = form.writeMode === "own" ? "own" : "ai";
   const selectedStationery = getLetterStationery(form.stationery);
 
@@ -189,10 +199,11 @@ export function MessageForm() {
     }
   }
 
-  async function goToPreview() {
-    if (!letter) return;
-    const subject = letter.subject.trim();
-    const message = letter.message.trim();
+  async function goToPreview(fromLetter?: typeof letter) {
+    const current = fromLetter ?? letter;
+    if (!current) return;
+    const subject = current.subject.trim();
+    const message = current.message.trim();
     if (message.length < 8) {
       setError("Write a little more — at least a short note.");
       return;
@@ -204,11 +215,11 @@ export function MessageForm() {
     setError("");
     /* Keep the latest stationery choice on the letter before preview. */
     setLetter({
-      ...letter,
+      ...current,
       subject,
       message,
       form: {
-        ...letter.form,
+        ...current.form,
         ...formWithLookVoice(),
       },
     });
@@ -508,7 +519,42 @@ export function MessageForm() {
                 </p>
               ) : null}
 
-              <div className="border-t-2 border-[var(--ll-lavender)]/60 pt-4">
+              <div className="flex flex-col gap-3 border-t-2 border-[var(--ll-lavender)]/60 pt-4 sm:flex-row sm:flex-wrap">
+                {letter ? (
+                  <PixelButton
+                    type="button"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                    onClick={() => {
+                      play("click");
+                      setError("");
+                      const ownSubject =
+                        form.ownSubject.trim() || letter.subject;
+                      const ownMessage =
+                        form.ownMessage.trim() || letter.message;
+                      const nextLetter = {
+                        ...letter,
+                        form: {
+                          ...letter.form,
+                          ...formWithLookVoice(),
+                          writeMode,
+                          ...(writeMode === "own"
+                            ? { ownSubject, ownMessage }
+                            : {}),
+                        },
+                        ...(writeMode === "own"
+                          ? { subject: ownSubject, message: ownMessage }
+                          : {}),
+                      };
+                      setLetter(nextLetter);
+                      restoredDraft.current = true;
+                      if (editingDetails) router.replace("/create");
+                      void goToPreview(nextLetter);
+                    }}
+                  >
+                    Next → Preview envelope
+                  </PixelButton>
+                ) : null}
                 <PixelButton
                   type="submit"
                   size="lg"
@@ -546,6 +592,16 @@ export function MessageForm() {
                   Then continue to the envelope.
                 </p>
               </div>
+
+              <PixelButton
+                id="letter-next-btn"
+                size="lg"
+                type="button"
+                onClick={() => void goToPreview()}
+                className="w-full"
+              >
+                Next → Preview envelope
+              </PixelButton>
 
               <StationeryPaper
                 stationery={getLetterStationery(
@@ -591,7 +647,7 @@ export function MessageForm() {
                 </p>
               ) : null}
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <PixelButton
                   variant="ghost"
                   type="button"
@@ -617,7 +673,7 @@ export function MessageForm() {
                   size="lg"
                   type="button"
                   onClick={() => void goToPreview()}
-                  className="sm:ml-auto"
+                  className="w-full sm:ml-auto sm:w-auto"
                 >
                   Next →
                 </PixelButton>
