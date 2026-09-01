@@ -25,6 +25,9 @@ function resolveSiteUrl() {
 
 export const SITE_URL = resolveSiteUrl();
 
+/** Baseline “lived-in” visitor count shown before real traffic accumulates. */
+export const VISITOR_BASELINE = 12_847;
+
 /** Public support / privacy contact (shown in footer and legal pages). */
 export const CONTACT_EMAIL = "sendlittleletter@gmail.com";
 

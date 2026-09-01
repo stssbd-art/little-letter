@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { PixelWindow } from "@/components/ui/PixelWindow";
-import { STORAGE_KEYS } from "@/lib/constants";
+import { STORAGE_KEYS, VISITOR_BASELINE } from "@/lib/constants";
 
 const SESSION_FLAG = "little-letter-visit-counted";
 
+function parseVisitorCount(value: unknown): number {
+  const n = Math.floor(Number(value));
+  if (!Number.isFinite(n) || n < VISITOR_BASELINE) return VISITOR_BASELINE;
+  return n;
+}
+
 export function VisitorCounter() {
-  const [count, setCount] = useState<number | null>(null);
+  const [count, setCount] = useState(VISITOR_BASELINE);
 
   useEffect(() => {
     let cancelled = false;
@@ -23,12 +29,9 @@ export function VisitorCounter() {
           method: alreadyCounted ? "GET" : "POST",
           cache: "no-store",
         });
-        const data = (await res.json()) as { count?: number };
-        const next =
-          typeof data.count === "number" && Number.isFinite(data.count)
-            ? Math.max(1, Math.floor(data.count))
-            : null;
-        if (!cancelled && next !== null) {
+        const data = (await res.json()) as { count?: unknown };
+        const next = parseVisitorCount(data.count);
+        if (!cancelled) {
           setCount(next);
           try {
             localStorage.setItem(STORAGE_KEYS.visitorCount, String(next));
@@ -40,12 +43,9 @@ export function VisitorCounter() {
         if (!cancelled) {
           try {
             const raw = localStorage.getItem(STORAGE_KEYS.visitorCount);
-            const fallback = raw ? Number(raw) : 12847;
-            setCount(
-              Number.isFinite(fallback) && fallback > 0 ? fallback : 12847
-            );
+            setCount(parseVisitorCount(raw));
           } catch {
-            setCount(12847);
+            setCount(VISITOR_BASELINE);
           }
         }
       }
@@ -57,7 +57,7 @@ export function VisitorCounter() {
     };
   }, []);
 
-  const display = (count ?? 0).toString().padStart(8, "0");
+  const display = count.toString().padStart(8, "0");
 
   return (
     <PixelWindow title="visitor_counter.gif" icon="👁️" liftOnHover={false}>
@@ -74,7 +74,7 @@ export function VisitorCounter() {
               key={i}
               className="inline-flex h-7 w-5 items-center justify-center rounded-sm bg-[#1f2937]"
             >
-              {count === null ? "–" : digit}
+              {digit}
             </span>
           ))}
         </div>
