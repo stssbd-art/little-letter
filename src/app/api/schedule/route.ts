@@ -15,7 +15,7 @@ import {
 import { isStripeConfigured } from "@/lib/stripe";
 import { parseVoiceNote } from "@/lib/voice-note";
 import { isCardDesignId } from "@/lib/card-designs";
-import { insertScheduledSend, parseScheduledAt, processDueScheduledSends } from "@/lib/scheduled-sends";
+import { insertScheduledSend, parseScheduledAt } from "@/lib/scheduled-sends";
 
 export const dynamic = "force-dynamic";
 
