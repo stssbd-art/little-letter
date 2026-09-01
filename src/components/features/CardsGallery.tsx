@@ -62,10 +62,10 @@ export function CardsGallery() {
 
       <p className="text-sm text-[var(--ll-muted)]">
         {designs.length} illustrated e-card{designs.length === 1 ? "" : "s"} —
-        tap one to personalise and send by email.
+        each shows a big preview so you can see the style before you personalise.
       </p>
 
-      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {designs.map((design, index) => {
           const occasion = OCCASIONS.find((o) => o.value === design.occasion);
           return (
@@ -87,18 +87,19 @@ export function CardsGallery() {
                 aria-label={`Personalise and send ${design.title} digital greeting card`}
               >
                 <GreetingCard designId={design.id} compact />
-                <div className="mt-2.5 flex items-start justify-between gap-2 px-1">
-                  <div>
-                    <p className="font-display text-sm text-[var(--ll-ink)] transition group-hover:text-[var(--ll-pink-deep)]">
-                      {design.title}
-                    </p>
-                    <p className="text-xs text-[var(--ll-muted)]">
-                      {occasion?.emoji} {occasion?.label}
-                    </p>
-                  </div>
-                  <span className="shrink-0 font-pixel text-[7px] text-[var(--ll-pink-deep)] transition group-hover:translate-x-0.5">
-                    OPEN →
-                  </span>
+                <div className="mt-3 rounded-xl border-2 border-[var(--ll-lavender)] bg-white/60 px-3 py-2.5 dark:bg-white/5">
+                  <p className="font-display text-sm font-semibold text-[var(--ll-ink)] transition group-hover:text-[var(--ll-pink-deep)]">
+                    {design.emoji} {design.title}
+                  </p>
+                  <p className="mt-0.5 text-xs leading-snug text-[var(--ll-muted)]">
+                    {design.blurb}
+                  </p>
+                  <p className="mt-1.5 text-[10px] text-[var(--ll-muted)]">
+                    {occasion?.emoji} {occasion?.label}
+                    <span className="ml-2 font-pixel text-[7px] text-[var(--ll-pink-deep)]">
+                      TAP TO OPEN →
+                    </span>
+                  </p>
                 </div>
               </Link>
             </motion.li>

@@ -23,7 +23,11 @@ export type CardDesignId =
   | "moon-whisper"
   | "pearl-locket"
   | "daisy-duo"
-  | "ivory-veil";
+  | "ivory-veil"
+  | "vintage-postcard"
+  | "champagne-cheers"
+  | "cupcake-party"
+  | "cosmic-love";
 
 export type CardDesign = {
   id: CardDesignId;
@@ -411,6 +415,70 @@ export const CARD_DESIGNS: CardDesign[] = [
     badge: "two become one",
     sparkles: ["💐", "✨", "🕊️"],
     vibe: "soft",
+  },
+  {
+    id: "vintage-postcard",
+    title: "Vintage Postcard",
+    blurb: "Airmail stripes & nostalgic stamps",
+    emoji: "📮",
+    occasion: "thinking-of-you",
+    pageBg: "linear-gradient(165deg,#fff8ee 0%,#f5ecd8 45%,#e8dcc8 100%)",
+    cardBg: "#fffbf5",
+    border: "#8b5e34",
+    accent: "#6b4f36",
+    ink: "#3d2f22",
+    muted: "#7a654f",
+    badge: "thinking of you",
+    sparkles: ["📮", "✉️", "💌"],
+    vibe: "retro",
+  },
+  {
+    id: "champagne-cheers",
+    title: "Champagne Cheers",
+    blurb: "Bubbles, gold foil & a toast",
+    emoji: "🥂",
+    occasion: "congratulations",
+    pageBg: "linear-gradient(155deg,#fff6d8 0%,#f8e8b8 40%,#e8d4a0 100%)",
+    cardBg: "#fffaf0",
+    border: "#c4a574",
+    accent: "#8b6a30",
+    ink: "#3d3020",
+    muted: "#7a6548",
+    badge: "cheers to you",
+    sparkles: ["🥂", "✨", "🎉"],
+    vibe: "party",
+  },
+  {
+    id: "cupcake-party",
+    title: "Cupcake Party",
+    blurb: "Sprinkles, frosting & birthday joy",
+    emoji: "🧁",
+    occasion: "birthday",
+    pageBg: "linear-gradient(160deg,#ffe4f0 0%,#fff0f8 40%,#e8f4ff 100%)",
+    cardBg: "#fffbfd",
+    border: "#e07a9a",
+    accent: "#c04070",
+    ink: "#3d2030",
+    muted: "#8a5068",
+    badge: "happy birthday",
+    sparkles: ["🧁", "🎈", "🎀"],
+    vibe: "party",
+  },
+  {
+    id: "cosmic-love",
+    title: "Cosmic Love",
+    blurb: "Galaxy hearts & stardust romance",
+    emoji: "💫",
+    occasion: "love",
+    pageBg: "linear-gradient(165deg,#2a1848 0%,#4a2868 45%,#6a3878 100%)",
+    cardBg: "#f7ecd8",
+    border: "#c4a574",
+    accent: "#e8b86d",
+    ink: "#3d2f22",
+    muted: "#6b5a44",
+    badge: "written in the stars",
+    sparkles: ["💫", "✨", "💜"],
+    vibe: "night",
   },
 ];
 

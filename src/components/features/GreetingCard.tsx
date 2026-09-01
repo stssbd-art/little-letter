@@ -50,13 +50,58 @@ function CardCover({
   compact?: boolean;
 }) {
   const night = design.vibe === "night";
+
+  if (compact) {
+    return (
+      <div
+        className="relative aspect-[3/4] w-full overflow-hidden rounded-[1.35rem] border-[4px]"
+        style={{
+          borderColor: design.border,
+          boxShadow: coverShadow(design.border),
+          background: design.cardBg,
+          color: design.ink,
+        }}
+        role="img"
+        aria-label={`${design.title} greeting card — ${design.blurb}`}
+      >
+        <CardSceneArt
+          designId={design.id}
+          compact
+          accent={design.accent}
+          border={design.border}
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-10 text-center"
+          style={{
+            background: night
+              ? "linear-gradient(to top, rgba(26,34,56,0.92) 55%, transparent)"
+              : `linear-gradient(to top, ${design.cardBg} 50%, transparent)`,
+          }}
+        >
+          <p
+            className="font-display text-sm font-bold leading-tight"
+            style={{ color: night ? "#f7ecd4" : design.accent }}
+          >
+            {design.emoji} {design.title}
+          </p>
+          <p
+            className="mt-0.5 line-clamp-1 text-[10px]"
+            style={{ color: night ? "#cbb892" : design.muted }}
+          >
+            {design.blurb}
+          </p>
+        </div>
+        <Shimmer night={night} />
+      </div>
+    );
+  }
+
   const clipId = useId().replace(/:/g, "");
 
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[1.35rem] border-[4px]",
-        compact ? "aspect-[3/4]" : "h-full w-full"
+        "relative overflow-hidden rounded-[1.35rem] border-[4px] h-full w-full"
       )}
       style={{
         borderColor: design.border,
@@ -67,14 +112,21 @@ function CardCover({
       role="img"
       aria-label={`${design.title} greeting card cover — ${design.blurb}`}
     >
-      <div className="relative h-[58%] w-full overflow-hidden">
+      <div className="relative h-[62%] w-full overflow-hidden">
         <CardSceneArt
           designId={design.id}
-          compact={compact}
           accent={design.accent}
           border={design.border}
           gid={`${clipId}-cover`}
         />
+        {/* Large emoji so the theme reads instantly */}
+        <div
+          className="pointer-events-none absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full border-2 bg-white/80 text-2xl shadow-sm sm:h-14 sm:w-14 sm:text-3xl"
+          style={{ borderColor: design.border }}
+          aria-hidden
+        >
+          {design.emoji}
+        </div>
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-12"
           style={{
@@ -86,15 +138,15 @@ function CardCover({
 
       <div
         className={cn(
-          "relative flex h-[42%] flex-col items-center justify-center px-5 text-center",
-          compact ? "pb-2 pt-1" : "pb-6 pt-3"
+          "relative flex h-[38%] flex-col items-center justify-center px-5 text-center",
+          "pb-6 pt-3"
         )}
         style={{ background: design.cardBg }}
       >
         <div
           className={cn(
             "relative mb-3 inline-flex max-w-[95%] items-center justify-center px-5",
-            compact ? "min-h-[1.4rem]" : "min-h-[2.1rem]"
+            "min-h-[2.1rem]"
           )}
         >
           <svg
@@ -119,7 +171,7 @@ function CardCover({
           <span
             className={cn(
               "relative z-[1] font-display font-semibold tracking-wide text-white",
-              compact ? "text-xs" : "text-base"
+              "text-base"
             )}
           >
             {design.badge}
@@ -129,7 +181,7 @@ function CardCover({
         <h3
           className={cn(
             "font-display font-bold leading-tight",
-            compact ? "line-clamp-2 text-xl" : "text-3xl sm:text-4xl"
+            "text-3xl sm:text-4xl"
           )}
           style={{ color: design.accent }}
         >
@@ -139,7 +191,7 @@ function CardCover({
         <p
           className={cn(
             "mt-2 max-w-[20rem] font-display leading-snug",
-            compact ? "line-clamp-2 text-xs" : "text-base sm:text-lg"
+            "text-base sm:text-lg"
           )}
           style={{ color: design.muted }}
         >

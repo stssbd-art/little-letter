@@ -236,9 +236,46 @@ export function buildCardSceneSvg(designId: CardDesignId): string {
         <circle cx="100" cy="78" r="7" fill="#f0e4d4" stroke="${accent}" stroke-width="1.5"/>
         <circle cx="120" cy="72" r="8" fill="#fff8ee" stroke="${accent}" stroke-width="1.5"/>
         <circle cx="140" cy="78" r="7" fill="#f0e4d4" stroke="${accent}" stroke-width="1.5"/>
-        <circle cx="120" cy="88" r="5" fill="#d4c0a0"/>
-        <path d="M55 135 Q120 115 185 135" fill="none" stroke="#e8c98a" stroke-width="2.5"/>
-        <circle cx="40" cy="35" r="2.5" fill="#fff"/><circle cx="200" cy="40" r="2.5" fill="#fff"/>`
+        <path d="M55 135 Q120 115 185 135" fill="none" stroke="#e8c98a" stroke-width="2.5"/>`
+      );
+    case "vintage-postcard":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff8ee"/><stop offset="100%" stop-color="#e8dcc8"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <rect x="8" y="8" width="224" height="144" fill="#fffbf5" stroke="${border}" stroke-width="2" rx="4"/>
+        <rect x="170" y="48" width="52" height="62" fill="#fff6df" stroke="${border}" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="196" y="88" text-anchor="middle" font-size="32">📮</text>
+        <text x="120" y="130" text-anchor="middle" font-size="11" fill="${accent}" font-family="Georgia, serif">with love from afar</text>`
+      );
+    case "champagne-cheers":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff6d8"/><stop offset="100%" stop-color="#e8d4a0"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <path d="M75 95 L85 55 L95 95 Z" fill="#f8f0e0" stroke="${border}" stroke-width="2"/>
+        <path d="M145 95 L155 55 L165 95 Z" fill="#f8f0e0" stroke="${border}" stroke-width="2"/>
+        <path d="M88 55 Q120 35 152 55" fill="none" stroke="#ffd166" stroke-width="3"/>
+        <text x="120" y="130" text-anchor="middle" font-size="12" fill="${accent}" font-family="Georgia, serif" font-weight="bold">cheers!</text>`
+      );
+    case "cupcake-party":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe4f0"/><stop offset="100%" stop-color="#e8f4ff"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <ellipse cx="95" cy="68" rx="22" ry="14" fill="#ffb4c8"/>
+        <path d="M85 110 L95 70 L105 110 Z" fill="#f4c4a0" stroke="${border}" stroke-width="2"/>
+        <ellipse cx="145" cy="68" rx="22" ry="14" fill="#c5d4ff"/>
+        <path d="M135 110 L145 70 L155 110 Z" fill="#f4c4a0" stroke="${border}" stroke-width="2"/>
+        <text x="120" y="135" text-anchor="middle" font-size="32">🎈</text>`
+      );
+    case "cosmic-love":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a1848"/><stop offset="100%" stop-color="#6a3878"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        ${stars()}${heart(120, 72, 1.2, "#ff8fab")}
+        <text x="120" y="48" text-anchor="middle" font-size="28">💫</text>`
       );
     default:
       return buildCardSceneSvg("honey-classic");

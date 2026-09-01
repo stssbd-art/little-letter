@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import type { CardDesignId } from "@/lib/card-designs";
+import { getCardDesign } from "@/lib/card-designs";
+import { CompactCardArt } from "@/components/features/CompactCardArt";
 
 type SceneProps = {
   compact?: boolean;
@@ -24,6 +26,10 @@ export function CardSceneArt({
   border: string;
   gid?: string;
 }) {
+  if (compact) {
+    return <CompactCardArt design={getCardDesign(designId)} />;
+  }
+
   const props = { compact, accent, border, gid };
   switch (designId) {
     case "balloon-bash":
@@ -72,6 +78,14 @@ export function CardSceneArt({
       return <DaisyDuoScene {...props} />;
     case "ivory-veil":
       return <IvoryVeilScene {...props} />;
+    case "vintage-postcard":
+      return <VintagePostcardScene {...props} />;
+    case "champagne-cheers":
+      return <ChampagneScene {...props} />;
+    case "cupcake-party":
+      return <CupcakePartyScene {...props} />;
+    case "cosmic-love":
+      return <CosmicLoveScene {...props} />;
     default:
       return <HoneyScene {...props} />;
   }
@@ -1077,6 +1091,177 @@ function IvoryVeilScene({ accent, border, gid }: SceneProps) {
       <circle cx="140" cy="78" r="7" fill="#f0e4d4" stroke={accent} strokeWidth="1.5" />
       <circle cx="120" cy="88" r="5" fill="#d4c0a0" />
       <path d="M55 135 Q120 115 185 135" fill="none" stroke="#e8c98a" strokeWidth="2.5" />
+    </svg>
+  );
+}
+
+function VintagePostcardScene({ accent, border, gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-vpcBg`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#fff8ee" />
+          <stop offset="100%" stopColor="#e8dcc8" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-vpcBg)`} />
+      <rect x="8" y="8" width="224" height="144" fill="#fffbf5" stroke={border} strokeWidth="2" rx="4" />
+      <rect x="8" y="8" width="224" height="28" fill={accent} opacity="0.15" />
+      <line x1="8" y1="36" x2="232" y2="36" stroke={border} strokeWidth="2" />
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <rect
+          key={i}
+          x={14 + i * 36}
+          y="10"
+          width="18"
+          height="18"
+          fill={i % 2 === 0 ? "#c04050" : "#3a5a88"}
+          opacity="0.85"
+        />
+      ))}
+      <rect x="170" y="48" width="52" height="62" fill="#fff6df" stroke={border} strokeWidth="2" strokeDasharray="4 3" />
+      <text x="196" y="82" textAnchor="middle" fontSize="28">📮</text>
+      <text x="196" y="100" textAnchor="middle" fontSize="8" fill={accent} fontFamily="Georgia, serif">
+        POST
+      </text>
+      <line x1="24" y1="55" x2="150" y2="55" stroke={border} strokeWidth="1.5" opacity="0.4" />
+      <line x1="24" y1="72" x2="130" y2="72" stroke={border} strokeWidth="1.5" opacity="0.3" />
+      <line x1="24" y1="89" x2="140" y2="89" stroke={border} strokeWidth="1.5" opacity="0.25" />
+      <text x="120" y="130" textAnchor="middle" fontSize="11" fill={accent} fontFamily="Georgia, serif">
+        with love from afar
+      </text>
+    </svg>
+  );
+}
+
+function ChampagneScene({ accent, border, gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-champBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff6d8" />
+          <stop offset="100%" stopColor="#e8d4a0" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-champBg)`} />
+      {Array.from({ length: 14 }, (_, i) => (
+        <motion.circle
+          key={i}
+          cx={30 + ((i * 47) % 180)}
+          cy={120 - ((i * 23) % 90)}
+          r={2 + (i % 3)}
+          fill="#fff"
+          opacity="0.7"
+          animate={{ y: [0, -40], opacity: [0.7, 0] }}
+          transition={{ duration: 2.5 + i * 0.2, repeat: Infinity, delay: i * 0.15 }}
+        />
+      ))}
+      <motion.g
+        animate={{ y: [0, -3, 0] }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <path d="M75 95 L85 55 L95 95 Z" fill="#f8f0e0" stroke={border} strokeWidth="2" />
+        <path d="M145 95 L155 55 L165 95 Z" fill="#f8f0e0" stroke={border} strokeWidth="2" />
+        <rect x="72" y="95" width="26" height="8" rx="2" fill={accent} />
+        <rect x="142" y="95" width="26" height="8" rx="2" fill={accent} />
+        <path d="M88 55 Q120 35 152 55" fill="none" stroke="#ffd166" strokeWidth="3" />
+        <circle cx="120" cy="38" r="6" fill="#ffd166" />
+      </motion.g>
+      <text x="120" y="130" textAnchor="middle" fontSize="12" fill={accent} fontFamily="Georgia, serif" fontWeight="bold">
+        cheers!
+      </text>
+    </svg>
+  );
+}
+
+function CupcakePartyScene({ accent, border, gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-cupBg`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#ffe4f0" />
+          <stop offset="50%" stopColor="#fff0f8" />
+          <stop offset="100%" stopColor="#e8f4ff" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-cupBg)`} />
+      {[
+        "#ff6b8a", "#ffd166", "#6bcBff", "#c084fc", "#7ed957", "#ff9f68",
+      ].map((c, i) => (
+        <circle
+          key={i}
+          cx={25 + ((i * 41) % 190)}
+          cy={20 + ((i * 17) % 50)}
+          r="3"
+          fill={c}
+        />
+      ))}
+      <motion.g
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <path d="M85 110 L95 70 L105 110 Z" fill="#f4c4a0" stroke={border} strokeWidth="2" />
+        <ellipse cx="95" cy="68" rx="22" ry="14" fill="#ffb4c8" />
+        <circle cx="88" cy="62" r="4" fill="#ff6b8a" />
+        <circle cx="100" cy="60" r="3" fill="#ffd166" />
+        <circle cx="95" cy="55" r="3" fill="#6bcBff" />
+        <rect x="88" y="48" width="3" height="10" fill="#ff6b8a" />
+        <path d="M135 110 L145 70 L155 110 Z" fill="#f4c4a0" stroke={border} strokeWidth="2" />
+        <ellipse cx="145" cy="68" rx="22" ry="14" fill="#c5d4ff" />
+        <circle cx="138" cy="62" r="4" fill="#c084fc" />
+        <circle cx="150" cy="60" r="3" fill="#ff6b8a" />
+        <rect x="143" y="48" width="3" height="10" fill="#ffd166" />
+      </motion.g>
+      <text x="120" y="135" textAnchor="middle" fontSize="32">🎈</text>
+    </svg>
+  );
+}
+
+function CosmicLoveScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-cosBg`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#2a1848" />
+          <stop offset="50%" stopColor="#4a2868" />
+          <stop offset="100%" stopColor="#6a3878" />
+        </linearGradient>
+        <radialGradient id={`${gid}-cosGlow`} cx="50%" cy="45%" r="45%">
+          <stop offset="0%" stopColor="#e8b86d" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#e8b86d" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-cosBg)`} />
+      <ellipse cx="120" cy="80" rx="80" ry="55" fill={`url(#${gid}-cosGlow)`} />
+      {Array.from({ length: 24 }, (_, i) => (
+        <motion.circle
+          key={i}
+          cx={10 + ((i * 43) % 220)}
+          cy={8 + ((i * 29) % 100)}
+          r={i % 5 === 0 ? 2 : 1.2}
+          fill="#ffe9a8"
+          animate={{ opacity: [0.2, 1, 0.2] }}
+          transition={{ duration: 1.6 + (i % 4) * 0.3, repeat: Infinity, delay: i * 0.08 }}
+        />
+      ))}
+      <motion.path
+        d="M120 95 C120 78 98 78 98 92 C98 108 120 125 120 125 C120 125 142 108 142 92 C142 78 120 78 120 95 Z"
+        fill="#ff8fab"
+        animate={{ scale: [1, 1.08, 1] }}
+        transition={{ duration: 2.5, repeat: Infinity }}
+        style={{ transformOrigin: "120px 100px" }}
+      />
+      <motion.text
+        x="120"
+        y="55"
+        textAnchor="middle"
+        fontSize="28"
+        animate={{ rotate: [0, 15, 0] }}
+        transition={{ duration: 4, repeat: Infinity }}
+        style={{ transformOrigin: "120px 55px" }}
+      >
+        💫
+      </motion.text>
     </svg>
   );
 }
