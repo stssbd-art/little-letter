@@ -4,6 +4,7 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { CONTACT_EMAIL } from "@/lib/constants";
+import { CARD_PRICE_LABEL } from "@/lib/usage-labels";
 
 export const metadata: Metadata = {
   title: "FAQ — Sending Letters & Mixtapes",
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is this really free to try?",
-    a: "Your first two letters are free. After that, each extra letter costs £0.70 (paid securely with Stripe). E-cards are £1.25 each with no free allowance. Your first mixtape is free; extra mixes are £0.99 for 1 song, or £1.20 for 2 or more songs.",
+    a: `Your first two letters are free. After that, each extra letter costs £0.70 (paid securely with Stripe). E-cards are ${CARD_PRICE_LABEL} each with no free allowance. Your first mixtape is free; extra mixes are £0.99 for 1 song, or £1.20 for 2 or more songs.`,
   },
   {
     q: "How do payments work?",
@@ -74,7 +75,7 @@ const FAQS = [
   },
   {
     q: "Can I send a digital card?",
-    a: "Yes — open Cards, browse designs by occasion, personalise one, then email it. The recipient gets a link to open the animated illustrated card on the Little Letter website. Each e-card is £1.25.",
+    a: `Yes — open Cards, browse designs by occasion, personalise one, then email it. The recipient gets a link to open the animated illustrated card on the Little Letter website. Each e-card is ${CARD_PRICE_LABEL}.`,
   },
   {
     q: "Can I mute the sounds?",

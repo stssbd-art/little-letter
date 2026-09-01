@@ -7,8 +7,8 @@ export const LETTER_PRICE_PENCE = 70;
 
 /** E-cards: no free allowance — every send is paid */
 export const FREE_CARDS = 0;
-export const CARD_PRICE_LABEL = "£1.25";
-export const CARD_PRICE_PENCE = 125;
+export const CARD_PRICE_LABEL = "£0.70";
+export const CARD_PRICE_PENCE = 70;
 
 /** Mixtapes: first one free, then tiered */
 export const FREE_MIXTAPES = 1;

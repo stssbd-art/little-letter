@@ -99,7 +99,7 @@ export default async function CardDesignPage({ params }: Props) {
             offers: {
               "@type": "Offer",
               url: `${SITE_URL}/cards/${design.id}`,
-              price: "1.25",
+              price: "0.70",
               priceCurrency: "GBP",
               availability: "https://schema.org/InStock",
             },

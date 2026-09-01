@@ -432,7 +432,7 @@ export function LetterPreview() {
     }
   }
 
-  // Cards: always £1.25, no free allowance. Letters: first 2 free, then £0.70.
+  // Cards: always £0.70, no free allowance. Letters: first 2 free, then £0.70.
   const priceLabel = isCard ? CARD_PRICE_LABEL : LETTER_PRICE_LABEL;
   const demo = usage?.demo ?? false;
   const freeLeft = isCard ? false : (usage?.freeAvailable ?? true);
