@@ -89,20 +89,18 @@ async function ensureTable() {
         ON CONFLICT (id) DO NOTHING
       `;
     }
-  } else {
-    /* Restore Joao if a deploy wiped ephemeral storage but DB already had other rows. */
-    await sql`
-      INSERT INTO guestbook_entries (id, name, message, emoji, created_at)
-      VALUES (
-        'seed-joao',
-        'Joao',
-        'Lovely site — glad I found Little Letter.',
-        '💌',
-        '2026-08-31T18:00:00.000Z'::timestamptz
-      )
-      ON CONFLICT (id) DO NOTHING
-    `;
   }
+  await sql`
+    INSERT INTO guestbook_entries (id, name, message, emoji, created_at)
+    VALUES (
+      'seed-joao',
+      'Joao',
+      'Lovely site — glad I found Little Letter.',
+      '💌',
+      '2026-08-31T18:00:00.000Z'::timestamptz
+    )
+    ON CONFLICT (id) DO NOTHING
+  `;
   ensured = true;
 }
 
