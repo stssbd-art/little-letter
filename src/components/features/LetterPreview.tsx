@@ -49,6 +49,7 @@ export function LetterPreview() {
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [usage, setUsage] = useState<UsageInfo | null>(null);
+  const [usageLoading, setUsageLoading] = useState(true);
   const [needsPayment, setNeedsPayment] = useState(false);
   const [shareExample, setShareExample] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -88,17 +89,24 @@ export function LetterPreview() {
     const isCardUsage =
       Boolean(letter?.form?.cardDesign) &&
       isCardDesignId(letter?.form?.cardDesign ?? "");
+    setUsageLoading(true);
     const qs = new URLSearchParams({ t: String(Date.now()) });
     if (email) qs.set("email", email);
     if (isCardUsage) qs.set("kind", "card");
-    const res = await fetch(`/api/usage?${qs.toString()}`, {
-      cache: "no-store",
-    });
-    const data = (await res.json()) as UsageInfo;
-    if (res.ok) {
-      setUsage(data);
-      // Never ask for payment while demo mode is on
-      setNeedsPayment(!(data.demo || data.canSend));
+    try {
+      const res = await fetch(`/api/usage?${qs.toString()}`, {
+        cache: "no-store",
+      });
+      const data = (await res.json()) as UsageInfo;
+      if (res.ok) {
+        setUsage(data);
+        // Never ask for payment while demo mode is on
+        setNeedsPayment(!(data.demo || data.canSend));
+      } else if (isCardUsage) {
+        setNeedsPayment(true);
+      }
+    } finally {
+      setUsageLoading(false);
     }
   }
 
@@ -106,6 +114,14 @@ export function LetterPreview() {
     void refreshUsage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letter?.form?.senderEmail, letter?.form?.cardDesign]);
+
+  /* Cards always require payment until usage confirms a credit. */
+  useEffect(() => {
+    const card =
+      Boolean(letter?.form?.cardDesign) &&
+      isCardDesignId(letter?.form?.cardDesign ?? "");
+    if (card) setNeedsPayment(true);
+  }, [letter?.form?.cardDesign]);
 
   useEffect(() => {
     if (!needsPayment || !letter?.form?.senderEmail?.trim()) return;
@@ -158,6 +174,12 @@ export function LetterPreview() {
             throw new Error(verifyData.error ?? "Could not verify payment");
           }
           await refreshUsage();
+          if (!hasAcceptedTerms()) {
+            setError(
+              "Please agree to the Terms, Privacy Policy, and Refund Policy before sending."
+            );
+            return;
+          }
           let wantLater = false;
           try {
             wantLater =
@@ -173,6 +195,7 @@ export function LetterPreview() {
           }
         } catch (err) {
           setError(err instanceof Error ? err.message : "Payment verify failed");
+        } finally {
           setPaying(false);
         }
       })();
@@ -204,6 +227,7 @@ export function LetterPreview() {
   async function scheduleLetter() {
     if (!hasAcceptedTerms()) {
       setError("Please agree to the Terms, Privacy Policy, and Refund Policy before scheduling.");
+      setPaying(false);
       return;
     }
     if (
@@ -211,10 +235,12 @@ export function LetterPreview() {
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentLetter.form.senderEmail.trim())
     ) {
       setError("Your email is missing — go back and add it so we can track free sends.");
+      setPaying(false);
       return;
     }
     if (!scheduledAt.trim()) {
       setError("Pick a date and time to send later.");
+      setPaying(false);
       return;
     }
 
@@ -243,6 +269,7 @@ export function LetterPreview() {
               : "Payment required for extra letters.")
         );
         setSending(false);
+        setPaying(false);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to schedule");
@@ -261,12 +288,14 @@ export function LetterPreview() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not schedule letter");
       setSending(false);
+      setPaying(false);
     }
   }
 
   async function sendLetter() {
     if (!hasAcceptedTerms()) {
       setError("Please agree to the Terms, Privacy Policy, and Refund Policy before sending.");
+      setPaying(false);
       return;
     }
     if (
@@ -274,6 +303,7 @@ export function LetterPreview() {
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentLetter.form.senderEmail.trim())
     ) {
       setError("Your email is missing — go back and add it so we can track free sends.");
+      setPaying(false);
       return;
     }
     setSending(true);
@@ -331,6 +361,7 @@ export function LetterPreview() {
           );
         }
         setSending(false);
+        setPaying(false);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to send");
@@ -362,6 +393,7 @@ export function LetterPreview() {
             : "Could not send letter"
       );
       setSending(false);
+      setPaying(false);
     }
   }
 
@@ -984,10 +1016,12 @@ export function LetterPreview() {
           <PixelButton
             size="lg"
             onClick={startPayment}
-            disabled={paying || !acceptedTerms}
+            disabled={paying || !acceptedTerms || usageLoading}
           >
-            {paying
-              ? "Opening checkout..."
+            {paying || usageLoading
+              ? paying
+                ? "Opening checkout..."
+                : "Checking payment…"
               : scheduleLater
                 ? isCard
                   ? `💳 Pay ${priceLabel} & schedule card`
@@ -1000,12 +1034,14 @@ export function LetterPreview() {
           <PixelButton
             size="lg"
             onClick={scheduleLater ? scheduleLetter : sendLetter}
-            disabled={sending || paying || !acceptedTerms}
+            disabled={sending || paying || !acceptedTerms || usageLoading}
           >
-            {sending || paying
-              ? scheduleLater
-                ? "Scheduling..."
-                : "Sending..."
+            {sending || paying || usageLoading
+              ? usageLoading
+                ? "Checking…"
+                : scheduleLater
+                  ? "Scheduling..."
+                  : "Sending..."
               : scheduleLater
                 ? isCard
                   ? "🕐 Schedule card"
