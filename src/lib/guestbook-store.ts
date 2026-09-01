@@ -41,8 +41,15 @@ export const GUESTBOOK_SEED: GuestbookEntry[] = [
   },
 ];
 
+const JOAO_ENTRY = GUESTBOOK_SEED.find((e) => e.id === "seed-joao")!;
+
 let ensured = false;
 let memoryEntries: GuestbookEntry[] | null = null;
+
+function withJoao(entries: GuestbookEntry[]): GuestbookEntry[] {
+  if (entries.some((e) => e.id === JOAO_ENTRY.id)) return entries;
+  return [JOAO_ENTRY, ...entries].slice(0, 100);
+}
 
 function rowToEntry(row: {
   id: string;
@@ -93,15 +100,31 @@ async function ensureTable() {
   await sql`
     INSERT INTO guestbook_entries (id, name, message, emoji, created_at)
     VALUES (
-      'seed-joao',
-      'Joao',
-      'Lovely site — glad I found Little Letter.',
-      '💌',
-      '2026-08-31T18:00:00.000Z'::timestamptz
+      ${JOAO_ENTRY.id},
+      ${JOAO_ENTRY.name},
+      ${JOAO_ENTRY.message},
+      ${JOAO_ENTRY.emoji},
+      ${JOAO_ENTRY.createdAt}
     )
     ON CONFLICT (id) DO NOTHING
   `;
   ensured = true;
+}
+
+async function ensureJoaoEntry() {
+  if (!hasDatabase()) return;
+  await ensureTable();
+  await sql`
+    INSERT INTO guestbook_entries (id, name, message, emoji, created_at)
+    VALUES (
+      ${JOAO_ENTRY.id},
+      ${JOAO_ENTRY.name},
+      ${JOAO_ENTRY.message},
+      ${JOAO_ENTRY.emoji},
+      ${JOAO_ENTRY.createdAt}
+    )
+    ON CONFLICT (id) DO NOTHING
+  `;
 }
 
 async function readFileEntries(): Promise<GuestbookEntry[]> {
@@ -109,6 +132,7 @@ async function readFileEntries(): Promise<GuestbookEntry[]> {
   try {
     const raw = await fs.readFile(FILE, "utf8");
     memoryEntries = JSON.parse(raw) as GuestbookEntry[];
+    memoryEntries = withJoao(memoryEntries);
     return memoryEntries;
   } catch {
     memoryEntries = [...GUESTBOOK_SEED];
@@ -134,7 +158,7 @@ async function writeFileEntries(entries: GuestbookEntry[]) {
 
 export async function listGuestbookEntries(): Promise<GuestbookEntry[]> {
   if (hasDatabase()) {
-    await ensureTable();
+    await ensureJoaoEntry();
     const { rows } = await sql<{
       id: string;
       name: string;
@@ -147,9 +171,10 @@ export async function listGuestbookEntries(): Promise<GuestbookEntry[]> {
       ORDER BY created_at DESC
       LIMIT 100
     `;
-    return rows.map(rowToEntry);
+    return withJoao(rows.map(rowToEntry));
   }
-  return readFileEntries();
+  const entries = await readFileEntries();
+  return withJoao(entries);
 }
 
 export async function addGuestbookEntry(
