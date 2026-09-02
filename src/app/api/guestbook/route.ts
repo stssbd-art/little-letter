@@ -1,15 +1,37 @@
 import { NextResponse } from "next/server";
 import {
   addGuestbookEntry,
+  GUESTBOOK_SEED,
   listGuestbookEntries,
 } from "@/lib/guestbook-store";
 import type { GuestbookEntry } from "@/types";
 
 export const dynamic = "force-dynamic";
 
+const JOAO_ENTRY = GUESTBOOK_SEED.find((e) => e.id === "seed-joao")!;
+
+/** Always surface restored signatures even if storage was wiped on deploy. */
+function withRestoredEntries(entries: GuestbookEntry[]): GuestbookEntry[] {
+  const hasJoao = entries.some(
+    (e) =>
+      e.id === JOAO_ENTRY.id ||
+      e.name.toLowerCase().includes("joao") ||
+      e.name.toLowerCase().includes("ferreira")
+  );
+  if (hasJoao) return entries;
+  return [JOAO_ENTRY, ...entries].slice(0, 100);
+}
+
 export async function GET() {
-  const entries = await listGuestbookEntries();
-  return NextResponse.json({ entries });
+  const entries = withRestoredEntries(await listGuestbookEntries());
+  return NextResponse.json(
+    { entries },
+    {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    }
+  );
 }
 
 export async function POST(request: Request) {
