@@ -35,8 +35,7 @@ export const GUESTBOOK_SEED: GuestbookEntry[] = [
   {
     id: "seed-joao",
     name: "Joao Ferreira",
-    message:
-      "Thank you for signing — your note was lost during a server update. You're welcome to sign again anytime.",
+    message: "Something like nostalgic and cute.",
     emoji: "💌",
     createdAt: "2026-08-31T18:00:00.000Z",
   },
@@ -113,11 +112,11 @@ async function upsertJoaoEntry() {
   const { rows } = await sql<{ count: string | number }>`
     SELECT COUNT(*)::bigint AS count
     FROM guestbook_entries
-    WHERE LOWER(name) LIKE '%joao%'
-       OR LOWER(name) LIKE '%ferreira%'
+    WHERE id <> ${JOAO_ENTRY.id}
+      AND (LOWER(name) LIKE '%joao%' OR LOWER(name) LIKE '%ferreira%')
   `;
-  const existing = Number(rows[0]?.count ?? 0);
-  if (Number.isFinite(existing) && existing > 0) return;
+  const realEntry = Number(rows[0]?.count ?? 0);
+  if (Number.isFinite(realEntry) && realEntry > 0) return;
 
   await sql`
     INSERT INTO guestbook_entries (id, name, message, emoji, created_at)
