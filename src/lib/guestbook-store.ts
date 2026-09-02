@@ -34,8 +34,9 @@ export const GUESTBOOK_SEED: GuestbookEntry[] = [
   },
   {
     id: "seed-joao",
-    name: "Joao",
-    message: "Lovely site — glad I found Little Letter.",
+    name: "Joao Ferreira",
+    message:
+      "Thank you for signing — your note was lost during a server update. You're welcome to sign again anytime.",
     emoji: "💌",
     createdAt: "2026-08-31T18:00:00.000Z",
   },
@@ -47,7 +48,13 @@ let ensured = false;
 let memoryEntries: GuestbookEntry[] | null = null;
 
 function withJoao(entries: GuestbookEntry[]): GuestbookEntry[] {
-  if (entries.some((e) => e.id === JOAO_ENTRY.id)) return entries;
+  const hasJoao = entries.some(
+    (e) =>
+      e.id === JOAO_ENTRY.id ||
+      e.name.toLowerCase().includes("joao") ||
+      e.name.toLowerCase().includes("ferreira")
+  );
+  if (hasJoao) return entries;
   return [JOAO_ENTRY, ...entries].slice(0, 100);
 }
 
@@ -97,6 +104,21 @@ async function ensureTable() {
       `;
     }
   }
+  await upsertJoaoEntry();
+  ensured = true;
+}
+
+async function upsertJoaoEntry() {
+  if (!hasDatabase()) return;
+  const { rows } = await sql<{ count: string | number }>`
+    SELECT COUNT(*)::bigint AS count
+    FROM guestbook_entries
+    WHERE LOWER(name) LIKE '%joao%'
+       OR LOWER(name) LIKE '%ferreira%'
+  `;
+  const existing = Number(rows[0]?.count ?? 0);
+  if (Number.isFinite(existing) && existing > 0) return;
+
   await sql`
     INSERT INTO guestbook_entries (id, name, message, emoji, created_at)
     VALUES (
@@ -104,27 +126,19 @@ async function ensureTable() {
       ${JOAO_ENTRY.name},
       ${JOAO_ENTRY.message},
       ${JOAO_ENTRY.emoji},
-      ${JOAO_ENTRY.createdAt}
+      ${JOAO_ENTRY.createdAt}::timestamptz
     )
-    ON CONFLICT (id) DO NOTHING
+    ON CONFLICT (id) DO UPDATE SET
+      name = EXCLUDED.name,
+      message = EXCLUDED.message,
+      emoji = EXCLUDED.emoji
   `;
-  ensured = true;
 }
 
 async function ensureJoaoEntry() {
   if (!hasDatabase()) return;
   await ensureTable();
-  await sql`
-    INSERT INTO guestbook_entries (id, name, message, emoji, created_at)
-    VALUES (
-      ${JOAO_ENTRY.id},
-      ${JOAO_ENTRY.name},
-      ${JOAO_ENTRY.message},
-      ${JOAO_ENTRY.emoji},
-      ${JOAO_ENTRY.createdAt}
-    )
-    ON CONFLICT (id) DO NOTHING
-  `;
+  await upsertJoaoEntry();
 }
 
 async function readFileEntries(): Promise<GuestbookEntry[]> {

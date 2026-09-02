@@ -50,6 +50,7 @@ function CardCover({
   compact?: boolean;
 }) {
   const night = design.vibe === "night";
+  const clipId = useId().replace(/:/g, "");
 
   if (compact) {
     return (
@@ -95,8 +96,6 @@ function CardCover({
       </div>
     );
   }
-
-  const clipId = useId().replace(/:/g, "");
 
   return (
     <div
