@@ -4,7 +4,6 @@ import {
   addPaidCreditForEmail,
   consumeLetterForEmail,
   consumeLetterCreditForEmail,
-  consumeCardForEmail,
   consumeMixtapeForEmail,
   consumeMixtapeCreditForEmail,
   hasUsageDatabase,
@@ -243,16 +242,15 @@ export async function getSendAccess(senderEmail?: string) {
   return { allowed: false as const, reason: "payment_required" as const, usage };
 }
 
-/** E-cards never use the letter free pool — paid credit or demo only. */
+/** E-cards are free — no payment or credit required. */
 export async function getCardSendAccess(senderEmail?: string) {
   const usage = await readUsage(senderEmail);
-  if (isDemoMode()) {
-    return { allowed: true as const, reason: "demo" as const, usage };
-  }
-  if (usage.letterCredits > 0) {
-    return { allowed: true as const, reason: "credit" as const, usage };
-  }
-  return { allowed: false as const, reason: "payment_required" as const, usage };
+  return { allowed: true as const, reason: "free" as const, usage };
+}
+
+/** No-op for free e-cards — nothing to consume. */
+export async function consumeCardSendAccess(senderEmail?: string) {
+  return readUsage(senderEmail);
 }
 
 export async function consumeSendAccess(senderEmail?: string) {
@@ -303,49 +301,6 @@ export async function consumeSendAccess(senderEmail?: string) {
     usage.letterCredits -= 1;
   } else {
     throw new Error("No send credit available.");
-  }
-  const next = finalize(usage);
-  await writeUsage(next, senderEmail);
-  return next;
-}
-
-/** Consume a paid credit for an e-card (never burns letter free allowance). */
-export async function consumeCardSendAccess(senderEmail?: string) {
-  const usage = await readUsage(senderEmail);
-  if (isDemoMode()) {
-    return usage;
-  }
-
-  if (requiresEmailUsageDb() && !hasUsageDatabase()) {
-    throw new Error("Send tracking is temporarily unavailable. Please try again shortly.");
-  }
-
-  if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
-    const emailUsage = await consumeCardForEmail(senderEmail);
-    const next = finalize({
-      letterFreeUsed: Math.max(
-        usage.letterFreeUsed,
-        emailUsage.letterFreeUsed
-      ),
-      letterCredits: emailUsage.letterCredits,
-      mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
-      mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
-      usedSessionIds: Array.from(
-        new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
-      ).slice(-30),
-    });
-    await writeUsage(next);
-    return next;
-  }
-
-  if (requiresEmailUsageDb()) {
-    throw new Error("Your email is required to track card sends.");
-  }
-
-  if (usage.letterCredits > 0) {
-    usage.letterCredits -= 1;
-  } else {
-    throw new Error("No card send credit available.");
   }
   const next = finalize(usage);
   await writeUsage(next, senderEmail);

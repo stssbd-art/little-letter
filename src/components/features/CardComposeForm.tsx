@@ -12,7 +12,6 @@ import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
 import { getCardDesign, type CardDesignId } from "@/lib/card-designs";
 import { OCCASIONS, RELATIONSHIPS } from "@/lib/constants";
-import { CARD_PRICE_LABEL } from "@/lib/usage-labels";
 import type { Relationship } from "@/types";
 
 type Props = {
@@ -169,9 +168,8 @@ export function CardComposeForm({ designId }: Props) {
           <form onSubmit={onSubmit} className="space-y-4">
             <p className="text-sm text-[var(--ll-muted)]">
               {design.blurb}. Fill in the details, then preview &amp; send —
-              each e-card is {CARD_PRICE_LABEL} (no free card allowance).
-              They’ll get an email with a button to open the animated card on
-              the website.
+              e-cards are free. They’ll get an email with a button to open the
+              animated card on the website.
             </p>
 
             <div className="grid gap-3 sm:grid-cols-2">

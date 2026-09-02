@@ -4,12 +4,11 @@ import { CardsGallery } from "@/components/features/CardsGallery";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SITE_URL } from "@/lib/constants";
 import { CARD_DESIGNS } from "@/lib/card-designs";
-import { CARD_PRICE_LABEL } from "@/lib/usage-labels";
 
 export const metadata: Metadata = {
   title: "Send a Digital Greeting Card Online",
   description:
-    `Browse animated digital greeting cards for birthdays, love, thank you, weddings, and more — pick a design, personalise, and email it. ${CARD_PRICE_LABEL} per card.`,
+    "Browse animated digital greeting cards for birthdays, love, thank you, weddings, and more — pick a design, personalise, and email it free.",
   keywords: [
     "send a card online",
     "digital greeting card",
@@ -38,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Digital Greeting Cards — Little Letter",
     description:
-      `Pick from animated card designs and email a personal wish — ${CARD_PRICE_LABEL} per card.`,
+      "Pick from animated card designs and email a personal wish — free to send.",
     images: ["/opengraph-image"],
   },
 };
@@ -63,7 +62,7 @@ export default function CardsPage() {
 
       <PageHeader title="Send an e-card">
         Illustrated digital greeting cards — pick a design, write a wish, email
-        it. Flip-open covers · {CARD_PRICE_LABEL} per card.
+        it. Flip-open covers · free to send.
       </PageHeader>
 
       <PixelWindow title="card_gallery.exe" icon="🎴">

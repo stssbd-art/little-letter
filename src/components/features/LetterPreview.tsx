@@ -18,7 +18,7 @@ import { isCardDesignId } from "@/lib/card-designs";
 import { getLetterStationery } from "@/lib/letter-stationery";
 import { breakAfterLetterGreeting } from "@/lib/letter-format";
 import { PostageStamp } from "@/components/features/PostageStamp";
-import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
+import { LETTER_PRICE_LABEL } from "@/lib/usage-labels";
 import { getCheckoutUrl, prefetchCheckout } from "@/lib/checkout-client";
 import {
   defaultScheduleValue,
@@ -115,14 +115,6 @@ export function LetterPreview() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letter?.form?.senderEmail, letter?.form?.cardDesign]);
 
-  /* Cards always require payment until usage confirms a credit. */
-  useEffect(() => {
-    const card =
-      Boolean(letter?.form?.cardDesign) &&
-      isCardDesignId(letter?.form?.cardDesign ?? "");
-    if (card) setNeedsPayment(true);
-  }, [letter?.form?.cardDesign]);
-
   useEffect(() => {
     if (!needsPayment || !letter?.form?.senderEmail?.trim()) return;
     const isCardUsage =
@@ -150,7 +142,7 @@ export function LetterPreview() {
         isCardDesignId(letter?.form.cardDesign ?? "");
       setError(
         cancelledWasCard
-          ? `Payment cancelled. E-cards are ${CARD_PRICE_LABEL} each.`
+          ? "Payment cancelled."
           : `Payment cancelled. Your first two letters are free; extras are ${LETTER_PRICE_LABEL}.`
       );
       return;
@@ -265,7 +257,7 @@ export function LetterPreview() {
         setError(
           data.error ??
             (isCard
-              ? `Payment required — e-cards are ${CARD_PRICE_LABEL} each.`
+              ? "Could not send your card. Please try again."
               : "Payment required for extra letters.")
         );
         setSending(false);
@@ -356,7 +348,7 @@ export function LetterPreview() {
           setError(
             data.error ??
               (isCard
-                ? `Payment required — e-cards are ${CARD_PRICE_LABEL} each.`
+                ? "Could not send your card. Please try again."
                 : "Payment required for extra letters.")
           );
         }
@@ -432,10 +424,9 @@ export function LetterPreview() {
     }
   }
 
-  // Cards: always £0.70, no free allowance. Letters: first 2 free, then £0.70.
-  const priceLabel = isCard ? CARD_PRICE_LABEL : LETTER_PRICE_LABEL;
+  const priceLabel = LETTER_PRICE_LABEL;
   const demo = usage?.demo ?? false;
-  const freeLeft = isCard ? false : (usage?.freeAvailable ?? true);
+  const freeLeft = isCard ? true : (usage?.freeAvailable ?? true);
   const freeRemaining = usage?.freeLeft ?? 2;
   const freeTotal = usage?.freeTotal ?? 2;
 
@@ -471,23 +462,19 @@ export function LetterPreview() {
         ) : null}
       </AnimatePresence>
 
-      <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
-        <p className="font-display text-sm text-[var(--ll-ink)]">
-          {demo
-            ? isCard
-              ? "Demo mode — e-cards are free for testing. No payment asked right now."
-              : "Demo mode — sends are free for testing. No payment asked right now."
-            : isCard
-              ? usage && usage.credits > 0
-                ? `You have ${usage.credits} paid card credit${usage.credits === 1 ? "" : "s"} ready.`
-                : `E-cards are ${priceLabel} each — there is no free card allowance.`
+      {!isCard ? (
+        <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
+          <p className="font-display text-sm text-[var(--ll-ink)]">
+            {demo
+              ? "Demo mode — sends are free for testing. No payment asked right now."
               : freeLeft
                 ? `Your first ${freeTotal} letters are free (${freeRemaining} left). Extra letters are ${priceLabel} each.`
                 : usage && usage.credits > 0
                   ? `You have ${usage.credits} paid letter credit${usage.credits === 1 ? "" : "s"} ready.`
                   : `Your free letters are used. Next letter costs ${priceLabel}.`}
-        </p>
-      </PixelWindow>
+          </p>
+        </PixelWindow>
+      ) : null}
 
       <VoiceNoteRecorder kind="letter" />
 
@@ -1047,9 +1034,7 @@ export function LetterPreview() {
                   ? "🕐 Schedule card"
                   : "🕐 Schedule letter"
                 : isCard
-                  ? demo
-                    ? "🎴 Send card (demo)"
-                    : "🎴 Send card"
+                  ? "🎴 Send card"
                   : demo
                     ? "✉️ Send letter (demo)"
                     : freeLeft

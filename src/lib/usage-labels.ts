@@ -5,10 +5,11 @@ export const FREE_LETTERS = 2;
 export const LETTER_PRICE_LABEL = "£0.70";
 export const LETTER_PRICE_PENCE = 70;
 
-/** E-cards: no free allowance — every send is paid */
-export const FREE_CARDS = 0;
-export const CARD_PRICE_LABEL = "£0.70";
-export const CARD_PRICE_PENCE = 70;
+/** E-cards: free to send */
+export const CARDS_ARE_FREE = true;
+export const FREE_CARDS = 1;
+export const CARD_PRICE_LABEL = "Free";
+export const CARD_PRICE_PENCE = 0;
 
 /** Mixtapes: first one free, then tiered */
 export const FREE_MIXTAPES = 1;

@@ -59,17 +59,13 @@ export async function GET(request: Request) {
   }
 
   if (kind === "card") {
-    const freeLeft = 0;
-    const freeAvailable = demo;
-    const canSend = demo || usage.letterCredits > 0;
-
     return NextResponse.json({
       demo,
-      freeAvailable,
-      freeLeft,
+      freeAvailable: true,
+      freeLeft: FREE_CARDS,
       freeTotal: FREE_CARDS,
-      credits: usage.letterCredits,
-      canSend,
+      credits: 0,
+      canSend: true,
       price: CARD_PRICE_LABEL,
       trackedByEmail: Boolean(senderEmail),
       emailDb: hasUsageDatabase(),

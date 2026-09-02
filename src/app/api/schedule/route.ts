@@ -9,7 +9,6 @@ import {
   getSendAccess,
   isValidSenderEmail,
   LETTER_PRICE_LABEL,
-  CARD_PRICE_LABEL,
   normalizeSenderEmail,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
@@ -78,10 +77,10 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: isCard
-            ? `E-cards are ${CARD_PRICE_LABEL} each — there is no free card allowance.`
+            ? "Could not schedule your card. Please try again."
             : `Your first ${FREE_LETTERS} letters are free. Extra letters are ${LETTER_PRICE_LABEL} each.`,
-          requiresPayment: true,
-          price: isCard ? CARD_PRICE_LABEL : LETTER_PRICE_LABEL,
+          requiresPayment: !isCard,
+          price: isCard ? undefined : LETTER_PRICE_LABEL,
           stripeConfigured: isStripeConfigured(),
         },
         { status: 402 }
@@ -124,11 +123,11 @@ export async function POST(request: Request) {
         {
           error: paymentRequired
             ? isCard
-              ? `E-cards are ${CARD_PRICE_LABEL} each — there is no free card allowance.`
+              ? "Could not schedule your card. Please try again."
               : `Your first ${FREE_LETTERS} letters are free. Extra letters are ${LETTER_PRICE_LABEL} each.`
             : message,
-          requiresPayment: paymentRequired,
-          price: isCard ? CARD_PRICE_LABEL : LETTER_PRICE_LABEL,
+          requiresPayment: paymentRequired && !isCard,
+          price: isCard ? undefined : LETTER_PRICE_LABEL,
           stripeConfigured: isStripeConfigured(),
         },
         { status: paymentRequired ? 402 : 503 }
