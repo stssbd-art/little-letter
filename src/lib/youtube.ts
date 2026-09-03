@@ -12,6 +12,12 @@ type YtPlayer = {
   getCurrentTime: () => number;
   getDuration: () => number;
   getPlayerState: () => number;
+  /** 0–100 */
+  setVolume: (volume: number) => void;
+  getVolume: () => number;
+  mute: () => void;
+  unMute: () => void;
+  isMuted: () => boolean;
 };
 
 type YtNamespace = {

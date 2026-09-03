@@ -25,6 +25,11 @@ import {
   type MixTrack,
 } from "@/lib/tracks";
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
+import {
+  MIX_FADE_LEAD_SECONDS,
+  safeSetVolume,
+  softMixToVideo,
+} from "@/lib/youtube-mix";
 import { YouTubeSongSearch } from "@/components/features/YouTubeSongSearch";
 import { TermsAcceptance } from "@/components/features/TermsAcceptance";
 import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
@@ -75,6 +80,11 @@ export function MixtapeForm() {
   const tracksRef = useRef<MixTrack[]>([]);
   const pendingPlayIdRef = useRef<string | null>(null);
   const playerReadyRef = useRef(false);
+  const advancingRef = useRef(false);
+  const fadeArmedRef = useRef(false);
+  const playTrackAtRef = useRef<
+    (list: MixTrack[], next: number, quick?: boolean) => Promise<void>
+  >(async () => undefined);
   const [playIndex, setPlayIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [playerReady, setPlayerReady] = useState(false);
@@ -148,6 +158,7 @@ export function MixtapeForm() {
       if (!pending || !playerRef.current) return;
       pendingPlayIdRef.current = null;
       try {
+        safeSetVolume(playerRef.current, 100);
         playerRef.current.loadVideoById(pending);
         playerRef.current.playVideo();
         setPlaying(true);
@@ -192,9 +203,10 @@ export function MixtapeForm() {
             origin: window.location.origin,
           },
           events: {
-            onReady: () => {
+            onReady: (event) => {
               if (cancelled) return;
               playerReadyRef.current = true;
+              safeSetVolume(event.target, 100);
               setPlayerReady(true);
               setPlayerError("");
               startPending();
@@ -202,23 +214,23 @@ export function MixtapeForm() {
             onStateChange: (event) => {
               if (cancelled) return;
               const { ENDED, PLAYING, PAUSED } = YT.PlayerState;
-              if (event.data === PLAYING) setPlaying(true);
+              if (event.data === PLAYING) {
+                setPlaying(true);
+                if (!advancingRef.current) {
+                  safeSetVolume(event.target, 100);
+                }
+              }
               if (event.data === PAUSED) setPlaying(false);
               if (event.data === ENDED) {
                 const list = tracksRef.current;
                 if (list.length < 2) {
                   setPlaying(false);
+                  fadeArmedRef.current = false;
                   return;
                 }
+                if (advancingRef.current) return;
                 const next = (indexRef.current + 1) % list.length;
-                setPlayIndex(next);
-                indexRef.current = next;
-                try {
-                  event.target.loadVideoById(list[next]!.youtubeId);
-                  event.target.playVideo();
-                } catch {
-                  setPlaying(false);
-                }
+                void playTrackAtRef.current(list, next, false);
               }
             },
             onError: () => {
@@ -230,14 +242,7 @@ export function MixtapeForm() {
               const next = (indexRef.current + 1) % list.length;
               window.setTimeout(() => {
                 if (cancelled) return;
-                setPlayIndex(next);
-                indexRef.current = next;
-                try {
-                  playerRef.current?.loadVideoById(list[next]!.youtubeId);
-                  playerRef.current?.playVideo();
-                } catch {
-                  /* ignore */
-                }
+                void playTrackAtRef.current(list, next, true);
               }, 400);
             },
           },
@@ -270,26 +275,68 @@ export function MixtapeForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function playTrackAt(list: MixTrack[], next: number) {
+  // Soft-mix near the end while auditioning (Apple Music–style fade)
+  useEffect(() => {
+    if (!playerReady) return;
+    const id = window.setInterval(() => {
+      const player = playerRef.current;
+      if (!player || advancingRef.current || !playing) return;
+      try {
+        const total = player.getDuration() || 0;
+        const currentTime = player.getCurrentTime() || 0;
+        const list = tracksRef.current;
+        if (list.length < 2) return;
+        const next = (indexRef.current + 1) % list.length;
+        if (
+          total > MIX_FADE_LEAD_SECONDS + 2 &&
+          currentTime > 0 &&
+          total - currentTime <= MIX_FADE_LEAD_SECONDS &&
+          !fadeArmedRef.current
+        ) {
+          fadeArmedRef.current = true;
+          void playTrackAtRef.current(list, next, false);
+        }
+      } catch {
+        /* mid-swap */
+      }
+    }, 250);
+    return () => window.clearInterval(id);
+  }, [playerReady, playing]);
+
+  async function playTrackAt(list: MixTrack[], next: number, quick = true) {
     const nextTrack = list[next];
     if (!nextTrack) return;
+    if (advancingRef.current) return;
+
     setPlayIndex(next);
     indexRef.current = next;
     setPlayerError("");
+    fadeArmedRef.current = false;
     const player = playerRef.current;
     if (player && playerReadyRef.current) {
+      advancingRef.current = true;
       try {
-        player.loadVideoById(nextTrack.youtubeId);
-        player.playVideo();
+        await softMixToVideo(player, nextTrack.youtubeId, { quick });
         setPlaying(true);
       } catch {
-        pendingPlayIdRef.current = nextTrack.youtubeId;
-        setPlayerError("Couldn’t switch track — tap Play on the deck.");
+        try {
+          player.loadVideoById(nextTrack.youtubeId);
+          player.playVideo();
+          safeSetVolume(player, 100);
+          setPlaying(true);
+        } catch {
+          pendingPlayIdRef.current = nextTrack.youtubeId;
+          setPlayerError("Couldn’t switch track — tap Play on the deck.");
+        }
+      } finally {
+        advancingRef.current = false;
+        fadeArmedRef.current = false;
       }
     } else {
       pendingPlayIdRef.current = nextTrack.youtubeId;
     }
   }
+  playTrackAtRef.current = playTrackAt;
 
   function playSelected() {
     const list = tracksRef.current;
@@ -785,7 +832,7 @@ export function MixtapeForm() {
               {selected.length
                 ? playing
                   ? `Now playing · ${selected[playIndex]?.title ?? "your mix"}`
-                  : "Tap a song under the deck to audition it"
+                  : "Tap a song under the deck to audition it · soft-mix between tracks"
                 : `Hand-labelled · Side A forever · pick at least ${MIN_MIXTAPE_TRACKS} song${MIN_MIXTAPE_TRACKS === 1 ? "" : "s"}`}
             </p>
           )}

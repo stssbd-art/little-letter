@@ -17,6 +17,11 @@ import {
   type MixTrack,
 } from "@/lib/tracks";
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
+import {
+  MIX_FADE_LEAD_SECONDS,
+  safeSetVolume,
+  softMixToVideo,
+} from "@/lib/youtube-mix";
 import { cn } from "@/lib/utils";
 
 const MAX_HOME_TRACKS = MIX_TRACKS.length + 12;
@@ -29,6 +34,16 @@ export function RetroMp3Player({ className }: { className?: string }) {
   const tracksRef = useRef<MixTrack[]>(MIX_TRACKS);
   const pendingPlayIdRef = useRef<string | null>(null);
   const readyRef = useRef(false);
+  const advancingRef = useRef(false);
+  const fadeArmedRef = useRef(false);
+  const playTrackAtRef = useRef<
+    (
+      list: MixTrack[],
+      next: number,
+      quick?: boolean,
+      opts?: { silent?: boolean }
+    ) => Promise<void>
+  >(async () => undefined);
 
   const [tracks, setTracks] = useState<MixTrack[]>(MIX_TRACKS);
   const [index, setIndex] = useState(0);
@@ -81,9 +96,10 @@ export function RetroMp3Player({ className }: { className?: string }) {
             origin: window.location.origin,
           },
           events: {
-            onReady: () => {
+            onReady: (event) => {
               if (cancelled) return;
               readyRef.current = true;
+              safeSetVolume(event.target, 100);
               setReady(true);
               setError("");
               const pending = pendingPlayIdRef.current;
@@ -101,20 +117,18 @@ export function RetroMp3Player({ className }: { className?: string }) {
             onStateChange: (event) => {
               if (cancelled) return;
               const { ENDED, PLAYING, PAUSED } = YT.PlayerState;
-              if (event.data === PLAYING) setPlaying(true);
+              if (event.data === PLAYING) {
+                setPlaying(true);
+                if (!advancingRef.current) {
+                  safeSetVolume(event.target, 100);
+                }
+              }
               if (event.data === PAUSED) setPlaying(false);
               if (event.data === ENDED) {
                 const list = tracksRef.current;
-                if (!list.length) return;
+                if (!list.length || advancingRef.current) return;
                 const next = (indexRef.current + 1) % list.length;
-                setIndex(next);
-                indexRef.current = next;
-                try {
-                  event.target.loadVideoById(list[next]!.youtubeId);
-                  event.target.playVideo();
-                } catch {
-                  setPlaying(false);
-                }
+                void playTrackAtRef.current(list, next, false, { silent: true });
               }
             },
             onError: () => {
@@ -126,14 +140,7 @@ export function RetroMp3Player({ className }: { className?: string }) {
               const next = (indexRef.current + 1) % list.length;
               window.setTimeout(() => {
                 if (cancelled) return;
-                setIndex(next);
-                indexRef.current = next;
-                try {
-                  playerRef.current?.loadVideoById(list[next]!.youtubeId);
-                  playerRef.current?.playVideo();
-                } catch {
-                  /* ignore */
-                }
+                void playTrackAtRef.current(list, next, true, { silent: true });
               }, 400);
             },
           },
@@ -164,27 +171,73 @@ export function RetroMp3Player({ className }: { className?: string }) {
     };
   }, []);
 
-  function playTrackAt(list: MixTrack[], next: number) {
+  // Soft-mix near the end (Apple Music–style fade)
+  useEffect(() => {
+    if (!ready) return;
+    const id = window.setInterval(() => {
+      const player = playerRef.current;
+      if (!player || advancingRef.current || !playing) return;
+      try {
+        const total = player.getDuration() || 0;
+        const currentTime = player.getCurrentTime() || 0;
+        const list = tracksRef.current;
+        if (list.length < 2) return;
+        const next = (indexRef.current + 1) % list.length;
+        if (
+          total > MIX_FADE_LEAD_SECONDS + 2 &&
+          currentTime > 0 &&
+          total - currentTime <= MIX_FADE_LEAD_SECONDS &&
+          !fadeArmedRef.current
+        ) {
+          fadeArmedRef.current = true;
+          void playTrackAtRef.current(list, next, false, { silent: true });
+        }
+      } catch {
+        /* mid-swap */
+      }
+    }, 250);
+    return () => window.clearInterval(id);
+  }, [ready, playing]);
+
+  async function playTrackAt(
+    list: MixTrack[],
+    next: number,
+    quick = true,
+    opts?: { silent?: boolean }
+  ) {
     const nextTrack = list[next];
     if (!nextTrack) return;
-    play("click");
+    if (advancingRef.current) return;
+    if (!opts?.silent) play("click");
     setIndex(next);
     indexRef.current = next;
     setError("");
+    fadeArmedRef.current = false;
     const player = playerRef.current;
     if (player && readyRef.current) {
+      advancingRef.current = true;
       try {
-        player.loadVideoById(nextTrack.youtubeId);
-        player.playVideo();
+        await softMixToVideo(player, nextTrack.youtubeId, { quick });
         setPlaying(true);
       } catch {
-        pendingPlayIdRef.current = nextTrack.youtubeId;
-        setError("Couldn’t switch track — try Play again.");
+        try {
+          player.loadVideoById(nextTrack.youtubeId);
+          player.playVideo();
+          safeSetVolume(player, 100);
+          setPlaying(true);
+        } catch {
+          pendingPlayIdRef.current = nextTrack.youtubeId;
+          setError("Couldn’t switch track — try Play again.");
+        }
+      } finally {
+        advancingRef.current = false;
+        fadeArmedRef.current = false;
       }
     } else {
       pendingPlayIdRef.current = nextTrack.youtubeId;
     }
   }
+  playTrackAtRef.current = playTrackAt;
 
   function selectTrack(next: number) {
     playTrackAt(tracks, next);

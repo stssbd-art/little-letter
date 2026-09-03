@@ -8,6 +8,11 @@ import type { MixShare } from "@/lib/mixtape-link";
 import { resolveShareTracks } from "@/lib/mixtape-link";
 import { youtubeWatchUrl } from "@/lib/tracks";
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
+import {
+  MIX_FADE_LEAD_SECONDS,
+  safeSetVolume,
+  softMixToVideo,
+} from "@/lib/youtube-mix";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +33,11 @@ export function MixtapePlayer({ mix }: Props) {
   const playerRef = useRef<YtPlayer | null>(null);
   const indexRef = useRef(0);
   const advancingRef = useRef(false);
+  const fadeArmedRef = useRef(false);
+  const tracksRef = useRef(tracks);
+  const playIndexRef = useRef<(nextIndex: number, quick?: boolean) => Promise<void>>(
+    async () => undefined
+  );
 
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -36,8 +46,10 @@ export function MixtapePlayer({ mix }: Props) {
   const [duration, setDuration] = useState(0);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
+  const [mixing, setMixing] = useState(false);
 
   const current = tracks[index];
+  tracksRef.current = tracks;
 
   useEffect(() => {
     indexRef.current = index;
@@ -80,8 +92,9 @@ export function MixtapePlayer({ mix }: Props) {
             origin: window.location.origin,
           },
           events: {
-            onReady: () => {
+            onReady: (event) => {
               if (cancelled) return;
+              safeSetVolume(event.target, 100);
               setReady(true);
             },
             onStateChange: (event) => {
@@ -90,10 +103,24 @@ export function MixtapePlayer({ mix }: Props) {
               if (event.data === PLAYING) {
                 setPlaying(true);
                 setDuration(event.target.getDuration() || 0);
+                if (!advancingRef.current) {
+                  safeSetVolume(event.target, 100);
+                }
               }
               if (event.data === PAUSED) setPlaying(false);
               if (event.data === ENDED) {
-                void advanceFrom(indexRef.current);
+                // Fallback if near-end fade didn't fire (very short tracks, etc.)
+                if (!advancingRef.current) {
+                  const next = indexRef.current + 1;
+                  if (next < tracksRef.current.length) {
+                    void playIndexRef.current(next, false);
+                  } else {
+                    event.target.pauseVideo();
+                    setPlaying(false);
+                    setProgress(100);
+                    fadeArmedRef.current = false;
+                  }
+                }
               }
             },
             onError: () => {
@@ -103,8 +130,8 @@ export function MixtapePlayer({ mix }: Props) {
               );
               setPlaying(false);
               const next = indexRef.current + 1;
-              if (next < tracks.length) {
-                void playIndex(next);
+              if (next < tracksRef.current.length) {
+                void playIndexRef.current(next, true);
               }
             },
           },
@@ -128,7 +155,7 @@ export function MixtapePlayer({ mix }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mix.title, tracks.map((t) => t.id).join(",")]);
 
-  // Track progress for the full song
+  // Progress + Apple Music–style soft mix near the end of each track
   useEffect(() => {
     if (!ready) return;
     const id = window.setInterval(() => {
@@ -136,59 +163,75 @@ export function MixtapePlayer({ mix }: Props) {
       if (!player || advancingRef.current) return;
       try {
         const total = player.getDuration() || 0;
-        const current = player.getCurrentTime() || 0;
+        const currentTime = player.getCurrentTime() || 0;
         setDuration(total);
-        setPlayTime(current);
-        setProgress(total > 0 ? Math.min(100, (current / total) * 100) : 0);
+        setPlayTime(currentTime);
+        setProgress(total > 0 ? Math.min(100, (currentTime / total) * 100) : 0);
+
+        const nextIndex = indexRef.current + 1;
+        if (
+          total > MIX_FADE_LEAD_SECONDS + 2 &&
+          currentTime > 0 &&
+          total - currentTime <= MIX_FADE_LEAD_SECONDS &&
+          nextIndex < tracksRef.current.length &&
+          !fadeArmedRef.current
+        ) {
+          fadeArmedRef.current = true;
+          void playIndexRef.current(nextIndex, false);
+        }
       } catch {
         /* player may be mid-swap */
       }
     }, 250);
     return () => window.clearInterval(id);
-  }, [ready, tracks.length]);
+  }, [ready]);
 
-  async function advanceFrom(fromIndex: number) {
-    if (advancingRef.current) return;
-    const next = fromIndex + 1;
-    if (next < tracks.length) {
-      advancingRef.current = true;
-      await playIndex(next);
-      advancingRef.current = false;
-    } else {
-      const player = playerRef.current;
-      player?.pauseVideo();
-      setPlaying(false);
-      setProgress(100);
-    }
-  }
-
-  async function playIndex(nextIndex: number) {
-    const track = tracks[nextIndex];
+  async function playIndex(nextIndex: number, quick = true) {
+    const track = tracksRef.current[nextIndex];
     const player = playerRef.current;
     if (!track || !player) return;
+    if (advancingRef.current) return;
+
+    advancingRef.current = true;
+    setMixing(true);
     setError("");
     setIndex(nextIndex);
     indexRef.current = nextIndex;
     setPlayTime(0);
     setProgress(0);
     setDuration(0);
+    fadeArmedRef.current = false;
 
-    player.loadVideoById({
-      videoId: track.youtubeId,
-      startSeconds: 0,
-    });
-    player.playVideo();
-    setPlaying(true);
+    try {
+      await softMixToVideo(player, track.youtubeId, { quick });
+      setPlaying(true);
+    } catch {
+      try {
+        player.loadVideoById(track.youtubeId);
+        player.playVideo();
+        safeSetVolume(player, 100);
+        setPlaying(true);
+      } catch {
+        setError("Couldn’t start the next track.");
+        setPlaying(false);
+      }
+    } finally {
+      advancingRef.current = false;
+      setMixing(false);
+      fadeArmedRef.current = false;
+    }
   }
+  playIndexRef.current = playIndex;
 
   function playMix() {
     const player = playerRef.current;
     if (!player || !ready) return;
     try {
+      safeSetVolume(player, 100);
       player.playVideo();
       setPlaying(true);
     } catch {
-      void playIndex(index);
+      void playIndex(index, true);
     }
   }
 
@@ -229,11 +272,11 @@ export function MixtapePlayer({ mix }: Props) {
         screenRef={hostRef}
         onPlay={playMix}
         onStop={stopMix}
-        onPrev={() => void playIndex(Math.max(0, index - 1))}
+        onPrev={() => void playIndex(Math.max(0, index - 1), true)}
         onNext={() =>
-          void playIndex(Math.min(tracks.length - 1, index + 1))
+          void playIndex(Math.min(tracks.length - 1, index + 1), true)
         }
-        controlsDisabled={!ready}
+        controlsDisabled={!ready || mixing}
         prevDisabled={index === 0}
         nextDisabled={index >= tracks.length - 1}
       />
@@ -249,7 +292,13 @@ export function MixtapePlayer({ mix }: Props) {
           <div className="min-w-0">
             <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
               TRACK {index + 1}/{tracks.length}
-              {!ready ? " · LOADING…" : playing ? " · LIVE" : " · READY"}
+              {!ready
+                ? " · LOADING…"
+                : mixing
+                  ? " · MIXING…"
+                  : playing
+                    ? " · LIVE"
+                    : " · READY"}
             </p>
             <p className="truncate font-display text-base text-[var(--ll-ink)]">
               {current?.title}
@@ -273,8 +322,8 @@ export function MixtapePlayer({ mix }: Props) {
           <div className="flex flex-wrap items-center justify-center gap-2">
             <PixelButton
               variant="ghost"
-              onClick={() => void playIndex(Math.max(0, index - 1))}
-              disabled={index === 0 || !ready}
+              onClick={() => void playIndex(Math.max(0, index - 1), true)}
+              disabled={index === 0 || !ready || mixing}
               aria-label="Previous track"
             >
               ⏮
@@ -282,7 +331,7 @@ export function MixtapePlayer({ mix }: Props) {
             <PixelButton
               size="lg"
               onClick={playMix}
-              disabled={!ready || playing}
+              disabled={!ready || playing || mixing}
               aria-label="Play"
             >
               ▶
@@ -291,7 +340,7 @@ export function MixtapePlayer({ mix }: Props) {
               variant="ghost"
               size="lg"
               onClick={stopMix}
-              disabled={!ready || !playing}
+              disabled={!ready || !playing || mixing}
               aria-label="Stop"
             >
               ■
@@ -299,9 +348,9 @@ export function MixtapePlayer({ mix }: Props) {
             <PixelButton
               variant="ghost"
               onClick={() =>
-                void playIndex(Math.min(tracks.length - 1, index + 1))
+                void playIndex(Math.min(tracks.length - 1, index + 1), true)
               }
-              disabled={index >= tracks.length - 1 || !ready}
+              disabled={index >= tracks.length - 1 || !ready || mixing}
               aria-label="Next track"
             >
               ⏭
@@ -328,7 +377,7 @@ export function MixtapePlayer({ mix }: Props) {
           ) : null}
 
           <p className="text-center font-pixel text-[7px] leading-relaxed text-[var(--ll-muted)]">
-            Songs play through YouTube. When one finishes, the next track starts.
+            Soft-mix between tracks (Apple Music–style fade) · powered by YouTube
           </p>
         </div>
       </PixelWindow>
@@ -339,8 +388,8 @@ export function MixtapePlayer({ mix }: Props) {
             <li key={`${t.id}-${i}`}>
               <button
                 type="button"
-                onClick={() => void playIndex(i)}
-                disabled={!ready}
+                onClick={() => void playIndex(i, true)}
+                disabled={!ready || mixing}
                 className={cn(
                   "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left",
                   i === index
