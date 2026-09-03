@@ -82,7 +82,7 @@ const FAQS = [
   },
   {
     q: "Is my data stored?",
-    a: "Letter drafts live in your browser session. Guestbook entries and opt-in shared examples are saved on the server. Shared examples never store emails — only names and a short preview. Never put secrets in the guestbook.",
+    a: "Letter drafts live in your browser session. For safety we keep a private send log of who emailed whom (sender and recipient emails, names, type, subject/title, and time) — not the full letter body. Guestbook entries and opt-in shared examples are also saved on the server. Shared examples never store emails — only names and a short preview. Never put secrets in the guestbook.",
   },
   {
     q: "Can I show my letter on The Wall?",

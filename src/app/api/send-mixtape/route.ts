@@ -20,6 +20,7 @@ import {
 } from "@/lib/tracks";
 import { addMixtapeExample } from "@/lib/shared-examples";
 import { parseVoiceNote } from "@/lib/voice-note";
+import { logSend } from "@/lib/send-log";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -147,6 +148,15 @@ export async function POST(request: Request) {
 
     try {
       const result = await sendMixtapeEmail(mix, voiceNote);
+
+      await logSend({
+        kind: "mixtape",
+        senderEmail,
+        senderName: mix.senderName,
+        recipientEmail: mix.recipientEmail,
+        recipientName: mix.recipientName,
+        subject: mix.title,
+      });
 
       if (body.shareExample) {
         try {

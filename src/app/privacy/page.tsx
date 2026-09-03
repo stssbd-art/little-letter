@@ -11,16 +11,20 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-const UPDATED = "20 August 2026";
+const UPDATED = "3 September 2026";
 
 const SECTIONS = [
   {
     title: "Information you provide",
-    body: `When you send a letter or mixtape, you may enter names, email addresses (including your own sender email), message text, dedications, song choices, and an optional voice recording. We use recipient details only to deliver that one message.`,
+    body: `When you send a letter or mixtape, you may enter names, email addresses (including your own sender email), message text, dedications, song choices, and an optional voice recording. We use recipient details to deliver that message, and we keep a limited send record (see below) for safety.`,
   },
   {
     title: "We do not hold your message data",
-    body: `${SITE_NAME} is a delivery tool. We do not store, archive, or keep copies of your letter text, dedications, voice recordings, or mixtape contents after the email is sent. Drafts may live briefly in your own browser; voice notes are attached to the email and are not kept on our servers. We may keep only minimal technical records needed to run the service (for example free-send / paid-credit counts tied to your sender email, and optional guestbook or shared-example posts you choose to publish). We do not keep a library of private messages.`,
+    body: `${SITE_NAME} is a delivery tool. We do not store, archive, or keep copies of your letter text, dedications, voice recordings, or mixtape contents after the email is sent. Drafts may live briefly in your own browser; voice notes are attached to the email and are not kept on our servers. We may keep only minimal technical records needed to run the service (for example free-send / paid-credit counts tied to your sender email, a safety send log of who emailed whom, and optional guestbook or shared-example posts you choose to publish). We do not keep a library of private message bodies.`,
+  },
+  {
+    title: "Safety send log",
+    body: `For safety and to help investigate illegal, threatening, or abusive use, we keep a private record of each successful send: sender email and name, recipient email and name, message type (letter, card, or mixtape), subject or mixtape title, and the time it was sent. We do not store the full letter or voice recording in that log. This record is not public.`,
   },
   {
     title: "No liability for illegal use",

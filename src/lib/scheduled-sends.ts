@@ -5,6 +5,7 @@ import { addLetterExample } from "@/lib/shared-examples";
 import { sendLetterEmail } from "@/lib/resend";
 import type { VoiceNotePayload } from "@/lib/voice-note";
 import { addPaidCredit } from "@/lib/usage";
+import { logSend } from "@/lib/send-log";
 import type { GeneratedLetter } from "@/types";
 
 export type ScheduledSendStatus = "pending" | "processing" | "sent" | "failed";
@@ -159,6 +160,15 @@ export async function processDueScheduledSends(limit = 10) {
 
     try {
       const result = await sendLetterEmail(letter, row.voice_note);
+
+      await logSend({
+        kind,
+        senderEmail: row.sender_email,
+        senderName: letter.form.senderName,
+        recipientEmail: letter.form.recipientEmail,
+        recipientName: letter.form.recipientName,
+        subject: letter.subject,
+      });
 
       if (row.share_example) {
         try {

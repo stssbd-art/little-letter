@@ -16,6 +16,7 @@ import { addLetterExample } from "@/lib/shared-examples";
 import { parseVoiceNote } from "@/lib/voice-note";
 import { isCardDesignId } from "@/lib/card-designs";
 import { resolveLetterStationeryId } from "@/lib/letter-stationery";
+import { logSend } from "@/lib/send-log";
 
 export const dynamic = "force-dynamic";
 /** Fail before platform 504 so the catch path can refund a consumed credit. */
@@ -133,6 +134,15 @@ export async function POST(request: Request) {
 
     try {
       const result = await sendLetterEmail(letter, voiceNote);
+
+      await logSend({
+        kind: isCard ? "card" : "letter",
+        senderEmail,
+        senderName: letter.form.senderName,
+        recipientEmail: letter.form.recipientEmail,
+        recipientName: letter.form.recipientName,
+        subject: letter.subject,
+      });
 
       if (body.shareExample) {
         try {
