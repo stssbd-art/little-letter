@@ -3,6 +3,7 @@
 import { memo, type ReactNode, type Ref } from "react";
 import { motion } from "framer-motion";
 import type { MixTrack } from "@/lib/tracks";
+import { youtubeWatchUrl } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
 type CassetteDeckProps = {
@@ -16,6 +17,8 @@ type CassetteDeckProps = {
   nowPlaying?: MixTrack | null;
   /** Stable host for the YouTube iframe */
   screenRef?: Ref<HTMLDivElement>;
+  /** Show “Hear the full song on YouTube” under the video */
+  showFullSongLink?: boolean;
   /** Extra controls (search, etc.) between the LCD and the video */
   children?: ReactNode;
   onPlay?: () => void;
@@ -37,6 +40,7 @@ export function CassetteDeck({
   className,
   nowPlaying,
   screenRef,
+  showFullSongLink = false,
   children,
   onPlay,
   onStop,
@@ -52,6 +56,10 @@ export function CassetteDeck({
   const hasControls = Boolean(onPlay || onStop || onPrev || onNext);
   const showScreen = Boolean(screenRef);
   const current = nowPlaying ?? tracks[0] ?? null;
+  const fullSongHref =
+    showFullSongLink && current?.youtubeId
+      ? youtubeWatchUrl(current.youtubeId)
+      : null;
   const status = spinning
     ? "STEREO"
     : loading
@@ -120,6 +128,18 @@ export function CassetteDeck({
               <div className="relative aspect-video min-h-[200px] w-full bg-black">
                 <ScreenHost screenRef={screenRef} />
               </div>
+              {fullSongHref ? (
+                <p className="border-t border-[#1a1510] bg-[#0f0c09] px-3 py-2 text-center">
+                  <a
+                    href={fullSongHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-pixel text-[8px] text-[#cbb892] underline decoration-dotted underline-offset-2 hover:text-[#f6d58a]"
+                  >
+                    Hear the full song on YouTube
+                  </a>
+                </p>
+              ) : null}
             </div>
           ) : null}
 

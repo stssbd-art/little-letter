@@ -2,11 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CassetteDeck } from "@/components/features/CassetteDeck";
-import { PixelButton } from "@/components/ui/PixelButton";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import type { MixShare } from "@/lib/mixtape-link";
 import { resolveShareTracks } from "@/lib/mixtape-link";
-import { youtubeWatchUrl } from "@/lib/tracks";
 import { loadYouTubeApi, type YtPlayer } from "@/lib/youtube";
 import {
   MIX_FADE_LEAD_SECONDS,
@@ -42,9 +40,7 @@ export function MixtapePlayer({ mix }: Props) {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [ready, setReady] = useState(false);
-  const [playTime, setPlayTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [mixing, setMixing] = useState(false);
 
@@ -117,7 +113,6 @@ export function MixtapePlayer({ mix }: Props) {
                   } else {
                     event.target.pauseVideo();
                     setPlaying(false);
-                    setProgress(100);
                     fadeArmedRef.current = false;
                   }
                 }
@@ -155,7 +150,7 @@ export function MixtapePlayer({ mix }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mix.title, tracks.map((t) => t.id).join(",")]);
 
-  // Progress + Apple Music–style soft mix near the end of each track
+  // Soft-mix near the end of each track
   useEffect(() => {
     if (!ready) return;
     const id = window.setInterval(() => {
@@ -165,8 +160,6 @@ export function MixtapePlayer({ mix }: Props) {
         const total = player.getDuration() || 0;
         const currentTime = player.getCurrentTime() || 0;
         setDuration(total);
-        setPlayTime(currentTime);
-        setProgress(total > 0 ? Math.min(100, (currentTime / total) * 100) : 0);
 
         const nextIndex = indexRef.current + 1;
         if (
@@ -197,8 +190,6 @@ export function MixtapePlayer({ mix }: Props) {
     setError("");
     setIndex(nextIndex);
     indexRef.current = nextIndex;
-    setPlayTime(0);
-    setProgress(0);
     setDuration(0);
     fadeArmedRef.current = false;
 
@@ -270,6 +261,7 @@ export function MixtapePlayer({ mix }: Props) {
         spinning={playing}
         nowPlaying={current}
         screenRef={hostRef}
+        showFullSongLink
         onPlay={playMix}
         onStop={stopMix}
         onPrev={() => void playIndex(Math.max(0, index - 1), true)}
@@ -287,100 +279,11 @@ export function MixtapePlayer({ mix }: Props) {
         </p>
       ) : null}
 
-      <PixelWindow title="mixtape_player.exe" icon="🎵" liftOnHover={false}>
-        <div className="space-y-4">
-          <div className="min-w-0">
-            <p className="font-pixel text-[8px] text-[var(--ll-muted)]">
-              TRACK {index + 1}/{tracks.length}
-              {!ready
-                ? " · LOADING…"
-                : mixing
-                  ? " · MIXING…"
-                  : playing
-                    ? " · LIVE"
-                    : " · READY"}
-            </p>
-            <p className="truncate font-display text-base text-[var(--ll-ink)]">
-              {current?.title}
-            </p>
-            <p className="truncate text-xs text-[var(--ll-muted)]">
-              {current?.artist} · {current?.year}
-            </p>
-          </div>
-
-          <div className="h-2 overflow-hidden rounded-full bg-[#ebe1cd]">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-[#8b5e34] via-[#e8b86d] to-[#8b5e34] transition-[width] duration-150"
-              style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-            />
-          </div>
-          <div className="flex justify-between font-pixel text-[7px] text-[var(--ll-muted)]">
-            <span>{formatTime(playTime)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <PixelButton
-              variant="ghost"
-              onClick={() => void playIndex(Math.max(0, index - 1), true)}
-              disabled={index === 0 || !ready || mixing}
-              aria-label="Previous track"
-            >
-              ⏮
-            </PixelButton>
-            <PixelButton
-              size="lg"
-              onClick={playMix}
-              disabled={!ready || playing || mixing}
-              aria-label="Play"
-            >
-              ▶
-            </PixelButton>
-            <PixelButton
-              variant="ghost"
-              size="lg"
-              onClick={stopMix}
-              disabled={!ready || !playing || mixing}
-              aria-label="Stop"
-            >
-              ■
-            </PixelButton>
-            <PixelButton
-              variant="ghost"
-              onClick={() =>
-                void playIndex(Math.min(tracks.length - 1, index + 1), true)
-              }
-              disabled={index >= tracks.length - 1 || !ready || mixing}
-              aria-label="Next track"
-            >
-              ⏭
-            </PixelButton>
-          </div>
-
-          {current ? (
-            <p className="text-center text-xs text-[var(--ll-muted)]">
-              <a
-                href={youtubeWatchUrl(current.youtubeId)}
-                target="_blank"
-                rel="noreferrer"
-                className="underline decoration-dotted underline-offset-2 hover:text-[var(--ll-pink-deep)]"
-              >
-                Hear the full song on YouTube
-              </a>
-            </p>
-          ) : null}
-
-          {error ? (
-            <p className="rounded-xl border-2 border-rose-300 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-              {error}
-            </p>
-          ) : null}
-
-          <p className="text-center font-pixel text-[7px] leading-relaxed text-[var(--ll-muted)]">
-            Soft-mix between tracks (Apple Music–style fade) · powered by YouTube
-          </p>
-        </div>
-      </PixelWindow>
+      {error ? (
+        <p className="rounded-xl border-2 border-rose-300 bg-rose-50 px-3 py-2 text-center text-sm text-rose-700">
+          {error}
+        </p>
+      ) : null}
 
       <PixelWindow title="side_a.tracklist" icon="📜" liftOnHover={false}>
         <ul className="ll-song-scroll max-h-64 space-y-1 pr-1">

@@ -810,6 +810,7 @@ export function MixtapeForm() {
             nowPlaying={selected[playIndex] ?? null}
             className="max-w-none"
             screenRef={hostRef}
+            showFullSongLink={Boolean(selected[playIndex])}
             onPlay={playSelected}
             onStop={stopSelected}
             onPrev={prevSelected}
