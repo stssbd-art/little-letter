@@ -1,15 +1,16 @@
 /** Client-safe pricing (no DB / Stripe / Node-only imports). */
 
-/** Letters: first 2 free, then this price */
-export const FREE_LETTERS = 2;
-export const LETTER_PRICE_LABEL = "£0.70";
-export const LETTER_PRICE_PENCE = 70;
+/** Letters: completely free, no send limit (audience growth). */
+export const LETTERS_ARE_FREE = true;
+export const FREE_LETTERS = 0;
+export const LETTER_PRICE_LABEL = "Free";
+export const LETTER_PRICE_PENCE = 0;
 
-/** E-cards: free to send */
-export const CARDS_ARE_FREE = true;
-export const FREE_CARDS = 1;
-export const CARD_PRICE_LABEL = "Free";
-export const CARD_PRICE_PENCE = 0;
+/** E-cards: every send is paid */
+export const CARDS_ARE_FREE = false;
+export const FREE_CARDS = 0;
+export const CARD_PRICE_LABEL = "£0.70";
+export const CARD_PRICE_PENCE = 70;
 
 /** Mixtapes: first one free, then tiered */
 export const FREE_MIXTAPES = 1;

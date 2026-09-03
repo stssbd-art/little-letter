@@ -18,7 +18,7 @@ import { isCardDesignId } from "@/lib/card-designs";
 import { getLetterStationery } from "@/lib/letter-stationery";
 import { breakAfterLetterGreeting } from "@/lib/letter-format";
 import { PostageStamp } from "@/components/features/PostageStamp";
-import { LETTER_PRICE_LABEL } from "@/lib/usage-labels";
+import { CARD_PRICE_LABEL, LETTER_PRICE_LABEL } from "@/lib/usage-labels";
 import { getCheckoutUrl, prefetchCheckout } from "@/lib/checkout-client";
 import {
   defaultScheduleValue,
@@ -103,17 +103,20 @@ export function LetterPreview() {
       const data = (await res.json()) as UsageInfo;
       if (res.ok) {
         setUsage(data);
-        // Never ask for payment while demo mode is on
-        setNeedsPayment(!(data.demo || data.canSend));
-      } else if (!isCardUsage) {
-        /* Letters: fail closed — don't show a free send when usage is unknown. */
+        // Letters are free; cards need payment when canSend is false
+        setNeedsPayment(isCardUsage ? !(data.demo || data.canSend) : false);
+      } else if (isCardUsage) {
         setNeedsPayment(true);
-        setError("Could not check your free letter allowance. Please try again.");
+        setError("Could not check card payment status. Please try again.");
+      } else {
+        setNeedsPayment(false);
       }
     } catch {
-      if (!isCardUsage) {
+      if (isCardUsage) {
         setNeedsPayment(true);
-        setError("Could not check your free letter allowance. Please try again.");
+        setError("Could not check card payment status. Please try again.");
+      } else {
+        setNeedsPayment(false);
       }
     } finally {
       window.clearTimeout(timeoutId);
@@ -125,6 +128,15 @@ export function LetterPreview() {
     void refreshUsage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letter?.form?.senderEmail, letter?.form?.cardDesign]);
+
+  /* Cards require payment until usage confirms a credit. */
+  useEffect(() => {
+    const card =
+      Boolean(letter?.form?.cardDesign) &&
+      isCardDesignId(letter?.form?.cardDesign ?? "");
+    if (card) setNeedsPayment(true);
+    else setNeedsPayment(false);
+  }, [letter?.form?.cardDesign]);
 
   useEffect(() => {
     if (!needsPayment || !letter?.form?.senderEmail?.trim()) return;
@@ -153,8 +165,8 @@ export function LetterPreview() {
         isCardDesignId(letter?.form.cardDesign ?? "");
       setError(
         cancelledWasCard
-          ? "Payment cancelled."
-          : `Payment cancelled. Your first two letters are free; extras are ${LETTER_PRICE_LABEL}.`
+          ? `Payment cancelled. E-cards are ${CARD_PRICE_LABEL} each.`
+          : "Payment cancelled."
       );
       return;
     }
@@ -268,8 +280,8 @@ export function LetterPreview() {
         setError(
           data.error ??
             (isCard
-              ? "Could not send your card. Please try again."
-              : "Payment required for extra letters.")
+              ? `Payment required — e-cards are ${CARD_PRICE_LABEL} each.`
+              : "Could not send your letter. Please try again.")
         );
         setSending(false);
         setPaying(false);
@@ -359,8 +371,8 @@ export function LetterPreview() {
           setError(
             data.error ??
               (isCard
-                ? "Could not send your card. Please try again."
-                : "Payment required for extra letters.")
+                ? `Payment required — e-cards are ${CARD_PRICE_LABEL} each.`
+                : "Could not send your letter. Please try again.")
           );
         }
         setSending(false);
@@ -435,12 +447,8 @@ export function LetterPreview() {
     }
   }
 
-  const priceLabel = LETTER_PRICE_LABEL;
+  const priceLabel = isCard ? CARD_PRICE_LABEL : LETTER_PRICE_LABEL;
   const demo = usage?.demo ?? false;
-  /* Letters default closed until usage loads — avoid showing free send by mistake. */
-  const freeLeft = isCard ? true : (usage?.freeAvailable ?? false);
-  const freeRemaining = usage?.freeLeft ?? 2;
-  const freeTotal = usage?.freeTotal ?? 2;
 
   return (
     <div className="relative space-y-6">
@@ -474,19 +482,19 @@ export function LetterPreview() {
         ) : null}
       </AnimatePresence>
 
-      {!isCard ? (
-        <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
-          <p className="font-display text-sm text-[var(--ll-ink)]">
-            {demo
-              ? "Demo mode — sends are free for testing. No payment asked right now."
-              : freeLeft
-                ? `Your first ${freeTotal} letters are free (${freeRemaining} left). Extra letters are ${priceLabel} each.`
-                : usage && usage.credits > 0
-                  ? `You have ${usage.credits} paid letter credit${usage.credits === 1 ? "" : "s"} ready.`
-                  : `Your free letters are used. Next letter costs ${priceLabel}.`}
-          </p>
-        </PixelWindow>
-      ) : null}
+      <PixelWindow title="pricing.ini" icon={demo ? "🧪" : "💷"} liftOnHover={false}>
+        <p className="font-display text-sm text-[var(--ll-ink)]">
+          {demo
+            ? isCard
+              ? "Demo mode — e-cards are free for testing. No payment asked right now."
+              : "Demo mode — sends are free for testing. No payment asked right now."
+            : isCard
+              ? usage && usage.credits > 0
+                ? `You have ${usage.credits} paid card credit${usage.credits === 1 ? "" : "s"} ready.`
+                : `E-cards are ${priceLabel} each — there is no free card allowance.`
+              : "Letters are completely free to send — no payment, no limit."}
+        </p>
+      </PixelWindow>
 
       <VoiceNoteRecorder kind="letter" />
 
@@ -1049,9 +1057,7 @@ export function LetterPreview() {
                   ? "🎴 Send card"
                   : demo
                     ? "✉️ Send letter (demo)"
-                    : freeLeft
-                      ? `✉️ Send free letter (${freeRemaining} left)`
-                      : "✉️ Send Little Letter"}
+                  : "✉️ Send letter"}
           </PixelButton>
         )}
       </div>

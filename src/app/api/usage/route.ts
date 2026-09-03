@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyPaidCheckoutSession } from "@/lib/stripe";
 import {
   addPaidCredit,
-  FREE_LETTERS,
   FREE_MIXTAPES,
-  FREE_CARDS,
   hasUsageDatabase,
   isDemoMode,
   isValidSenderEmail,
@@ -47,18 +45,18 @@ export async function GET(request: Request) {
     ]);
   } catch {
     /* Fail closed for paid kinds when tracking is unavailable. */
-    if (!demo && kind !== "card") {
+    if (!demo && (kind === "card" || kind === "mixtape")) {
       return NextResponse.json({
         demo,
         freeAvailable: false,
         freeLeft: 0,
-        freeTotal: kind === "mixtape" ? FREE_MIXTAPES : FREE_LETTERS,
+        freeTotal: kind === "mixtape" ? FREE_MIXTAPES : 0,
         credits: 0,
         canSend: false,
         price:
           kind === "mixtape"
             ? mixtapePrice(Number.isFinite(trackCount) ? trackCount : 1).label
-            : LETTER_PRICE_LABEL,
+            : CARD_PRICE_LABEL,
         trackedByEmail: Boolean(senderEmail),
         emailDb: hasUsageDatabase(),
         trackingError: true,
@@ -99,33 +97,31 @@ export async function GET(request: Request) {
   }
 
   if (kind === "card") {
+    const freeAvailable = demo;
+    const canSend = demo || usage.letterCredits > 0;
     return NextResponse.json({
       demo,
-      freeAvailable: true,
-      freeLeft: FREE_CARDS,
-      freeTotal: FREE_CARDS,
-      credits: 0,
-      canSend: true,
+      freeAvailable,
+      freeLeft: 0,
+      freeTotal: 0,
+      credits: usage.letterCredits,
+      canSend,
       price: CARD_PRICE_LABEL,
       trackedByEmail: Boolean(senderEmail),
       emailDb: hasUsageDatabase(),
     });
   }
 
-  const freeLeft = demo
-    ? FREE_LETTERS
-    : Math.max(0, FREE_LETTERS - usage.letterFreeUsed);
-  const freeAvailable = demo || freeLeft > 0;
-  const canSend = demo || freeAvailable || usage.letterCredits > 0;
-
+  /* Letters are completely free. */
   return NextResponse.json({
     demo,
-    freeAvailable,
-    freeLeft,
-    freeTotal: FREE_LETTERS,
-    credits: usage.letterCredits,
-    canSend,
+    freeAvailable: true,
+    freeLeft: 999,
+    freeTotal: 999,
+    credits: 0,
+    canSend: true,
     price: LETTER_PRICE_LABEL,
+    unlimited: true,
     trackedByEmail: Boolean(senderEmail),
     emailDb: hasUsageDatabase(),
   });

@@ -4,6 +4,7 @@ import {
   addPaidCreditForEmail,
   consumeLetterForEmail,
   consumeLetterCreditForEmail,
+  consumeCardForEmail,
   consumeMixtapeForEmail,
   consumeMixtapeCreditForEmail,
   hasUsageDatabase,
@@ -16,6 +17,7 @@ import {
 import {
   FREE_LETTERS,
   FREE_MIXTAPES,
+  LETTERS_ARE_FREE,
   LETTER_PRICE_LABEL,
   LETTER_PRICE_PENCE,
   isDemoMode,
@@ -26,6 +28,8 @@ export {
   FREE_LETTERS,
   FREE_MIXTAPES,
   FREE_CARDS,
+  LETTERS_ARE_FREE,
+  CARDS_ARE_FREE,
   LETTER_PRICE_LABEL,
   CARD_PRICE_LABEL,
   MIX_MULTI_SONG_LABEL,
@@ -242,6 +246,10 @@ export async function getSendAccess(senderEmail?: string) {
   try {
     usage = await readUsage(senderEmail);
   } catch {
+    if (LETTERS_ARE_FREE) {
+      usage = await readCookieUsage();
+      return { allowed: true as const, reason: "free" as const, usage };
+    }
     if (requiresEmailUsageDb()) {
       return {
         allowed: false as const,
@@ -251,8 +259,8 @@ export async function getSendAccess(senderEmail?: string) {
     }
     usage = await readCookieUsage();
   }
-  if (isDemoMode()) {
-    return { allowed: true as const, reason: "demo" as const, usage };
+  if (isDemoMode() || LETTERS_ARE_FREE) {
+    return { allowed: true as const, reason: "free" as const, usage };
   }
   if (usage.letterFreeUsed < FREE_LETTERS) {
     return { allowed: true as const, reason: "free" as const, usage };
@@ -263,22 +271,67 @@ export async function getSendAccess(senderEmail?: string) {
   return { allowed: false as const, reason: "payment_required" as const, usage };
 }
 
-/** E-cards are free — no payment or credit required. */
+/** E-cards: paid credit or demo only — no free allowance. */
 export async function getCardSendAccess(senderEmail?: string) {
   const usage = await readUsage(senderEmail);
-  return { allowed: true as const, reason: "free" as const, usage };
+  if (isDemoMode()) {
+    return { allowed: true as const, reason: "demo" as const, usage };
+  }
+  if (usage.letterCredits > 0) {
+    return { allowed: true as const, reason: "credit" as const, usage };
+  }
+  return { allowed: false as const, reason: "payment_required" as const, usage };
 }
 
-/** No-op for free e-cards — nothing to consume. */
+/** Consume a paid credit for an e-card (never burns letter free allowance). */
 export async function consumeCardSendAccess(senderEmail?: string) {
-  return readUsage(senderEmail);
-}
-
-export async function consumeSendAccess(senderEmail?: string) {
   const usage = await readUsage(senderEmail);
   if (isDemoMode()) {
     return usage;
   }
+
+  if (requiresEmailUsageDb() && !hasUsageDatabase()) {
+    throw new Error("Send tracking is temporarily unavailable. Please try again shortly.");
+  }
+
+  if (senderEmail && isValidSenderEmail(senderEmail) && hasUsageDatabase()) {
+    const emailUsage = await consumeCardForEmail(senderEmail);
+    const next = finalize({
+      letterFreeUsed: Math.max(
+        usage.letterFreeUsed,
+        emailUsage.letterFreeUsed
+      ),
+      letterCredits: emailUsage.letterCredits,
+      mixFreeUsed: Math.max(usage.mixFreeUsed, emailUsage.mixFreeUsed),
+      mixCredits: Math.max(usage.mixCredits, emailUsage.mixCredits),
+      usedSessionIds: Array.from(
+        new Set([...usage.usedSessionIds, ...emailUsage.usedSessionIds])
+      ).slice(-30),
+    });
+    await writeUsage(next);
+    return next;
+  }
+
+  if (requiresEmailUsageDb()) {
+    throw new Error("Your email is required to track card sends.");
+  }
+
+  if (usage.letterCredits > 0) {
+    usage.letterCredits -= 1;
+  } else {
+    throw new Error("No card send credit available.");
+  }
+  const next = finalize(usage);
+  await writeUsage(next, senderEmail);
+  return next;
+}
+
+export async function consumeSendAccess(senderEmail?: string) {
+  if (isDemoMode() || LETTERS_ARE_FREE) {
+    return readUsage(senderEmail);
+  }
+
+  const usage = await readUsage(senderEmail);
 
   if (requiresEmailUsageDb() && !hasUsageDatabase()) {
     throw new Error("Send tracking is temporarily unavailable. Please try again shortly.");

@@ -13,7 +13,7 @@ export default function PreviewPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title="Preview your letter">
-        First two letters free · then £0.70 each. Preview the envelope, then send.
+        Letters are free to send. Preview the envelope, then send.
       </PageHeader>
       <Suspense fallback={<p className="text-left text-sm text-[var(--ll-muted)]">Loading preview...</p>}>
         <LetterPreview />

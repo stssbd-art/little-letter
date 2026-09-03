@@ -30,7 +30,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Birthday",
     title: "Send a Birthday Card & Wish Online",
     metaDescription:
-      "Send a free digital birthday card and warm birthday wish by email. Write your own message or let AI help — first two letters free, then £0.70.",
+      "Send a free digital birthday card and warm birthday wish by email. Write your own message or let AI help — letters are free to send.",
     keywords: [
       "birthday card",
       "birthday wish",
@@ -46,7 +46,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
       "Skip the shop-bought card. Little Letter helps you send a personal birthday wish by email: cute retro styling, your words (or AI help), and delivery straight to someone you love.",
     body: [
       "Whether it is for a best friend, partner, parent, or colleague, you pick the tone — cute, funny, romantic, or encouraging — and we help you write something that feels like you.",
-      "Recipients open a warm email that reads like a sealed note, not a marketing blast. Your first two birthday letters are free; extras are £0.70 each.",
+      "Recipients open a warm email that reads like a sealed note, not a marketing blast. Birthday letters are free to send.",
     ],
     exampleWishes: [
       "Happy birthday! Hope your day is full of cake, laughter, and one surprise that makes you grin.",
@@ -69,7 +69,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Love",
     title: "Send a Love Letter & Romantic Wish Online",
     metaDescription:
-      "Send a romantic love letter or sweet love wish by email. Digital love notes with a retro feel — first two letters free.",
+      "Send a romantic love letter or sweet love wish by email. Digital love notes with a retro feel — letters are free to send.",
     keywords: [
       "love letter online",
       "romantic wish",
@@ -103,7 +103,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Friendship",
     title: "Send a Friendship Card & Thank-You Wish",
     metaDescription:
-      "Send a friendship message or digital card to a friend by email. Warm, personal notes — first two letters free.",
+      "Send a friendship message or digital card to a friend by email. Warm, personal notes — letters are free to send.",
     keywords: [
       "friendship card",
       "message for friend",
@@ -158,7 +158,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Thinking of You",
     title: "Send a Thinking of You Card & Message",
     metaDescription:
-      "Send a thinking-of-you message or digital card by email. A gentle note for someone on your mind — first two letters free.",
+      "Send a thinking-of-you message or digital card by email. A gentle note for someone on your mind — letters are free to send.",
     keywords: [
       "thinking of you card",
       "thinking of you message",
@@ -185,7 +185,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Thank You",
     title: "Send a Thank You Card & Message Online",
     metaDescription:
-      "Send a thank you card and grateful message by email. Personal thank-you notes — first two letters free.",
+      "Send a thank you card and grateful message by email. Personal thank-you notes — letters are free to send.",
     keywords: [
       "thank you card",
       "thank you message",
@@ -238,7 +238,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Sorry",
     title: "Send a Sorry Card & Apology Message",
     metaDescription:
-      "Send a sincere apology or sorry message by email. Thoughtful digital notes when words matter — first two letters free.",
+      "Send a sincere apology or sorry message by email. Thoughtful digital notes when words matter — letters are free to send.",
     keywords: [
       "sorry card",
       "apology message",
@@ -265,7 +265,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Wedding",
     title: "Send a Wedding Card & Congratulations Wish",
     metaDescription:
-      "Send a wedding congratulations card and warm wish by email. Digital wedding messages — first two letters free.",
+      "Send a wedding congratulations card and warm wish by email. Digital wedding messages — letters are free to send.",
     keywords: [
       "wedding card",
       "wedding congratulations",
@@ -292,7 +292,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Graduation",
     title: "Send a Graduation Card & Congratulations Wish",
     metaDescription:
-      "Send a graduation congratulations card and proud message by email. Digital grad wishes — first two letters free.",
+      "Send a graduation congratulations card and proud message by email. Digital grad wishes — letters are free to send.",
     keywords: [
       "graduation card",
       "graduation congratulations",
@@ -318,7 +318,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Promotion",
     title: "Send a Promotion Congratulations Card",
     metaDescription:
-      "Send a promotion congratulations message or digital card by email. Celebrate their new role — first two letters free.",
+      "Send a promotion congratulations message or digital card by email. Celebrate their new role — letters are free to send.",
     keywords: [
       "promotion congratulations",
       "new job card",
@@ -344,7 +344,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Valentine's Day",
     title: "Send a Valentine's Day Card & Love Wish",
     metaDescription:
-      "Send a Valentine's Day card and romantic wish by email. Digital Valentine e-cards with heart — first two letters free.",
+      "Send a Valentine's Day card and romantic wish by email. Digital Valentine e-cards with heart — letters are free to send.",
     keywords: [
       "valentines day card",
       "valentine e-card",
@@ -371,7 +371,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Mother's Day",
     title: "Send a Mother's Day Card & Wish Online",
     metaDescription:
-      "Send a Mother's Day card and grateful message by email. Digital Mother's Day wishes — first two letters free.",
+      "Send a Mother's Day card and grateful message by email. Digital Mother's Day wishes — letters are free to send.",
     keywords: [
       "mothers day card",
       "mothers day message",
@@ -398,7 +398,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Father's Day",
     title: "Send a Father's Day Card & Wish Online",
     metaDescription:
-      "Send a Father's Day card and message by email. Digital Father's Day wishes — first two letters free.",
+      "Send a Father's Day card and message by email. Digital Father's Day wishes — letters are free to send.",
     keywords: [
       "fathers day card",
       "fathers day message",

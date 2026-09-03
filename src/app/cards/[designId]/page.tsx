@@ -10,6 +10,7 @@ import {
   isCardDesignId,
 } from "@/lib/card-designs";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import { CARD_PRICE_LABEL } from "@/lib/usage-labels";
 
 type Props = {
   params: Promise<{ designId: string }>;
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const design = getCardDesign(designId);
   const imageUrl = await cardCoverImageUrl(design.id);
   const title = `${design.title} — Digital Greeting Card`;
-  const description = `${design.blurb}. Personalise and email this digital greeting card with ${SITE_NAME} — free to send.`;
+  const description = `${design.blurb}. Personalise and email this digital greeting card with ${SITE_NAME}. ${CARD_PRICE_LABEL} per card.`;
   return {
     title,
     description,
@@ -98,7 +99,7 @@ export default async function CardDesignPage({ params }: Props) {
             offers: {
               "@type": "Offer",
               url: `${SITE_URL}/cards/${design.id}`,
-              price: "0.00",
+              price: "0.70",
               priceCurrency: "GBP",
               availability: "https://schema.org/InStock",
             },
@@ -107,7 +108,8 @@ export default async function CardDesignPage({ params }: Props) {
       />
       <div className="mx-auto max-w-6xl space-y-6">
         <PageHeader title={`${design.emoji} ${design.title}`}>
-          {design.blurb} Personalise this digital card and send it by email — free.
+          {design.blurb} Personalise this digital card and send it by email —
+          {CARD_PRICE_LABEL} per card.
         </PageHeader>
         <CardComposeForm designId={design.id} />
       </div>

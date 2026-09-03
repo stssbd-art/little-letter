@@ -22,15 +22,15 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is this really free to try?",
-    a: "Your first two letters are free. After that, each extra letter costs £0.70 (paid securely with Stripe). E-cards are free to send. Your first mixtape is free; extra mixes are £0.99 for 1 song, or £1.20 for 2 or more songs.",
+    a: "Letters are completely free to send — no limit. E-cards are £0.70 each (paid securely with Stripe). Your first mixtape is free; extra mixes are £0.99 for 1 song, or £1.20 for 2 or more songs.",
   },
   {
     q: "How do payments work?",
-    a: "Send two letters free. For the next ones, tap Pay £0.70 & send, complete Stripe Checkout, then your message goes out automatically. Your first mixtape is free; extra mixes use Stripe too (£0.99 / £1.20).",
+    a: "Letters are free. For e-cards, tap Pay £0.70 & send card, complete Stripe Checkout, then your card goes out automatically. Your first mixtape is free; extra mixes use Stripe too (£0.99 / £1.20).",
   },
   {
     q: "How do I send to any email?",
-    a: "Yes — put in any recipient email address and we’ll deliver the letter or mixtape there. You also get a copy in the inbox for the email you enter as the sender (so you can keep what you sent). Stripe charges apply only after your free letter allowance, and after your first free mixtape.",
+    a: "Yes — put in any recipient email address and we’ll deliver the letter or mixtape there. You also get a copy in the inbox for the email you enter as the sender (so you can keep what you sent). Letters are free; Stripe charges apply for e-cards (£0.70) and after your first free mixtape.",
   },
   {
     q: "Why did my letter go to spam?",
@@ -46,7 +46,7 @@ const FAQS = [
   },
   {
     q: "How do free sends work without an account?",
-    a: "You enter your email when creating a letter or mixtape. We track free/paid usage against that email (and browser cookies). Clearing cookies alone won’t reset your free allowance if you use the same email again. After free sends are used, Stripe charges apply.",
+    a: "You enter your email when creating a letter, card, or mixtape. Letters are free. E-cards and extra mixtapes use Stripe. Clearing cookies alone won’t reset paid usage if you use the same email again.",
   },
   {
     q: "Can I get a refund?",
@@ -74,7 +74,7 @@ const FAQS = [
   },
   {
     q: "Can I send a digital card?",
-    a: `Yes — open Cards, browse designs by occasion, personalise one, then email it. The recipient gets a link to open the animated illustrated card on the Little Letter website. E-cards are free.`,
+    a: "Yes — open Cards, browse designs by occasion, personalise one, then email it. The recipient gets a link to open the animated illustrated card on the Little Letter website. Each e-card is £0.70.",
   },
   {
     q: "Can I mute the sounds?",

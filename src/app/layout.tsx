@@ -159,7 +159,7 @@ const jsonLd = {
         price: "0.00",
         priceCurrency: "GBP",
         description:
-          "First two letters free, then £0.70. First mixtape free, then £0.99 for 1 song or £1.20 for 2+ songs. Digital greeting cards are free.",
+          "Letters are completely free. First mixtape free, then £0.99 for 1 song or £1.20 for 2+ songs. Digital greeting cards £0.70 each.",
       },
       featureList: [
         "Send a personal letter by email",

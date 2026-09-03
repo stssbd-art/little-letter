@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { createSendCheckoutSession, isStripeConfigured } from "@/lib/stripe";
 import {
+  CARDS_ARE_FREE,
   CARD_PRICE_LABEL,
+  LETTERS_ARE_FREE,
   isDemoMode,
   LETTER_PRICE_LABEL,
   mixtapePrice,
@@ -74,6 +76,30 @@ export async function POST(request: Request) {
       }
     } catch {
       /* empty body is fine */
+    }
+
+    if (kind === "card" && CARDS_ARE_FREE) {
+      return NextResponse.json(
+        {
+          error:
+            "Digital greeting cards are completely free — no payment needed. Just send your card.",
+          cardsAreFree: true,
+          price: CARD_PRICE_LABEL,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (kind === "letter" && LETTERS_ARE_FREE) {
+      return NextResponse.json(
+        {
+          error:
+            "Letters are completely free — no payment needed. Just send your letter.",
+          lettersAreFree: true,
+          price: LETTER_PRICE_LABEL,
+        },
+        { status: 400 }
+      );
     }
 
     if (!senderEmail) {
