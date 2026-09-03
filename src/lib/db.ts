@@ -37,9 +37,11 @@ function getSql() {
     globalThis.__llSql = postgres(url, {
       /* PgBouncer / Supabase pooler rejects prepared statements. */
       prepare: false,
-      max: 1,
+      /* Keep a few connections so email/cron work cannot block usage/guestbook. */
+      max: 5,
       idle_timeout: 10,
-      connect_timeout: 10,
+      connect_timeout: 8,
+      max_lifetime: 60 * 10,
       ssl: url.includes("localhost") ? false : "require",
     });
   }

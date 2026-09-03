@@ -171,12 +171,29 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
 
     try {
       const voiceNote = await loadVoicePayloadSafe("mixtape");
-      const res = await fetch("/api/send-mixtape", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, shareExample, voiceNote }),
-      });
-      const data = await res.json();
+      const controller = new AbortController();
+      const abortTimer = setTimeout(() => controller.abort(), 35_000);
+      let res: Response;
+      try {
+        res = await fetch("/api/send-mixtape", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...payload, shareExample, voiceNote }),
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(abortTimer);
+      }
+      let data: { error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(
+          res.status === 504 || res.status >= 500
+            ? "Send timed out. Please try again — any used credit should be restored automatically."
+            : "Could not send mixtape. Please try again."
+        );
+      }
       if (res.status === 402) {
         setNeedsPayment(true);
         setError(data.error ?? "Payment required for extra sends.");

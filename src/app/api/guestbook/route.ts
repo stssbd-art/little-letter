@@ -23,15 +23,33 @@ function withRestoredEntries(entries: GuestbookEntry[]): GuestbookEntry[] {
 }
 
 export async function GET() {
-  const entries = withRestoredEntries(await listGuestbookEntries());
-  return NextResponse.json(
-    { entries },
-    {
-      headers: {
-        "Cache-Control": "no-store, max-age=0",
-      },
-    }
-  );
+  try {
+    const entries = withRestoredEntries(
+      await Promise.race([
+        listGuestbookEntries(),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Guestbook lookup timed out.")), 6_000)
+        ),
+      ])
+    );
+    return NextResponse.json(
+      { entries },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
+  } catch {
+    return NextResponse.json(
+      { entries: withRestoredEntries([...GUESTBOOK_SEED]) },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
+  }
 }
 
 export async function POST(request: Request) {

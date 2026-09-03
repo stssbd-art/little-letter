@@ -15,13 +15,11 @@ import {
   readUsage,
   type CheckoutKind,
 } from "@/lib/usage";
-import { processDueScheduledSends } from "@/lib/scheduled-sends";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  /* Hobby plan only allows daily cron — also drain due scheduled letters on traffic. */
-  void processDueScheduledSends(3).catch(() => {});
+  /* Scheduled sends: daily cron only (/api/cron/process-scheduled-sends). */
 
   const url = new URL(request.url);
   const kind = url.searchParams.get("kind");
