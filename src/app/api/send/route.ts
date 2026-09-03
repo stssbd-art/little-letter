@@ -60,6 +60,15 @@ export async function POST(request: Request) {
       ? await getCardSendAccess(senderEmail)
       : await getSendAccess(senderEmail);
     if (!access.allowed) {
+      if (access.reason === "tracking_unavailable") {
+        return NextResponse.json(
+          {
+            error:
+              "Send tracking is temporarily unavailable. Please try again shortly.",
+          },
+          { status: 503 }
+        );
+      }
       return NextResponse.json(
         {
           error: isCard

@@ -178,7 +178,16 @@ export async function readUsage(senderEmail?: string): Promise<UsageSnapshot> {
   try {
     const emailUsage = await readSenderUsage(senderEmail);
     return finalize(mergeSenderIntoCookieUsage(cookie, emailUsage));
-  } catch {
+  } catch (err) {
+    /*
+     * Production must not fall open to empty cookies — that lets people keep
+     * sending free letters after their email pool is used (or when DB is down).
+     */
+    if (requiresEmailUsageDb()) {
+      throw err instanceof Error
+        ? err
+        : new Error("Send tracking is temporarily unavailable.");
+    }
     return cookie;
   }
 }
@@ -229,7 +238,19 @@ export async function writeUsage(usage: UsageSnapshot, senderEmail?: string) {
 }
 
 export async function getSendAccess(senderEmail?: string) {
-  const usage = await readUsage(senderEmail);
+  let usage: UsageSnapshot;
+  try {
+    usage = await readUsage(senderEmail);
+  } catch {
+    if (requiresEmailUsageDb()) {
+      return {
+        allowed: false as const,
+        reason: "tracking_unavailable" as const,
+        usage: await readCookieUsage(),
+      };
+    }
+    usage = await readCookieUsage();
+  }
   if (isDemoMode()) {
     return { allowed: true as const, reason: "demo" as const, usage };
   }

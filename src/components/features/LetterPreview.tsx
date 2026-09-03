@@ -93,19 +93,30 @@ export function LetterPreview() {
     const qs = new URLSearchParams({ t: String(Date.now()) });
     if (email) qs.set("email", email);
     if (isCardUsage) qs.set("kind", "card");
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 12_000);
     try {
       const res = await fetch(`/api/usage?${qs.toString()}`, {
         cache: "no-store",
+        signal: controller.signal,
       });
       const data = (await res.json()) as UsageInfo;
       if (res.ok) {
         setUsage(data);
         // Never ask for payment while demo mode is on
         setNeedsPayment(!(data.demo || data.canSend));
-      } else if (isCardUsage) {
+      } else if (!isCardUsage) {
+        /* Letters: fail closed — don't show a free send when usage is unknown. */
         setNeedsPayment(true);
+        setError("Could not check your free letter allowance. Please try again.");
+      }
+    } catch {
+      if (!isCardUsage) {
+        setNeedsPayment(true);
+        setError("Could not check your free letter allowance. Please try again.");
       }
     } finally {
+      window.clearTimeout(timeoutId);
       setUsageLoading(false);
     }
   }
@@ -426,7 +437,8 @@ export function LetterPreview() {
 
   const priceLabel = LETTER_PRICE_LABEL;
   const demo = usage?.demo ?? false;
-  const freeLeft = isCard ? true : (usage?.freeAvailable ?? true);
+  /* Letters default closed until usage loads — avoid showing free send by mistake. */
+  const freeLeft = isCard ? true : (usage?.freeAvailable ?? false);
   const freeRemaining = usage?.freeLeft ?? 2;
   const freeTotal = usage?.freeTotal ?? 2;
 

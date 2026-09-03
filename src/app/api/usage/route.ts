@@ -33,7 +33,47 @@ export async function GET(request: Request) {
   const senderEmail = isValidSenderEmail(emailRaw)
     ? normalizeSenderEmail(emailRaw)
     : undefined;
-  const usage = await readUsage(senderEmail);
+
+  let usage;
+  try {
+    usage = await Promise.race([
+      readUsage(senderEmail),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Usage lookup timed out.")),
+          8_000
+        )
+      ),
+    ]);
+  } catch {
+    /* Fail closed for paid kinds when tracking is unavailable. */
+    if (!demo && kind !== "card") {
+      return NextResponse.json({
+        demo,
+        freeAvailable: false,
+        freeLeft: 0,
+        freeTotal: kind === "mixtape" ? FREE_MIXTAPES : FREE_LETTERS,
+        credits: 0,
+        canSend: false,
+        price:
+          kind === "mixtape"
+            ? mixtapePrice(Number.isFinite(trackCount) ? trackCount : 1).label
+            : LETTER_PRICE_LABEL,
+        trackedByEmail: Boolean(senderEmail),
+        emailDb: hasUsageDatabase(),
+        trackingError: true,
+      });
+    }
+    usage = {
+      letterFreeUsed: 0,
+      letterCredits: 0,
+      mixFreeUsed: 0,
+      mixCredits: 0,
+      usedSessionIds: [] as string[],
+      freeUsed: false,
+      credits: 0,
+    };
+  }
 
   if (kind === "mixtape") {
     const priceInfo = mixtapePrice(Number.isFinite(trackCount) ? trackCount : 1);
