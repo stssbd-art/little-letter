@@ -14,10 +14,10 @@ export const CARD_PRICE_PENCE = 70;
 
 /** Mixtapes: first one free, then tiered */
 export const FREE_MIXTAPES = 1;
-export const MIX_ONE_SONG_LABEL = "£0.99";
-export const MIX_MULTI_SONG_LABEL = "£1.20";
-export const MIX_ONE_SONG_PENCE = 99;
-export const MIX_MULTI_SONG_PENCE = 120;
+export const MIX_ONE_SONG_LABEL = "£0.70";
+export const MIX_MULTI_SONG_LABEL = "£1.00";
+export const MIX_ONE_SONG_PENCE = 70;
+export const MIX_MULTI_SONG_PENCE = 100;
 
 export type CheckoutKind = "letter" | "mixtape" | "card";
 

@@ -22,11 +22,11 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is this really free to try?",
-    a: "Letters are completely free to send — no limit. E-cards are £0.70 each (paid securely with Stripe). Your first mixtape is free; extra mixes are £0.99 for 1 song, or £1.20 for 2 or more songs.",
+    a: "Letters are completely free to send — no limit. E-cards are £0.70 each (paid securely with Stripe). Your first mixtape is free; extra mixes are £0.70 for 1 song, or £1.00 for 2 or more songs.",
   },
   {
     q: "How do payments work?",
-    a: "Letters are free. For e-cards, tap Pay £0.70 & send card, complete Stripe Checkout, then your card goes out automatically. Your first mixtape is free; extra mixes use Stripe too (£0.99 / £1.20).",
+    a: "Letters are free. For e-cards, tap Pay £0.70 & send card, complete Stripe Checkout, then your card goes out automatically. Your first mixtape is free; extra mixes use Stripe too (£0.70 / £1.00).",
   },
   {
     q: "How do I send to any email?",
@@ -70,7 +70,7 @@ const FAQS = [
   },
   {
     q: "Can I send a mixtape?",
-    a: "Yes — open Mixtape, label a cassette, pick songs from the crate or search YouTube, add an optional dedication, and email it. The Play link opens the mix (via YouTube). Each song plays in full, then the next one starts. Your first mixtape is free; extra mixes are £0.99 for 1 song, £1.20 for 2 or more.",
+    a: "Yes — open Mixtape, label a cassette, pick songs from the crate or search YouTube, add an optional dedication, and email it. The Play link opens the mix (via YouTube). Each song plays in full, then the next one starts. Your first mixtape is free; extra mixes are £0.70 for 1 song, £1.00 for 2 or more.",
   },
   {
     q: "Can I send a digital card?",
