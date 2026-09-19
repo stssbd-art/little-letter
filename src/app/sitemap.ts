@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/constants";
+import { CONTENT_UPDATED } from "@/lib/content-updated";
 import { OCCASION_SEO_LIST } from "@/lib/occasion-seo";
 import { CARD_DESIGNS } from "@/lib/card-designs";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const lastModified = new Date(`${CONTENT_UPDATED.site}T12:00:00.000Z`);
   const pages: {
     path: string;
     priority: number;
@@ -15,6 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/create", priority: 0.95, changeFrequency: "weekly" },
     { path: "/cards", priority: 0.95, changeFrequency: "weekly" },
     { path: "/mixtape", priority: 0.95, changeFrequency: "weekly" },
+    { path: "/guides", priority: 0.9, changeFrequency: "monthly" },
+    {
+      path: "/guides/how-to-send-a-little-letter",
+      priority: 0.88,
+      changeFrequency: "monthly",
+    },
     { path: "/wall", priority: 0.75, changeFrequency: "weekly" },
     { path: "/about", priority: 0.8, changeFrequency: "monthly" },
     { path: "/paperless", priority: 0.7, changeFrequency: "monthly" },
@@ -35,7 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return pages.map(({ path, priority, changeFrequency }) => ({
     url: `${SITE_URL}${path}`,
-    lastModified: now,
+    lastModified,
     changeFrequency,
     priority,
   }));

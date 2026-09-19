@@ -5,8 +5,7 @@ import { AnimatedBackground } from "@/components/decorations/AnimatedBackground"
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { EndPageAdGate } from "@/components/ads/EndPageAdGate";
-import { AffiliateBanner } from "@/components/ads/AffiliateBanner";
-import { AffiliateSideSlide } from "@/components/ads/AffiliateSideSlide";
+import { AffiliatePlacement } from "@/components/ads/AffiliatePlacement";
 import {
   CONTACT_EMAIL,
   SEO_KEYWORDS,
@@ -203,8 +202,7 @@ export default function RootLayout({
               {children}
             </main>
             <EndPageAdGate />
-            <AffiliateBanner />
-            <AffiliateSideSlide />
+            <AffiliatePlacement />
             <Footer />
           </AnimatedBackground>
         </AppProviders>

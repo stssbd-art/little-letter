@@ -59,6 +59,10 @@ export function Guestbook() {
 
   return (
     <PixelWindow title="guestbook.html" icon="📝">
+      <p className="mb-3 text-xs leading-relaxed text-[var(--ll-muted)]">
+        Sign with a short public note. Example starter notes are marked
+        clearly; visitor signatures stay once they&apos;re posted.
+      </p>
       <form onSubmit={submit} className="space-y-3">
         <Field label="Your name" htmlFor="gb-name">
           <PixelInput
@@ -119,6 +123,11 @@ export function Guestbook() {
               <div className="flex items-center justify-between gap-2">
                 <p className="font-display text-sm text-[var(--ll-ink)]">
                   {entry.emoji} {entry.name}
+                  {entry.id.startsWith("seed-") ? (
+                    <span className="ml-2 align-middle font-sans text-[9px] uppercase tracking-wide text-[var(--ll-muted)]">
+                      example
+                    </span>
+                  ) : null}
                 </p>
                 <time className="text-[10px] text-[var(--ll-muted)]">
                   {formatDate(entry.createdAt)}

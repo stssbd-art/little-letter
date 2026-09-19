@@ -30,7 +30,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Birthday",
     title: "Send a Birthday Card & Wish Online",
     metaDescription:
-      "Send a free digital birthday card and warm birthday wish by email. Write your own message or let AI help — letters are free to send.",
+      "Send a warm birthday wish by email — free letters, or an illustrated digital birthday card. Write your own message or let AI help.",
     keywords: [
       "birthday card",
       "birthday wish",
@@ -38,7 +38,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
       "birthday e-card",
       "send birthday message online",
       "birthday greeting email",
-      "online birthday card free",
+      "free birthday letter email",
     ],
     h1: "Send a birthday card & wish by email",
     tagline: "A cosy digital birthday note that lands in their inbox — not a printed card.",
@@ -131,7 +131,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Good Luck",
     title: "Send a Good Luck Card & Wish Online",
     metaDescription:
-      "Send a good luck message or digital card by email before an exam, interview, or big day. First two letters free.",
+      "Send a good luck message or digital card by email before an exam, interview, or big day. Letters are free to send.",
     keywords: [
       "good luck card",
       "good luck wish",
@@ -212,7 +212,7 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     label: "Congratulations",
     title: "Send a Congratulations Card & Wish",
     metaDescription:
-      "Send a congratulations message or digital card by email for achievements big and small. First two letters free.",
+      "Send a congratulations message or digital card by email for achievements big and small. Letters are free to send.",
     keywords: [
       "congratulations card",
       "congratulations message",

@@ -5,6 +5,16 @@ import { PixelButton } from "@/components/ui/PixelButton";
 import { Mascot } from "@/components/ui/Logo";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { CONTACT_EMAIL } from "@/lib/constants";
+import {
+  CONTENT_UPDATED,
+  formatContentDate,
+} from "@/lib/content-updated";
+import {
+  CARD_PRICE_LABEL,
+  LETTER_PRICE_LABEL,
+  MIX_MULTI_SONG_LABEL,
+  MIX_ONE_SONG_LABEL,
+} from "@/lib/usage-labels";
 
 export const metadata: Metadata = {
   title: "About — Send Letters & Mixtapes Online",
@@ -51,7 +61,8 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title="About">
-        Soft notes, mixtapes, and a little pixel magic.
+        Soft notes, mixtapes, and a little pixel magic. Last updated{" "}
+        {formatContentDate(CONTENT_UPDATED.about)}.
       </PageHeader>
 
       <PixelWindow title="about_little_letter.txt" icon="📖">
@@ -118,6 +129,48 @@ export default function AboutPage() {
             >
               {CONTACT_EMAIL}
             </a>
+            .
+          </p>
+        </div>
+      </PixelWindow>
+
+      <PixelWindow title="whats_new.log" icon="✨">
+        <div className="space-y-3 text-left text-[var(--ll-ink)]">
+          <h2 className="font-pixel text-sm leading-relaxed text-[var(--ll-pink-deep)] sm:text-base">
+            What&apos;s new
+          </h2>
+          <ul className="space-y-2 text-sm leading-relaxed text-[var(--ll-muted)]">
+            <li>
+              <span className="font-semibold text-[var(--ll-ink)]">
+                19 Sep 2026 —
+              </span>{" "}
+              Clearer pricing, a how-to guide, and honest guestbook labels so
+              the site stays easy to trust.
+            </li>
+            <li>
+              <span className="font-semibold text-[var(--ll-ink)]">
+                3 Sep 2026 —
+              </span>{" "}
+              Letters are {LETTER_PRICE_LABEL.toLowerCase()} to send. E-cards
+              are {CARD_PRICE_LABEL} each. Extra mixtapes are{" "}
+              {MIX_ONE_SONG_LABEL} (1 song) or {MIX_MULTI_SONG_LABEL} (2+).
+            </li>
+            <li>
+              <span className="font-semibold text-[var(--ll-ink)]">
+                Aug 2026 —
+              </span>{" "}
+              Illustrated digital cards, voice notes, and send-later scheduling
+              for letters and cards.
+            </li>
+          </ul>
+          <p className="text-sm leading-relaxed text-[var(--ll-muted)]">
+            New here? Read{" "}
+            <Link
+              href="/guides/how-to-send-a-little-letter"
+              className="font-semibold text-[var(--ll-pink-deep)] underline underline-offset-2"
+            >
+              how to send a Little Letter
+            </Link>
             .
           </p>
         </div>

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "e-card",
     "birthday e-card",
     "online greeting card",
-    "free digital card",
+    "paid digital greeting card",
   ],
   alternates: { canonical: "/cards" },
   openGraph: {

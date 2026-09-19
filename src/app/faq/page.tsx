@@ -4,6 +4,10 @@ import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { CONTACT_EMAIL } from "@/lib/constants";
+import {
+  CONTENT_UPDATED,
+  formatContentDate,
+} from "@/lib/content-updated";
 
 export const metadata: Metadata = {
   title: "FAQ — Sending Letters & Mixtapes",
@@ -118,7 +122,8 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <PageHeader title="FAQ">
-        Tiny answers for curious hearts.
+        Tiny answers for curious hearts. Last updated{" "}
+        {formatContentDate(CONTENT_UPDATED.faq)}.
       </PageHeader>
 
       <div className="space-y-4">

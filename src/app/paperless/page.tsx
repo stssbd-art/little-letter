@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PixelButton } from "@/components/ui/PixelButton";
 import { PageHeader } from "@/components/layout/PageHeader";
+import {
+  CONTENT_UPDATED,
+  formatContentDate,
+} from "@/lib/content-updated";
 
 export const metadata: Metadata = {
   title: "Paperless Wishes — Care for the Planet",
@@ -21,7 +25,8 @@ export default function PaperlessPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title="Paperless wishes">
-        Softer on the planet. Still full of heart.
+        Softer on the planet. Still full of heart. Last updated{" "}
+        {formatContentDate(CONTENT_UPDATED.paperless)}.
       </PageHeader>
 
       <section aria-labelledby="paperless-heading">

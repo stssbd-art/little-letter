@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Create & Send a Letter Online — Little Letter",
     description:
-      "Write a heartfelt birthday card, thank-you, or love letter and email it. First two letters free.",
+      "Write a heartfelt thank-you or love letter and email it. Letters are free to send.",
     url: "/create",
     type: "website",
     images: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Create & Send a Letter Online — Little Letter",
     description:
-      "Write a heartfelt birthday card, thank-you, or love letter and email it. First two letters free.",
+      "Write a heartfelt thank-you or love letter and email it. Letters are free to send.",
     images: ["/opengraph-image"],
   },
 };
