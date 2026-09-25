@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { STORAGE_KEYS } from "@/lib/constants";
-import { playSound } from "@/lib/sounds";
+import { playSound, playWelcomeAmbience } from "@/lib/sounds";
 
 type SoundName = "click" | "sparkle" | "success" | "whoosh";
 
@@ -33,6 +33,10 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     setMuted((prev) => {
       const next = !prev;
       localStorage.setItem(STORAGE_KEYS.soundMuted, String(next));
+      // Unmuting is a user gesture — soft welcome if not yet played this visit
+      if (!next) {
+        window.setTimeout(() => playWelcomeAmbience(false), 0);
+      }
       return next;
     });
   }, []);
