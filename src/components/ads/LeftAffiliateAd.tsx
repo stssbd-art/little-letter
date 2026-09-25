@@ -27,15 +27,16 @@ export function LeftAffiliateAd() {
       className="pointer-events-none fixed left-2 top-1/2 z-[200] hidden -translate-y-1/2 sm:block"
       aria-label={`Sponsored: ${offer.label}`}
     >
-      <div className="pointer-events-auto w-[15rem] overflow-hidden rounded-xl border-[3px] border-[var(--ll-window-border)] bg-[var(--ll-window-bg)] p-1.5 shadow-[3px_3px_0_rgba(61,47,34,0.28)]">
+      <div className="pointer-events-auto w-[17.5rem] overflow-hidden rounded-xl border-[3px] border-[var(--ll-window-border)] bg-[var(--ll-window-bg)] p-1.5 shadow-[3px_3px_0_rgba(61,47,34,0.28)]">
         <p className="mb-1 text-center font-pixel text-[5px] tracking-widest text-[var(--ll-muted)]">
           SPONSORED
         </p>
         <a
           href={offer.href}
-          target="_blank"
-          rel="sponsored noopener"
+          target="_top"
+          rel="sponsored"
           className="block rounded-md outline-none ring-[var(--ll-pink-deep)] transition hover:brightness-105 focus-visible:ring-2"
+          aria-label={offer.label}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
