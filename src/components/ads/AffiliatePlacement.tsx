@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { AffiliateBanner } from "@/components/ads/AffiliateBanner";
 import { AffiliateSideSlide } from "@/components/ads/AffiliateSideSlide";
+import { LeftAffiliateAd } from "@/components/ads/LeftAffiliateAd";
 
 /**
  * Sponsored placements only on tool / home surfaces — not on thin SEO,
@@ -25,6 +26,7 @@ export function AffiliatePlacement() {
     <>
       <AffiliateBanner />
       <AffiliateSideSlide />
+      <LeftAffiliateAd />
     </>
   );
 }
