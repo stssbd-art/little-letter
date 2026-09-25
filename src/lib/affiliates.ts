@@ -142,7 +142,7 @@ export const FOOTER_AFFILIATE_OFFERS = AFFILIATE_OFFERS.filter(
     o.id !== "brick-zone"
 );
 
-/** Slim left-edge image creative (CJ / Impact-style banner — keep narrow, not full-width). */
+/** Slim left-edge image creative (CJ banner) — always open, horizontal art on the left. */
 export const LEFT_IMAGE_AFFILIATE = {
   id: "cj-left-banner",
   href: "https://www.anrdoezrs.net/click-101847156-17343754",
@@ -150,7 +150,4 @@ export const LEFT_IMAGE_AFFILIATE = {
   label: "Sponsored offer",
   tabLabel: "DEAL",
   emoji: "✨",
-  /** Display size in the slim left rail (native creative is 480×260). */
-  width: 120,
-  height: 65,
 } as const;
