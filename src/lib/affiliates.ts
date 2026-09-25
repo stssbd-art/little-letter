@@ -146,10 +146,8 @@ export const FOOTER_AFFILIATE_OFFERS = AFFILIATE_OFFERS.filter(
 export const LEFT_IMAGE_AFFILIATE = {
   id: "cj-left-banner",
   href: "https://www.anrdoezrs.net/click-101847156-17343754",
-  /** Remote tracking URL (impression); often blocked by ad blockers. */
+  /** Remote tracking image URL (optional; often blocked — UI uses bundled art). */
   imageSrc: "https://www.lduhtrp.net/image-101847156-17343754",
-  /** Hosted copy so the banner remains visible on the site. */
-  localImageSrc: "/ads/cj-17343754.png",
   label: "Sponsored offer",
   tabLabel: "DEAL",
   emoji: "✨",

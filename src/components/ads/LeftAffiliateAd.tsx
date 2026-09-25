@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { LEFT_IMAGE_AFFILIATE } from "@/lib/affiliates";
+import cjBanner from "@/assets/cj-17343754.png";
 
 /**
  * Always-open left-edge sponsored banner.
- * Click uses the CJ tracking URL; art is hosted locally so ad-blockers
- * don’t leave an empty box (remote CJ image domains are often blocked).
+ * Creative is bundled (not a remote CJ img URL) so ad-blockers / failed
+ * hotlinks don’t leave an empty box. Click still goes to the CJ tracking URL.
  */
 export function LeftAffiliateAd() {
   const [mounted, setMounted] = useState(false);
@@ -18,6 +19,8 @@ export function LeftAffiliateAd() {
   }, []);
 
   if (!mounted) return null;
+
+  const imgSrc = typeof cjBanner === "string" ? cjBanner : cjBanner.src;
 
   return createPortal(
     <aside
@@ -34,10 +37,9 @@ export function LeftAffiliateAd() {
           rel="sponsored noopener"
           className="block rounded-md outline-none ring-[var(--ll-pink-deep)] transition hover:brightness-105 focus-visible:ring-2"
         >
-          {/* Local creative so the banner always shows; click still hits CJ. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={offer.localImageSrc}
+            src={imgSrc}
             alt={offer.label}
             width={480}
             height={260}
@@ -47,16 +49,6 @@ export function LeftAffiliateAd() {
             SHOP →
           </span>
         </a>
-        {/* Impression pixel (may be blocked; harmless if so). */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={offer.imageSrc}
-          alt=""
-          width={1}
-          height={1}
-          className="pointer-events-none absolute h-px w-px opacity-0"
-          aria-hidden
-        />
       </div>
     </aside>,
     document.body
