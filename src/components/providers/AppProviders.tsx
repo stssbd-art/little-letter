@@ -20,8 +20,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           <LetterProvider>
             <EasterEggProvider>
               <WelcomeAmbience />
-              <SoftAtmosphere />
               {children}
+              <SoftAtmosphere />
               <CookieConsentBanner />
               <GoogleAnalytics />
               <AdSenseLoader />
