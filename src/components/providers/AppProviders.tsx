@@ -2,10 +2,12 @@
 
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SoundProvider } from "@/components/providers/SoundProvider";
+import { WelcomeAmbience } from "@/components/providers/WelcomeAmbience";
 import { LetterProvider } from "@/components/providers/LetterProvider";
 import { EasterEggProvider } from "@/components/providers/EasterEggProvider";
 import { CookieConsentProvider } from "@/components/providers/CookieConsentProvider";
 import { CookieConsentBanner } from "@/components/features/CookieConsentBanner";
+import { SoftAtmosphere } from "@/components/decorations/SoftAtmosphere";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AdSenseLoader } from "@/components/ads/AdSenseLoader";
 import { AwinMasterTag } from "@/components/ads/AwinMasterTag";
@@ -17,6 +19,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         <SoundProvider>
           <LetterProvider>
             <EasterEggProvider>
+              <WelcomeAmbience />
+              <SoftAtmosphere />
               {children}
               <CookieConsentBanner />
               <GoogleAnalytics />
