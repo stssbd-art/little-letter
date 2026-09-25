@@ -2,7 +2,7 @@
 
 type SoundName = "click" | "sparkle" | "success" | "whoosh";
 
-const WELCOME_SESSION_KEY = "little-letter-welcome-played";
+const WELCOME_SESSION_KEY = "little-letter-welcome-played-v2";
 
 let audioCtx: AudioContext | null = null;
 
@@ -38,44 +38,62 @@ function tone(
 
   const start = ctx.currentTime + delay;
   gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(volume, start + 0.01);
+  gain.gain.linearRampToValueAtTime(volume, start + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
   osc.start(start);
   osc.stop(start + duration + 0.02);
 }
 
-/** Soft music-box style pad — about 3.5s, very quiet. */
-export function playWelcomeAmbience(muted: boolean) {
+/**
+ * Soft music-box welcome — ~4s.
+ * Only marks itself played after AudioContext is actually running,
+ * so a blocked autoplay attempt can retry on the next tap.
+ */
+export async function playWelcomeAmbience(muted: boolean): Promise<boolean> {
   if (muted || typeof window === "undefined") return false;
   try {
     if (sessionStorage.getItem(WELCOME_SESSION_KEY) === "1") return false;
-    sessionStorage.setItem(WELCOME_SESSION_KEY, "1");
   } catch {
     /* private mode */
   }
 
-  void getCtx()?.resume();
+  const ctx = getCtx();
+  if (!ctx) return false;
 
-  // Gentle pentatonic lullaby (Hz) — triangle + sine for a soft cute feel
+  try {
+    if (ctx.state !== "running") {
+      await ctx.resume();
+    }
+  } catch {
+    return false;
+  }
+  if (ctx.state !== "running") return false;
+
+  try {
+    sessionStorage.setItem(WELCOME_SESSION_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+
+  // Soft but audible music-box phrase
   const notes: Array<[number, number, number]> = [
-    [523.25, 0, 0.014], // C5
-    [659.25, 0.35, 0.012], // E5
-    [783.99, 0.7, 0.013], // G5
-    [880.0, 1.05, 0.011], // A5
-    [783.99, 1.45, 0.012], // G5
-    [659.25, 1.85, 0.011], // E5
-    [698.46, 2.25, 0.01], // F5
-    [523.25, 2.7, 0.014], // C5
+    [523.25, 0, 0.055],
+    [659.25, 0.38, 0.05],
+    [783.99, 0.76, 0.052],
+    [880.0, 1.14, 0.048],
+    [783.99, 1.55, 0.05],
+    [659.25, 1.95, 0.048],
+    [698.46, 2.35, 0.045],
+    [523.25, 2.85, 0.055],
   ];
 
   for (const [freq, delay, vol] of notes) {
-    tone(freq, 0.85, "triangle", vol, delay);
-    tone(freq * 2, 0.7, "sine", vol * 0.35, delay + 0.04);
+    tone(freq, 0.9, "triangle", vol, delay);
+    tone(freq * 2, 0.75, "sine", vol * 0.4, delay + 0.05);
   }
 
-  // Soft low pad underneath
-  tone(261.63, 3.4, "sine", 0.008, 0);
-  tone(392.0, 3.2, "sine", 0.006, 0.15);
+  tone(261.63, 3.6, "sine", 0.028, 0);
+  tone(392.0, 3.4, "sine", 0.02, 0.12);
 
   return true;
 }

@@ -35,7 +35,7 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(STORAGE_KEYS.soundMuted, String(next));
       // Unmuting is a user gesture — soft welcome if not yet played this visit
       if (!next) {
-        window.setTimeout(() => playWelcomeAmbience(false), 0);
+        void playWelcomeAmbience(false);
       }
       return next;
     });

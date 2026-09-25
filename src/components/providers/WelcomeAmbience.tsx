@@ -5,18 +5,17 @@ import { playWelcomeAmbience } from "@/lib/sounds";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 /**
- * Soft welcome chime once per visit on the first tap/key.
- * Browsers block autoplay until a gesture. Skipped if sound was
- * explicitly muted in a previous visit.
+ * Soft welcome music once per visit.
+ * Browsers block autoplay — plays on first tap/key (and keeps listening
+ * until AudioContext actually starts, so a blocked attempt can retry).
  */
 export function WelcomeAmbience() {
-  const armedRef = useRef(false);
+  const doneRef = useRef(false);
 
   useEffect(() => {
-    if (armedRef.current) return;
-    armedRef.current = true;
+    const tryPlay = () => {
+      if (doneRef.current) return;
 
-    const onGesture = () => {
       let explicitlyMuted = false;
       try {
         explicitlyMuted =
@@ -24,20 +23,31 @@ export function WelcomeAmbience() {
       } catch {
         explicitlyMuted = false;
       }
-      if (!explicitlyMuted) {
-        playWelcomeAmbience(false);
+      if (explicitlyMuted) {
+        doneRef.current = true;
+        cleanup();
+        return;
       }
-      window.removeEventListener("pointerdown", onGesture);
-      window.removeEventListener("keydown", onGesture);
+
+      void playWelcomeAmbience(false).then((played) => {
+        if (played) {
+          doneRef.current = true;
+          cleanup();
+        }
+      });
     };
 
-    window.addEventListener("pointerdown", onGesture, { once: true });
-    window.addEventListener("keydown", onGesture, { once: true });
-
-    return () => {
-      window.removeEventListener("pointerdown", onGesture);
-      window.removeEventListener("keydown", onGesture);
+    const cleanup = () => {
+      window.removeEventListener("pointerdown", tryPlay);
+      window.removeEventListener("keydown", tryPlay);
+      window.removeEventListener("touchstart", tryPlay);
     };
+
+    window.addEventListener("pointerdown", tryPlay);
+    window.addEventListener("keydown", tryPlay);
+    window.addEventListener("touchstart", tryPlay, { passive: true });
+
+    return cleanup;
   }, []);
 
   return null;
