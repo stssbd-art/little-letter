@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 
 const ATMOSPHERE_MS = 2 * 60 * 1000;
@@ -79,6 +80,8 @@ function buildFloaters(): Floater[] {
 }
 
 export function SoftAtmosphere() {
+  const pathname = usePathname();
+  const onHome = pathname === "/";
   const reduceMotion = useReducedMotion();
   const floaters = useMemo(() => buildFloaters(), []);
   const [visible, setVisible] = useState(true);
@@ -96,7 +99,7 @@ export function SoftAtmosphere() {
     };
   }, []);
 
-  if (!visible) return null;
+  if (!onHome || !visible) return null;
 
   return (
     <div
