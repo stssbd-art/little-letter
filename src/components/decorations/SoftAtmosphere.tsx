@@ -26,11 +26,11 @@ function CloudSvg({ width }: { width: number }) {
       aria-hidden
       style={{ display: "block" }}
     >
-      <ellipse cx="32" cy="30" rx="22" ry="7" fill="rgba(186, 198, 214, 0.28)" />
-      <ellipse cx="22" cy="24" rx="12" ry="9" fill="#fff" />
-      <ellipse cx="36" cy="20" rx="14" ry="11" fill="#fff" />
-      <ellipse cx="48" cy="25" rx="10" ry="8" fill="#fff" />
-      <ellipse cx="33" cy="27" rx="20" ry="8" fill="#fffefb" />
+      <ellipse cx="32" cy="31" rx="22" ry="7" fill="rgba(150, 168, 190, 0.35)" />
+      <ellipse cx="22" cy="24" rx="12" ry="9" fill="#fff" stroke="#9aafc4" strokeWidth="1.4" />
+      <ellipse cx="36" cy="20" rx="14" ry="11" fill="#fff" stroke="#9aafc4" strokeWidth="1.4" />
+      <ellipse cx="48" cy="25" rx="10" ry="8" fill="#fff" stroke="#9aafc4" strokeWidth="1.4" />
+      <ellipse cx="33" cy="27" rx="20" ry="8" fill="#fffefb" stroke="#9aafc4" strokeWidth="1.4" />
     </svg>
   );
 }
@@ -40,12 +40,12 @@ function buildClouds(): Cloud[] {
     id: i,
     left: `${4 + ((i * 11) % 88)}%`,
     top: `${6 + ((i * 13) % 78)}%`,
-    width: 28 + (i % 4) * 8,
+    width: 40 + (i % 4) * 10,
     duration: 26 + (i % 5) * 4,
     delay: (i % 6) * 0.8,
     driftX: i % 2 === 0 ? 70 + (i % 3) * 18 : -(64 + (i % 3) * 16),
     driftY: i % 2 === 0 ? -18 - (i % 3) * 6 : 14 + (i % 3) * 5,
-    opacity: 0.72 + (i % 3) * 0.08,
+    opacity: 0.92,
   }));
 }
 
