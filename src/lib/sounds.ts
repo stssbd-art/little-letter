@@ -2,7 +2,7 @@
 
 type SoundName = "click" | "sparkle" | "success" | "whoosh";
 
-const WELCOME_SESSION_KEY = "little-letter-welcome-played-v2";
+const WELCOME_SESSION_KEY = "little-letter-welcome-played-v3";
 
 let audioCtx: AudioContext | null = null;
 
@@ -45,7 +45,7 @@ function tone(
 }
 
 /**
- * Soft music-box welcome — ~4s.
+ * Slow lullaby welcome — low sine notes, no bright music-box sparkle.
  * Only marks itself played after AudioContext is actually running,
  * so a blocked autoplay attempt can retry on the next tap.
  */
@@ -75,25 +75,24 @@ export async function playWelcomeAmbience(muted: boolean): Promise<boolean> {
     /* ignore */
   }
 
-  // Soft but audible music-box phrase
+  // Quiet descending lullaby in a lower register
   const notes: Array<[number, number, number]> = [
-    [523.25, 0, 0.055],
-    [659.25, 0.38, 0.05],
-    [783.99, 0.76, 0.052],
-    [880.0, 1.14, 0.048],
-    [783.99, 1.55, 0.05],
-    [659.25, 1.95, 0.048],
-    [698.46, 2.35, 0.045],
-    [523.25, 2.85, 0.055],
+    [392.0, 0, 0.032],
+    [349.23, 1.15, 0.03],
+    [329.63, 2.3, 0.028],
+    [293.66, 3.45, 0.028],
+    [261.63, 4.7, 0.03],
+    [293.66, 6.0, 0.026],
+    [246.94, 7.2, 0.03],
   ];
 
   for (const [freq, delay, vol] of notes) {
-    tone(freq, 0.9, "triangle", vol, delay);
-    tone(freq * 2, 0.75, "sine", vol * 0.4, delay + 0.05);
+    tone(freq, 1.7, "sine", vol, delay);
+    tone(freq / 2, 2.1, "sine", vol * 0.35, delay);
   }
 
-  tone(261.63, 3.6, "sine", 0.028, 0);
-  tone(392.0, 3.4, "sine", 0.02, 0.12);
+  tone(130.81, 8.4, "sine", 0.018, 0);
+  tone(196.0, 8.2, "sine", 0.012, 0.4);
 
   return true;
 }
