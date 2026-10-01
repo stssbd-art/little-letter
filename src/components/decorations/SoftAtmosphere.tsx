@@ -29,26 +29,26 @@ function FeatherSvg({ size }: { size: number }) {
     >
       <path
         d="M20 3C11 12 5 24 8 36c1.4 7 6 12.5 12 17 6-4.5 10.6-10 12-17 3-12-3-24-12-33Z"
-        fill="rgba(255,252,246,0.72)"
-        stroke="rgba(176,154,122,0.55)"
-        strokeWidth="1"
+        fill="#fffaf2"
+        stroke="#8b7355"
+        strokeWidth="1.6"
       />
       <path
         d="M20 8c-2.2 6-3.2 12-2.4 18"
-        stroke="rgba(196,176,146,0.45)"
-        strokeWidth="0.7"
+        stroke="#a89070"
+        strokeWidth="0.9"
         strokeLinecap="round"
       />
       <path
         d="M20 8c2.4 6 3.4 12 2.5 18"
-        stroke="rgba(196,176,146,0.45)"
-        strokeWidth="0.7"
+        stroke="#a89070"
+        strokeWidth="0.9"
         strokeLinecap="round"
       />
       <path
         d="M20 7v42"
-        stroke="rgba(168,140,98,0.5)"
-        strokeWidth="0.8"
+        stroke="#8b7355"
+        strokeWidth="1.1"
         strokeLinecap="round"
       />
     </svg>
@@ -60,13 +60,13 @@ function buildFeathers(): Feather[] {
     id: i,
     left: `${6 + ((i * 13) % 84)}%`,
     top: `${8 + ((i * 15) % 74)}%`,
-    size: 16 + (i % 3) * 4,
+    size: 28 + (i % 3) * 6,
     duration: 22 + (i % 4) * 4,
     delay: (i % 5) * 0.7,
     driftX: i % 2 === 0 ? 36 + (i % 3) * 10 : -(32 + (i % 3) * 8),
     driftY: -16 - (i % 3) * 6,
     rotate: i % 2 === 0 ? 12 : -14,
-    opacity: 0.55 + (i % 3) * 0.08,
+    opacity: 1,
   }));
 }
 
