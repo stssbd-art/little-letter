@@ -4,48 +4,69 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 
-type Cloud = {
+type Feather = {
   id: number;
   left: string;
   top: string;
-  width: number;
+  size: number;
   duration: number;
   delay: number;
   driftX: number;
   driftY: number;
+  rotate: number;
   opacity: number;
 };
 
-function CloudSvg({ width }: { width: number }) {
+function FeatherSvg({ size }: { size: number }) {
   return (
     <svg
-      width={width}
-      height={width * 0.62}
-      viewBox="0 0 64 40"
+      width={size}
+      height={size * 1.45}
+      viewBox="0 0 40 58"
       fill="none"
       aria-hidden
       style={{ display: "block" }}
     >
-      <ellipse cx="32" cy="31" rx="22" ry="7" fill="rgba(150, 168, 190, 0.35)" />
-      <ellipse cx="22" cy="24" rx="12" ry="9" fill="#fff" stroke="#9aafc4" strokeWidth="1.4" />
-      <ellipse cx="36" cy="20" rx="14" ry="11" fill="#fff" stroke="#9aafc4" strokeWidth="1.4" />
-      <ellipse cx="48" cy="25" rx="10" ry="8" fill="#fff" stroke="#9aafc4" strokeWidth="1.4" />
-      <ellipse cx="33" cy="27" rx="20" ry="8" fill="#fffefb" stroke="#9aafc4" strokeWidth="1.4" />
+      <path
+        d="M20 3C11 12 5 24 8 36c1.4 7 6 12.5 12 17 6-4.5 10.6-10 12-17 3-12-3-24-12-33Z"
+        fill="rgba(255,252,246,0.72)"
+        stroke="rgba(176,154,122,0.55)"
+        strokeWidth="1"
+      />
+      <path
+        d="M20 8c-2.2 6-3.2 12-2.4 18"
+        stroke="rgba(196,176,146,0.45)"
+        strokeWidth="0.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M20 8c2.4 6 3.4 12 2.5 18"
+        stroke="rgba(196,176,146,0.45)"
+        strokeWidth="0.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M20 7v42"
+        stroke="rgba(168,140,98,0.5)"
+        strokeWidth="0.8"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-function buildClouds(): Cloud[] {
-  return Array.from({ length: 9 }, (_, i) => ({
+function buildFeathers(): Feather[] {
+  return Array.from({ length: 7 }, (_, i) => ({
     id: i,
-    left: `${4 + ((i * 11) % 88)}%`,
-    top: `${6 + ((i * 13) % 78)}%`,
-    width: 40 + (i % 4) * 10,
-    duration: 26 + (i % 5) * 4,
-    delay: (i % 6) * 0.8,
-    driftX: i % 2 === 0 ? 70 + (i % 3) * 18 : -(64 + (i % 3) * 16),
-    driftY: i % 2 === 0 ? -18 - (i % 3) * 6 : 14 + (i % 3) * 5,
-    opacity: 0.92,
+    left: `${6 + ((i * 13) % 84)}%`,
+    top: `${8 + ((i * 15) % 74)}%`,
+    size: 16 + (i % 3) * 4,
+    duration: 22 + (i % 4) * 4,
+    delay: (i % 5) * 0.7,
+    driftX: i % 2 === 0 ? 36 + (i % 3) * 10 : -(32 + (i % 3) * 8),
+    driftY: -16 - (i % 3) * 6,
+    rotate: i % 2 === 0 ? 12 : -14,
+    opacity: 0.55 + (i % 3) * 0.08,
   }));
 }
 
@@ -53,7 +74,7 @@ export function SoftAtmosphere() {
   const pathname = usePathname();
   const onHome = pathname === "/";
   const reduceMotion = useReducedMotion();
-  const clouds = useMemo(() => buildClouds(), []);
+  const feathers = useMemo(() => buildFeathers(), []);
 
   if (!onHome) return null;
 
@@ -62,31 +83,32 @@ export function SoftAtmosphere() {
       className="pointer-events-none fixed inset-0 z-[35] overflow-hidden"
       aria-hidden
     >
-      {clouds.map((cloud) => (
+      {feathers.map((feather) => (
         <motion.div
-          key={cloud.id}
+          key={feather.id}
           className="absolute"
           style={{
-            left: cloud.left,
-            top: cloud.top,
-            opacity: cloud.opacity,
+            left: feather.left,
+            top: feather.top,
+            opacity: feather.opacity,
           }}
           animate={
             reduceMotion
               ? undefined
               : {
-                  x: [0, cloud.driftX, cloud.driftX * 0.35, 0],
-                  y: [0, cloud.driftY, cloud.driftY * 0.4, 0],
+                  x: [0, feather.driftX, feather.driftX * 0.3, 0],
+                  y: [0, feather.driftY, feather.driftY * 0.45, 0],
+                  rotate: [0, feather.rotate, -feather.rotate * 0.5, 0],
                 }
           }
           transition={{
-            duration: cloud.duration,
-            delay: cloud.delay,
+            duration: feather.duration,
+            delay: feather.delay,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         >
-          <CloudSvg width={cloud.width} />
+          <FeatherSvg size={feather.size} />
         </motion.div>
       ))}
     </div>
