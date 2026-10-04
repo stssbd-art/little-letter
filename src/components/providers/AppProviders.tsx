@@ -7,7 +7,6 @@ import { LetterProvider } from "@/components/providers/LetterProvider";
 import { EasterEggProvider } from "@/components/providers/EasterEggProvider";
 import { CookieConsentProvider } from "@/components/providers/CookieConsentProvider";
 import { CookieConsentBanner } from "@/components/features/CookieConsentBanner";
-import { SoftAtmosphere } from "@/components/decorations/SoftAtmosphere";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AdSenseLoader } from "@/components/ads/AdSenseLoader";
 import { AwinMasterTag } from "@/components/ads/AwinMasterTag";
@@ -21,7 +20,6 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
             <EasterEggProvider>
               <WelcomeAmbience />
               {children}
-              <SoftAtmosphere />
               <CookieConsentBanner />
               <GoogleAnalytics />
               <AdSenseLoader />
