@@ -606,7 +606,38 @@ export function stopCardMusic() {
   cardHorror = false;
 }
 
-/** Card beds are off. This only clears anything already playing. */
-export function startCardMusic(_occasion?: Occasion, _designId = "") {
+/** Scary bed for Halloween. A matching tune for every other occasion. */
+export function startCardMusic(occasion: Occasion, designId = "") {
   stopCardMusic();
+  const token = cardGeneration;
+  const ctx = getCtx();
+  if (!ctx) return;
+  const horror = occasion === "halloween";
+
+  const begin = () => {
+    if (token !== cardGeneration || cardHold) return;
+    clearCardRetry();
+    holdSiteSounds();
+    cardHold = true;
+    cardHorror = horror;
+    const bus = getCardBus();
+    if (bus) bus.gain.setValueAtTime(1, ctx.currentTime);
+    const phrase = horror ? null : CARD_PHRASES[occasion];
+    const every = phrase?.every ?? HORROR_EVERY;
+    const fire = () => {
+      if (token !== cardGeneration) return;
+      if (horror) singHorror(designId);
+      else if (phrase) sing(phrase);
+    };
+    fire();
+    cardTimer = window.setInterval(fire, every * 1000);
+  };
+
+  if (ctx.state === "running") begin();
+  else {
+    void ctx.resume().then(() => {
+      if (token !== cardGeneration) return;
+      if (ctx.state === "running") begin();
+    });
+  }
 }

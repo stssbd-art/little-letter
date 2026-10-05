@@ -3,7 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CardSceneArt } from "@/components/features/CardSceneArt";
-import { stopCardMusic } from "@/lib/sounds";
+import { useSound } from "@/components/providers/SoundProvider";
+import { startCardMusic, stopCardMusic } from "@/lib/sounds";
 import { getCardDesign, type CardDesign, type CardDesignId } from "@/lib/card-designs";
 import { cn } from "@/lib/utils";
 
@@ -380,6 +381,7 @@ export function GreetingCard({
   defaultOpen = false,
 }: Props) {
   const design = getCardDesign(designId);
+  const { muted } = useSound();
   const [open, setOpen] = useState(defaultOpen);
   const openRef = useRef(open);
   const lockUntil = useRef(0);
@@ -395,8 +397,10 @@ export function GreetingCard({
   }
 
   useEffect(() => {
-    stopCardMusic();
-  }, []);
+    if (compact || !open || muted) return;
+    startCardMusic(design.occasion, design.id);
+    return () => stopCardMusic();
+  }, [compact, open, muted, design.occasion, design.id]);
 
   function openCard() {
     if (!canAct() || openRef.current) return;
