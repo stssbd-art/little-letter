@@ -2,7 +2,6 @@
 
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SoundProvider } from "@/components/providers/SoundProvider";
-import { WelcomeAmbience } from "@/components/providers/WelcomeAmbience";
 import { LetterProvider } from "@/components/providers/LetterProvider";
 import { EasterEggProvider } from "@/components/providers/EasterEggProvider";
 import { CookieConsentProvider } from "@/components/providers/CookieConsentProvider";
@@ -18,7 +17,6 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         <SoundProvider>
           <LetterProvider>
             <EasterEggProvider>
-              <WelcomeAmbience />
               {children}
               <CookieConsentBanner />
               <GoogleAnalytics />

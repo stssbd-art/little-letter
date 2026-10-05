@@ -1,8 +1,6 @@
 "use client";
 
-type SoundName = "click" | "sparkle" | "success" | "whoosh" | "spooky";
-
-const WELCOME_SESSION_KEY = "little-letter-welcome-played-v3";
+type SoundName = "click" | "sparkle" | "success" | "whoosh";
 
 let audioCtx: AudioContext | null = null;
 let siteGain: GainNode | null = null;
@@ -20,7 +18,7 @@ function getCtx() {
   return audioCtx;
 }
 
-/** Clicks, sparkles, and the welcome tune. Spooky cards duck this bus. */
+/** Clicks, sparkles, and other site sounds. Spooky cards duck this bus. */
 function getSiteBus(): GainNode | null {
   const ctx = getCtx();
   if (!ctx) return null;
@@ -32,7 +30,7 @@ function getSiteBus(): GainNode | null {
   return siteGain;
 }
 
-/** Silence every site sound except the spooky card. Nested holds are safe. */
+/** Silence clicks, sparkles, and the other site sounds. Nested holds are safe. */
 export function holdSiteSounds() {
   siteHolds += 1;
   const ctx = getCtx();
@@ -53,93 +51,6 @@ export function releaseSiteSounds() {
   siteGain.gain.cancelScheduledValues(now);
   siteGain.gain.setValueAtTime(siteGain.gain.value, now);
   siteGain.gain.linearRampToValueAtTime(1, now + 0.4);
-}
-
-function slide(
-  from: number,
-  to: number,
-  duration: number,
-  type: OscillatorType = "sine",
-  volume = 0.04,
-  delay = 0,
-  out?: AudioNode | null
-) {
-  const ctx = getCtx();
-  const dest = out ?? getSiteBus();
-  if (!ctx || !dest) return;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = type;
-  osc.connect(gain);
-  gain.connect(dest);
-  const start = ctx.currentTime + delay;
-  osc.frequency.setValueAtTime(from, start);
-  osc.frequency.exponentialRampToValueAtTime(Math.max(40, to), start + duration);
-  gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(volume, start + 0.04);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-  osc.start(start);
-  osc.stop(start + duration + 0.02);
-}
-
-/** High creak: noise with a rising band-pass, like a rusty hinge. */
-function creak(duration: number, volume: number, delay: number, out: AudioNode) {
-  const ctx = getCtx();
-  if (!ctx) return;
-  const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
-  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
-  const src = ctx.createBufferSource();
-  src.buffer = buffer;
-  const filter = ctx.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.Q.value = 14;
-  const gain = ctx.createGain();
-  src.connect(filter);
-  filter.connect(gain);
-  gain.connect(out);
-  const start = ctx.currentTime + delay;
-  filter.frequency.setValueAtTime(280, start);
-  filter.frequency.exponentialRampToValueAtTime(2200, start + duration * 0.72);
-  filter.frequency.exponentialRampToValueAtTime(640, start + duration);
-  gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(volume, start + 0.08);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-  src.start(start);
-  src.stop(start + duration + 0.02);
-}
-function flutter(
-  duration: number,
-  volume: number,
-  delay: number,
-  freq: number,
-  q = 0.7,
-  out?: AudioNode | null
-) {
-  const ctx = getCtx();
-  const dest = out ?? getSiteBus();
-  if (!ctx || !dest) return;
-  const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
-  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
-  const src = ctx.createBufferSource();
-  src.buffer = buffer;
-  const filter = ctx.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.frequency.value = freq;
-  filter.Q.value = q;
-  const gain = ctx.createGain();
-  src.connect(filter);
-  filter.connect(gain);
-  gain.connect(dest);
-  const start = ctx.currentTime + delay;
-  gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(volume, start + 0.03);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-  src.start(start);
-  src.stop(start + duration + 0.02);
 }
 
 function tone(
@@ -170,62 +81,9 @@ function tone(
   osc.stop(start + duration + 0.02);
 }
 
-/**
- * Slow lullaby welcome — low sine notes, no bright music-box sparkle.
- * Only marks itself played after AudioContext is actually running,
- * so a blocked autoplay attempt can retry on the next tap.
- */
-export async function playWelcomeAmbience(muted: boolean): Promise<boolean> {
-  if (muted || typeof window === "undefined") return false;
-  try {
-    if (sessionStorage.getItem(WELCOME_SESSION_KEY) === "1") return false;
-  } catch {
-    /* private mode */
-  }
-
-  const ctx = getCtx();
-  if (!ctx || siteHolds > 0) return false;
-
-  try {
-    if (ctx.state !== "running") {
-      await ctx.resume();
-    }
-  } catch {
-    return false;
-  }
-  if (ctx.state !== "running") return false;
-
-  try {
-    sessionStorage.setItem(WELCOME_SESSION_KEY, "1");
-  } catch {
-    /* ignore */
-  }
-
-  // Quiet descending lullaby in a lower register
-  const notes: Array<[number, number, number]> = [
-    [392.0, 0, 0.032],
-    [349.23, 1.15, 0.03],
-    [329.63, 2.3, 0.028],
-    [293.66, 3.45, 0.028],
-    [261.63, 4.7, 0.03],
-    [293.66, 6.0, 0.026],
-    [246.94, 7.2, 0.03],
-  ];
-
-  for (const [freq, delay, vol] of notes) {
-    tone(freq, 1.7, "sine", vol, delay);
-    tone(freq / 2, 2.1, "sine", vol * 0.35, delay);
-  }
-
-  tone(130.81, 8.4, "sine", 0.018, 0);
-  tone(196.0, 8.2, "sine", 0.012, 0.4);
-
-  return true;
-}
-
 export function playSound(name: SoundName, muted: boolean) {
   if (muted || typeof window === "undefined") return;
-  if (name !== "spooky" && siteHolds > 0) return;
+  if (siteHolds > 0) return;
 
   void getCtx()?.resume();
 
@@ -248,26 +106,122 @@ export function playSound(name: SoundName, muted: boolean) {
       tone(220, 0.25, "sawtooth", 0.015);
       tone(440, 0.2, "sine", 0.02, 0.05);
       break;
-    case "spooky": {
-      const ear = getCtx()?.destination ?? null;
-      if (!ear) break;
-      // Sudden low hit, then a clashing stab.
-      tone(40, 0.45, "sine", 0.18, 0, ear);
-      flutter(0.28, 0.1, 0, 70, 0.5, ear);
-      tone(622, 0.28, "sawtooth", 0.045, 0.06, ear);
-      tone(659, 0.28, "square", 0.032, 0.06, ear);
-      tone(932, 0.22, "sawtooth", 0.028, 0.1, ear);
-      // Rising shriek that drops into a moan.
-      slide(280, 1680, 0.42, "sawtooth", 0.05, 0.16, ear);
-      slide(420, 1420, 0.36, "square", 0.022, 0.2, ear);
-      slide(1500, 160, 0.95, "sawtooth", 0.04, 0.55, ear);
-      slide(980, 110, 0.85, "triangle", 0.035, 0.62, ear);
-      creak(1.1, 0.07, 0.35, ear);
-      // Leftover dread, two notes a semitone apart.
-      tone(49, 2.4, "sine", 0.09, 1.15, ear);
-      tone(52, 2.2, "sine", 0.055, 1.2, ear);
-      flutter(1.6, 0.05, 1.2, 140, 0.6, ear);
-      break;
+  }
+}
+
+const HALLOWEEN_EVERY = 7.8;
+const HALLOWEEN_NOTES: Array<[number, number, number]> = [
+  [659.25, 0, 0.7],
+  [587.33, 0.7, 0.6],
+  [523.25, 1.35, 0.65],
+  [493.88, 2.05, 0.6],
+  [440, 2.7, 0.85],
+  [523.25, 3.6, 0.6],
+  [493.88, 4.2, 0.6],
+  [440, 4.85, 0.65],
+  [392, 5.5, 0.7],
+  [440, 6.15, 0.9],
+];
+
+let cardBus: GainNode | null = null;
+let cardVoices: OscillatorNode[] = [];
+let cardTimer: number | null = null;
+let cardHold = false;
+let cardGeneration = 0;
+
+function getCardBus(): GainNode | null {
+  const ctx = getCtx();
+  if (!ctx) return null;
+  if (!cardBus) {
+    cardBus = ctx.createGain();
+    cardBus.gain.value = 1;
+    cardBus.connect(ctx.destination);
+  }
+  return cardBus;
+}
+
+function cardVoice(
+  frequency: number,
+  duration: number,
+  type: OscillatorType,
+  volume: number,
+  delay: number
+) {
+  const ctx = getCtx();
+  const dest = getCardBus();
+  if (!ctx || !dest) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = frequency;
+  osc.connect(gain);
+  gain.connect(dest);
+  const start = ctx.currentTime + delay;
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume, start + 0.04);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + Math.max(0.12, duration));
+  osc.start(start);
+  osc.stop(start + duration + 0.06);
+  cardVoices.push(osc);
+  osc.onended = () => {
+    const index = cardVoices.indexOf(osc);
+    if (index >= 0) cardVoices.splice(index, 1);
+  };
+}
+
+function singHalloween() {
+  cardVoice(110, HALLOWEEN_EVERY - 0.2, "sine", 0.036, 0);
+  cardVoice(164.81, HALLOWEEN_EVERY - 0.2, "sine", 0.024, 0);
+  for (const [freq, delay, duration] of HALLOWEEN_NOTES) {
+    cardVoice(freq, duration, "triangle", 0.04, delay);
+    cardVoice(freq / 2, duration + 0.15, "sine", 0.014, delay);
+  }
+}
+
+export function stopCardMusic() {
+  cardGeneration += 1;
+  if (cardTimer != null) {
+    window.clearInterval(cardTimer);
+    cardTimer = null;
+  }
+  const now = getCtx()?.currentTime ?? 0;
+  for (const osc of cardVoices) {
+    try {
+      osc.stop(now);
+    } catch {
+      /* already ended */
     }
+  }
+  cardVoices = [];
+  if (cardHold) {
+    releaseSiteSounds();
+    cardHold = false;
+  }
+}
+
+/** Quiet minor music-box line for an open Halloween card. */
+export function startCardMusic() {
+  stopCardMusic();
+  const token = cardGeneration;
+  const ctx = getCtx();
+  if (!ctx) return;
+
+  const begin = () => {
+    if (token !== cardGeneration) return;
+    holdSiteSounds();
+    cardHold = true;
+    const fire = () => {
+      if (token !== cardGeneration) return;
+      singHalloween();
+    };
+    fire();
+    cardTimer = window.setInterval(fire, HALLOWEEN_EVERY * 1000);
+  };
+
+  if (ctx.state === "running") begin();
+  else {
+    void ctx.resume().then(() => {
+      if (ctx.state === "running") begin();
+    });
   }
 }

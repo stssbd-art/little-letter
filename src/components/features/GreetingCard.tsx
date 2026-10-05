@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CardSceneArt } from "@/components/features/CardSceneArt";
 import { useSound } from "@/components/providers/SoundProvider";
-import { holdSiteSounds, releaseSiteSounds } from "@/lib/sounds";
+import { startCardMusic, stopCardMusic } from "@/lib/sounds";
 import { getCardDesign, type CardDesign, type CardDesignId } from "@/lib/card-designs";
 import { cn } from "@/lib/utils";
 
@@ -381,8 +381,8 @@ export function GreetingCard({
   defaultOpen = false,
 }: Props) {
   const design = getCardDesign(designId);
-  const { play } = useSound();
   const spooky = design.vibe === "spooky";
+  const { muted } = useSound();
   const [open, setOpen] = useState(defaultOpen);
   const openRef = useRef(open);
   const lockUntil = useRef(0);
@@ -398,15 +398,10 @@ export function GreetingCard({
   }
 
   useEffect(() => {
-    if (compact || !spooky || !open) return;
-    holdSiteSounds();
-    play("spooky");
-    const id = window.setInterval(() => play("spooky"), 7200);
-    return () => {
-      window.clearInterval(id);
-      releaseSiteSounds();
-    };
-  }, [compact, spooky, open, play]);
+    if (compact || !spooky || !open || muted) return;
+    startCardMusic();
+    return () => stopCardMusic();
+  }, [compact, spooky, open, muted]);
 
   function openCard() {
     if (!canAct() || openRef.current) return;
