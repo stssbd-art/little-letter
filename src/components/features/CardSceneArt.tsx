@@ -1272,35 +1272,159 @@ function CosmicLoveScene({ gid }: SceneProps) {
   );
 }
 
+function PumpkinFace({
+  cx,
+  cy,
+  rx,
+  ry,
+  fill,
+}: {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  fill: string;
+}) {
+  return (
+    <g>
+      <ellipse cx={cx} cy={cy + 6} rx={rx + 4} ry={6} fill="#1a1020" opacity="0.28" />
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={fill} />
+      <ellipse cx={cx - rx * 0.28} cy={cy - ry * 0.25} rx={rx * 0.22} ry={ry * 0.18} fill="#fff" opacity="0.22" />
+      <motion.g
+        animate={{ opacity: [0.55, 1, 0.7, 1, 0.55] }}
+        transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <path
+          d={`M${cx - rx * 0.38} ${cy - ry * 0.08} l${rx * 0.16} ${ry * 0.22} l${rx * 0.16} ${-ry * 0.22} z`}
+          fill="#2a1408"
+        />
+        <path
+          d={`M${cx + rx * 0.06} ${cy - ry * 0.08} l${rx * 0.16} ${ry * 0.22} l${rx * 0.16} ${-ry * 0.22} z`}
+          fill="#2a1408"
+        />
+        <path
+          d={`M${cx - rx * 0.28} ${cy + ry * 0.28} Q${cx} ${cy + ry * 0.55} ${cx + rx * 0.28} ${cy + ry * 0.28}`}
+          fill="none"
+          stroke="#2a1408"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        <ellipse cx={cx} cy={cy + ry * 0.18} rx={rx * 0.12} ry={ry * 0.08} fill="#ffb347" opacity="0.85" />
+      </motion.g>
+      <path
+        d={`M${cx - 8} ${cy - ry * 0.7} Q${cx} ${cy - ry - 10} ${cx + 8} ${cy - ry * 0.7}`}
+        fill="none"
+        stroke="#3a2418"
+        strokeWidth="2"
+      />
+      <rect x={cx - 3} y={cy - ry - 14} width="6" height="12" rx="2" fill="#5a8a32" />
+    </g>
+  );
+}
+
 function PumpkinPatchScene({ gid }: SceneProps) {
+  const leaves = [
+    { x: 30, delay: 0 },
+    { x: 90, delay: 0.8 },
+    { x: 150, delay: 1.4 },
+    { x: 200, delay: 0.3 },
+  ];
   return (
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-pkBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2a1840" />
-          <stop offset="70%" stopColor="#4a2860" />
-          <stop offset="100%" stopColor="#ff9a3c" />
+          <stop offset="0%" stopColor="#1a1028" />
+          <stop offset="55%" stopColor="#3a2058" />
+          <stop offset="100%" stopColor="#ff8a2a" />
         </linearGradient>
+        <radialGradient id={`${gid}-pkMoon`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fff4c8" />
+          <stop offset="45%" stopColor="#ffd27a" />
+          <stop offset="100%" stopColor="#ffd27a" stopOpacity="0" />
+        </radialGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-pkBg)`} />
-      <circle cx="188" cy="36" r="18" fill="#ffd27a" />
-      {[
-        { cx: 70, cy: 118, rx: 28, ry: 22, fill: "#e07a18" },
-        { cx: 120, cy: 108, rx: 34, ry: 28, fill: "#f08a20" },
-        { cx: 168, cy: 122, rx: 24, ry: 18, fill: "#c45a12" },
-      ].map((p) => (
-        <g key={p.cx}>
-          <ellipse cx={p.cx} cy={p.cy} rx={p.rx} ry={p.ry} fill={p.fill} />
-          <path
-            d={`M${p.cx - 8} ${p.cy - 10} Q${p.cx} ${p.cy - 24} ${p.cx + 8} ${p.cy - 10}`}
-            fill="none"
-            stroke="#3a2418"
-            strokeWidth="2"
-          />
-          <rect x={p.cx - 3} y={p.cy - 28} width="6" height="12" rx="2" fill="#5a8a32" />
-        </g>
+      {[18, 42, 70, 110, 210].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={16 + (i % 3) * 10}
+          r={i % 2 === 0 ? 1.2 : 1.8}
+          fill="#fff6df"
+          animate={{ opacity: [0.2, 1, 0.25] }}
+          transition={{ duration: 1.8 + i * 0.2, repeat: Infinity, delay: i * 0.15 }}
+        />
       ))}
+      <motion.circle
+        cx="188"
+        cy="34"
+        r="34"
+        fill={`url(#${gid}-pkMoon)`}
+        animate={{ opacity: [0.65, 1, 0.75] }}
+        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <circle cx="188" cy="34" r="16" fill="#ffe7a8" />
+      {leaves.map((leaf) => (
+        <motion.ellipse
+          key={leaf.x}
+          cx={leaf.x}
+          cy={-8}
+          rx="5"
+          ry="3"
+          fill="#c45a12"
+          animate={{ y: [0, 170], x: [0, 12, -8, 6], rotate: [0, 80, 160] }}
+          transition={{
+            duration: 5.5,
+            repeat: Infinity,
+            ease: "linear",
+            delay: leaf.delay,
+          }}
+        />
+      ))}
+      <ellipse cx="120" cy="152" rx="120" ry="22" fill="#2a1840" />
+      <ellipse cx="120" cy="148" rx="100" ry="12" fill="#3d2458" opacity="0.7" />
+      <PumpkinFace cx={68} cy={118} rx={26} ry={20} fill="#e07a18" />
+      <PumpkinFace cx={120} cy={106} rx={32} ry={26} fill="#f08a20" />
+      <PumpkinFace cx={170} cy={122} rx={22} ry={16} fill="#c45a12" />
+      <motion.ellipse
+        cx="120"
+        cy="150"
+        rx="90"
+        ry="10"
+        fill="#fff"
+        animate={{ opacity: [0.05, 0.16, 0.05], x: [0, 8, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
     </svg>
+  );
+}
+
+function GhostBody({
+  x,
+  fill,
+  eye,
+}: {
+  x: number;
+  fill: string;
+  eye: string;
+}) {
+  return (
+    <g transform={`translate(${x} 0)`}>
+      <path
+        d="M0 52 C0 8 52 8 52 52 L52 64 L42 54 L32 64 L22 54 L12 64 L0 54 Z"
+        fill={fill}
+      />
+      <ellipse cx="16" cy="18" rx="8" ry="6" fill="#fff" opacity="0.35" />
+      <motion.g
+        animate={{ scaleY: [1, 0.15, 1] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "26px 32px" }}
+      >
+        <circle cx="18" cy="32" r="3.4" fill={eye} />
+        <circle cx="36" cy="32" r="3.4" fill={eye} />
+      </motion.g>
+      <path d="M22 44 Q27 50 32 44" fill="none" stroke="#7a4ea8" strokeWidth="1.8" />
+    </g>
   );
 }
 
@@ -1309,24 +1433,81 @@ function FriendlyGhostScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-ghBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1c1430" />
+          <stop offset="0%" stopColor="#120c22" />
           <stop offset="100%" stopColor="#6a4890" />
         </linearGradient>
+        <radialGradient id={`${gid}-ghMoon`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#c9b8e8" stopOpacity="0" />
+        </radialGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-ghBg)`} />
+      {[24, 60, 100, 200, 220].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={20 + (i % 4) * 12}
+          r="1.3"
+          fill="#fff"
+          animate={{ opacity: [0.15, 0.9, 0.2] }}
+          transition={{ duration: 2 + i * 0.3, repeat: Infinity }}
+        />
+      ))}
+      <circle cx="196" cy="36" r="28" fill={`url(#${gid}-ghMoon)`} />
+      <circle cx="196" cy="36" r="14" fill="#f4e8ff" />
       <motion.g
-        animate={{ y: [0, -6, 0] }}
-        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ y: [0, -10, 0], x: [0, 4, 0] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <GhostBody x={78} fill="#fff8f2" eye="#3a2860" />
+      </motion.g>
+      <motion.g
+        animate={{ y: [4, -6, 4], x: [0, -6, 0] }}
+        transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+        opacity={0.72}
+      >
+        <g transform="scale(0.62)">
+          <GhostBody x={40} fill="#efe4ff" eye="#5a3a88" />
+        </g>
+      </motion.g>
+      <motion.ellipse
+        cx="40"
+        cy="140"
+        rx="70"
+        ry="14"
+        fill="#fff"
+        animate={{ x: [0, 140, 0], opacity: [0.04, 0.14, 0.04] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </svg>
+  );
+}
+
+function Bat({ delay }: { delay: number }) {
+  return (
+    <motion.g
+      animate={{
+        x: [-30, 260],
+        y: [0, -16, 8, -10, 0],
+      }}
+      transition={{
+        duration: 6.5,
+        repeat: Infinity,
+        ease: "linear",
+        delay,
+      }}
+    >
+      <motion.g
+        animate={{ scaleY: [1, 0.35, 1] }}
+        transition={{ duration: 0.28, repeat: Infinity, ease: "easeInOut", delay }}
+        style={{ transformOrigin: "0px 0px" }}
       >
         <path
-          d="M90 120 C90 70 150 70 150 120 L150 132 L138 122 L126 132 L114 122 L102 132 L90 122 Z"
-          fill="#fff8f2"
+          d="M0 0 C-10 -8 -18 -2 -22 2 C-14 1 -8 3 0 2 C8 3 14 1 22 2 C18 -2 10 -8 0 0 Z"
+          fill="#1a1020"
         />
-        <circle cx="110" cy="98" r="4" fill="#3a2860" />
-        <circle cx="132" cy="98" r="4" fill="#3a2860" />
-        <path d="M114 112 Q121 118 128 112" fill="none" stroke="#7a4ea8" strokeWidth="2" />
       </motion.g>
-    </svg>
+    </motion.g>
   );
 }
 
@@ -1335,24 +1516,56 @@ function MoonlitBatsScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-btBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#140e22" />
+          <stop offset="0%" stopColor="#0c0816" />
           <stop offset="100%" stopColor="#3d2458" />
         </linearGradient>
+        <radialGradient id={`${gid}-btGlow`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffd27a" />
+          <stop offset="40%" stopColor="#ffb347" />
+          <stop offset="100%" stopColor="#ffb347" stopOpacity="0" />
+        </radialGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-btBg)`} />
-      <circle cx="170" cy="48" r="26" fill="#ffb347" />
-      <motion.text
-        x="36"
-        y="58"
-        fontSize="28"
-        animate={{ x: [36, 70, 36], y: [58, 42, 58] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      >
-        🦇
-      </motion.text>
-      <text x="48" y="120" fontSize="26">
-        🎃
-      </text>
+      {[16, 40, 78, 120, 210].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={14 + (i % 3) * 16}
+          r="1.2"
+          fill="#fff6df"
+          animate={{ opacity: [0.2, 1, 0.2] }}
+          transition={{ duration: 1.6 + i * 0.25, repeat: Infinity }}
+        />
+      ))}
+      <motion.circle
+        cx="168"
+        cy="46"
+        r="42"
+        fill={`url(#${gid}-btGlow)`}
+        animate={{ opacity: [0.55, 0.95, 0.6] }}
+        transition={{ duration: 2.8, repeat: Infinity }}
+      />
+      <circle cx="168" cy="46" r="22" fill="#ffc56a" />
+      <g transform="translate(36 48)">
+        <Bat delay={0} />
+      </g>
+      <g transform="translate(10 78) scale(0.75)">
+        <Bat delay={1.6} />
+      </g>
+      <g transform="translate(80 36) scale(0.55)">
+        <Bat delay={3.1} />
+      </g>
+      <ellipse cx="70" cy="148" rx="28" ry="16" fill="#e07a18" />
+      <motion.ellipse
+        cx="70"
+        cy="146"
+        rx="8"
+        ry="5"
+        fill="#ffb347"
+        animate={{ opacity: [0.4, 1, 0.5] }}
+        transition={{ duration: 1.2, repeat: Infinity }}
+      />
+      <rect x="67" y="128" width="6" height="10" rx="2" fill="#5a8a32" />
     </svg>
   );
 }

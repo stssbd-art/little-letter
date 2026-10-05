@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import type { CardDesign } from "@/lib/card-designs";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +50,7 @@ export function CompactCardArt({
 }) {
   const decor = VIBE_DECOR[design.vibe];
   const night = design.vibe === "night";
+  const spooky = design.vibe === "spooky";
 
   return (
     <div
@@ -88,15 +90,48 @@ export function CompactCardArt({
         </span>
       ))}
 
+      {spooky
+        ? decor.corners.map((glyph, i) => (
+            <motion.span
+              key={glyph}
+              className="pointer-events-none absolute text-xl"
+              style={{
+                left: `${18 + (i % 2) * 58}%`,
+                top: `${16 + Math.floor(i / 2) * 52}%`,
+              }}
+              animate={{ y: [0, -8, 0], opacity: [0.35, 0.9, 0.35] }}
+              transition={{
+                duration: 2.4 + i * 0.35,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.2,
+              }}
+              aria-hidden
+            >
+              {glyph}
+            </motion.span>
+          ))
+        : null}
+
       {/* Hero — big and obvious */}
       <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-        <span
+        <motion.span
           className="text-6xl leading-none drop-shadow-[0_4px_12px_rgba(61,47,34,0.25)] sm:text-7xl"
           role="img"
           aria-label={design.title}
+          animate={
+            spooky
+              ? { y: [0, -6, 0], scale: [1, 1.06, 1], rotate: [0, -4, 4, 0] }
+              : undefined
+          }
+          transition={
+            spooky
+              ? { duration: 2.8, repeat: Infinity, ease: "easeInOut" }
+              : undefined
+          }
         >
           {design.emoji}
-        </span>
+        </motion.span>
         <span
           className="mt-3 max-w-[90%] rounded-full px-3 py-1 text-[9px] font-semibold tracking-wide text-white shadow-sm sm:text-[10px]"
           style={{ backgroundColor: design.accent }}

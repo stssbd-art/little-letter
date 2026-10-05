@@ -11,7 +11,7 @@ import {
 import { STORAGE_KEYS } from "@/lib/constants";
 import { playSound, playWelcomeAmbience } from "@/lib/sounds";
 
-type SoundName = "click" | "sparkle" | "success" | "whoosh";
+type SoundName = "click" | "sparkle" | "success" | "whoosh" | "spooky";
 
 interface SoundContextValue {
   muted: boolean;

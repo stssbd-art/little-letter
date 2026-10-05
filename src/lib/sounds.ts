@@ -1,6 +1,6 @@
 "use client";
 
-type SoundName = "click" | "sparkle" | "success" | "whoosh";
+type SoundName = "click" | "sparkle" | "success" | "whoosh" | "spooky";
 
 const WELCOME_SESSION_KEY = "little-letter-welcome-played-v3";
 
@@ -16,6 +16,57 @@ function getCtx() {
     audioCtx = new Ctx();
   }
   return audioCtx;
+}
+
+function slide(
+  from: number,
+  to: number,
+  duration: number,
+  type: OscillatorType = "sine",
+  volume = 0.04,
+  delay = 0
+) {
+  const ctx = getCtx();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  const start = ctx.currentTime + delay;
+  osc.frequency.setValueAtTime(from, start);
+  osc.frequency.exponentialRampToValueAtTime(Math.max(40, to), start + duration);
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume, start + 0.04);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  osc.start(start);
+  osc.stop(start + duration + 0.02);
+}
+
+/** Soft filtered noise — bat wings / wind, not a jump-scare. */
+function flutter(duration: number, volume: number, delay: number, freq: number) {
+  const ctx = getCtx();
+  if (!ctx) return;
+  const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
+  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.value = freq;
+  filter.Q.value = 0.7;
+  const gain = ctx.createGain();
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  const start = ctx.currentTime + delay;
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume, start + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  src.start(start);
+  src.stop(start + duration + 0.02);
 }
 
 function tone(
@@ -120,6 +171,18 @@ export function playSound(name: SoundName, muted: boolean) {
     case "whoosh":
       tone(220, 0.25, "sawtooth", 0.015);
       tone(440, 0.2, "sine", 0.02, 0.05);
+      break;
+    case "spooky":
+      // Low porch-night drone, a soft descending “boo”, then bat-wing flutter.
+      tone(72, 1.6, "sine", 0.028);
+      tone(108, 1.3, "triangle", 0.014, 0.05);
+      slide(240, 78, 0.85, "sine", 0.035, 0.12);
+      slide(180, 90, 0.7, "triangle", 0.018, 0.28);
+      flutter(0.22, 0.03, 0.55, 1400);
+      flutter(0.16, 0.022, 0.85, 2100);
+      flutter(0.14, 0.018, 1.15, 900);
+      tone(392, 0.45, "sine", 0.012, 1.05);
+      tone(294, 0.55, "sine", 0.01, 1.35);
       break;
   }
 }

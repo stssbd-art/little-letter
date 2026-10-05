@@ -1,8 +1,9 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CardSceneArt } from "@/components/features/CardSceneArt";
+import { useSound } from "@/components/providers/SoundProvider";
 import { getCardDesign, type CardDesign, type CardDesignId } from "@/lib/card-designs";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,39 @@ type Props = {
   compact?: boolean;
   defaultOpen?: boolean;
 };
+
+function SpookyVeil() {
+  const bits = ["🦇", "✨", "🍂", "👻"];
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden rounded-[inherit]" aria-hidden>
+      <motion.div
+        className="absolute inset-x-[-20%] bottom-0 h-1/3"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(255,255,255,0.22), transparent)",
+        }}
+        animate={{ x: ["-8%", "8%", "-8%"], opacity: [0.25, 0.55, 0.25] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {bits.map((glyph, i) => (
+        <motion.span
+          key={glyph}
+          className="absolute text-lg"
+          style={{ left: `${12 + i * 22}%`, top: `${8 + (i % 2) * 18}%` }}
+          animate={{ y: [0, 18, -6, 0], opacity: [0.15, 0.7, 0.2] }}
+          transition={{
+            duration: 4.2 + i * 0.4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: i * 0.35,
+          }}
+        >
+          {glyph}
+        </motion.span>
+      ))}
+    </div>
+  );
+}
 
 function Shimmer({ night }: { night?: boolean }) {
   return (
@@ -50,6 +84,7 @@ function CardCover({
   compact?: boolean;
 }) {
   const night = design.vibe === "night";
+  const spooky = design.vibe === "spooky";
   const clipId = useId().replace(/:/g, "");
 
   if (compact) {
@@ -92,7 +127,8 @@ function CardCover({
             {design.blurb}
           </p>
         </div>
-        <Shimmer night={night} />
+        <Shimmer night={night || spooky} />
+        {spooky ? <SpookyVeil /> : null}
       </div>
     );
   }
@@ -132,7 +168,8 @@ function CardCover({
             background: `linear-gradient(to top, ${design.cardBg}, transparent)`,
           }}
         />
-        <Shimmer night={night} />
+        <Shimmer night={night || spooky} />
+        {spooky ? <SpookyVeil /> : null}
       </div>
 
       <div
@@ -343,6 +380,8 @@ export function GreetingCard({
   defaultOpen = false,
 }: Props) {
   const design = getCardDesign(designId);
+  const { play } = useSound();
+  const spooky = design.vibe === "spooky";
   const [open, setOpen] = useState(defaultOpen);
   const openRef = useRef(open);
   const lockUntil = useRef(0);
@@ -357,10 +396,17 @@ export function GreetingCard({
     lockUntil.current = Date.now() + 500;
   }
 
+  useEffect(() => {
+    if (compact || !spooky || !open) return;
+    const id = window.setInterval(() => play("spooky"), 9000);
+    return () => window.clearInterval(id);
+  }, [compact, spooky, open, play]);
+
   function openCard() {
     if (!canAct() || openRef.current) return;
     armLock();
     setOpen(true);
+    if (spooky) play("spooky");
   }
 
   function closeCard() {
