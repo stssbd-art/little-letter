@@ -74,6 +74,19 @@ export function MessageForm() {
   const selectedStationery = getLetterStationery(form.stationery);
 
   useEffect(() => {
+    if (!form.cardDesign) return;
+    setForm({ cardDesign: undefined });
+  }, [form.cardDesign, setForm]);
+
+  useEffect(() => {
+    if (!letter?.form.cardDesign) return;
+    setLetter({
+      ...letter,
+      form: { ...letter.form, cardDesign: undefined },
+    });
+  }, [letter, setLetter]);
+
+  useEffect(() => {
     const looks = stationeryForOccasion(form.occasion);
     const current = form.stationery ?? "classic-honey";
     if (looks.some((s) => s.id === current)) return;
@@ -104,6 +117,7 @@ export function MessageForm() {
       ...form,
       stationery: selectedStationery.id,
       style: selectedStationery.writingStyle,
+      cardDesign: undefined,
     };
   }
 

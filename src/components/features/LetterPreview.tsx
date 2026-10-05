@@ -235,9 +235,12 @@ export function LetterPreview() {
   const stationery = getLetterStationery(
     currentLetter.form.stationery ?? form.stationery
   );
-  const isCard =
-    Boolean(currentLetter.form.cardDesign) &&
-    isCardDesignId(currentLetter.form.cardDesign ?? "");
+  const cardDesignId =
+    currentLetter.form.cardDesign &&
+    isCardDesignId(currentLetter.form.cardDesign)
+      ? currentLetter.form.cardDesign
+      : null;
+  const isCard = cardDesignId != null;
 
   async function scheduleLetter() {
     if (!hasAcceptedTerms()) {
@@ -498,7 +501,25 @@ export function LetterPreview() {
 
       <VoiceNoteRecorder kind="letter" />
 
-      <PixelWindow title="letter_preview.rtf" icon="📬" liftOnHover={false}>
+      <PixelWindow
+        title={isCard ? "card_preview.rtf" : "letter_preview.rtf"}
+        icon={isCard ? "🎴" : "📬"}
+        liftOnHover={false}
+      >
+        {isCard && cardDesignId ? (
+          <GreetingCard
+            designId={cardDesignId}
+            recipientName={currentLetter.form.recipientName}
+            subject={currentLetter.subject}
+            message={currentLetter.message}
+            senderName={currentLetter.form.senderName}
+            occasionLabel={
+              OCCASIONS.find((o) => o.value === currentLetter.form.occasion)
+                ?.label
+            }
+            defaultOpen
+          />
+        ) : (
         <div className="flex flex-col items-center">
           <button
             type="button"
@@ -795,21 +816,6 @@ export function LetterPreview() {
             inert={!open ? true : undefined}
           >
             <article className="mt-6">
-              {currentLetter.form.cardDesign &&
-              isCardDesignId(currentLetter.form.cardDesign) ? (
-                <GreetingCard
-                  designId={currentLetter.form.cardDesign}
-                  recipientName={currentLetter.form.recipientName}
-                  subject={currentLetter.subject}
-                  message={currentLetter.message}
-                  senderName={currentLetter.form.senderName}
-                  occasionLabel={
-                    OCCASIONS.find(
-                      (o) => o.value === currentLetter.form.occasion
-                    )?.label
-                  }
-                />
-              ) : (
                 <StationeryPaper
                   stationery={stationery}
                   subject={currentLetter.subject}
@@ -834,10 +840,10 @@ export function LetterPreview() {
                     — {currentLetter.form.senderName}
                   </p>
                 </StationeryPaper>
-              )}
             </article>
           </motion.div>
         </div>
+        )}
       </PixelWindow>
 
       {error ? (
