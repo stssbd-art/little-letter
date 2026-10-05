@@ -425,27 +425,16 @@ export function getLetterStationery(
   return { ...base, ...CLASSIC_ENVELOPE };
 }
 
-/** Soft-ranked list for the picker (matching occasion first, classic always first). */
+/** Looks tagged for this occasion only. Classic honey if nothing is tagged. */
 export function stationeryForOccasion(
   occasion: Occasion | undefined
 ): LetterStationery[] {
   const classic = BY_ID["classic-honey"];
-  const halloweenLooks = [
-    BY_ID["halloween-lantern"],
-    BY_ID["halloween-ghost"],
-    BY_ID["halloween-bats"],
-  ];
-  const pinned = new Set<LetterStationeryId>([
-    "classic-honey",
-    "halloween-lantern",
-    "halloween-ghost",
-    "halloween-bats",
-  ]);
-  const rest = LETTER_STATIONERY.filter((s) => !pinned.has(s.id));
-  if (!occasion) return [classic, ...halloweenLooks, ...rest];
-  const matched = rest.filter((s) => s.occasionHints.includes(occasion));
-  const others = rest.filter((s) => !s.occasionHints.includes(occasion));
-  return [classic, ...halloweenLooks, ...matched, ...others];
+  if (!occasion) return [classic];
+  const matched = LETTER_STATIONERY.filter((s) =>
+    s.occasionHints.includes(occasion)
+  );
+  return matched.length > 0 ? matched : [classic];
 }
 
 /** Writing voice bundled with a stationery look. */

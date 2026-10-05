@@ -73,6 +73,18 @@ export function MessageForm() {
   const writeMode: LetterWriteMode = form.writeMode === "own" ? "own" : "ai";
   const selectedStationery = getLetterStationery(form.stationery);
 
+  useEffect(() => {
+    const looks = stationeryForOccasion(form.occasion);
+    const current = form.stationery ?? "classic-honey";
+    if (looks.some((s) => s.id === current)) return;
+    const next = looks[0];
+    if (!next) return;
+    setForm({
+      stationery: next.id as LetterStationeryId,
+      style: next.writingStyle,
+    });
+  }, [form.occasion, form.stationery, setForm]);
+
   /* Keep AI voice in sync with the chosen look (old drafts may diverge). */
   useEffect(() => {
     if (form.style !== selectedStationery.writingStyle) {
@@ -349,7 +361,20 @@ export function MessageForm() {
                       selected={form.occasion === o.value}
                       onClick={() => {
                         play("click");
-                        setForm({ occasion: o.value as Occasion });
+                        const occasion = o.value as Occasion;
+                        const looks = stationeryForOccasion(occasion);
+                        const current = form.stationery ?? "classic-honey";
+                        const keep = looks.some((s) => s.id === current);
+                        const next = keep ? undefined : looks[0];
+                        setForm({
+                          occasion,
+                          ...(next
+                            ? {
+                                stationery: next.id as LetterStationeryId,
+                                style: next.writingStyle,
+                              }
+                            : {}),
+                        });
                       }}
                       className="flex flex-col items-center gap-1 py-3"
                     >
@@ -367,9 +392,7 @@ export function MessageForm() {
                   Look &amp; voice
                 </p>
                 <p className="mb-2 text-xs text-[var(--ll-muted)]">
-                  {writeMode === "ai"
-                    ? "One pick for paper look and writing tone."
-                    : "Pick the paper look for your letter."}
+                  Paper looks for this occasion only.
                 </p>
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                   {stationeryForOccasion(form.occasion).map((s) => {
