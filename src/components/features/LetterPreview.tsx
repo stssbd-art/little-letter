@@ -808,6 +808,7 @@ export function LetterPreview() {
                       (o) => o.value === currentLetter.form.occasion
                     )?.label
                   }
+                  music={open}
                 />
               ) : (
                 <StationeryPaper
