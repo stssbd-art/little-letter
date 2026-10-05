@@ -119,29 +119,8 @@ type Phrase = {
   notes: Array<[number, number, number]>;
 };
 
-/** Original cues only — short, quiet, and matched to the occasion. */
-const CARD_PHRASES: Record<Occasion, Phrase> = {
-  halloween: {
-    every: 7.8,
-    wave: "triangle",
-    level: 0.04,
-    drone: [
-      [110, 0.036],
-      [164.81, 0.024],
-    ],
-    notes: [
-      [659.25, 0, 0.7],
-      [587.33, 0.7, 0.6],
-      [523.25, 1.35, 0.65],
-      [493.88, 2.05, 0.6],
-      [440, 2.7, 0.85],
-      [523.25, 3.6, 0.6],
-      [493.88, 4.2, 0.6],
-      [440, 4.85, 0.65],
-      [392, 5.5, 0.7],
-      [440, 6.15, 0.9],
-    ],
-  },
+/** Soft original cues for the gentle occasions. Halloween is handled apart. */
+const CARD_PHRASES: Record<Exclude<Occasion, "halloween">, Phrase> = {
   birthday: {
     every: 8.2,
     wave: "triangle",
@@ -427,7 +406,8 @@ const CARD_PHRASES: Record<Occasion, Phrase> = {
 };
 
 let cardBus: GainNode | null = null;
-let cardVoices: OscillatorNode[] = [];
+let cardVoices: AudioScheduledSourceNode[] = [];
+let cardHorror = false;
 let cardTimer: number | null = null;
 let cardHold = false;
 let cardGeneration = 0;
@@ -479,6 +459,108 @@ function cardVoice(
   };
 }
 
+function cardSlide(
+  from: number,
+  to: number,
+  duration: number,
+  type: OscillatorType,
+  volume: number,
+  delay: number
+) {
+  const ctx = getCtx();
+  const dest = getCardBus();
+  if (!ctx || !dest) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.connect(gain);
+  gain.connect(dest);
+  const start = ctx.currentTime + delay;
+  osc.frequency.setValueAtTime(Math.max(40, from), start);
+  osc.frequency.exponentialRampToValueAtTime(Math.max(40, to), start + duration);
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume, start + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  osc.start(start);
+  osc.stop(start + duration + 0.05);
+  cardVoices.push(osc);
+}
+
+function cardNoise(
+  duration: number,
+  volume: number,
+  delay: number,
+  freq: number,
+  q: number,
+  filterType: BiquadFilterType = "bandpass"
+) {
+  const ctx = getCtx();
+  const dest = getCardBus();
+  if (!ctx || !dest) return;
+  const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
+  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = filterType;
+  filter.frequency.value = freq;
+  filter.Q.value = q;
+  const gain = ctx.createGain();
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(dest);
+  const start = ctx.currentTime + delay;
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume, start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  src.start(start);
+  src.stop(start + duration + 0.04);
+  cardVoices.push(src);
+}
+
+const HORROR_EVERY = 8.6;
+
+/** Three different horror beds. Not a tune — drone, moan, and bat shrieks. */
+function singHorror(designId: string) {
+  if (designId === "friendly-ghost") {
+    cardVoice(38, 8.2, "sine", 0.13, 0);
+    cardVoice(40.5, 8.2, "sine", 0.07, 0);
+    cardSlide(340, 58, 2.6, "sine", 0.09, 0.25);
+    cardSlide(290, 52, 3.1, "triangle", 0.07, 3.3);
+    cardNoise(6.5, 0.06, 0.1, 520, 0.8);
+    cardNoise(0.9, 0.05, 6.2, 1400, 6);
+    cardVoice(733, 0.7, "sine", 0.03, 6.3);
+    cardVoice(780, 0.55, "sine", 0.025, 6.45);
+    return;
+  }
+  if (designId === "moonlit-bats") {
+    cardVoice(48, 8.2, "sine", 0.11, 0);
+    cardVoice(51, 8, "sawtooth", 0.03, 0.1);
+    cardNoise(7, 0.045, 0, 180, 0.4, "lowpass");
+    const squeaks = [0.15, 0.38, 0.7, 1.15, 2.05, 2.35, 4.1, 4.38, 4.7, 6.05, 6.4];
+    squeaks.forEach((delay, i) => {
+      const high = i % 2 === 0 ? 2800 : 2100;
+      cardSlide(high, 700 + (i % 3) * 180, 0.14, "square", 0.045, delay);
+      cardNoise(0.1, 0.04, delay, high, 4);
+    });
+    cardVoice(42, 0.2, "sine", 0.16, 3.35);
+    return;
+  }
+  // Pumpkin night: wind, a growl, and uneven knocks.
+  cardVoice(42, 8.2, "sine", 0.14, 0);
+  cardVoice(45, 8.2, "sine", 0.08, 0);
+  cardNoise(7.4, 0.08, 0, 120, 0.5, "lowpass");
+  cardSlide(180, 52, 2.4, "sawtooth", 0.055, 0.35);
+  cardSlide(90, 40, 1.6, "triangle", 0.06, 5.4);
+  cardVoice(55, 0.16, "sine", 0.2, 2.9);
+  cardVoice(48, 0.14, "sine", 0.16, 3.7);
+  cardVoice(44, 0.22, "sine", 0.18, 4.85);
+  cardVoice(233, 0.28, "square", 0.04, 6.5);
+  cardVoice(329, 0.22, "square", 0.03, 6.55);
+}
+
 function sing(phrase: Phrase) {
   for (const [freq, volume] of phrase.drone) {
     cardVoice(freq, phrase.every - 0.2, "sine", volume, 0);
@@ -495,7 +577,7 @@ export function setCardMusicOpen(open: boolean) {
   const bus = getCardBus();
   if (!ctx || !bus) return;
   const now = ctx.currentTime;
-  const next = open ? 1 : 0.62;
+  const next = open ? 1 : cardHorror ? 0.9 : 0.62;
   bus.gain.cancelScheduledValues(now);
   bus.gain.setValueAtTime(bus.gain.value, now);
   bus.gain.linearRampToValueAtTime(next, now + 0.35);
@@ -521,27 +603,32 @@ export function stopCardMusic() {
     releaseSiteSounds();
     cardHold = false;
   }
+  cardHorror = false;
 }
 
-/** Soft occasion tune. Other site sounds stay quiet until this stops. */
-export function startCardMusic(occasion: Occasion) {
+/** Occasion tune, or a horror bed for Halloween cards. Site clicks stay quiet. */
+export function startCardMusic(occasion: Occasion, designId = "") {
   stopCardMusic();
   const token = cardGeneration;
   const ctx = getCtx();
   if (!ctx) return;
+  const horror = occasion === "halloween";
 
   const begin = () => {
     if (token !== cardGeneration || cardHold) return;
     clearCardRetry();
     holdSiteSounds();
     cardHold = true;
-    const phrase = CARD_PHRASES[occasion];
+    cardHorror = horror;
+    const phrase = horror ? null : CARD_PHRASES[occasion];
+    const every = phrase?.every ?? HORROR_EVERY;
     const fire = () => {
       if (token !== cardGeneration) return;
-      sing(phrase);
+      if (horror) singHorror(designId);
+      else if (phrase) sing(phrase);
     };
     fire();
-    cardTimer = window.setInterval(fire, phrase.every * 1000);
+    cardTimer = window.setInterval(fire, every * 1000);
   };
 
   const armRetry = () => {

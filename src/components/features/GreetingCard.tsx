@@ -406,9 +406,9 @@ export function GreetingCard({
 
   useEffect(() => {
     if (compact || !music || muted) return;
-    startCardMusic(design.occasion);
+    startCardMusic(design.occasion, design.id);
     return () => stopCardMusic();
-  }, [compact, music, muted, design.occasion]);
+  }, [compact, music, muted, design.occasion, design.id]);
 
   function openCard() {
     if (!canAct() || openRef.current) return;
