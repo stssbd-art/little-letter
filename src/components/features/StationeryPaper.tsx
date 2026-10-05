@@ -327,6 +327,48 @@ function StationeryArt({
     );
   }
 
+  if (decor === "halloween-ghost") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-50"
+          style={{
+            backgroundImage: `radial-gradient(circle at 78% 16%, #fff 0 20px, transparent 22px),
+              radial-gradient(circle at 20% 70%, ${accent}33 0 28px, transparent 29px)`,
+          }}
+        />
+        <span className={cn("absolute left-3 top-3", size)}>👻</span>
+        <span className={cn("absolute right-3 top-3", size)}>🌙</span>
+        <span className={cn("absolute bottom-4 left-4", size)}>💜</span>
+        <span className={cn("absolute bottom-4 right-3", size)}>⭐</span>
+        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-xs opacity-85 sm:text-sm">
+          ghost post · a gentle boo
+        </span>
+      </div>
+    );
+  }
+
+  if (decor === "halloween-bats") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-45"
+          style={{
+            backgroundImage: `radial-gradient(circle at 80% 18%, #ffb347 0 22px, transparent 24px),
+              linear-gradient(180deg, #2a1840 0%, transparent 42%)`,
+          }}
+        />
+        <span className={cn("absolute left-3 top-3", size)}>🦇</span>
+        <span className={cn("absolute right-3 top-3", size)}>🌙</span>
+        <span className={cn("absolute bottom-4 left-4", size)}>🎃</span>
+        <span className={cn("absolute bottom-4 right-3", size)}>🦇</span>
+        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-xs opacity-85 sm:text-sm">
+          bat moon · under the night
+        </span>
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -357,6 +399,10 @@ function paperWash(stationery: LetterStationery): string {
       return `linear-gradient(180deg, #f7f5fc, #ebe8f8 45%, #f5f3fa)`;
     case "halloween":
       return `linear-gradient(180deg, #fff6ea, #ffe0b8 42%, #fff1dc)`;
+    case "halloween-ghost":
+      return `linear-gradient(180deg, #f8f4ff, #efe6fa 45%, #f7f2ff)`;
+    case "halloween-bats":
+      return `linear-gradient(180deg, #2a1840 0%, #f7f1e8 38%, #fff6ea)`;
     default:
       return `linear-gradient(180deg, ${stationery.paperBg}, #fff6df 55%, ${stationery.paperBg})`;
   }

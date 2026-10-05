@@ -26,7 +26,9 @@ export type LetterStationeryId =
   | "thank-you-friendship"
   | "childhood-nostalgia"
   | "moonlit-tea"
-  | "halloween-lantern";
+  | "halloween-lantern"
+  | "halloween-ghost"
+  | "halloween-bats";
 
 export type LetterStationeryDecor =
   | "none"
@@ -41,7 +43,9 @@ export type LetterStationeryDecor =
   | "birds"
   | "toys"
   | "moon"
-  | "halloween";
+  | "halloween"
+  | "halloween-ghost"
+  | "halloween-bats";
 
 /** Old picker IDs → current looks (saved drafts still open). */
 const LEGACY_STATIONERY_IDS: Record<string, LetterStationeryId> = {
@@ -352,6 +356,48 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     accent: "#e07a18",
     writingStyle: "whimsical",
   },
+  {
+    id: "halloween-ghost",
+    title: "Ghost Post",
+    blurb: "A pale moon, a friendly ghost & soft lilac paper",
+    emoji: "👻",
+    era: "Halloween",
+    occasionHints: ["halloween"],
+    paperBg: "#f8f4ff",
+    paperBorder: "#b79ad4",
+    ink: "#2e2438",
+    muted: "#6a5880",
+    fontClass: "font-script",
+    ...CLASSIC_ENVELOPE,
+    sealEmoji: "👻",
+    stampLabel: "BOO",
+    stampColors: { bg: "#f4ecff", ink: "#7a4ea8", border: "#7a4ea8" },
+    postmarkColor: "rgba(122,78,168,0.45)",
+    decor: "halloween-ghost",
+    accent: "#7a4ea8",
+    writingStyle: "cute",
+  },
+  {
+    id: "halloween-bats",
+    title: "Bat Moon",
+    blurb: "A dark sky, an orange moon & little bats",
+    emoji: "🦇",
+    era: "Halloween",
+    occasionHints: ["halloween"],
+    paperBg: "#f7f1e8",
+    paperBorder: "#3d2458",
+    ink: "#241830",
+    muted: "#5a4868",
+    fontClass: "font-display",
+    ...CLASSIC_ENVELOPE,
+    sealEmoji: "🦇",
+    stampLabel: "NIGHT",
+    stampColors: { bg: "#2a1840", ink: "#ffb347", border: "#ffb347" },
+    postmarkColor: "rgba(61,36,88,0.5)",
+    decor: "halloween-bats",
+    accent: "#e08a20",
+    writingStyle: "whimsical",
+  },
 ];
 
 const BY_ID = Object.fromEntries(
@@ -384,14 +430,22 @@ export function stationeryForOccasion(
   occasion: Occasion | undefined
 ): LetterStationery[] {
   const classic = BY_ID["classic-honey"];
-  const halloween = BY_ID["halloween-lantern"];
-  const rest = LETTER_STATIONERY.filter(
-    (s) => s.id !== "classic-honey" && s.id !== "halloween-lantern"
-  );
-  if (!occasion) return [classic, halloween, ...rest];
+  const halloweenLooks = [
+    BY_ID["halloween-lantern"],
+    BY_ID["halloween-ghost"],
+    BY_ID["halloween-bats"],
+  ];
+  const pinned = new Set<LetterStationeryId>([
+    "classic-honey",
+    "halloween-lantern",
+    "halloween-ghost",
+    "halloween-bats",
+  ]);
+  const rest = LETTER_STATIONERY.filter((s) => !pinned.has(s.id));
+  if (!occasion) return [classic, ...halloweenLooks, ...rest];
   const matched = rest.filter((s) => s.occasionHints.includes(occasion));
   const others = rest.filter((s) => !s.occasionHints.includes(occasion));
-  return [classic, halloween, ...matched, ...others];
+  return [classic, ...halloweenLooks, ...matched, ...others];
 }
 
 /** Writing voice bundled with a stationery look. */

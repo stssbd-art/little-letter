@@ -93,7 +93,7 @@ export interface MixtapePayload {
   title: string;
   dedication: string;
   /** Cassette look. Missing on older sends, which stay classic. */
-  look?: "classic" | "halloween";
+  look?: "classic" | "halloween" | "ghost" | "bats";
   trackIds: string[];
   customTracks?: Array<{
     id: string;

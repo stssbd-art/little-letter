@@ -387,7 +387,7 @@ export function MixtapeForm() {
             senderName: next.senderName || mix.from || "",
             recipientName: next.recipientName || mix.to || "",
             dedication: next.dedication || mix.note || "",
-            look: mix.look === "halloween" ? "halloween" : next.look,
+            look: mix.look && mix.look !== "classic" ? mix.look : next.look,
             trackIds: mix.tracks,
             customTracks: mix.extras ?? [],
           };
@@ -1002,7 +1002,9 @@ export function MixtapeForm() {
                 {(
                   [
                     ["classic", "📼 Classic"],
-                    ["halloween", "🎃 Halloween"],
+                    ["halloween", "🎃 Pumpkin"],
+                    ["ghost", "👻 Ghost"],
+                    ["bats", "🦇 Bats"],
                   ] as const
                 ).map(([id, label]) => (
                   <button

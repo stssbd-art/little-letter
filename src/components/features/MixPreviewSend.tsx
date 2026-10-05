@@ -80,7 +80,7 @@ export function MixPreviewSend({ mix, mixPath }: Props) {
       senderEmail: stored?.senderEmail || "",
       title: stored?.title || mix.title || "",
       dedication: stored?.dedication || mix.note || "",
-      look: mix.look === "halloween" ? "halloween" : stored?.look ?? "classic",
+      look: mix.look && mix.look !== "classic" ? mix.look : stored?.look ?? "classic",
       trackIds: mix.tracks,
       customTracks: mix.extras ?? stored?.customTracks ?? [],
     };

@@ -70,7 +70,38 @@ export function CassetteDeck({
       : showScreen
         ? "READY"
         : "STOP";
-  const halloween = look === "halloween";
+  const skin =
+    look === "ghost"
+      ? {
+          shell:
+            "border-[#c9b8e8] bg-gradient-to-b from-[#4a3870] via-[#2e2248] to-[#1c1430] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),6px_8px_0_rgba(40,20,70,0.35)]",
+          kicker: "text-[#f4e8ff]",
+          label: "SIDE A · GHOST MIX",
+          play: "bg-[#e8d8ff]",
+        }
+      : look === "bats"
+        ? {
+            shell:
+              "border-[#f0a040] bg-gradient-to-b from-[#1a1028] via-[#140c1c] to-[#0c0814] shadow-[inset_0_1px_0_rgba(255,255,255,0.1),6px_8px_0_rgba(40,16,8,0.4)]",
+            kicker: "text-[#ffb347]",
+            label: "SIDE A · BAT MIX",
+            play: "bg-[#f08a20]",
+          }
+        : look === "halloween"
+          ? {
+              shell:
+                "border-[#e07a18] bg-gradient-to-b from-[#3a2158] via-[#241430] to-[#140c1c] shadow-[inset_0_1px_0_rgba(255,255,255,0.12),6px_8px_0_rgba(90,40,10,0.35)]",
+              kicker: "text-[#ffb347]",
+              label: "SIDE A · PUMPKIN MIX",
+              play: "bg-[#ffb347]",
+            }
+          : {
+              shell:
+                "border-[#2a2218] bg-gradient-to-b from-[#4a4036] via-[#322a22] to-[#241c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.12),6px_8px_0_rgba(61,47,34,0.22)]",
+              kicker: "text-[#f6d58a]",
+              label: "SIDE A · LITTLE LETTER MIX",
+              play: "bg-[#f6d58a]",
+            };
 
   return (
     <div
@@ -82,19 +113,12 @@ export function CassetteDeck({
       <section
         className={cn(
           "overflow-hidden rounded-[22px] border-[3px]",
-          halloween
-            ? "border-[#e07a18] bg-gradient-to-b from-[#3a2158] via-[#241430] to-[#140c1c] shadow-[inset_0_1px_0_rgba(255,255,255,0.12),6px_8px_0_rgba(90,40,10,0.35)]"
-            : "border-[#2a2218] bg-gradient-to-b from-[#4a4036] via-[#322a22] to-[#241c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.12),6px_8px_0_rgba(61,47,34,0.22)]"
+          skin.shell
         )}
       >
         <div className="flex items-center justify-between border-b border-[#1a1510]/80 px-3 py-2">
-          <p
-            className={cn(
-              "font-pixel text-[9px] tracking-wide",
-              halloween ? "text-[#ffb347]" : "text-[#f6d58a]"
-            )}
-          >
-            {halloween ? "SIDE A · HALLOWEEN MIX" : "SIDE A · LITTLE LETTER MIX"}
+          <p className={cn("font-pixel text-[9px] tracking-wide", skin.kicker)}>
+            {skin.label}
           </p>
           <p className="font-pixel text-[8px] text-[#cbb892]">{status}</p>
         </div>
@@ -169,7 +193,7 @@ export function CassetteDeck({
                 disabled={controlsDisabled || spinning}
                 onClick={onPlay}
                 play
-                look={look}
+                playClass={skin.play}
               >
                 ▶
               </DeckButton>
@@ -202,14 +226,14 @@ function DeckButton({
   disabled,
   onClick,
   play = false,
-  look = "classic",
+  playClass = "bg-[#f6d58a]",
   children,
 }: {
   label: string;
   disabled?: boolean;
   onClick?: () => void;
   play?: boolean;
-  look?: MixLook;
+  playClass?: string;
   children: ReactNode;
 }) {
   return (
@@ -220,11 +244,7 @@ function DeckButton({
       onClick={onClick}
       className={cn(
         "flex items-center justify-center rounded-full border-2 border-[#1a1510] text-[#3d2f22]",
-        play
-          ? look === "halloween"
-            ? "h-11 w-11 bg-[#ffb347] text-base"
-            : "h-11 w-11 bg-[#f6d58a] text-base"
-          : "h-10 w-10 bg-[#d8cdb6] text-sm",
+        play ? cn("h-11 w-11 text-base", playClass) : "h-10 w-10 bg-[#d8cdb6] text-sm",
         "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
         "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
       )}

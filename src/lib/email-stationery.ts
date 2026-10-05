@@ -54,6 +54,10 @@ export function stationeryPaperWash(stationery: LetterStationery): string {
       return `linear-gradient(180deg, #f7f5fc, #ebe8f8 45%, #f5f3fa)`;
     case "halloween":
       return `linear-gradient(180deg, #fff6ea, #ffe0b8 42%, #fff1dc)`;
+    case "halloween-ghost":
+      return `linear-gradient(180deg, #f8f4ff, #efe6fa 45%, #f7f2ff)`;
+    case "halloween-bats":
+      return `linear-gradient(180deg, #2a1840 0%, #f7f1e8 38%, #fff6ea)`;
     default:
       return `linear-gradient(180deg, ${stationery.paperBg}, #fff6df 55%, ${stationery.paperBg})`;
   }
@@ -78,6 +82,10 @@ function decorPattern(decor: LetterStationeryDecor, accent: string, border: stri
       return `radial-gradient(circle at 78% 16%, #fff8d8 0 26px, transparent 28px), radial-gradient(circle at 18% 28%, #e8e4f8 0 14px, transparent 15px)`;
     case "halloween":
       return `radial-gradient(circle at 78% 18%, #ffd27a 0 22px, transparent 24px), radial-gradient(circle at 18% 78%, #ffb347 0 16px, transparent 17px)`;
+    case "halloween-ghost":
+      return `radial-gradient(circle at 78% 16%, #fff 0 20px, transparent 22px), radial-gradient(circle at 20% 70%, ${accent}33 0 28px, transparent 29px)`;
+    case "halloween-bats":
+      return `radial-gradient(circle at 80% 18%, #ffb347 0 22px, transparent 24px)`;
     default:
       return "none";
   }
@@ -123,6 +131,10 @@ function decorBits(decor: LetterStationeryDecor): DecorBits {
       return { caption: "moonlit tea · soft twilight", tl: "🫖", tr: "🌙", bl: "⭐", br: "✨" };
     case "halloween":
       return { caption: "pumpkin night · happy halloween", tl: "🎃", tr: "👻", bl: "🦇", br: "🍬" };
+    case "halloween-ghost":
+      return { caption: "ghost post · a gentle boo", tl: "👻", tr: "🌙", bl: "💜", br: "⭐" };
+    case "halloween-bats":
+      return { caption: "bat moon · under the night", tl: "🦇", tr: "🌙", bl: "🎃", br: "🦇" };
     default:
       return { caption: "a little letter for you", tl: "💌", tr: "✨", bl: "✦", br: "✦" };
   }

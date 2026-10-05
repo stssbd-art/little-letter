@@ -8,10 +8,30 @@ import {
   type MixTrack,
 } from "@/lib/tracks";
 
-export type MixLook = "classic" | "halloween";
+export type MixLook = "classic" | "halloween" | "ghost" | "bats";
+
+const MIX_LOOKS: MixLook[] = ["classic", "halloween", "ghost", "bats"];
 
 export function resolveMixLook(value: unknown): MixLook {
-  return value === "halloween" ? "halloween" : "classic";
+  return MIX_LOOKS.includes(value as MixLook) ? (value as MixLook) : "classic";
+}
+
+const LOOK_CODE: Record<Exclude<MixLook, "classic">, string> = {
+  halloween: "h",
+  ghost: "g",
+  bats: "b",
+};
+
+export function mixLookSuffix(look: MixLook | undefined): string {
+  if (!look || look === "classic") return "";
+  return `\u001f${LOOK_CODE[look]}`;
+}
+
+export function mixLookFromCode(code: string | undefined): MixLook {
+  if (code === "h") return "halloween";
+  if (code === "g") return "ghost";
+  if (code === "b") return "bats";
+  return "classic";
 }
 
 export type MixShare = {
@@ -92,7 +112,7 @@ export function encodeMixShare(mix: MixShare): string {
     mix.note.slice(0, 500),
   ];
 
-  const lookBit = mix.look === "halloween" ? "\u001fh" : "";
+  const lookBit = mixLookSuffix(mix.look);
 
   if (v2Items.length === catalogIndices.length) {
     return `1.${toBase64Url(
@@ -123,7 +143,7 @@ function decodeCompactV1(code: string): MixShare | null {
       to: (to ?? "").slice(0, 60),
       note: (note ?? "").slice(0, 500),
       tracks,
-      look: resolveMixLook(lookPart === "h" ? "halloween" : "classic"),
+      look: mixLookFromCode(lookPart),
     };
   } catch {
     return null;
@@ -169,7 +189,7 @@ function decodeCompactV2(code: string): MixShare | null {
       note: (note ?? "").slice(0, 500),
       tracks,
       extras: extras.length ? extras : undefined,
-      look: resolveMixLook(lookPart === "h" ? "halloween" : "classic"),
+      look: mixLookFromCode(lookPart),
     };
   } catch {
     return null;
