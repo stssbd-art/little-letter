@@ -82,7 +82,33 @@ function slide(
   osc.stop(start + duration + 0.02);
 }
 
-/** Filtered noise — wind, wings, or a low howl. */
+/** High creak: noise with a rising band-pass, like a rusty hinge. */
+function creak(duration: number, volume: number, delay: number, out: AudioNode) {
+  const ctx = getCtx();
+  if (!ctx) return;
+  const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
+  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.Q.value = 14;
+  const gain = ctx.createGain();
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(out);
+  const start = ctx.currentTime + delay;
+  filter.frequency.setValueAtTime(280, start);
+  filter.frequency.exponentialRampToValueAtTime(2200, start + duration * 0.72);
+  filter.frequency.exponentialRampToValueAtTime(640, start + duration);
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume, start + 0.08);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  src.start(start);
+  src.stop(start + duration + 0.02);
+}
 function flutter(
   duration: number,
   volume: number,
@@ -224,22 +250,23 @@ export function playSound(name: SoundName, muted: boolean) {
       break;
     case "spooky": {
       const ear = getCtx()?.destination ?? null;
-      // Two low notes a semitone apart — a slow, uneasy beating drone.
-      tone(55, 5.6, "sine", 0.1, 0, ear);
-      tone(58.27, 5.4, "sine", 0.07, 0.04, ear);
-      // Tritone growl, then a longer descending moan.
-      slide(174.6, 65.4, 2.6, "sawtooth", 0.04, 0.15, ear);
-      slide(311, 73, 2.2, "triangle", 0.055, 0.35, ear);
-      slide(233, 49, 2.8, "sine", 0.06, 2.1, ear);
-      // Low wind, then a thin dissonant whisper.
-      flutter(3.4, 0.07, 0.2, 180, 0.45, ear);
-      flutter(0.7, 0.035, 2.4, 2400, 8, ear);
-      tone(698, 1.1, "sine", 0.018, 2.5, ear);
-      tone(740, 0.9, "sine", 0.014, 2.65, ear);
-      // Three slow knocks.
-      tone(48, 0.18, "sine", 0.14, 3.35, ear);
-      tone(46, 0.16, "sine", 0.11, 4.15, ear);
-      tone(44, 0.22, "sine", 0.13, 4.9, ear);
+      if (!ear) break;
+      // Sudden low hit, then a clashing stab.
+      tone(40, 0.45, "sine", 0.18, 0, ear);
+      flutter(0.28, 0.1, 0, 70, 0.5, ear);
+      tone(622, 0.28, "sawtooth", 0.045, 0.06, ear);
+      tone(659, 0.28, "square", 0.032, 0.06, ear);
+      tone(932, 0.22, "sawtooth", 0.028, 0.1, ear);
+      // Rising shriek that drops into a moan.
+      slide(280, 1680, 0.42, "sawtooth", 0.05, 0.16, ear);
+      slide(420, 1420, 0.36, "square", 0.022, 0.2, ear);
+      slide(1500, 160, 0.95, "sawtooth", 0.04, 0.55, ear);
+      slide(980, 110, 0.85, "triangle", 0.035, 0.62, ear);
+      creak(1.1, 0.07, 0.35, ear);
+      // Leftover dread, two notes a semitone apart.
+      tone(49, 2.4, "sine", 0.09, 1.15, ear);
+      tone(52, 2.2, "sine", 0.055, 1.2, ear);
+      flutter(1.6, 0.05, 1.2, 140, 0.6, ear);
       break;
     }
   }
