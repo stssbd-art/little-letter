@@ -5,6 +5,8 @@ type SoundName = "click" | "sparkle" | "success" | "whoosh" | "spooky";
 const WELCOME_SESSION_KEY = "little-letter-welcome-played-v3";
 
 let audioCtx: AudioContext | null = null;
+let siteGain: GainNode | null = null;
+let siteHolds = 0;
 
 function getCtx() {
   if (typeof window === "undefined") return null;
@@ -18,21 +20,58 @@ function getCtx() {
   return audioCtx;
 }
 
+/** Clicks, sparkles, and the welcome tune. Spooky cards duck this bus. */
+function getSiteBus(): GainNode | null {
+  const ctx = getCtx();
+  if (!ctx) return null;
+  if (!siteGain) {
+    siteGain = ctx.createGain();
+    siteGain.gain.value = siteHolds > 0 ? 0 : 1;
+    siteGain.connect(ctx.destination);
+  }
+  return siteGain;
+}
+
+/** Silence every site sound except the spooky card. Nested holds are safe. */
+export function holdSiteSounds() {
+  siteHolds += 1;
+  const ctx = getCtx();
+  const bus = getSiteBus();
+  if (!ctx || !bus) return;
+  const now = ctx.currentTime;
+  bus.gain.cancelScheduledValues(now);
+  bus.gain.setValueAtTime(bus.gain.value, now);
+  bus.gain.linearRampToValueAtTime(0, now + 0.05);
+}
+
+export function releaseSiteSounds() {
+  siteHolds = Math.max(0, siteHolds - 1);
+  if (siteHolds > 0) return;
+  const ctx = getCtx();
+  if (!ctx || !siteGain) return;
+  const now = ctx.currentTime;
+  siteGain.gain.cancelScheduledValues(now);
+  siteGain.gain.setValueAtTime(siteGain.gain.value, now);
+  siteGain.gain.linearRampToValueAtTime(1, now + 0.4);
+}
+
 function slide(
   from: number,
   to: number,
   duration: number,
   type: OscillatorType = "sine",
   volume = 0.04,
-  delay = 0
+  delay = 0,
+  out?: AudioNode | null
 ) {
   const ctx = getCtx();
-  if (!ctx) return;
+  const dest = out ?? getSiteBus();
+  if (!ctx || !dest) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = type;
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(dest);
   const start = ctx.currentTime + delay;
   osc.frequency.setValueAtTime(from, start);
   osc.frequency.exponentialRampToValueAtTime(Math.max(40, to), start + duration);
@@ -43,10 +82,18 @@ function slide(
   osc.stop(start + duration + 0.02);
 }
 
-/** Soft filtered noise — bat wings / wind, not a jump-scare. */
-function flutter(duration: number, volume: number, delay: number, freq: number) {
+/** Filtered noise — wind, wings, or a low howl. */
+function flutter(
+  duration: number,
+  volume: number,
+  delay: number,
+  freq: number,
+  q = 0.7,
+  out?: AudioNode | null
+) {
   const ctx = getCtx();
-  if (!ctx) return;
+  const dest = out ?? getSiteBus();
+  if (!ctx || !dest) return;
   const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
   const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
   const data = buffer.getChannelData(0);
@@ -56,11 +103,11 @@ function flutter(duration: number, volume: number, delay: number, freq: number) 
   const filter = ctx.createBiquadFilter();
   filter.type = "bandpass";
   filter.frequency.value = freq;
-  filter.Q.value = 0.7;
+  filter.Q.value = q;
   const gain = ctx.createGain();
   src.connect(filter);
   filter.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(dest);
   const start = ctx.currentTime + delay;
   gain.gain.setValueAtTime(0, start);
   gain.gain.linearRampToValueAtTime(volume, start + 0.03);
@@ -74,10 +121,12 @@ function tone(
   duration: number,
   type: OscillatorType = "sine",
   volume = 0.04,
-  delay = 0
+  delay = 0,
+  out?: AudioNode | null
 ) {
   const ctx = getCtx();
-  if (!ctx) return;
+  const dest = out ?? getSiteBus();
+  if (!ctx || !dest) return;
 
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -85,7 +134,7 @@ function tone(
   osc.frequency.value = frequency;
   gain.gain.value = 0;
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(dest);
 
   const start = ctx.currentTime + delay;
   gain.gain.setValueAtTime(0, start);
@@ -109,7 +158,7 @@ export async function playWelcomeAmbience(muted: boolean): Promise<boolean> {
   }
 
   const ctx = getCtx();
-  if (!ctx) return false;
+  if (!ctx || siteHolds > 0) return false;
 
   try {
     if (ctx.state !== "running") {
@@ -150,6 +199,7 @@ export async function playWelcomeAmbience(muted: boolean): Promise<boolean> {
 
 export function playSound(name: SoundName, muted: boolean) {
   if (muted || typeof window === "undefined") return;
+  if (name !== "spooky" && siteHolds > 0) return;
 
   void getCtx()?.resume();
 
@@ -172,17 +222,25 @@ export function playSound(name: SoundName, muted: boolean) {
       tone(220, 0.25, "sawtooth", 0.015);
       tone(440, 0.2, "sine", 0.02, 0.05);
       break;
-    case "spooky":
-      // Low porch-night drone, a soft descending “boo”, then bat-wing flutter.
-      tone(72, 1.6, "sine", 0.028);
-      tone(108, 1.3, "triangle", 0.014, 0.05);
-      slide(240, 78, 0.85, "sine", 0.035, 0.12);
-      slide(180, 90, 0.7, "triangle", 0.018, 0.28);
-      flutter(0.22, 0.03, 0.55, 1400);
-      flutter(0.16, 0.022, 0.85, 2100);
-      flutter(0.14, 0.018, 1.15, 900);
-      tone(392, 0.45, "sine", 0.012, 1.05);
-      tone(294, 0.55, "sine", 0.01, 1.35);
+    case "spooky": {
+      const ear = getCtx()?.destination ?? null;
+      // Two low notes a semitone apart — a slow, uneasy beating drone.
+      tone(55, 5.6, "sine", 0.1, 0, ear);
+      tone(58.27, 5.4, "sine", 0.07, 0.04, ear);
+      // Tritone growl, then a longer descending moan.
+      slide(174.6, 65.4, 2.6, "sawtooth", 0.04, 0.15, ear);
+      slide(311, 73, 2.2, "triangle", 0.055, 0.35, ear);
+      slide(233, 49, 2.8, "sine", 0.06, 2.1, ear);
+      // Low wind, then a thin dissonant whisper.
+      flutter(3.4, 0.07, 0.2, 180, 0.45, ear);
+      flutter(0.7, 0.035, 2.4, 2400, 8, ear);
+      tone(698, 1.1, "sine", 0.018, 2.5, ear);
+      tone(740, 0.9, "sine", 0.014, 2.65, ear);
+      // Three slow knocks.
+      tone(48, 0.18, "sine", 0.14, 3.35, ear);
+      tone(46, 0.16, "sine", 0.11, 4.15, ear);
+      tone(44, 0.22, "sine", 0.13, 4.9, ear);
       break;
+    }
   }
 }

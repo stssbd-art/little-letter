@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CardSceneArt } from "@/components/features/CardSceneArt";
 import { useSound } from "@/components/providers/SoundProvider";
+import { holdSiteSounds, releaseSiteSounds } from "@/lib/sounds";
 import { getCardDesign, type CardDesign, type CardDesignId } from "@/lib/card-designs";
 import { cn } from "@/lib/utils";
 
@@ -398,15 +399,19 @@ export function GreetingCard({
 
   useEffect(() => {
     if (compact || !spooky || !open) return;
-    const id = window.setInterval(() => play("spooky"), 9000);
-    return () => window.clearInterval(id);
+    holdSiteSounds();
+    play("spooky");
+    const id = window.setInterval(() => play("spooky"), 7200);
+    return () => {
+      window.clearInterval(id);
+      releaseSiteSounds();
+    };
   }, [compact, spooky, open, play]);
 
   function openCard() {
     if (!canAct() || openRef.current) return;
     armLock();
     setOpen(true);
-    if (spooky) play("spooky");
   }
 
   function closeCard() {
