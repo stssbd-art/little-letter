@@ -162,7 +162,6 @@ export function CardComposeForm({ designId }: Props) {
             }
             senderName={senderName.trim() || "you"}
             occasionLabel={occasionMeta?.label}
-            music
           />
         </motion.div>
 

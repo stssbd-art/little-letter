@@ -3,8 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CardSceneArt } from "@/components/features/CardSceneArt";
-import { useSound } from "@/components/providers/SoundProvider";
-import { setCardMusicOpen, startCardMusic, stopCardMusic } from "@/lib/sounds";
+import { stopCardMusic } from "@/lib/sounds";
 import { getCardDesign, type CardDesign, type CardDesignId } from "@/lib/card-designs";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +17,6 @@ type Props = {
   className?: string;
   compact?: boolean;
   defaultOpen?: boolean;
-  /** Play the occasion tune. Gallery thumbnails leave this off. */
-  music?: boolean;
 };
 
 function SpookyVeil() {
@@ -381,10 +378,8 @@ export function GreetingCard({
   className,
   compact = false,
   defaultOpen = false,
-  music = false,
 }: Props) {
   const design = getCardDesign(designId);
-  const { muted } = useSound();
   const [open, setOpen] = useState(defaultOpen);
   const openRef = useRef(open);
   const lockUntil = useRef(0);
@@ -400,15 +395,8 @@ export function GreetingCard({
   }
 
   useEffect(() => {
-    if (compact || !music) return;
-    setCardMusicOpen(open);
-  }, [compact, music, open]);
-
-  useEffect(() => {
-    if (compact || !music || muted) return;
-    startCardMusic(design.occasion, design.id);
-    return () => stopCardMusic();
-  }, [compact, music, muted, design.occasion, design.id]);
+    stopCardMusic();
+  }, []);
 
   function openCard() {
     if (!canAct() || openRef.current) return;
