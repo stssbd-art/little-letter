@@ -25,7 +25,8 @@ export type LetterStationeryId =
   | "birthday-vintage"
   | "thank-you-friendship"
   | "childhood-nostalgia"
-  | "moonlit-tea";
+  | "moonlit-tea"
+  | "halloween-lantern";
 
 export type LetterStationeryDecor =
   | "none"
@@ -39,7 +40,8 @@ export type LetterStationeryDecor =
   | "cake"
   | "birds"
   | "toys"
-  | "moon";
+  | "moon"
+  | "halloween";
 
 /** Old picker IDs → current looks (saved drafts still open). */
 const LEGACY_STATIONERY_IDS: Record<string, LetterStationeryId> = {
@@ -329,6 +331,27 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     accent: "#6b6f9e",
     writingStyle: "whimsical",
   },
+  {
+    id: "halloween-lantern",
+    title: "Pumpkin Night",
+    blurb: "Lanterns, little ghosts & an orange moon",
+    emoji: "🎃",
+    era: "Halloween",
+    occasionHints: ["halloween"],
+    paperBg: "#fff6ea",
+    paperBorder: "#e07a18",
+    ink: "#3a2418",
+    muted: "#8a5030",
+    fontClass: "font-display",
+    ...CLASSIC_ENVELOPE,
+    sealEmoji: "🎃",
+    stampLabel: "BOO",
+    stampColors: { bg: "#fff1dc", ink: "#c45a12", border: "#c45a12" },
+    postmarkColor: "rgba(196,90,18,0.5)",
+    decor: "halloween",
+    accent: "#e07a18",
+    writingStyle: "whimsical",
+  },
 ];
 
 const BY_ID = Object.fromEntries(
@@ -361,11 +384,14 @@ export function stationeryForOccasion(
   occasion: Occasion | undefined
 ): LetterStationery[] {
   const classic = BY_ID["classic-honey"];
-  const rest = LETTER_STATIONERY.filter((s) => s.id !== "classic-honey");
-  if (!occasion) return [classic, ...rest];
+  const halloween = BY_ID["halloween-lantern"];
+  const rest = LETTER_STATIONERY.filter(
+    (s) => s.id !== "classic-honey" && s.id !== "halloween-lantern"
+  );
+  if (!occasion) return [classic, halloween, ...rest];
   const matched = rest.filter((s) => s.occasionHints.includes(occasion));
   const others = rest.filter((s) => !s.occasionHints.includes(occasion));
-  return [classic, ...matched, ...others];
+  return [classic, halloween, ...matched, ...others];
 }
 
 /** Writing voice bundled with a stationery look. */

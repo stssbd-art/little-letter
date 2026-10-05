@@ -106,6 +106,7 @@ export async function POST(request: Request) {
       senderEmail,
       title: body.title.trim().slice(0, 80),
       dedication: (body.dedication ?? "").trim().slice(0, 500),
+      look: body.look === "halloween" ? "halloween" : "classic",
       trackIds,
       customTracks: customTracks.filter(
         (t) =>

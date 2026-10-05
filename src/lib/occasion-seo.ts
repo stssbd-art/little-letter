@@ -392,6 +392,33 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     ],
     faq: [],
   },
+  halloween: {
+    slug: "halloween",
+    emoji: "🎃",
+    label: "Halloween",
+    title: "Send a Halloween Card & Letter Online",
+    metaDescription:
+      "Send a Halloween card, letter, or note by email. Pumpkins, friendly ghosts, and warm October wishes — letters are free.",
+    keywords: [
+      "halloween card",
+      "halloween e-card",
+      "halloween message",
+      "send halloween wish",
+      "digital halloween card",
+    ],
+    h1: "Send a Halloween card & wish",
+    tagline: "A friendly October note — more treat than trick.",
+    intro:
+      "Send a Halloween message by email with pumpkin paper, a ghost card, or a little October wish.",
+    body: [
+      "Write it yourself or let Little Letter help. The night can be playful without being scary.",
+    ],
+    exampleWishes: [
+      "Happy Halloween — wishing you good sweets and a warm porch light.",
+      "A little boo, mostly affection. Hope your October feels cosy.",
+    ],
+    faq: [],
+  },
   "fathers-day": {
     slug: "fathers-day",
     emoji: "👔",

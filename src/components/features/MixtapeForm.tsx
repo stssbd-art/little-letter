@@ -387,6 +387,7 @@ export function MixtapeForm() {
             senderName: next.senderName || mix.from || "",
             recipientName: next.recipientName || mix.to || "",
             dedication: next.dedication || mix.note || "",
+            look: mix.look === "halloween" ? "halloween" : next.look,
             trackIds: mix.tracks,
             customTracks: mix.extras ?? [],
           };
@@ -621,6 +622,7 @@ export function MixtapeForm() {
       senderEmail: current.senderEmail.trim(),
       title: current.title.trim(),
       dedication: current.dedication.trim(),
+      look: current.look,
       trackIds: current.trackIds,
       customTracks: current.customTracks,
       createdAt: new Date().toISOString(),
@@ -754,6 +756,7 @@ export function MixtapeForm() {
         from: draft.senderName.trim() || "a friend",
         to: draft.recipientName.trim() || "someone special",
         note: draft.dedication.trim(),
+        look: draft.look,
         tracks: draft.trackIds,
         extras: draft.customTracks,
       });
@@ -802,6 +805,7 @@ export function MixtapeForm() {
         <div className="space-y-4">
           <CassetteDeck
             title={draft.title}
+            look={draft.look}
             fromName={draft.senderName}
             toName={draft.recipientName}
             tracks={selected}
@@ -989,6 +993,33 @@ export function MixtapeForm() {
                 required
               />
             </Field>
+
+            <div>
+              <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
+                Cassette look
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {(
+                  [
+                    ["classic", "📼 Classic"],
+                    ["halloween", "🎃 Halloween"],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setDraft((d) => ({ ...d, look: id }))}
+                    className={
+                      draft.look === id
+                        ? "rounded-full border-2 border-[#c45a12] bg-[#fff1dc] px-3 py-1.5 font-display text-xs text-[#3a2418]"
+                        : "rounded-full border-2 border-[#d2a35a] bg-white/70 px-3 py-1.5 font-display text-xs text-[var(--ll-ink)]"
+                    }
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="For" htmlFor="mix-to">

@@ -8,6 +8,12 @@ import {
   type MixTrack,
 } from "@/lib/tracks";
 
+export type MixLook = "classic" | "halloween";
+
+export function resolveMixLook(value: unknown): MixLook {
+  return value === "halloween" ? "halloween" : "classic";
+}
+
 export type MixShare = {
   title: string;
   from: string;
@@ -15,6 +21,7 @@ export type MixShare = {
   note: string;
   tracks: string[];
   extras?: MixTrack[];
+  look?: MixLook;
 };
 
 /** Browser + Node safe base64url helpers (no Buffer on the client). */
@@ -85,18 +92,24 @@ export function encodeMixShare(mix: MixShare): string {
     mix.note.slice(0, 500),
   ];
 
+  const lookBit = mix.look === "halloween" ? "\u001fh" : "";
+
   if (v2Items.length === catalogIndices.length) {
-    return `1.${toBase64Url([...payloadHead, catalogIndices.join(".")].join("\u001f"))}`;
+    return `1.${toBase64Url(
+      [...payloadHead, catalogIndices.join(".")].join("\u001f") + lookBit
+    )}`;
   }
 
-  return `2.${toBase64Url([...payloadHead, v2Items.join("\u001e")].join("\u001f"))}`;
+  return `2.${toBase64Url(
+    [...payloadHead, v2Items.join("\u001e")].join("\u001f") + lookBit
+  )}`;
 }
 
 function decodeCompactV1(code: string): MixShare | null {
   if (!code.startsWith("1.")) return null;
   try {
     const raw = fromBase64Url(code.slice(2));
-    const [title, from, to, note, indexPart] = raw.split("\u001f");
+    const [title, from, to, note, indexPart, lookPart] = raw.split("\u001f");
     if (!title || !indexPart) return null;
     const tracks = indexPart
       .split(".")
@@ -110,6 +123,7 @@ function decodeCompactV1(code: string): MixShare | null {
       to: (to ?? "").slice(0, 60),
       note: (note ?? "").slice(0, 500),
       tracks,
+      look: resolveMixLook(lookPart === "h" ? "halloween" : "classic"),
     };
   } catch {
     return null;
@@ -120,7 +134,7 @@ function decodeCompactV2(code: string): MixShare | null {
   if (!code.startsWith("2.")) return null;
   try {
     const raw = fromBase64Url(code.slice(2));
-    const [title, from, to, note, trackPart] = raw.split("\u001f");
+    const [title, from, to, note, trackPart, lookPart] = raw.split("\u001f");
     if (!title || !trackPart) return null;
 
     const tracks: string[] = [];
@@ -155,6 +169,7 @@ function decodeCompactV2(code: string): MixShare | null {
       note: (note ?? "").slice(0, 500),
       tracks,
       extras: extras.length ? extras : undefined,
+      look: resolveMixLook(lookPart === "h" ? "halloween" : "classic"),
     };
   } catch {
     return null;
@@ -182,6 +197,7 @@ function decodeLegacyJson(code: string): MixShare | null {
       note: String(data.note ?? "").slice(0, 500),
       tracks,
       extras,
+      look: resolveMixLook(data.look),
     };
   } catch {
     return null;

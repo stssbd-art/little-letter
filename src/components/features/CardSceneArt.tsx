@@ -86,6 +86,12 @@ export function CardSceneArt({
       return <CupcakePartyScene {...props} />;
     case "cosmic-love":
       return <CosmicLoveScene {...props} />;
+    case "pumpkin-patch":
+      return <PumpkinPatchScene {...props} />;
+    case "friendly-ghost":
+      return <FriendlyGhostScene {...props} />;
+    case "moonlit-bats":
+      return <MoonlitBatsScene {...props} />;
     default:
       return <HoneyScene {...props} />;
   }
@@ -1262,6 +1268,91 @@ function CosmicLoveScene({ gid }: SceneProps) {
       >
         💫
       </motion.text>
+    </svg>
+  );
+}
+
+function PumpkinPatchScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-pkBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#2a1840" />
+          <stop offset="70%" stopColor="#4a2860" />
+          <stop offset="100%" stopColor="#ff9a3c" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-pkBg)`} />
+      <circle cx="188" cy="36" r="18" fill="#ffd27a" />
+      {[
+        { cx: 70, cy: 118, rx: 28, ry: 22, fill: "#e07a18" },
+        { cx: 120, cy: 108, rx: 34, ry: 28, fill: "#f08a20" },
+        { cx: 168, cy: 122, rx: 24, ry: 18, fill: "#c45a12" },
+      ].map((p) => (
+        <g key={p.cx}>
+          <ellipse cx={p.cx} cy={p.cy} rx={p.rx} ry={p.ry} fill={p.fill} />
+          <path
+            d={`M${p.cx - 8} ${p.cy - 10} Q${p.cx} ${p.cy - 24} ${p.cx + 8} ${p.cy - 10}`}
+            fill="none"
+            stroke="#3a2418"
+            strokeWidth="2"
+          />
+          <rect x={p.cx - 3} y={p.cy - 28} width="6" height="12" rx="2" fill="#5a8a32" />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function FriendlyGhostScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-ghBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#1c1430" />
+          <stop offset="100%" stopColor="#6a4890" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-ghBg)`} />
+      <motion.g
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <path
+          d="M90 120 C90 70 150 70 150 120 L150 132 L138 122 L126 132 L114 122 L102 132 L90 122 Z"
+          fill="#fff8f2"
+        />
+        <circle cx="110" cy="98" r="4" fill="#3a2860" />
+        <circle cx="132" cy="98" r="4" fill="#3a2860" />
+        <path d="M114 112 Q121 118 128 112" fill="none" stroke="#7a4ea8" strokeWidth="2" />
+      </motion.g>
+    </svg>
+  );
+}
+
+function MoonlitBatsScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-btBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#140e22" />
+          <stop offset="100%" stopColor="#3d2458" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-btBg)`} />
+      <circle cx="170" cy="48" r="26" fill="#ffb347" />
+      <motion.text
+        x="36"
+        y="58"
+        fontSize="28"
+        animate={{ x: [36, 70, 36], y: [58, 42, 58] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      >
+        🦇
+      </motion.text>
+      <text x="48" y="120" fontSize="26">
+        🎃
+      </text>
     </svg>
   );
 }

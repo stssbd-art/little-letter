@@ -363,6 +363,7 @@ export async function sendMixtapeEmail(
     from: mix.senderName,
     to: mix.recipientName,
     note: mix.dedication,
+    look: mix.look,
     tracks: mix.trackIds,
     extras: mix.customTracks,
   });

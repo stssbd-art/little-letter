@@ -27,7 +27,10 @@ export type CardDesignId =
   | "vintage-postcard"
   | "champagne-cheers"
   | "cupcake-party"
-  | "cosmic-love";
+  | "cosmic-love"
+  | "pumpkin-patch"
+  | "friendly-ghost"
+  | "moonlit-bats";
 
 export type CardDesign = {
   id: CardDesignId;
@@ -44,10 +47,58 @@ export type CardDesign = {
   badge: string;
   sparkles: string[];
   /** Extra motion flavour + decorative layer preset for animated previews */
-  vibe: "party" | "soft" | "garden" | "night" | "retro";
+  vibe: "party" | "soft" | "garden" | "night" | "retro" | "spooky";
 };
 
 export const CARD_DESIGNS: CardDesign[] = [
+  {
+    id: "pumpkin-patch",
+    title: "Pumpkin Patch",
+    blurb: "Lanterns, leaves, and a friendly grin",
+    emoji: "🎃",
+    occasion: "halloween",
+    pageBg: "linear-gradient(165deg,#2a1840 0%,#4a2860 40%,#ff9a3c 140%)",
+    cardBg: "#fff6ea",
+    border: "#e07a18",
+    accent: "#c45a12",
+    ink: "#3a2418",
+    muted: "#8a5030",
+    badge: "happy halloween",
+    sparkles: ["🎃", "🍂", "✨"],
+    vibe: "spooky",
+  },
+  {
+    id: "friendly-ghost",
+    title: "Friendly Ghost",
+    blurb: "A little boo, mostly sweet",
+    emoji: "👻",
+    occasion: "halloween",
+    pageBg: "linear-gradient(165deg,#1c1430 0%,#3a2860 55%,#6a4890 100%)",
+    cardBg: "#fff8f2",
+    border: "#c9b8e8",
+    accent: "#7a4ea8",
+    ink: "#2e2438",
+    muted: "#6a5880",
+    badge: "a gentle boo",
+    sparkles: ["👻", "💜", "⭐"],
+    vibe: "spooky",
+  },
+  {
+    id: "moonlit-bats",
+    title: "Moonlit Bats",
+    blurb: "An orange moon and a night sky",
+    emoji: "🦇",
+    occasion: "halloween",
+    pageBg: "linear-gradient(180deg,#140e22 0%,#2a1848 50%,#3d2458 100%)",
+    cardBg: "#fff3df",
+    border: "#f0a040",
+    accent: "#e08a20",
+    ink: "#3a2418",
+    muted: "#7a5840",
+    badge: "under the moon",
+    sparkles: ["🦇", "🌙", "🎃"],
+    vibe: "spooky",
+  },
   {
     id: "balloon-bash",
     title: "Balloon Bash",

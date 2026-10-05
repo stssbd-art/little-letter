@@ -305,6 +305,28 @@ function StationeryArt({
     );
   }
 
+  if (decor === "halloween") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-55"
+          style={{
+            backgroundImage: `radial-gradient(circle at 78% 18%, #ffd27a 0 22px, transparent 24px),
+              radial-gradient(circle at 18% 78%, #ffb347 0 16px, transparent 17px),
+              radial-gradient(circle at 50% 40%, ${accent}22 0 48px, transparent 49px)`,
+          }}
+        />
+        <span className={cn("absolute left-3 top-3", size)}>🎃</span>
+        <span className={cn("absolute right-3 top-3", size)}>👻</span>
+        <span className={cn("absolute bottom-4 left-4", size)}>🦇</span>
+        <span className={cn("absolute bottom-4 right-3", size)}>🍬</span>
+        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-xs opacity-85 sm:text-sm">
+          pumpkin night · happy halloween
+        </span>
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -333,6 +355,8 @@ function paperWash(stationery: LetterStationery): string {
       return `linear-gradient(180deg, #fff8f0, #ffe8d4 45%, #fff4e8)`;
     case "moon":
       return `linear-gradient(180deg, #f7f5fc, #ebe8f8 45%, #f5f3fa)`;
+    case "halloween":
+      return `linear-gradient(180deg, #fff6ea, #ffe0b8 42%, #fff1dc)`;
     default:
       return `linear-gradient(180deg, ${stationery.paperBg}, #fff6df 55%, ${stationery.paperBg})`;
   }

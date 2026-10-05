@@ -58,6 +58,7 @@ export const OCCASIONS: {
   label: string;
   emoji: string;
 }[] = [
+  { value: "halloween", label: "Halloween", emoji: "🎃" },
   { value: "birthday", label: "Birthday", emoji: "🎂" },
   { value: "love", label: "Love", emoji: "❤️" },
   { value: "friendship", label: "Friendship", emoji: "🤝" },

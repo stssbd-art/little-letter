@@ -323,6 +323,26 @@ const THEMES: Record<Occasion, FrameTheme> = {
     footerIcons: "⭐ ☕ ✨ 🌟 ☁️",
     mission: "If this felt appreciated right back, lovely.",
   },
+  halloween: {
+    pageBg: "linear-gradient(180deg,#2a1840 0%,#fff6ea 42%,#ffe0b8 100%)",
+    cardBg: "#fff6ea",
+    border: "#e07a18",
+    shadow: "#c45a12",
+    headerGrad: "linear-gradient(90deg,#e07a18,#f0a040,#7a4ea8)",
+    headerInk: "#3a2418",
+    headerSub: "#8a5030",
+    badgeBg: "#fff1dc",
+    badgeBorder: "#e07a18",
+    badgeInk: "#c45a12",
+    titleInk: "#c45a12",
+    bodyInk: "#3a2418",
+    msgBorder: "#e07a18",
+    accent: "#e07a18",
+    badge: "happy halloween · a little treat",
+    tagline: "a Halloween note, warm rather than scary",
+    footerIcons: "🎃 👻 🦇 🍬 ✨",
+    mission: "If this made them smile, the night did its job.",
+  },
 };
 
 function themeFor(occasion: Occasion): FrameTheme {
@@ -355,6 +375,9 @@ function cardOpenEmoji(designId: string): string {
     "pearl-locket": "🤍",
     "daisy-duo": "🌼",
     "ivory-veil": "💐",
+    "pumpkin-patch": "🎃",
+    "friendly-ghost": "👻",
+    "moonlit-bats": "🦇",
   };
   return byId[designId] ?? "💌";
 }

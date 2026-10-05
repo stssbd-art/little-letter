@@ -12,7 +12,8 @@ export type Occasion =
   | "promotion"
   | "valentines-day"
   | "mothers-day"
-  | "fathers-day";
+  | "fathers-day"
+  | "halloween";
 
 export type MessageStyle =
   | "cute"
@@ -91,6 +92,8 @@ export interface MixtapePayload {
   senderEmail: string;
   title: string;
   dedication: string;
+  /** Cassette look. Missing on older sends, which stay classic. */
+  look?: "classic" | "halloween";
   trackIds: string[];
   customTracks?: Array<{
     id: string;

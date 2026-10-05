@@ -277,6 +277,39 @@ export function buildCardSceneSvg(designId: CardDesignId): string {
         ${stars()}${heart(120, 72, 1.2, "#ff8fab")}
         <text x="120" y="48" text-anchor="middle" font-size="28">💫</text>`
       );
+    case "pumpkin-patch":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a1840"/><stop offset="70%" stop-color="#4a2860"/><stop offset="100%" stop-color="#ff9a3c"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <circle cx="188" cy="36" r="18" fill="#ffd27a"/>
+        <ellipse cx="70" cy="118" rx="28" ry="22" fill="#e07a18"/><path d="M62 108 Q70 96 78 108" fill="none" stroke="#3a2418" stroke-width="2"/><rect x="66" y="96" width="6" height="10" rx="2" fill="#5a8a32"/>
+        <ellipse cx="120" cy="112" rx="32" ry="26" fill="#f08a20"/><path d="M108 100 Q120 86 132 100" fill="none" stroke="#3a2418" stroke-width="2"/><rect x="116" y="84" width="7" height="12" rx="2" fill="#5a8a32"/>
+        <ellipse cx="168" cy="122" rx="24" ry="18" fill="#c45a12"/><rect x="164" y="104" width="5" height="8" rx="2" fill="#5a8a32"/>
+        <text x="36" y="48" font-size="22">🍂</text>`
+      );
+    case "friendly-ghost":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c1430"/><stop offset="100%" stop-color="#6a4890"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <circle cx="40" cy="28" r="1.5" fill="#fff"/><circle cx="80" cy="18" r="1.2" fill="#fff"/><circle cx="200" cy="24" r="1.5" fill="#fff"/>
+        <path d="M90 120 C90 70 150 70 150 120 L150 132 L138 122 L126 132 L114 122 L102 132 L90 122 Z" fill="#fff8f2"/>
+        <circle cx="110" cy="98" r="4" fill="#3a2860"/><circle cx="132" cy="98" r="4" fill="#3a2860"/>
+        <path d="M114 112 Q121 118 128 112" fill="none" stroke="#7a4ea8" stroke-width="2"/>
+        <text x="48" y="70" font-size="18">💜</text><text x="176" y="64" font-size="18">⭐</text>`
+      );
+    case "moonlit-bats":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#140e22"/><stop offset="100%" stop-color="#3d2458"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <circle cx="170" cy="48" r="26" fill="#ffb347"/>
+        <text x="36" y="58" font-size="28">🦇</text>
+        <text x="78" y="40" font-size="20">🦇</text>
+        <text x="48" y="110" font-size="22">🎃</text>
+        <text x="120" y="130" font-size="18">✨</text>`
+      );
     default:
       return buildCardSceneSvg("honey-classic");
   }

@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from "@/lib/constants";
+import { resolveMixLook, type MixLook } from "@/lib/mixtape-link";
 import type { MixTrack } from "@/lib/tracks";
 
 export type MixtapeDraft = {
@@ -8,6 +9,7 @@ export type MixtapeDraft = {
   senderEmail: string;
   title: string;
   dedication: string;
+  look: MixLook;
   trackIds: string[];
   customTracks: MixTrack[];
 };
@@ -19,6 +21,7 @@ export const EMPTY_MIXTAPE_DRAFT: MixtapeDraft = {
   senderEmail: "",
   title: "",
   dedication: "",
+  look: "classic",
   trackIds: [],
   customTracks: [],
 };
@@ -43,6 +46,7 @@ function normalizeDraft(parsed: Partial<MixtapeDraft> | null | undefined): Mixta
       typeof parsed.senderEmail === "string" ? parsed.senderEmail : "",
     title: typeof parsed.title === "string" ? parsed.title : "",
     dedication: typeof parsed.dedication === "string" ? parsed.dedication : "",
+    look: resolveMixLook(parsed.look),
     trackIds,
     customTracks,
   };

@@ -32,6 +32,11 @@ const VIBE_DECOR: Record<
     pattern:
       "repeating-linear-gradient(45deg, rgba(255,255,255,0.12) 0 10px, transparent 10px 20px)",
   },
+  spooky: {
+    corners: ["🎃", "👻", "🦇", "🍬"],
+    pattern:
+      "radial-gradient(circle at 80% 18%, rgba(255,168,60,0.55) 0 28px, transparent 30px), radial-gradient(circle at 18% 78%, rgba(122,78,168,0.35) 0 36px, transparent 37px)",
+  },
 };
 
 /** Bold, readable card art for gallery thumbnails and small previews. */

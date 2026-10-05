@@ -255,6 +255,7 @@ export function MixtapePlayer({ mix }: Props) {
 
       <CassetteDeck
         title={mix.title}
+        look={mix.look}
         fromName={mix.from}
         toName={mix.to}
         tracks={tracks}

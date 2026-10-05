@@ -206,6 +206,14 @@ const MIDDLES: Record<LetterFormData["occasion"], string[]> = {
     `Wishing you a day that feels easy, proud, and a little spoiled in the best way.`,
     `You are appreciated beyond the card aisle. Happy Father's Day.`,
   ],
+  halloween: [
+    `Happy Halloween — a little treat of a note, with none of the jump-scares.`,
+    `Wishing you porch lights, good sweets, and a night that feels playful rather than spooky.`,
+    `This is my Halloween card: orange moon, friendly ghost, and a warm hello.`,
+    `May your evening have costumes if you want them, and quiet if you do not.`,
+    `Sending a pumpkin-lantern kind of cheer. Happy Halloween.`,
+    `A small October wish: something sweet, something silly, and someone glad you exist.`,
+  ],
 };
 
 const EXTRAS: Record<LetterFormData["style"], string[]> = {

@@ -3,6 +3,7 @@
 import { memo, type ReactNode, type Ref } from "react";
 import { motion } from "framer-motion";
 import type { MixTrack } from "@/lib/tracks";
+import type { MixLook } from "@/lib/mixtape-link";
 import { youtubeWatchUrl } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,7 @@ type CassetteDeckProps = {
   controlsDisabled?: boolean;
   prevDisabled?: boolean;
   nextDisabled?: boolean;
+  look?: MixLook;
 };
 
 export function CassetteDeck({
@@ -49,6 +51,7 @@ export function CassetteDeck({
   controlsDisabled = false,
   prevDisabled = false,
   nextDisabled = false,
+  look = "classic",
 }: CassetteDeckProps) {
   const labelTitle = title.trim() || "Untitled Mix";
   const forLine = toName.trim() || "someone special";
@@ -67,6 +70,7 @@ export function CassetteDeck({
       : showScreen
         ? "READY"
         : "STOP";
+  const halloween = look === "halloween";
 
   return (
     <div
@@ -77,14 +81,20 @@ export function CassetteDeck({
     >
       <section
         className={cn(
-          "overflow-hidden rounded-[22px] border-[3px] border-[#2a2218]",
-          "bg-gradient-to-b from-[#4a4036] via-[#322a22] to-[#241c16]",
-          "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),6px_8px_0_rgba(61,47,34,0.22)]"
+          "overflow-hidden rounded-[22px] border-[3px]",
+          halloween
+            ? "border-[#e07a18] bg-gradient-to-b from-[#3a2158] via-[#241430] to-[#140c1c] shadow-[inset_0_1px_0_rgba(255,255,255,0.12),6px_8px_0_rgba(90,40,10,0.35)]"
+            : "border-[#2a2218] bg-gradient-to-b from-[#4a4036] via-[#322a22] to-[#241c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.12),6px_8px_0_rgba(61,47,34,0.22)]"
         )}
       >
         <div className="flex items-center justify-between border-b border-[#1a1510]/80 px-3 py-2">
-          <p className="font-pixel text-[9px] tracking-wide text-[#f6d58a]">
-            SIDE A · LITTLE LETTER MIX
+          <p
+            className={cn(
+              "font-pixel text-[9px] tracking-wide",
+              halloween ? "text-[#ffb347]" : "text-[#f6d58a]"
+            )}
+          >
+            {halloween ? "SIDE A · HALLOWEEN MIX" : "SIDE A · LITTLE LETTER MIX"}
           </p>
           <p className="font-pixel text-[8px] text-[#cbb892]">{status}</p>
         </div>
@@ -159,6 +169,7 @@ export function CassetteDeck({
                 disabled={controlsDisabled || spinning}
                 onClick={onPlay}
                 play
+                look={look}
               >
                 ▶
               </DeckButton>
@@ -191,12 +202,14 @@ function DeckButton({
   disabled,
   onClick,
   play = false,
+  look = "classic",
   children,
 }: {
   label: string;
   disabled?: boolean;
   onClick?: () => void;
   play?: boolean;
+  look?: MixLook;
   children: ReactNode;
 }) {
   return (
@@ -207,7 +220,11 @@ function DeckButton({
       onClick={onClick}
       className={cn(
         "flex items-center justify-center rounded-full border-2 border-[#1a1510] text-[#3d2f22]",
-        play ? "h-11 w-11 bg-[#f6d58a] text-base" : "h-10 w-10 bg-[#d8cdb6] text-sm",
+        play
+          ? look === "halloween"
+            ? "h-11 w-11 bg-[#ffb347] text-base"
+            : "h-11 w-11 bg-[#f6d58a] text-base"
+          : "h-10 w-10 bg-[#d8cdb6] text-sm",
         "shadow-[0_3px_0_#1a1510] active:translate-y-[2px] active:shadow-none",
         "disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none"
       )}

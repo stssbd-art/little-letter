@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { randomBytes } from "crypto";
-import type { MixShare } from "@/lib/mixtape-link";
+import { resolveMixLook, type MixShare } from "@/lib/mixtape-link";
 import {
   isValidYoutubeId,
   MIX_TRACKS,
@@ -30,6 +30,7 @@ function cleanShare(mix: MixShare): MixShare {
     from: mix.from.slice(0, 60),
     to: mix.to.slice(0, 60),
     note: mix.note.slice(0, 500),
+    look: resolveMixLook(mix.look),
     tracks,
     extras: extras.length
       ? extras.map((t) => ({
