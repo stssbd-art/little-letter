@@ -115,6 +115,8 @@ export function MessageForm() {
   function formWithLookVoice() {
     return {
       ...form,
+      recipientEmail: form.recipientEmail.trim(),
+      senderEmail: form.senderEmail.trim(),
       stationery: selectedStationery.id,
       style: selectedStationery.writingStyle,
       cardDesign: undefined,

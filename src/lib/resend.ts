@@ -14,6 +14,7 @@ import type { VoiceNotePayload } from "@/lib/voice-note";
 import { voiceNoteToAttachment } from "@/lib/voice-note";
 import type { InlineImageAttachment } from "@/lib/card-cover";
 import { buildCardOpenUrl, cardShareFromLetter } from "@/lib/card-link";
+import { isValidEmailAddress, normalizeEmail } from "@/lib/sender-usage";
 
 type SendResult = {
   id: string;
@@ -225,14 +226,18 @@ async function deliverEmail(opts: {
   inlineImages?: InlineImageAttachment[];
 }): Promise<SendResult> {
   const attachment = opts.voiceNote ? voiceNoteToAttachment(opts.voiceNote) : undefined;
-  const bcc = senderCopyBcc(opts.to, opts.senderEmail);
+  const to = normalizeEmail(opts.to);
+  if (!isValidEmailAddress(to)) {
+    throw new Error("Valid recipient email required.");
+  }
+  const bcc = senderCopyBcc(to, opts.senderEmail);
   const inlineImages = opts.inlineImages ?? [];
 
   if (isGmailApiConfigured()) {
     try {
       const id = await withMailTimeout(
         sendViaGmailApi({
-          to: opts.to,
+          to,
           bcc,
           from: brandedFrom(process.env.GMAIL_USER!.trim(), opts.senderName),
           subject: opts.subject,
@@ -259,7 +264,7 @@ async function deliverEmail(opts: {
   if (getGmailTransport()) {
     try {
       return await sendViaGmailSmtp({
-        to: opts.to,
+        to,
         bcc,
         subject: opts.subject,
         text: opts.text,
@@ -296,7 +301,7 @@ async function deliverEmail(opts: {
     const { data, error } = await withMailTimeout(
       resend.emails.send({
         from: verified.from,
-        to: opts.to,
+        to,
         bcc: bcc ? [bcc] : undefined,
         subject: opts.subject,
         text: opts.text,
@@ -327,7 +332,7 @@ async function deliverEmail(opts: {
   }
 
   console.info(`[Little Letter] No email provider — simulating ${opts.logLabel}`, {
-    to: opts.to,
+    to,
     bcc,
     subject: opts.subject,
   });
@@ -342,14 +347,23 @@ export async function sendLetterEmail(
   const share = cardShareFromLetter(letter);
   const openUrl = share ? buildCardOpenUrl(share) : undefined;
 
+  const prepared: GeneratedLetter = {
+    ...letter,
+    form: {
+      ...letter.form,
+      recipientEmail: normalizeEmail(letter.form.recipientEmail),
+      senderEmail: normalizeEmail(letter.form.senderEmail),
+    },
+  };
+
   return deliverEmail({
-    to: letter.form.recipientEmail,
-    subject: letterSubject(letter),
-    text: buildLetterEmailText(letter, hasVoice, { openUrl }),
-    html: buildLetterEmailHtml(letter, hasVoice, { openUrl }),
+    to: prepared.form.recipientEmail,
+    subject: letterSubject(prepared),
+    text: buildLetterEmailText(prepared, hasVoice, { openUrl }),
+    html: buildLetterEmailHtml(prepared, hasVoice, { openUrl }),
     logLabel: "send",
-    senderName: letter.form.senderName,
-    senderEmail: letter.form.senderEmail,
+    senderName: prepared.form.senderName,
+    senderEmail: prepared.form.senderEmail,
     voiceNote,
   });
 }
@@ -369,14 +383,19 @@ export async function sendMixtapeEmail(
   });
 
   const hasVoice = Boolean(voiceNote);
+  const prepared: MixtapePayload = {
+    ...mix,
+    recipientEmail: normalizeEmail(mix.recipientEmail),
+    senderEmail: normalizeEmail(mix.senderEmail),
+  };
   return deliverEmail({
-    to: mix.recipientEmail,
-    subject: mixtapeSubject(mix),
-    text: buildMixtapeEmailText(mix, playUrl, hasVoice),
-    html: buildMixtapeEmailHtml(mix, playUrl, hasVoice),
+    to: prepared.recipientEmail,
+    subject: mixtapeSubject(prepared),
+    text: buildMixtapeEmailText(prepared, playUrl, hasVoice),
+    html: buildMixtapeEmailHtml(prepared, playUrl, hasVoice),
     logLabel: "mixtape",
-    senderName: mix.senderName,
-    senderEmail: mix.senderEmail,
+    senderName: prepared.senderName,
+    senderEmail: prepared.senderEmail,
     voiceNote,
   });
 }

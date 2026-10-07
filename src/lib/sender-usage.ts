@@ -9,12 +9,20 @@ export type SenderUsageRecord = {
   usedSessionIds: string[];
 };
 
-export function normalizeSenderEmail(email: string) {
+export function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+export function isValidEmailAddress(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(email));
+}
+
+export function normalizeSenderEmail(email: string) {
+  return normalizeEmail(email);
+}
+
 export function isValidSenderEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeSenderEmail(email));
+  return isValidEmailAddress(email);
 }
 
 export function hasUsageDatabase() {

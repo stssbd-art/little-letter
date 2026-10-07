@@ -4,13 +4,10 @@ import type { LetterFormData } from "@/types";
 import { OCCASIONS, RELATIONSHIPS, STYLES } from "@/lib/constants";
 import { isCardDesignId } from "@/lib/card-designs";
 import { resolveLetterStationeryId } from "@/lib/letter-stationery";
+import { isValidEmailAddress, normalizeEmail } from "@/lib/sender-usage";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
 
 export async function POST(request: Request) {
   try {
@@ -22,13 +19,13 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    if (!body.recipientEmail || !isValidEmail(body.recipientEmail)) {
+    if (!body.recipientEmail || !isValidEmailAddress(body.recipientEmail)) {
       return NextResponse.json(
         { error: "A valid recipient email is required." },
         { status: 400 }
       );
     }
-    if (!body.senderEmail || !isValidEmail(body.senderEmail)) {
+    if (!body.senderEmail || !isValidEmailAddress(body.senderEmail)) {
       return NextResponse.json(
         { error: "Your email is required to track free sends." },
         { status: 400 }
@@ -49,9 +46,9 @@ export async function POST(request: Request) {
 
     const form: LetterFormData = {
       recipientName: body.recipientName.trim(),
-      recipientEmail: body.recipientEmail.trim(),
+      recipientEmail: normalizeEmail(body.recipientEmail),
       senderName: body.senderName.trim(),
-      senderEmail: body.senderEmail.trim().toLowerCase(),
+      senderEmail: normalizeEmail(body.senderEmail),
       relationship: body.relationship!,
       occasion: body.occasion!,
       style: body.style!,

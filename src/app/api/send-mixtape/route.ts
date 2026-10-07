@@ -5,10 +5,12 @@ import {
   addPaidCredit,
   consumeMixtapeSendAccess,
   getMixtapeSendAccess,
+  isValidEmailAddress,
   isValidSenderEmail,
   MIX_MULTI_SONG_LABEL,
   MIX_ONE_SONG_LABEL,
   mixtapePrice,
+  normalizeEmail,
   normalizeSenderEmail,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
@@ -25,10 +27,6 @@ import { logSend } from "@/lib/send-log";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Partial<MixtapePayload> & {
@@ -36,7 +34,7 @@ export async function POST(request: Request) {
       voiceNote?: unknown;
     };
 
-    if (!body.recipientEmail || !isValidEmail(body.recipientEmail)) {
+    if (!body.recipientEmail || !isValidEmailAddress(body.recipientEmail)) {
       return NextResponse.json(
         { error: "Valid recipient email required." },
         { status: 400 }
@@ -85,6 +83,7 @@ export async function POST(request: Request) {
     }
 
     const senderEmail = normalizeSenderEmail(body.senderEmail);
+    const recipientEmail = normalizeEmail(body.recipientEmail);
     const access = await getMixtapeSendAccess(senderEmail);
     if (!access.allowed) {
       const price = mixtapePrice(trackIds.length);
@@ -101,7 +100,7 @@ export async function POST(request: Request) {
 
     const mix: MixtapePayload = {
       recipientName: body.recipientName.trim(),
-      recipientEmail: body.recipientEmail.trim(),
+      recipientEmail,
       senderName: body.senderName.trim(),
       senderEmail,
       title: body.title.trim().slice(0, 80),

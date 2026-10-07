@@ -6,8 +6,10 @@ import {
   consumeSendAccess,
   getCardSendAccess,
   getSendAccess,
+  isValidEmailAddress,
   isValidSenderEmail,
   CARD_PRICE_LABEL,
+  normalizeEmail,
   normalizeSenderEmail,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
@@ -16,10 +18,6 @@ import { isCardDesignId } from "@/lib/card-designs";
 import { insertScheduledSend, parseScheduledAt } from "@/lib/scheduled-sends";
 
 export const dynamic = "force-dynamic";
-
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
 
 export async function POST(request: Request) {
   try {
@@ -36,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!body?.form?.recipientEmail || !isValidEmail(body.form.recipientEmail)) {
+    if (!body?.form?.recipientEmail || !isValidEmailAddress(body.form.recipientEmail)) {
       return NextResponse.json(
         { error: "Valid recipient email required." },
         { status: 400 }
@@ -66,6 +64,7 @@ export async function POST(request: Request) {
     }
 
     const senderEmail = normalizeSenderEmail(body.form.senderEmail);
+    const recipientEmail = normalizeEmail(body.form.recipientEmail);
     const isCard = Boolean(
       body.form.cardDesign && isCardDesignId(body.form.cardDesign)
     );
@@ -101,6 +100,7 @@ export async function POST(request: Request) {
       form: {
         ...body.form,
         senderEmail,
+        recipientEmail,
       },
       createdAt: body.createdAt || new Date().toISOString(),
     };

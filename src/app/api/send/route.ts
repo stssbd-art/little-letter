@@ -7,8 +7,10 @@ import {
   consumeCardSendAccess,
   getSendAccess,
   getCardSendAccess,
+  isValidEmailAddress,
   isValidSenderEmail,
   CARD_PRICE_LABEL,
+  normalizeEmail,
   normalizeSenderEmail,
 } from "@/lib/usage";
 import { isStripeConfigured } from "@/lib/stripe";
@@ -22,10 +24,6 @@ export const dynamic = "force-dynamic";
 /** Fail before platform 504 so the catch path can refund a consumed credit. */
 export const maxDuration = 30;
 
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as GeneratedLetter & {
@@ -33,7 +31,7 @@ export async function POST(request: Request) {
       voiceNote?: unknown;
     };
 
-    if (!body?.form?.recipientEmail || !isValidEmail(body.form.recipientEmail)) {
+    if (!body?.form?.recipientEmail || !isValidEmailAddress(body.form.recipientEmail)) {
       return NextResponse.json(
         { error: "Valid recipient email required." },
         { status: 400 }
@@ -53,6 +51,7 @@ export async function POST(request: Request) {
     }
 
     const senderEmail = normalizeSenderEmail(body.form.senderEmail);
+    const recipientEmail = normalizeEmail(body.form.recipientEmail);
     const isCard = Boolean(
       body.form.cardDesign && isCardDesignId(body.form.cardDesign)
     );
@@ -88,6 +87,7 @@ export async function POST(request: Request) {
       form: {
         ...body.form,
         senderEmail,
+        recipientEmail,
         stationery: body.form.cardDesign
           ? undefined
           : resolveLetterStationeryId(body.form.stationery),

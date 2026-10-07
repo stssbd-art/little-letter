@@ -8,8 +8,10 @@ import {
   consumeMixtapeForEmail,
   consumeMixtapeCreditForEmail,
   hasUsageDatabase,
+  isValidEmailAddress,
   isValidSenderEmail,
   mergeSenderIntoCookieUsage,
+  normalizeEmail,
   normalizeSenderEmail,
   readSenderUsage,
   writeSenderUsage,
@@ -493,4 +495,10 @@ export async function addPaidCredit(
   return { usage: next, alreadyApplied: false as const };
 }
 
-export { normalizeSenderEmail, isValidSenderEmail, hasUsageDatabase };
+export {
+  normalizeEmail,
+  normalizeSenderEmail,
+  isValidEmailAddress,
+  isValidSenderEmail,
+  hasUsageDatabase,
+};
