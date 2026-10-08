@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 
 export default function CreatePage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <PageHeader title="Create a Little Letter">
         <p className="text-[var(--ll-ink)]">A few words can mean so much.</p>
         <p className="mt-2">

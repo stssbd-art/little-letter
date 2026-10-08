@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function PreviewPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <PageHeader title="Preview your letter">
         Letters are free to send. Preview the envelope, then send.
       </PageHeader>

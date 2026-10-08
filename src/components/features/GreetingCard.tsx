@@ -236,11 +236,6 @@ function CardCover({
         </p>
       </div>
 
-      <div
-        className="pointer-events-none absolute inset-2.5 rounded-[1rem] border-2"
-        style={{ borderColor: `${design.border}66` }}
-        aria-hidden
-      />
     </div>
   );
 }
@@ -302,12 +297,11 @@ function CardInterior({
     >
       <div
         className={cn(
-          "m-3 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-2xl border-2 sm:m-5",
-          roomy ? "p-6 sm:p-8" : "p-5 sm:p-6"
+          "m-2 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain sm:m-3",
+          roomy ? "px-6 py-7 sm:px-10" : "px-5 py-6 sm:px-7"
         )}
         style={{
           backgroundColor: design.cardBg,
-          borderColor: design.border,
           backgroundImage: `repeating-linear-gradient(
             transparent,
             transparent 32px,
@@ -319,8 +313,7 @@ function CardInterior({
         }}
       >
         <div
-          className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 sm:h-14 sm:w-14"
-          style={{ borderColor: design.border }}
+          className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-14 sm:w-14"
         >
           <div className="h-full w-full scale-150">
             <CardSceneArt

@@ -417,7 +417,7 @@ export function StationeryPaper({
   compact = false,
 }: Props) {
   const topPad = compact ? "pt-12 sm:pt-14" : "pt-14 sm:pt-16";
-  const sidePad = compact ? "px-4 pb-4 sm:px-5" : "px-5 pb-5 sm:px-7 sm:pb-7";
+  const sidePad = compact ? "px-5 pb-5 sm:px-7" : "px-6 pb-6 sm:px-10 sm:pb-8";
 
   return (
     <div
@@ -440,38 +440,20 @@ export function StationeryPaper({
         compact={compact}
       />
 
-      <div
-        className="pointer-events-none absolute inset-2 rounded-xl border-2 sm:inset-2.5"
-        style={{ borderColor: `${stationery.paperBorder}cc` }}
-        aria-hidden
-      />
-
       {showChrome ? (
-        <div
+        <p
           className={cn(
-            "relative z-[2] mx-4 mt-10 flex items-center justify-between gap-2 rounded-lg border-2 px-3 shadow-sm sm:mx-5 sm:mt-12",
-            compact ? "py-1.5" : "py-2"
+            "relative z-[2] px-5 text-center text-xs sm:px-8",
+            compact ? "mt-8" : "mt-10"
           )}
-          style={{
-            borderColor: stationery.paperBorder,
-            backgroundColor: "rgba(255,255,255,0.72)",
-          }}
+          style={{ color: stationery.muted }}
         >
-          <div className="min-w-0">
-            <p
-              className="font-pixel text-[8px] tracking-wide sm:text-[9px]"
-              style={{ color: stationery.accent }}
-            >
-              {stationery.emoji} {stationery.title}
-            </p>
-            <p className="truncate text-[10px]" style={{ color: stationery.muted }}>
-              {stationery.era} · {stationery.blurb}
-            </p>
-          </div>
-          <span className="shrink-0 text-xl sm:text-2xl" aria-hidden>
-            {stationery.sealEmoji}
+          <span style={{ color: stationery.accent }}>
+            {stationery.emoji} {stationery.title}
           </span>
-        </div>
+          {" · "}
+          {stationery.era}
+        </p>
       ) : null}
 
       <div
@@ -483,18 +465,13 @@ export function StationeryPaper({
       >
         {subject ? (
           <p
-            className="mb-2 break-words font-display text-sm font-semibold leading-snug sm:mb-3 sm:text-base"
+            className="mb-3 break-words font-display text-base font-semibold leading-snug sm:text-lg"
             style={{ color: stationery.accent }}
           >
             {subject}
           </p>
         ) : null}
-        <div
-          className="rounded-xl border border-dashed bg-white/55 px-3 py-3 backdrop-blur-[1px] sm:px-4 sm:py-4"
-          style={{ borderColor: `${stationery.paperBorder}99` }}
-        >
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   );
@@ -537,24 +514,6 @@ export function StationerySwatch({
           border={stationery.paperBorder}
           compact
         />
-        <div
-          className="absolute inset-1.5 rounded-lg border"
-          style={{ borderColor: `${stationery.paperBorder}aa` }}
-        />
-        <div className="absolute inset-x-4 bottom-3 top-10 rounded-md bg-white/50 px-2 py-1.5 backdrop-blur-[0.5px]">
-          <div
-            className="mt-0.5 h-1.5 rounded-full opacity-45"
-            style={{ backgroundColor: stationery.ink }}
-          />
-          <div
-            className="mt-1 h-1.5 w-4/5 rounded-full opacity-30"
-            style={{ backgroundColor: stationery.ink }}
-          />
-          <div
-            className="mt-1 h-1.5 w-3/5 rounded-full opacity-20"
-            style={{ backgroundColor: stationery.ink }}
-          />
-        </div>
       </div>
       <div className="space-y-0.5 bg-white/80 px-2.5 py-2 dark:bg-black/25">
         <p className="flex items-center gap-1 font-display text-xs text-[var(--ll-ink)]">

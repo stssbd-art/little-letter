@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PixelWindow } from "@/components/ui/PixelWindow";
 import { PixelButton } from "@/components/ui/PixelButton";
-import { PixelCard } from "@/components/ui/PixelCard";
 import { Field, PixelInput, PixelSelect, PixelTextarea } from "@/components/ui/PixelInput";
+import { OccasionPicker } from "@/components/features/OccasionPicker";
 import { VoiceNoteRecorder } from "@/components/features/VoiceNoteRecorder";
 import { useLetter } from "@/components/providers/LetterProvider";
 import { useSound } from "@/components/providers/SoundProvider";
@@ -365,43 +365,37 @@ export function MessageForm() {
                 </Field>
               </div>
 
-              <div>
-                <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
-                  Occasion
-                </p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {OCCASIONS.map((o) => (
-                    <PixelCard
-                      key={o.value}
-                      as="button"
-                      selected={form.occasion === o.value}
-                      onClick={() => {
-                        play("click");
-                        const occasion = o.value as Occasion;
-                        const looks = stationeryForOccasion(occasion);
-                        const current = form.stationery ?? "classic-honey";
-                        const keep = looks.some((s) => s.id === current);
-                        const next = keep ? undefined : looks[0];
-                        setForm({
-                          occasion,
-                          ...(next
-                            ? {
-                                stationery: next.id as LetterStationeryId,
-                                style: next.writingStyle,
-                              }
-                            : {}),
-                        });
-                      }}
-                      className="flex flex-col items-center gap-1 py-3"
-                    >
-                      <span className="text-xl">{o.emoji}</span>
-                      <span className="text-center font-display text-xs">
-                        {o.label}
-                      </span>
-                    </PixelCard>
-                  ))}
-                </div>
-              </div>
+              <OccasionPicker
+                current={
+                  OCCASIONS.find((o) => o.value === form.occasion) ?? {
+                    value: form.occasion,
+                    label: "Occasion",
+                    emoji: "💌",
+                  }
+                }
+                options={OCCASIONS.map((o) => ({
+                  value: o.value,
+                  label: o.label,
+                  emoji: o.emoji,
+                }))}
+                onSelect={(value) => {
+                  play("click");
+                  const occasion = value as Occasion;
+                  const looks = stationeryForOccasion(occasion);
+                  const current = form.stationery ?? "classic-honey";
+                  const keep = looks.some((s) => s.id === current);
+                  const next = keep ? undefined : looks[0];
+                  setForm({
+                    occasion,
+                    ...(next
+                      ? {
+                          stationery: next.id as LetterStationeryId,
+                          style: next.writingStyle,
+                        }
+                      : {}),
+                  });
+                }}
+              />
 
               <div>
                 <p className="mb-2 font-display text-sm text-[var(--ll-ink)]">
