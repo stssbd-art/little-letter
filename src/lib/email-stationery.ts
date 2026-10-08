@@ -22,10 +22,6 @@ export function stationeryScriptStack() {
   return "'Great Vibes','Segoe Script','Apple Chancery','Brush Script MT',cursive";
 }
 
-export function stationeryPixelStack() {
-  return "'Press Start 2P','Courier New',Courier,monospace";
-}
-
 /** Same washes as StationeryPaper on the website. */
 export function stationeryPaperWash(stationery: LetterStationery): string {
   const a = stationery.accent;
@@ -159,8 +155,9 @@ export type StationeryLetterEmailParts = {
 };
 
 /**
- * Mirrors StationeryPaper on /preview — same chrome, lace/pattern, script body.
- * No separate “Little Letter” brand strip inside the paper (that’s only site chrome).
+ * One sheet of paper in the inbox — no nested frames.
+ * Stationery still changes the paper, ink, and seal. A soft flicker lives in
+ * the style block; clients that ignore it just show a still letter.
  */
 export function buildStationeryLetterCardHtml(
   parts: StationeryLetterEmailParts
@@ -170,100 +167,58 @@ export function buildStationeryLetterCardHtml(
   const bodyFont = stationeryFontStack(s.fontClass);
   const displayFont = stationeryDisplayStack();
   const scriptFont = stationeryScriptStack();
-  const pixelFont = stationeryPixelStack();
   const wash = stationeryPaperWash(s);
   const pattern = decorPattern(s.decor, s.accent, s.paperBorder);
   const patternSize = decorPatternSize(s.decor);
-  const layeredBg =
-    pattern === "none"
-      ? wash
-      : `${pattern}, ${wash}`;
-  const messageSize = s.fontClass === "font-pixel" ? "13px" : s.fontClass === "font-script" ? "22px" : "16px";
+  const layeredBg = pattern === "none" ? wash : `${pattern}, ${wash}`;
+  const messageSize =
+    s.fontClass === "font-pixel" ? "13px" : s.fontClass === "font-script" ? "22px" : "17px";
   const messageLine = s.fontClass === "font-script" ? "1.85" : "1.75";
 
   const voice = parts.hasVoiceNote
-    ? `<div style="margin-top:14px;padding:12px 14px;background:${s.stampColors.bg};border:2px dashed ${s.stampColors.border};border-radius:12px;font-size:13px;line-height:1.5;color:${s.ink};font-family:${displayFont};">
+    ? `<p style="margin:20px 0 0;font-family:${displayFont};font-size:13px;line-height:1.5;color:${s.muted};">
         🎙️ A voice note is attached — open the audio file in this email to hear it.
-      </div>`
+      </p>`
     : "";
 
-  /*
-   * Structure matches StationeryPaper:
-   * outer border → patterned paper → caption → corners + chrome → subject → dashed letter body
-   */
-  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border:3px solid ${s.paperBorder};border-radius:16px;overflow:hidden;box-shadow:6px 8px 0 rgba(61,47,34,0.16);">
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="ll-sheet" style="max-width:560px;border:2px solid ${s.paperBorder};border-radius:22px;background-color:${s.paperBg};background-image:${layeredBg};background-size:${pattern === "none" ? "auto" : patternSize}, cover;">
   <tr>
-    <td style="background-color:${s.paperBg};background-image:${layeredBg};background-size:${pattern === "none" ? "auto" : patternSize}, cover;padding:14px 12px 12px;">
-      <!-- inner dashed frame (site inset border) -->
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:2px dashed ${s.paperBorder};border-radius:12px;">
+    <td style="padding:32px 36px 28px;">
+      <p style="margin:0;text-align:center;font-family:${scriptFont};font-size:26px;line-height:1.15;color:${s.accent};">
+        <span class="ll-spark" style="font-family:${displayFont};font-size:12px;letter-spacing:1px;">${bits.tl}</span>
+        &nbsp;${escapeHtml(bits.caption)}&nbsp;
+        <span class="ll-spark ll-spark-late" style="font-family:${displayFont};font-size:12px;">${bits.tr}</span>
+      </p>
+      <p style="margin:18px 0 0;text-align:center;font-family:${displayFont};font-size:22px;font-weight:700;line-height:1.3;color:${s.ink};">
+        ${escapeHtml(parts.subject)}
+      </p>
+      <table role="presentation" width="72%" align="center" cellspacing="0" cellpadding="0" style="margin:14px auto 0;">
         <tr>
-          <td style="padding:12px 14px 0;text-align:center;">
-            <p style="margin:0;font-size:13px;color:${s.accent};font-family:${displayFont};opacity:0.85;">
-              ${escapeHtml(bits.caption)}
-            </p>
-          </td>
+          <td style="border-bottom:1px solid ${s.paperBorder};height:10px;font-size:0;line-height:0;">&nbsp;</td>
+          <td width="36" align="center" class="ll-spark" style="width:36px;font-family:${displayFont};font-size:12px;line-height:1;color:${s.accent};">✦</td>
+          <td style="border-bottom:1px solid ${s.paperBorder};height:10px;font-size:0;line-height:0;">&nbsp;</td>
         </tr>
+      </table>
+      <p style="margin:16px 0 0;text-align:center;font-family:${displayFont};font-size:13px;line-height:1.4;color:${s.muted};">
+        For ${escapeHtml(parts.recipientName)}
+      </p>
+      <div style="margin:22px 0 0;font-family:${bodyFont};font-size:${messageSize};line-height:${messageLine};color:${s.ink};">
+        ${parts.messageHtml}
+      </div>
+      <p style="margin:26px 0 0;text-align:right;font-family:${scriptFont};font-size:32px;color:${s.accent};line-height:1.1;">
+        — ${escapeHtml(parts.senderName)}
+      </p>
+      ${voice}
+      <table role="presentation" align="center" cellspacing="0" cellpadding="0" style="margin:26px auto 0;">
         <tr>
-          <td style="padding:10px 10px 0;">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-              <tr>
-                <td style="width:28px;font-size:20px;line-height:1;vertical-align:top;">${bits.tl}</td>
-                <td style="vertical-align:middle;padding:0 4px;">
-                  <!-- chrome strip — same as StationeryPaper -->
-                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:2px solid ${s.paperBorder};border-radius:10px;background-color:rgba(255,255,255,0.72);">
-                    <tr>
-                      <td style="padding:10px 12px;">
-                        <p style="margin:0;font-family:${pixelFont};font-size:10px;letter-spacing:0.8px;color:${s.accent};line-height:1.45;">
-                          ${s.emoji} ${escapeHtml(s.title)}
-                        </p>
-                        <p style="margin:5px 0 0;font-family:${displayFont};font-size:11px;color:${s.muted};line-height:1.4;">
-                          ${escapeHtml(s.era)} · ${escapeHtml(s.blurb)}
-                        </p>
-                      </td>
-                      <td style="width:44px;text-align:center;font-size:24px;padding-right:8px;vertical-align:middle;">${s.sealEmoji}</td>
-                    </tr>
-                  </table>
-                </td>
-                <td style="width:28px;font-size:20px;line-height:1;text-align:right;vertical-align:top;">${bits.tr}</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 18px 6px;">
-            <p style="margin:0;font-family:${displayFont};font-size:16px;font-weight:700;line-height:1.35;color:${s.accent};">
-              ${escapeHtml(parts.subject)}
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:8px 18px 14px;">
-            <div style="border:1px dashed ${s.paperBorder};border-radius:12px;background-color:rgba(255,255,255,0.55);padding:18px 16px;">
-              <p style="margin:0;font-family:${displayFont};font-size:12px;color:${s.muted};line-height:1.5;">
-                To: ${escapeHtml(parts.recipientName)} &lt;${escapeHtml(parts.recipientEmail)}&gt;
-              </p>
-              <div style="margin:16px 0 0;font-family:${bodyFont};font-size:${messageSize};line-height:${messageLine};color:${s.ink};">
-                ${parts.messageHtml}
-              </div>
-              <p style="margin:22px 0 0;text-align:right;font-family:${scriptFont};font-size:26px;color:${s.accent};line-height:1.15;">
-                — ${escapeHtml(parts.senderName)}
-              </p>
-            </div>
-            ${voice}
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0 10px 12px;">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-              <tr>
-                <td style="width:28px;font-size:18px;line-height:1;">${bits.bl}</td>
-                <td style="text-align:center;font-size:12px;color:${s.muted};font-family:${displayFont};">&nbsp;</td>
-                <td style="width:28px;font-size:18px;line-height:1;text-align:right;">${bits.br}</td>
-              </tr>
-            </table>
+          <td class="ll-seal" align="center" width="64" height="64" style="width:64px;height:64px;border-radius:32px;background-color:${s.stampColors.bg};border:2px solid ${s.stampColors.border};font-size:26px;line-height:64px;color:${s.stampColors.ink};text-align:center;">
+            ${s.sealEmoji}
           </td>
         </tr>
       </table>
+      <p style="margin:12px 0 0;text-align:center;font-family:${displayFont};font-size:11px;line-height:1.45;letter-spacing:0.3px;color:${s.muted};">
+        ${s.emoji} ${escapeHtml(s.title)} · ${escapeHtml(s.era)}
+      </p>
     </td>
   </tr>
 </table>`;
@@ -272,5 +227,18 @@ export function buildStationeryLetterCardHtml(
 /** Prefer @import inside <style> — more clients keep it than bare <link>. */
 export const STATIONERY_EMAIL_FONT_STYLE = `<style type="text/css">
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Press+Start+2P&family=Quicksand:wght@500;600;700&display=swap');
+@media screen {
+  .ll-spark { animation: ll-spark 2.8s ease-in-out infinite; }
+  .ll-spark-late { animation-delay: 1.15s; }
+  .ll-seal { animation: ll-seal 3.6s ease-in-out infinite; }
+}
+@keyframes ll-spark {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+@keyframes ll-seal {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
+}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Press+Start+2P&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />`;
