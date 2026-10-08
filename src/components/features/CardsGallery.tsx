@@ -60,7 +60,7 @@ export function CardsGallery() {
         each shows a big preview so you can see the style before you personalise.
       </p>
 
-      <ul className="grid gap-8 sm:grid-cols-2">
+      <ul className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
         {designs.map((design, index) => {
           const occasion = OCCASIONS.find((o) => o.value === design.occasion);
           return (

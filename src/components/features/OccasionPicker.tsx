@@ -32,10 +32,13 @@ export function OccasionPicker({
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
     const previous = document.activeElement;
     dialogRef.current?.focus();
     return () => {
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
       if (previous instanceof HTMLElement) previous.focus();
     };
@@ -68,7 +71,7 @@ export function OccasionPicker({
 
       {open
         ? createPortal(
-            <div className="fixed inset-0 z-[80] flex items-end justify-center p-3 sm:items-center sm:p-6">
+            <div className="fixed inset-0 z-[80] flex items-end justify-center p-0 sm:items-center sm:p-6">
               <button
                 type="button"
                 className="absolute inset-0 bg-[#3d2f22]/45"
@@ -81,7 +84,7 @@ export function OccasionPicker({
                 aria-modal="true"
                 aria-labelledby={titleId}
                 tabIndex={-1}
-                className="relative z-10 max-h-[min(80vh,36rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--ll-window-border)] bg-[var(--ll-window-bg)] p-4 shadow-[8px_10px_0_rgba(61,47,34,0.18)] outline-none sm:p-5"
+                className="relative z-10 max-h-[min(88dvh,36rem)] w-full overflow-y-auto rounded-t-2xl border border-[var(--ll-window-border)] bg-[var(--ll-window-bg)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[8px_10px_0_rgba(61,47,34,0.18)] outline-none sm:max-w-lg sm:rounded-2xl sm:p-5"
               >
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <h2
@@ -98,7 +101,7 @@ export function OccasionPicker({
                     Close
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {options.map((option) => {
                     const selected = option.value === current.value;
                     return (
@@ -110,7 +113,7 @@ export function OccasionPicker({
                           setOpen(false);
                         }}
                         className={cn(
-                          "flex items-center gap-2 rounded-xl px-3 py-2.5 text-left transition",
+                          "flex min-h-11 items-center gap-2 rounded-xl px-3 py-3 text-left transition",
                           selected
                             ? "bg-[#fff6df] text-[var(--ll-ink)] ring-2 ring-[var(--ll-pink-deep)]"
                             : "bg-white/50 text-[var(--ll-ink)] hover:bg-[#fff6df] dark:bg-white/5"

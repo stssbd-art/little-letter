@@ -417,7 +417,9 @@ export function StationeryPaper({
   compact = false,
 }: Props) {
   const topPad = compact ? "pt-12 sm:pt-14" : "pt-14 sm:pt-16";
-  const sidePad = compact ? "px-5 pb-5 sm:px-7" : "px-6 pb-6 sm:px-10 sm:pb-8";
+  const sidePad = compact
+    ? "px-4 pb-4 sm:px-6 lg:px-8"
+    : "px-4 pb-5 sm:px-8 lg:px-10 lg:pb-8";
 
   return (
     <div

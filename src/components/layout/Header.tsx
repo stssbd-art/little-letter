@@ -139,7 +139,7 @@ export function Header() {
               animate={{ opacity: 1 }}
               exit={reduceMotion ? undefined : { opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[60] bg-[var(--ll-ink)]/25 backdrop-blur-[2px] md:hidden"
+              className="fixed inset-0 z-[60] bg-[var(--ll-ink)]/25 backdrop-blur-[2px] lg:hidden"
               aria-label="Close menu"
               onClick={() => {
                 play("click");
@@ -156,7 +156,7 @@ export function Header() {
               className={cn(
                 "fixed inset-y-0 right-0 z-[70] flex h-dvh max-h-dvh w-[min(100%,20rem)] flex-col",
                 "border-l-2 border-[var(--ll-window-border)] bg-[var(--ll-window-bg)]",
-                "pb-[env(safe-area-inset-bottom)] shadow-[-8px_0_24px_rgba(0,0,0,0.12)] md:hidden"
+                "pb-[env(safe-area-inset-bottom)] shadow-[-8px_0_24px_rgba(0,0,0,0.12)] lg:hidden"
               )}
               aria-label="Site"
             >
@@ -231,7 +231,7 @@ export function Header() {
           <Logo size="sm" />
         </div>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-0.5 lg:flex xl:gap-1" aria-label="Main">
           {LINKS.map((link) => {
             const active = linkIsActive(pathname, link.href);
             return (
@@ -241,7 +241,7 @@ export function Header() {
                 aria-current={active ? "page" : undefined}
                 onClick={() => play("click")}
                 className={cn(
-                  "rounded-md px-3 py-2 font-display text-sm transition",
+                  "rounded-md px-2 py-2 font-display text-sm transition xl:px-3",
                   active
                     ? "bg-[var(--ll-pink-soft)] text-[var(--ll-pink-deep)]"
                     : "text-[var(--ll-ink)] hover:bg-white/60 dark:hover:bg-white/10"
@@ -284,7 +284,7 @@ export function Header() {
             className={cn(
               "inline-flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--ll-lavender)] sm:h-10 sm:w-10 sm:rounded-xl",
               "bg-white/70 text-[var(--ll-ink)] shadow-[0_2px_0_var(--ll-lavender-shadow)] sm:shadow-[0_3px_0_var(--ll-lavender-shadow)]",
-              "transition hover:bg-white/90 dark:bg-white/10 dark:hover:bg-white/15 md:hidden"
+              "transition hover:bg-white/90 dark:bg-white/10 dark:hover:bg-white/15 lg:hidden"
             )}
             onClick={() => {
               play("click");

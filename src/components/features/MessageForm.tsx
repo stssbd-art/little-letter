@@ -404,7 +404,7 @@ export function MessageForm() {
                 <p className="mb-2 text-xs text-[var(--ll-muted)]">
                   Paper looks for this occasion only.
                 </p>
-                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
                   {stationeryForOccasion(form.occasion).map((s) => {
                     const selected =
                       (form.stationery ?? "classic-honey") === s.id;
@@ -430,7 +430,7 @@ export function MessageForm() {
                 <p className="font-display text-sm text-[var(--ll-ink)]">
                   How do you want to write it?
                 </p>
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="grid gap-2 lg:grid-cols-2">
                   <button
                     type="button"
                     onClick={() => setWriteMode("ai")}
