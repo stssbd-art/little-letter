@@ -107,7 +107,7 @@ export const CARD_DESIGNS: CardDesign[] = [
     muted: "#7a5860",
     badge: "meet me under",
     sparkles: ["🌿", "💋", "✨"],
-    vibe: "soft",
+    vibe: "festive",
   },
   {
     id: "gingerbread-house",
@@ -139,7 +139,7 @@ export const CARD_DESIGNS: CardDesign[] = [
     muted: "#4a6070",
     badge: "winter sky",
     sparkles: ["🌌", "🌲", "✨"],
-    vibe: "night",
+    vibe: "festive",
   },
   {
     id: "holly-wreath",
@@ -203,7 +203,7 @@ export const CARD_DESIGNS: CardDesign[] = [
     muted: "#7a5840",
     badge: "for you",
     sparkles: ["🎁", "🎀", "✨"],
-    vibe: "party",
+    vibe: "festive",
   },
   {
     id: "christmas-star",
@@ -219,7 +219,7 @@ export const CARD_DESIGNS: CardDesign[] = [
     muted: "#6b5a40",
     badge: "follow the light",
     sparkles: ["⭐", "✨", "❄️"],
-    vibe: "night",
+    vibe: "festive",
   },
   {
     id: "pumpkin-patch",

@@ -53,6 +53,44 @@ function SpookyVeil() {
   );
 }
 
+function FestiveVeil() {
+  const bits = ["❄️", "✨", "⭐", "🎄", "🎁"];
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden rounded-[inherit]" aria-hidden>
+      <motion.div
+        className="absolute inset-x-[-15%] top-0 h-1/4"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(255,231,168,0.28), transparent)",
+        }}
+        animate={{ opacity: [0.2, 0.55, 0.25] }}
+        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {bits.map((glyph, i) => (
+        <motion.span
+          key={`${glyph}-${i}`}
+          className="absolute text-base sm:text-lg"
+          style={{ left: `${8 + i * 18}%`, top: `${-4 + (i % 3) * 6}%` }}
+          animate={{
+            y: [0, 110, 140],
+            x: [0, i % 2 === 0 ? 10 : -8, i % 2 === 0 ? -4 : 6],
+            opacity: [0, 0.85, 0],
+            rotate: [0, 40, 90],
+          }}
+          transition={{
+            duration: 5.5 + i * 0.55,
+            repeat: Infinity,
+            ease: "easeIn",
+            delay: i * 0.7,
+          }}
+        >
+          {glyph}
+        </motion.span>
+      ))}
+    </div>
+  );
+}
+
 function Shimmer({ night }: { night?: boolean }) {
   return (
     <motion.div
@@ -86,6 +124,14 @@ function CardCover({
 }) {
   const night = design.vibe === "night";
   const spooky = design.vibe === "spooky";
+  const festive = design.vibe === "festive" || design.occasion === "christmas";
+  const darkFestive =
+    design.id === "snowy-tree" ||
+    design.id === "santa-sleigh" ||
+    design.id === "northern-lights" ||
+    design.id === "cozy-fireplace" ||
+    design.id === "christmas-star";
+  const darkCover = night || darkFestive;
   const clipId = useId().replace(/:/g, "");
 
   if (compact) {
@@ -110,26 +156,27 @@ function CardCover({
         <div
           className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-10 text-center"
           style={{
-            background: night
+            background: darkCover
               ? "linear-gradient(to top, rgba(26,34,56,0.92) 55%, transparent)"
               : `linear-gradient(to top, ${design.cardBg} 50%, transparent)`,
           }}
         >
           <p
             className="font-display text-sm font-bold leading-tight"
-            style={{ color: night ? "#f7ecd4" : design.accent }}
+            style={{ color: darkCover ? "#f7ecd4" : design.accent }}
           >
             {design.emoji} {design.title}
           </p>
           <p
             className="mt-0.5 line-clamp-1 text-[10px]"
-            style={{ color: night ? "#cbb892" : design.muted }}
+            style={{ color: darkCover ? "#cbb892" : design.muted }}
           >
             {design.blurb}
           </p>
         </div>
-        <Shimmer night={night || spooky} />
+        <Shimmer night={darkCover || spooky} />
         {spooky ? <SpookyVeil /> : null}
+        {festive ? <FestiveVeil /> : null}
       </div>
     );
   }
@@ -169,8 +216,9 @@ function CardCover({
             background: `linear-gradient(to top, ${design.cardBg}, transparent)`,
           }}
         />
-        <Shimmer night={night || spooky} />
+        <Shimmer night={darkCover || spooky} />
         {spooky ? <SpookyVeil /> : null}
+        {festive ? <FestiveVeil /> : null}
       </div>
 
       <div

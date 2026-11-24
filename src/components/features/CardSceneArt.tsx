@@ -26,8 +26,10 @@ export function CardSceneArt({
   border: string;
   gid?: string;
 }) {
-  if (compact) {
-    return <CompactCardArt design={getCardDesign(designId)} />;
+  const design = getCardDesign(designId);
+  /* Christmas keeps illustrated motion even as gallery thumbnails. */
+  if (compact && design.occasion !== "christmas") {
+    return <CompactCardArt design={design} />;
   }
 
   const props = { compact, accent, border, gid };
@@ -1590,57 +1592,139 @@ function MoonlitBatsScene({ gid }: SceneProps) {
   );
 }
 
+function FallingFlakes({
+  count = 8,
+  color = "#fff",
+}: {
+  count?: number;
+  color?: string;
+}) {
+  return (
+    <>
+      {Array.from({ length: count }, (_, i) => {
+        const x = 12 + ((i * 31) % 216);
+        return (
+          <motion.circle
+            key={i}
+            cx={x}
+            cy={-8}
+            r={i % 3 === 0 ? 2.2 : 1.4}
+            fill={color}
+            animate={{
+              y: [0, 175],
+              x: [0, i % 2 === 0 ? 10 : -8, 4],
+              opacity: [0, 1, 0.2],
+            }}
+            transition={{
+              duration: 3.8 + (i % 4) * 0.7,
+              repeat: Infinity,
+              ease: "linear",
+              delay: i * 0.35,
+            }}
+          />
+        );
+      })}
+    </>
+  );
+}
+
 function SnowyTreeScene({ gid }: SceneProps) {
+  const ornaments = [
+    { cx: 112, cy: 52, fill: "#c45a48" },
+    { cx: 130, cy: 64, fill: "#d4a84a" },
+    { cx: 104, cy: 78, fill: "#fff6df" },
+    { cx: 136, cy: 88, fill: "#c45a48" },
+    { cx: 118, cy: 98, fill: "#7ec8ff" },
+    { cx: 96, cy: 112, fill: "#d4a84a" },
+    { cx: 142, cy: 118, fill: "#fff6df" },
+    { cx: 122, cy: 128, fill: "#c45a48" },
+  ];
   return (
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-stBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#152838" />
-          <stop offset="60%" stopColor="#2a4860" />
-          <stop offset="100%" stopColor="#dce8f0" />
+          <stop offset="0%" stopColor="#0e1c2c" />
+          <stop offset="45%" stopColor="#243e58" />
+          <stop offset="100%" stopColor="#d8e6f0" />
         </linearGradient>
+        <radialGradient id={`${gid}-stGlow`} cx="50%" cy="30%" r="50%">
+          <stop offset="0%" stopColor="#ffe7a8" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#ffe7a8" stopOpacity="0" />
+        </radialGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-stBg)`} />
-      {[20, 55, 95, 140, 190, 220].map((x, i) => (
+      <ellipse cx="120" cy="36" rx="70" ry="40" fill={`url(#${gid}-stGlow)`} />
+      {[22, 58, 95, 155, 198, 222].map((x, i) => (
         <motion.circle
           key={x}
           cx={x}
-          cy={-6}
-          r={i % 2 === 0 ? 2 : 1.4}
-          fill="#fff"
-          animate={{ y: [0, 170], opacity: [0.2, 1, 0.2] }}
-          transition={{ duration: 4 + i * 0.4, repeat: Infinity, delay: i * 0.35 }}
+          cy={14 + (i % 3) * 10}
+          r="1.2"
+          fill="#fff6df"
+          animate={{ opacity: [0.2, 1, 0.25] }}
+          transition={{ duration: 1.7 + i * 0.2, repeat: Infinity }}
         />
       ))}
-      <ellipse cx="120" cy="150" rx="110" ry="16" fill="#eef4f8" />
-      <path d="M120 28 L150 70 L135 70 L160 105 L140 105 L170 140 L70 140 L100 105 L80 105 L105 70 L90 70 Z" fill="#2f6b4a" />
-      <rect x="114" y="140" width="12" height="12" rx="2" fill="#6b4a28" />
-      {[
-        [112, 48],
-        [128, 62],
-        [105, 82],
-        [135, 92],
-        [118, 112],
-        [98, 120],
-        [140, 124],
-      ].map(([cx, cy], i) => (
-        <motion.circle
-          key={`${cx}-${cy}`}
-          cx={cx}
-          cy={cy}
-          r="3"
-          fill={i % 3 === 0 ? "#c45a48" : i % 3 === 1 ? "#d4a84a" : "#fff6df"}
-          animate={{ opacity: [0.45, 1, 0.45], scale: [0.9, 1.15, 0.9] }}
-          transition={{ duration: 1.6 + i * 0.15, repeat: Infinity }}
+      <FallingFlakes count={9} />
+      <ellipse cx="120" cy="152" rx="118" ry="18" fill="#eef4f8" />
+      <ellipse cx="70" cy="148" rx="28" ry="8" fill="#fff" opacity="0.7" />
+      <ellipse cx="175" cy="150" rx="22" ry="7" fill="#fff" opacity="0.65" />
+      <motion.g
+        animate={{ y: [0, -2, 0] }}
+        transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <path
+          d="M120 22 L152 68 L138 68 L168 102 L148 102 L182 142 L58 142 L92 102 L72 102 L102 68 L88 68 Z"
+          fill="#2a6a48"
         />
-      ))}
-      <motion.polygon
-        points="120,18 124,28 134,28 126,34 129,44 120,38 111,44 114,34 106,28 116,28"
-        fill="#ffe7a8"
-        animate={{ opacity: [0.65, 1, 0.7], scale: [0.95, 1.08, 0.95] }}
-        transition={{ duration: 2.2, repeat: Infinity }}
-        style={{ transformOrigin: "120px 30px" }}
+        <path
+          d="M120 34 L140 64 L130 64 L152 92 L140 92 L160 128 L80 128 L100 92 L88 92 L110 64 L100 64 Z"
+          fill="#348a58"
+          opacity="0.85"
+        />
+        <rect x="114" y="140" width="12" height="14" rx="2" fill="#6b4a28" />
+        {ornaments.map((o, i) => (
+          <motion.circle
+            key={`${o.cx}-${o.cy}`}
+            cx={o.cx}
+            cy={o.cy}
+            r="3.4"
+            fill={o.fill}
+            animate={{ opacity: [0.45, 1, 0.5], scale: [0.9, 1.2, 0.9] }}
+            transition={{ duration: 1.4 + i * 0.12, repeat: Infinity, delay: i * 0.1 }}
+            style={{ transformOrigin: `${o.cx}px ${o.cy}px` }}
+          />
+        ))}
+        <motion.polygon
+          points="120,12 125,24 138,24 128,32 132,44 120,36 108,44 112,32 102,24 115,24"
+          fill="#ffe7a8"
+          animate={{ opacity: [0.7, 1, 0.75], scale: [0.94, 1.1, 0.94], rotate: [0, 6, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity }}
+          style={{ transformOrigin: "120px 28px" }}
+        />
+      </motion.g>
+      <motion.rect
+        x="48"
+        y="132"
+        width="18"
+        height="16"
+        rx="2"
+        fill="#c45a48"
+        animate={{ y: [0, -3, 0] }}
+        transition={{ duration: 2.2, repeat: Infinity, delay: 0.3 }}
       />
+      <rect x="54" y="128" width="6" height="8" fill="#d4a84a" />
+      <motion.rect
+        x="178"
+        y="134"
+        width="16"
+        height="14"
+        rx="2"
+        fill="#2f6b4a"
+        animate={{ y: [0, -2, 0] }}
+        transition={{ duration: 2.6, repeat: Infinity, delay: 0.6 }}
+      />
+      <rect x="183" y="130" width="6" height="8" fill="#d4a84a" />
     </svg>
   );
 }
@@ -1650,29 +1734,75 @@ function SantaSleighScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-ssBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0c1428" />
-          <stop offset="70%" stopColor="#243868" />
-          <stop offset="100%" stopColor="#8aa0c8" />
+          <stop offset="0%" stopColor="#08101f" />
+          <stop offset="55%" stopColor="#1e3468" />
+          <stop offset="100%" stopColor="#7a94c0" />
         </linearGradient>
+        <radialGradient id={`${gid}-ssMoon`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fff8dc" />
+          <stop offset="50%" stopColor="#ffe7a8" />
+          <stop offset="100%" stopColor="#ffe7a8" stopOpacity="0" />
+        </radialGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-ssBg)`} />
-      {[18, 48, 80, 120, 170, 210].map((x, i) => (
-        <circle key={x} cx={x} cy={14 + (i % 3) * 12} r="1.2" fill="#fff6df" opacity={0.7} />
+      {[16, 40, 72, 110, 160, 200, 228].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={10 + (i % 4) * 12}
+          r="1.15"
+          fill="#fff6df"
+          animate={{ opacity: [0.15, 1, 0.2] }}
+          transition={{ duration: 1.8 + i * 0.2, repeat: Infinity }}
+        />
       ))}
-      <circle cx="190" cy="36" r="18" fill="#fff4c8" opacity="0.9" />
+      <motion.circle
+        cx="198"
+        cy="32"
+        r="36"
+        fill={`url(#${gid}-ssMoon)`}
+        animate={{ opacity: [0.6, 1, 0.7] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      />
+      <circle cx="198" cy="32" r="16" fill="#fff4c8" />
+      <FallingFlakes count={7} color="#e8f0ff" />
+      <ellipse cx="120" cy="152" rx="130" ry="16" fill="#c8d8ec" opacity="0.55" />
       <motion.g
-        animate={{ x: [0, 8, 0], y: [0, -4, 0] }}
-        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ x: [-40, 260], y: [0, -8, 4, -6, 0] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
       >
-        <ellipse cx="70" cy="78" rx="10" ry="6" fill="#f5f0e8" />
-        <ellipse cx="92" cy="76" rx="9" ry="5.5" fill="#f5f0e8" />
-        <ellipse cx="112" cy="78" rx="8" ry="5" fill="#f5f0e8" />
-        <path d="M120 72 L168 78 L168 96 L124 100 Z" fill="#c45a48" />
-        <rect x="124" y="80" width="18" height="12" rx="2" fill="#d4a84a" />
-        <path d="M120 100 Q145 108 168 100" fill="none" stroke="#8b5e34" strokeWidth="3" />
-        <circle cx="58" cy="78" r="3" fill="#c45a48" />
+        <g transform="translate(0 55)">
+          {[0, 22, 44].map((dx, i) => (
+            <g key={dx} transform={`translate(${dx} ${i % 2})`}>
+              <ellipse cx="10" cy="18" rx="9" ry="5.5" fill="#f5f0e8" />
+              <ellipse cx="4" cy="16" rx="4" ry="3" fill="#f5f0e8" />
+              <motion.path
+                d="M16 12 Q22 4 20 14"
+                fill="none"
+                stroke="#c45a48"
+                strokeWidth="1.5"
+                animate={{ d: ["M16 12 Q22 4 20 14", "M16 12 Q24 8 20 14", "M16 12 Q22 4 20 14"] }}
+                transition={{ duration: 0.35, repeat: Infinity }}
+              />
+              <circle cx="2" cy="16" r="1.6" fill="#c45a48" />
+            </g>
+          ))}
+          <path d="M68 14 L118 20 L118 40 L72 46 Z" fill="#c45a48" />
+          <rect x="76" y="22" width="16" height="12" rx="2" fill="#d4a84a" />
+          <circle cx="96" cy="18" r="7" fill="#f0e0d0" />
+          <path d="M90 14 Q96 6 102 14" fill="#c45a48" />
+          <path d="M68 46 Q94 54 118 46" fill="none" stroke="#8b5e34" strokeWidth="3" strokeLinecap="round" />
+          <motion.g
+            animate={{ y: [0, 10, 22], opacity: [0.8, 0.5, 0] }}
+            transition={{ duration: 1.4, repeat: Infinity }}
+          >
+            <rect x="88" y="48" width="8" height="8" rx="1" fill="#2f6b4a" />
+            <rect x="90" y="46" width="4" height="4" fill="#d4a84a" />
+          </motion.g>
+        </g>
       </motion.g>
-      <ellipse cx="120" cy="150" rx="120" ry="18" fill="#dce6f0" opacity="0.85" />
+      <path d="M20 140 L34 110 L48 140 Z" fill="#1a3028" opacity="0.75" />
+      <path d="M200 145 L214 118 L228 145 Z" fill="#1a3028" opacity="0.7" />
     </svg>
   );
 }
@@ -1682,38 +1812,76 @@ function MistletoeScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-mtBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#eef4ea" />
-          <stop offset="55%" stopColor="#fff6f2" />
-          <stop offset="100%" stopColor="#ffe4ea" />
+          <stop offset="0%" stopColor="#e6f0e2" />
+          <stop offset="50%" stopColor="#fff8f4" />
+          <stop offset="100%" stopColor="#ffe0e8" />
         </linearGradient>
+        <radialGradient id={`${gid}-mtBlush`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffb0c0" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#ffb0c0" stopOpacity="0" />
+        </radialGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-mtBg)`} />
-      <rect x="116" y="8" width="8" height="28" rx="2" fill="#8b5e34" />
-      <ellipse cx="100" cy="55" rx="28" ry="16" fill="#6a8a58" transform="rotate(-25 100 55)" />
-      <ellipse cx="140" cy="55" rx="28" ry="16" fill="#5a7a48" transform="rotate(25 140 55)" />
-      <ellipse cx="120" cy="70" rx="24" ry="14" fill="#6a8a58" />
-      <circle cx="112" cy="68" r="5" fill="#c45a68" />
-      <circle cx="124" cy="72" r="5" fill="#c45a68" />
-      <circle cx="118" cy="78" r="4" fill="#a84858" />
+      <ellipse cx="120" cy="120" rx="80" ry="36" fill={`url(#${gid}-mtBlush)`} />
+      {[30, 70, 170, 210].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={40 + (i % 2) * 30}
+          r="2"
+          fill="#ffb0c0"
+          animate={{ y: [0, -10, 0], opacity: [0.3, 0.9, 0.3] }}
+          transition={{ duration: 2.4 + i * 0.3, repeat: Infinity }}
+        />
+      ))}
+      <rect x="116" y="4" width="8" height="22" rx="2" fill="#8b5e34" />
+      <motion.g
+        animate={{ rotate: [-4, 4, -4] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "120px 28px" }}
+      >
+        <ellipse cx="96" cy="52" rx="30" ry="16" fill="#5a8a48" transform="rotate(-28 96 52)" />
+        <ellipse cx="144" cy="52" rx="30" ry="16" fill="#6a9a58" transform="rotate(28 144 52)" />
+        <ellipse cx="108" cy="68" rx="22" ry="14" fill="#4a7a38" transform="rotate(-12 108 68)" />
+        <ellipse cx="132" cy="68" rx="22" ry="14" fill="#5a8a48" transform="rotate(12 132 68)" />
+        <ellipse cx="120" cy="78" rx="20" ry="12" fill="#6a9a58" />
+        {[
+          [110, 70],
+          [126, 74],
+          [118, 82],
+          [120, 66],
+        ].map(([cx, cy], i) => (
+          <motion.circle
+            key={`${cx}-${cy}`}
+            cx={cx}
+            cy={cy}
+            r={i === 3 ? 4.5 : 5}
+            fill={i % 2 === 0 ? "#c45a68" : "#a83848"}
+            animate={{ scale: [1, 1.12, 1] }}
+            transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.2 }}
+            style={{ transformOrigin: `${cx}px ${cy}px` }}
+          />
+        ))}
+      </motion.g>
       <motion.path
-        d="M120 88 Q120 108 120 120"
+        d="M120 92 Q120 108 120 122"
         fill="none"
         stroke="#c45a68"
         strokeWidth="2"
-        strokeDasharray="3 4"
-        animate={{ opacity: [0.3, 1, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        strokeDasharray="3 5"
+        animate={{ opacity: [0.25, 1, 0.25], pathLength: [0.4, 1, 0.4] }}
+        transition={{ duration: 2.2, repeat: Infinity }}
       />
-      <motion.text
-        x="120"
-        y="138"
-        textAnchor="middle"
-        fontSize="22"
-        animate={{ y: [138, 132, 138], opacity: [0.5, 1, 0.5] }}
+      <motion.g
+        animate={{ y: [0, -8, 0], scale: [0.92, 1.08, 0.92] }}
         transition={{ duration: 2.4, repeat: Infinity }}
+        style={{ transformOrigin: "120px 138px" }}
       >
-        💋
-      </motion.text>
+        <path
+          d="M120 128 C112 120 100 126 104 136 C108 144 120 150 120 150 C120 150 132 144 136 136 C140 126 128 120 120 128 Z"
+          fill="#e87890"
+        />
+      </motion.g>
     </svg>
   );
 }
@@ -1723,30 +1891,81 @@ function GingerbreadHouseScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-ghBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fff6df" />
-          <stop offset="100%" stopColor="#f0c98a" />
+          <stop offset="0%" stopColor="#fff8e8" />
+          <stop offset="55%" stopColor="#ffe4b8" />
+          <stop offset="100%" stopColor="#e8b878" />
         </linearGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-ghBg)`} />
-      <ellipse cx="120" cy="150" rx="100" ry="14" fill="#e8c078" opacity="0.55" />
-      <path d="M70 90 L120 40 L170 90 Z" fill="#fff" />
-      <rect x="78" y="90" width="84" height="50" fill="#c4894a" />
-      <rect x="108" y="108" width="24" height="32" rx="2" fill="#8b5e34" />
-      <rect x="88" y="100" width="16" height="14" rx="2" fill="#7ec8ff" />
-      <rect x="136" y="100" width="16" height="14" rx="2" fill="#7ec8ff" />
-      {[86, 100, 114, 128, 142].map((x, i) => (
-        <circle key={x} cx={x} cy="86" r="4" fill={i % 2 === 0 ? "#ff6b8a" : "#7ed957"} />
+      <FallingFlakes count={6} color="#fff" />
+      <ellipse cx="120" cy="150" rx="105" ry="14" fill="#d4a868" opacity="0.45" />
+      <motion.g
+        animate={{ y: [0, -2, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <path d="M62 92 L120 28 L178 92 Z" fill="#fff" />
+        <path d="M70 92 L120 40 L170 92 Z" fill="#fff8f0" />
+        <rect x="74" y="90" width="92" height="52" fill="#c4894a" />
+        <rect x="74" y="90" width="92" height="8" fill="#a87038" />
+        <rect x="108" y="110" width="24" height="32" rx="2" fill="#6b4420" />
+        <circle cx="128" cy="126" r="2" fill="#d4a84a" />
+        <motion.rect
+          x="86"
+          y="100"
+          width="16"
+          height="14"
+          rx="2"
+          fill="#7ec8ff"
+          animate={{ opacity: [0.55, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        />
+        <motion.rect
+          x="138"
+          y="100"
+          width="16"
+          height="14"
+          rx="2"
+          fill="#7ec8ff"
+          animate={{ opacity: [0.6, 1, 0.55] }}
+          transition={{ duration: 2.2, repeat: Infinity, delay: 0.4 }}
+        />
+        <path d="M62 92 Q120 76 178 92" fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" />
+        {[80, 96, 112, 128, 144, 160].map((x, i) => (
+          <motion.circle
+            key={x}
+            cx={x}
+            cy="86"
+            r="4.5"
+            fill={i % 3 === 0 ? "#ff6b8a" : i % 3 === 1 ? "#7ed957" : "#6bcBff"}
+            animate={{ y: [0, -3, 0], scale: [1, 1.1, 1] }}
+            transition={{ duration: 1.6 + i * 0.1, repeat: Infinity, delay: i * 0.12 }}
+            style={{ transformOrigin: `${x}px 86px` }}
+          />
+        ))}
+        <motion.circle
+          cx="120"
+          cy="52"
+          r="6"
+          fill="#c45a48"
+          animate={{ scale: [1, 1.18, 1] }}
+          transition={{ duration: 1.6, repeat: Infinity }}
+          style={{ transformOrigin: "120px 52px" }}
+        />
+        <rect x="42" y="118" width="14" height="22" rx="2" fill="#e8a0b0" />
+        <rect x="184" y="120" width="14" height="20" rx="2" fill="#90d0a0" />
+      </motion.g>
+      {[50, 190].map((x, i) => (
+        <motion.ellipse
+          key={x}
+          cx={x}
+          cy={30 + i * 8}
+          rx="4"
+          ry="2.5"
+          fill="#ff8aa0"
+          animate={{ y: [0, 8, 0], rotate: [0, 20, 0] }}
+          transition={{ duration: 2.8, repeat: Infinity, delay: i }}
+        />
       ))}
-      <motion.circle
-        cx="120"
-        cy="58"
-        r="5"
-        fill="#c45a48"
-        animate={{ scale: [1, 1.15, 1] }}
-        transition={{ duration: 1.8, repeat: Infinity }}
-        style={{ transformOrigin: "120px 58px" }}
-      />
-      <path d="M70 90 Q120 78 170 90" fill="none" stroke="#fff" strokeWidth="5" />
     </svg>
   );
 }
@@ -1756,71 +1975,153 @@ function NorthernLightsScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-nlBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0a1428" />
-          <stop offset="55%" stopColor="#1a3860" />
-          <stop offset="100%" stopColor="#1e4038" />
+          <stop offset="0%" stopColor="#060e1c" />
+          <stop offset="50%" stopColor="#142848" />
+          <stop offset="100%" stopColor="#1a3830" />
         </linearGradient>
         <linearGradient id={`${gid}-nlAur`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#5ec4a0" stopOpacity="0" />
-          <stop offset="35%" stopColor="#5ec4a0" stopOpacity="0.7" />
-          <stop offset="65%" stopColor="#7ab8ff" stopOpacity="0.55" />
+          <stop offset="30%" stopColor="#5ec4a0" stopOpacity="0.75" />
+          <stop offset="55%" stopColor="#7ab8ff" stopOpacity="0.6" />
+          <stop offset="80%" stopColor="#a78bfa" stopOpacity="0.5" />
           <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id={`${gid}-nlAur2`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#7ab8ff" stopOpacity="0" />
+          <stop offset="40%" stopColor="#5ec4a0" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#c4a0ff" stopOpacity="0" />
         </linearGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-nlBg)`} />
-      {[24, 60, 100, 150, 200].map((x, i) => (
-        <circle key={x} cx={x} cy={12 + (i % 3) * 10} r="1.1" fill="#fff6df" opacity="0.8" />
+      {[20, 48, 80, 120, 160, 200, 225].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={10 + (i % 4) * 11}
+          r="1.15"
+          fill="#fff6df"
+          animate={{ opacity: [0.15, 1, 0.2] }}
+          transition={{ duration: 1.9 + i * 0.2, repeat: Infinity }}
+        />
       ))}
       <motion.path
-        d="M0 50 Q60 20 120 48 T240 40 L240 70 Q180 90 120 68 T0 80 Z"
+        d="M-20 46 Q50 12 110 44 T250 36 L250 72 Q180 96 110 70 T-20 84 Z"
         fill={`url(#${gid}-nlAur)`}
-        animate={{ opacity: [0.35, 0.85, 0.4], x: [0, 10, 0] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ opacity: [0.35, 0.9, 0.4], x: [0, 14, 0], y: [0, -4, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
-      <path d="M30 160 L45 110 L60 160 Z" fill="#1a3028" />
-      <path d="M55 160 L75 95 L95 160 Z" fill="#243c30" />
-      <path d="M150 160 L170 100 L190 160 Z" fill="#1a3028" />
-      <path d="M175 160 L200 88 L220 160 Z" fill="#243c30" />
-      <ellipse cx="120" cy="154" rx="120" ry="12" fill="#dce8f0" opacity="0.35" />
+      <motion.path
+        d="M-10 70 Q70 40 130 66 T250 58 L250 88 Q170 108 120 86 T-10 98 Z"
+        fill={`url(#${gid}-nlAur2)`}
+        animate={{ opacity: [0.2, 0.7, 0.25], x: [0, -12, 0] }}
+        transition={{ duration: 6.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+      />
+      <FallingFlakes count={5} color="#d8ecff" />
+      <path d="M18 160 L36 96 L54 160 Z" fill="#142820" />
+      <path d="M42 160 L68 78 L94 160 Z" fill="#1c3428" />
+      <path d="M148 160 L172 88 L196 160 Z" fill="#142820" />
+      <path d="M178 160 L206 70 L230 160 Z" fill="#1c3428" />
+      <ellipse cx="120" cy="156" rx="130" ry="12" fill="#dce8f0" opacity="0.28" />
+      <motion.ellipse
+        cx="120"
+        cy="50"
+        rx="60"
+        ry="20"
+        fill="#5ec4a0"
+        opacity={0.08}
+        animate={{ opacity: [0.04, 0.14, 0.05], scaleX: [1, 1.15, 1] }}
+        transition={{ duration: 4, repeat: Infinity }}
+        style={{ transformOrigin: "120px 50px" }}
+      />
     </svg>
   );
 }
 
 function HollyWreathScene({ gid }: SceneProps) {
+  const berries = [0, 40, 80, 120, 160, 200, 240, 280, 320];
   return (
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-hwBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fff8f4" />
-          <stop offset="100%" stopColor="#e8f0e4" />
+          <stop offset="0%" stopColor="#fff6f2" />
+          <stop offset="100%" stopColor="#e4f0e0" />
         </linearGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-hwBg)`} />
-      <circle cx="120" cy="82" r="48" fill="none" stroke="#2f6b4a" strokeWidth="18" />
-      <circle cx="120" cy="82" r="48" fill="none" stroke="#3f7b5a" strokeWidth="8" opacity="0.5" />
-      {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => {
-        const rad = (deg * Math.PI) / 180;
-        const x = 120 + Math.cos(rad) * 48;
-        const y = 82 + Math.sin(rad) * 48;
-        return (
-          <circle
-            key={deg}
-            cx={x}
-            cy={y}
-            r={i % 2 === 0 ? 5 : 4}
-            fill="#c45a48"
-          />
-        );
-      })}
-      <motion.path
-        d="M120 34 Q132 20 144 34 Q132 28 120 34"
-        fill="#c45a48"
-        animate={{ y: [0, -3, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      />
-      <text x="120" y="88" textAnchor="middle" fontSize="18" fill="#2f6b4a">
+      {[40, 200].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={28 + i * 20}
+          r="2.5"
+          fill="#c45a48"
+          animate={{ y: [0, 12, 0], opacity: [0.35, 1, 0.35] }}
+          transition={{ duration: 2.6 + i, repeat: Infinity }}
+        />
+      ))}
+      <motion.g
+        animate={{ rotate: [0, 8, 0, -8, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "120px 82px" }}
+      >
+        <circle cx="120" cy="82" r="52" fill="none" stroke="#2a6a48" strokeWidth="20" />
+        <circle cx="120" cy="82" r="52" fill="none" stroke="#3f8a58" strokeWidth="10" opacity="0.55" />
+        {berries.map((deg, i) => {
+          const rad = (deg * Math.PI) / 180;
+          const x = 120 + Math.cos(rad) * 52;
+          const y = 82 + Math.sin(rad) * 52;
+          return (
+            <motion.circle
+              key={deg}
+              cx={x}
+              cy={y}
+              r={i % 2 === 0 ? 5.5 : 4.2}
+              fill="#c45a48"
+              animate={{ scale: [1, 1.15, 1] }}
+              transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.15 }}
+              style={{ transformOrigin: `${x}px ${y}px` }}
+            />
+          );
+        })}
+        {[20, 100, 180, 260].map((deg) => {
+          const rad = (deg * Math.PI) / 180;
+          const x = 120 + Math.cos(rad) * 52;
+          const y = 82 + Math.sin(rad) * 52;
+          return (
+            <ellipse
+              key={`leaf-${deg}`}
+              cx={x}
+              cy={y}
+              rx="10"
+              ry="5"
+              fill="#4a8a58"
+              transform={`rotate(${deg + 40} ${x} ${y})`}
+              opacity="0.85"
+            />
+          );
+        })}
+      </motion.g>
+      <motion.g
+        animate={{ y: [0, -4, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 2.2, repeat: Infinity }}
+        style={{ transformOrigin: "120px 30px" }}
+      >
+        <path d="M120 28 Q138 12 152 30 Q136 24 120 28" fill="#c45a48" />
+        <path d="M120 28 Q102 12 88 30 Q104 24 120 28" fill="#d46858" />
+        <circle cx="120" cy="30" r="6" fill="#fff6df" />
+      </motion.g>
+      <motion.text
+        x="120"
+        y="90"
+        textAnchor="middle"
+        fontSize="22"
+        fill="#2f6b4a"
+        animate={{ opacity: [0.5, 1, 0.5], scale: [0.95, 1.05, 0.95] }}
+        transition={{ duration: 2.6, repeat: Infinity }}
+        style={{ transformOrigin: "120px 90px" }}
+      >
         ✦
-      </text>
+      </motion.text>
     </svg>
   );
 }
@@ -1830,33 +2131,83 @@ function CozyFireplaceScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-cfBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2a1810" />
-          <stop offset="55%" stopColor="#5a3020" />
-          <stop offset="100%" stopColor="#c47840" />
+          <stop offset="0%" stopColor="#1c100c" />
+          <stop offset="50%" stopColor="#4a2818" />
+          <stop offset="100%" stopColor="#c07038" />
         </linearGradient>
-        <radialGradient id={`${gid}-cfFire`} cx="50%" cy="70%" r="50%">
-          <stop offset="0%" stopColor="#ffe08a" />
-          <stop offset="45%" stopColor="#ff8a3c" />
-          <stop offset="100%" stopColor="#ff8a3c" stopOpacity="0" />
+        <radialGradient id={`${gid}-cfFire`} cx="50%" cy="70%" r="55%">
+          <stop offset="0%" stopColor="#fff0a0" />
+          <stop offset="35%" stopColor="#ff9a3c" />
+          <stop offset="100%" stopColor="#ff6a20" stopOpacity="0" />
         </radialGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-cfBg)`} />
-      <rect x="55" y="48" width="130" height="90" rx="6" fill="#3a2418" />
-      <rect x="70" y="62" width="100" height="68" rx="4" fill="#1c100c" />
+      <rect x="48" y="40" width="144" height="100" rx="8" fill="#3a2418" />
+      <rect x="58" y="38" width="124" height="10" rx="2" fill="#5a3a22" />
+      <rect x="66" y="56" width="108" height="72" rx="4" fill="#140c08" />
       <motion.ellipse
         cx="120"
-        cy="118"
-        rx="34"
-        ry="28"
+        cy="116"
+        rx="38"
+        ry="32"
         fill={`url(#${gid}-cfFire)`}
-        animate={{ scale: [1, 1.08, 0.96, 1], opacity: [0.75, 1, 0.8, 1] }}
-        transition={{ duration: 1.1, repeat: Infinity }}
-        style={{ transformOrigin: "120px 118px" }}
+        animate={{ scale: [1, 1.1, 0.94, 1.06, 1], opacity: [0.75, 1, 0.8, 1, 0.85] }}
+        transition={{ duration: 0.9, repeat: Infinity }}
+        style={{ transformOrigin: "120px 116px" }}
       />
-      <rect x="78" y="42" width="16" height="22" rx="2" fill="#c45a48" />
-      <rect x="112" y="42" width="16" height="22" rx="2" fill="#2f6b4a" />
-      <rect x="146" y="42" width="16" height="22" rx="2" fill="#d4a84a" />
-      <rect x="50" y="136" width="140" height="12" rx="2" fill="#5a3a22" />
+      <motion.path
+        d="M100 118 Q110 88 120 110 Q130 86 140 118"
+        fill="#ffc050"
+        animate={{ d: [
+          "M100 118 Q110 88 120 110 Q130 86 140 118",
+          "M100 118 Q108 80 120 105 Q132 78 140 118",
+          "M100 118 Q112 92 120 112 Q128 90 140 118",
+          "M100 118 Q110 88 120 110 Q130 86 140 118",
+        ] }}
+        transition={{ duration: 0.7, repeat: Infinity }}
+        opacity={0.85}
+      />
+      <rect x="92" y="122" width="20" height="8" rx="1" fill="#5a3a22" />
+      <rect x="118" y="124" width="22" height="7" rx="1" fill="#4a2e18" />
+      {[
+        { x: 74, fill: "#c45a48" },
+        { x: 112, fill: "#2f6b4a" },
+        { x: 150, fill: "#d4a84a" },
+      ].map((s, i) => (
+        <motion.g
+          key={s.x}
+          animate={{ y: [0, 2, 0] }}
+          transition={{ duration: 2 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}
+        >
+          <rect x={s.x} y="40" width="16" height="24" rx="2" fill={s.fill} />
+          <path
+            d={`M${s.x} 42 Q${s.x + 8} 32 ${s.x + 16} 42`}
+            fill={s.fill}
+            opacity="0.9"
+          />
+        </motion.g>
+      ))}
+      <rect x="42" y="136" width="156" height="14" rx="3" fill="#5a3a22" />
+      <motion.ellipse
+        cx="40"
+        cy="90"
+        rx="18"
+        ry="40"
+        fill="#ff9a3c"
+        opacity={0.08}
+        animate={{ opacity: [0.04, 0.14, 0.05] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      />
+      <motion.ellipse
+        cx="200"
+        cy="90"
+        rx="18"
+        ry="40"
+        fill="#ff9a3c"
+        opacity={0.08}
+        animate={{ opacity: [0.05, 0.12, 0.04] }}
+        transition={{ duration: 1.7, repeat: Infinity, delay: 0.3 }}
+      />
     </svg>
   );
 }
@@ -1866,35 +2217,77 @@ function SnowmanCheerScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-smBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#c8dcf0" />
-          <stop offset="55%" stopColor="#f4f8fc" />
-          <stop offset="100%" stopColor="#fff8f0" />
+          <stop offset="0%" stopColor="#a8c8e4" />
+          <stop offset="45%" stopColor="#e8f2fa" />
+          <stop offset="100%" stopColor="#fff6ea" />
         </linearGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-smBg)`} />
-      {[30, 70, 120, 170, 210].map((x, i) => (
-        <motion.circle
-          key={x}
-          cx={x}
-          cy={-4}
-          r="2"
-          fill="#fff"
-          animate={{ y: [0, 160] }}
-          transition={{ duration: 3.5 + i * 0.3, repeat: Infinity, delay: i * 0.4 }}
+      <circle cx="200" cy="28" r="22" fill="#fff4c8" opacity="0.85" />
+      <FallingFlakes count={10} />
+      <ellipse cx="120" cy="152" rx="100" ry="14" fill="#fff" />
+      <ellipse cx="50" cy="148" rx="24" ry="8" fill="#fff" opacity="0.8" />
+      <motion.g
+        animate={{ y: [0, -3, 0], rotate: [-1.5, 1.5, -1.5] }}
+        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "120px 110px" }}
+      >
+        <circle cx="120" cy="122" r="30" fill="#fff" stroke="#d0dce8" strokeWidth="1.2" />
+        <circle cx="120" cy="74" r="22" fill="#fff" stroke="#d0dce8" strokeWidth="1.2" />
+        <motion.g
+          animate={{ scaleY: [1, 0.15, 1] }}
+          transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+          style={{ transformOrigin: "120px 70px" }}
+        >
+          <circle cx="111" cy="70" r="2.4" fill="#2a2418" />
+          <circle cx="129" cy="70" r="2.4" fill="#2a2418" />
+        </motion.g>
+        <path d="M120 74 L138 80 L120 82 Z" fill="#e07a18" />
+        <motion.path
+          d="M98 90 Q120 104 142 90"
+          fill="none"
+          stroke="#c45a48"
+          strokeWidth="6"
+          strokeLinecap="round"
+          animate={{ d: [
+            "M98 90 Q120 104 142 90",
+            "M98 90 Q120 100 142 90",
+            "M98 90 Q120 104 142 90",
+          ] }}
+          transition={{ duration: 2.4, repeat: Infinity }}
         />
-      ))}
-      <ellipse cx="120" cy="150" rx="90" ry="12" fill="#fff" />
-      <circle cx="120" cy="118" r="28" fill="#fff" stroke="#d0d8e0" strokeWidth="1" />
-      <circle cx="120" cy="74" r="20" fill="#fff" stroke="#d0d8e0" strokeWidth="1" />
-      <circle cx="112" cy="70" r="2.2" fill="#2a2418" />
-      <circle cx="128" cy="70" r="2.2" fill="#2a2418" />
-      <path d="M120 74 L136 78 L120 80 Z" fill="#e07a18" />
-      <path d="M100 88 Q120 98 140 88" fill="none" stroke="#c45a48" strokeWidth="5" />
-      <rect x="104" y="52" width="32" height="8" rx="2" fill="#2a2418" />
-      <rect x="128" y="40" width="14" height="16" rx="2" fill="#2a2418" />
-      <circle cx="112" cy="110" r="2.5" fill="#2a2418" />
-      <circle cx="120" cy="118" r="2.5" fill="#2a2418" />
-      <circle cx="128" cy="126" r="2.5" fill="#2a2418" />
+        <path d="M98 90 Q88 100 82 112" fill="none" stroke="#c45a48" strokeWidth="5" strokeLinecap="round" />
+        <path d="M142 90 Q152 100 158 112" fill="none" stroke="#c45a48" strokeWidth="5" strokeLinecap="round" />
+        <rect x="102" y="50" width="36" height="10" rx="2" fill="#2a2418" />
+        <rect x="128" y="36" width="16" height="18" rx="2" fill="#2a2418" />
+        <circle cx="112" cy="112" r="2.8" fill="#2a2418" />
+        <circle cx="120" cy="122" r="2.8" fill="#2a2418" />
+        <circle cx="128" cy="132" r="2.8" fill="#2a2418" />
+        <motion.line
+          x1="78"
+          y1="110"
+          x2="58"
+          y2="98"
+          stroke="#6b4a28"
+          strokeWidth="3"
+          strokeLinecap="round"
+          animate={{ rotate: [0, -12, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity }}
+          style={{ transformOrigin: "78px 110px" }}
+        />
+        <motion.line
+          x1="162"
+          y1="110"
+          x2="182"
+          y2="96"
+          stroke="#6b4a28"
+          strokeWidth="3"
+          strokeLinecap="round"
+          animate={{ rotate: [0, 12, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, delay: 0.2 }}
+          style={{ transformOrigin: "162px 110px" }}
+        />
+      </motion.g>
     </svg>
   );
 }
@@ -1904,35 +2297,61 @@ function GiftBowScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-gbBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fff0f0" />
-          <stop offset="50%" stopColor="#ffe8d4" />
-          <stop offset="100%" stopColor="#e8f0e4" />
+          <stop offset="0%" stopColor="#fff0f2" />
+          <stop offset="50%" stopColor="#ffe8d8" />
+          <stop offset="100%" stopColor="#e4f0e4" />
+        </linearGradient>
+        <linearGradient id={`${gid}-gbBox`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#d46858" />
+          <stop offset="100%" stopColor="#b84838" />
         </linearGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-gbBg)`} />
-      <rect x="70" y="62" width="100" height="78" rx="6" fill="#c45a48" />
-      <rect x="112" y="62" width="16" height="78" fill="#d4a84a" />
-      <rect x="70" y="92" width="100" height="16" fill="#d4a84a" />
-      <motion.g
-        animate={{ scale: [1, 1.06, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        style={{ transformOrigin: "120px 54px" }}
-      >
-        <path d="M120 54 Q95 28 78 54 Q100 48 120 54" fill="#d4a84a" />
-        <path d="M120 54 Q145 28 162 54 Q140 48 120 54" fill="#e8c06a" />
-        <circle cx="120" cy="54" r="8" fill="#fff6df" />
-      </motion.g>
-      {[40, 200].map((x, i) => (
+      {[28, 60, 180, 212].map((x, i) => (
         <motion.circle
           key={x}
           cx={x}
-          cy={40 + i * 20}
-          r="3"
-          fill="#c45a48"
-          animate={{ y: [0, -8, 0], opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 2 + i, repeat: Infinity }}
+          cy={24 + (i % 2) * 40}
+          r="2.5"
+          fill={i % 2 === 0 ? "#c45a48" : "#d4a84a"}
+          animate={{ y: [0, -12, 0], opacity: [0.35, 1, 0.35], scale: [1, 1.3, 1] }}
+          transition={{ duration: 2.2 + i * 0.25, repeat: Infinity }}
+          style={{ transformOrigin: `${x}px ${24 + (i % 2) * 40}px` }}
         />
       ))}
+      <motion.g
+        animate={{ y: [0, -4, 0], rotate: [-1, 1, -1] }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "120px 100px" }}
+      >
+        <rect x="62" y="68" width="116" height="78" rx="8" fill={`url(#${gid}-gbBox)`} />
+        <rect x="112" y="68" width="16" height="78" fill="#d4a84a" />
+        <rect x="62" y="98" width="116" height="16" fill="#e8c06a" />
+        <motion.g
+          animate={{ scale: [1, 1.08, 1], rotate: [0, 3, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity }}
+          style={{ transformOrigin: "120px 58px" }}
+        >
+          <path d="M120 58 Q90 22 68 56 Q96 50 120 58" fill="#d4a84a" />
+          <path d="M120 58 Q150 22 172 56 Q144 50 120 58" fill="#e8c06a" />
+          <path d="M120 58 Q108 78 100 96" fill="none" stroke="#d4a84a" strokeWidth="5" />
+          <path d="M120 58 Q132 78 140 96" fill="none" stroke="#e8c06a" strokeWidth="5" />
+          <circle cx="120" cy="56" r="10" fill="#fff6df" />
+          <circle cx="120" cy="56" r="5" fill="#d4a84a" />
+        </motion.g>
+      </motion.g>
+      <motion.g
+        animate={{ y: [0, 40], opacity: [0, 1, 0], scale: [0.6, 1] }}
+        transition={{ duration: 2.4, repeat: Infinity, delay: 0.5 }}
+      >
+        <circle cx="50" cy="70" r="3" fill="#ffb0c0" />
+      </motion.g>
+      <motion.g
+        animate={{ y: [0, 36], opacity: [0, 1, 0] }}
+        transition={{ duration: 2.8, repeat: Infinity, delay: 1.2 }}
+      >
+        <circle cx="190" cy="60" r="3" fill="#d4a84a" />
+      </motion.g>
     </svg>
   );
 }
@@ -1942,46 +2361,83 @@ function ChristmasStarScene({ gid }: SceneProps) {
     <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
       <defs>
         <linearGradient id={`${gid}-csBg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0c1424" />
-          <stop offset="60%" stopColor="#243858" />
-          <stop offset="100%" stopColor="#d4b878" />
+          <stop offset="0%" stopColor="#080e1c" />
+          <stop offset="55%" stopColor="#1e3458" />
+          <stop offset="100%" stopColor="#c8a868" />
         </linearGradient>
         <radialGradient id={`${gid}-csGlow`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#fff4c8" />
-          <stop offset="40%" stopColor="#ffe08a" />
+          <stop offset="0%" stopColor="#fff8dc" />
+          <stop offset="35%" stopColor="#ffe08a" />
           <stop offset="100%" stopColor="#ffe08a" stopOpacity="0" />
         </radialGradient>
       </defs>
       <rect width="240" height="160" fill={`url(#${gid}-csBg)`} />
-      {[22, 50, 90, 140, 185, 215].map((x, i) => (
+      {[18, 42, 70, 100, 145, 185, 215].map((x, i) => (
         <motion.circle
           key={x}
           cx={x}
-          cy={16 + (i % 4) * 14}
-          r="1.2"
+          cy={12 + (i % 5) * 12}
+          r={i % 3 === 0 ? 1.6 : 1.1}
           fill="#fff6df"
-          animate={{ opacity: [0.2, 1, 0.2] }}
-          transition={{ duration: 1.8 + i * 0.2, repeat: Infinity }}
+          animate={{ opacity: [0.15, 1, 0.2], scale: [1, 1.4, 1] }}
+          transition={{ duration: 1.6 + i * 0.2, repeat: Infinity }}
+          style={{ transformOrigin: `${x}px ${12 + (i % 5) * 12}px` }}
         />
       ))}
+      <FallingFlakes count={6} color="#ffe8b0" />
       <motion.circle
         cx="120"
-        cy="58"
-        r="42"
+        cy="56"
+        r="52"
         fill={`url(#${gid}-csGlow)`}
-        animate={{ opacity: [0.5, 0.95, 0.55] }}
-        transition={{ duration: 2.6, repeat: Infinity }}
+        animate={{ opacity: [0.45, 0.95, 0.5], scale: [0.92, 1.08, 0.92] }}
+        transition={{ duration: 2.8, repeat: Infinity }}
+        style={{ transformOrigin: "120px 56px" }}
       />
-      <motion.polygon
-        points="120,24 128,48 154,48 133,64 141,90 120,74 99,90 107,64 86,48 112,48"
-        fill="#ffe7a8"
-        animate={{ scale: [0.96, 1.05, 0.96], rotate: [0, 8, 0] }}
-        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-        style={{ transformOrigin: "120px 58px" }}
+      <motion.g
+        animate={{ rotate: [0, 12, 0], scale: [0.96, 1.06, 0.96] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "120px 56px" }}
+      >
+        <polygon
+          points="120,18 130,46 160,46 136,64 146,94 120,76 94,94 104,64 80,46 110,46"
+          fill="#ffe7a8"
+        />
+        <polygon
+          points="120,30 126,48 146,48 130,60 136,78 120,68 104,78 110,60 94,48 114,48"
+          fill="#fff8dc"
+          opacity="0.85"
+        />
+      </motion.g>
+      {[0, 60, 120, 180, 240, 300].map((deg, i) => {
+        const rad = (deg * Math.PI) / 180;
+        const x = 120 + Math.cos(rad) * 48;
+        const y = 56 + Math.sin(rad) * 32;
+        return (
+          <motion.circle
+            key={deg}
+            cx={x}
+            cy={y}
+            r="2"
+            fill="#fff6df"
+            animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, delay: i * 0.25 }}
+            style={{ transformOrigin: `${x}px ${y}px` }}
+          />
+        );
+      })}
+      <ellipse cx="120" cy="152" rx="120" ry="14" fill="#f0e4c8" opacity="0.5" />
+      <path d="M28 152 L44 112 L60 152 Z" fill="#1a3028" opacity="0.8" />
+      <path d="M175 152 L198 104 L218 152 Z" fill="#1a3028" opacity="0.75" />
+      <motion.path
+        d="M44 112 L120 56 L198 104"
+        fill="none"
+        stroke="#ffe7a8"
+        strokeWidth="1"
+        strokeDasharray="4 6"
+        animate={{ opacity: [0.15, 0.55, 0.15] }}
+        transition={{ duration: 3, repeat: Infinity }}
       />
-      <ellipse cx="120" cy="150" rx="110" ry="14" fill="#f0e8d4" opacity="0.55" />
-      <path d="M40 150 L52 118 L64 150 Z" fill="#1a3028" opacity="0.8" />
-      <path d="M180 150 L198 112 L214 150 Z" fill="#1a3028" opacity="0.75" />
     </svg>
   );
 }
