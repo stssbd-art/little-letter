@@ -419,6 +419,34 @@ export const OCCASION_SEO: Record<Occasion, OccasionSeo> = {
     ],
     faq: [],
   },
+  christmas: {
+    slug: "christmas",
+    emoji: "🎄",
+    label: "Christmas",
+    title: "Send a Christmas Card & Letter Online",
+    metaDescription:
+      "Send a Christmas card, letter, or warm December wish by email. Trees, snow, holly, and cosy notes — letters are free.",
+    keywords: [
+      "christmas card",
+      "christmas e-card",
+      "christmas message",
+      "send christmas wish",
+      "digital christmas card",
+      "online christmas letter",
+    ],
+    h1: "Send a Christmas card & wish",
+    tagline: "A soft December note — lights, snow, and a little cheer.",
+    intro:
+      "Send a Christmas message by email with pine paper, a snowy card, or a cosy winter wish.",
+    body: [
+      "Write it yourself or let Little Letter help. Keep it merry, quiet, or somewhere in between.",
+    ],
+    exampleWishes: [
+      "Merry Christmas — wishing you warm lights and an easy December.",
+      "A little winter note for you: soft snow, soft joy, and someone thinking of you.",
+    ],
+    faq: [],
+  },
   "fathers-day": {
     slug: "fathers-day",
     emoji: "👔",

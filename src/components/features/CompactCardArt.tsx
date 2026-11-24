@@ -38,6 +38,11 @@ const VIBE_DECOR: Record<
     pattern:
       "radial-gradient(circle at 80% 18%, rgba(255,168,60,0.55) 0 28px, transparent 30px), radial-gradient(circle at 18% 78%, rgba(122,78,168,0.35) 0 36px, transparent 37px)",
   },
+  festive: {
+    corners: ["🎄", "⭐", "❄️", "🎁"],
+    pattern:
+      "radial-gradient(circle at 78% 16%, rgba(255,231,168,0.55) 0 26px, transparent 28px), radial-gradient(circle at 18% 72%, rgba(47,107,74,0.28) 0 34px, transparent 35px), radial-gradient(circle at 50% 40%, rgba(196,90,72,0.18) 0 40px, transparent 41px)",
+  },
 };
 
 /** Bold, readable card art for gallery thumbnails and small previews. */

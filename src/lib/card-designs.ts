@@ -30,7 +30,17 @@ export type CardDesignId =
   | "cosmic-love"
   | "pumpkin-patch"
   | "friendly-ghost"
-  | "moonlit-bats";
+  | "moonlit-bats"
+  | "snowy-tree"
+  | "santa-sleigh"
+  | "mistletoe-kiss"
+  | "gingerbread-house"
+  | "northern-lights"
+  | "holly-wreath"
+  | "cozy-fireplace"
+  | "snowman-cheer"
+  | "gift-bow"
+  | "christmas-star";
 
 export type CardDesign = {
   id: CardDesignId;
@@ -47,10 +57,170 @@ export type CardDesign = {
   badge: string;
   sparkles: string[];
   /** Extra motion flavour + decorative layer preset for animated previews */
-  vibe: "party" | "soft" | "garden" | "night" | "retro" | "spooky";
+  vibe: "party" | "soft" | "garden" | "night" | "retro" | "spooky" | "festive";
 };
 
 export const CARD_DESIGNS: CardDesign[] = [
+  {
+    id: "snowy-tree",
+    title: "Snowy Tree",
+    blurb: "Evergreen lights under soft snow",
+    emoji: "🎄",
+    occasion: "christmas",
+    pageBg: "linear-gradient(165deg,#1a2a38 0%,#2f4a58 45%,#f0f6fa 130%)",
+    cardBg: "#fff8f0",
+    border: "#2f6b4a",
+    accent: "#2f6b4a",
+    ink: "#243428",
+    muted: "#5a6e5e",
+    badge: "merry christmas",
+    sparkles: ["🎄", "❄️", "✨"],
+    vibe: "festive",
+  },
+  {
+    id: "santa-sleigh",
+    title: "Santa's Sleigh",
+    blurb: "A midnight ride across the sky",
+    emoji: "🛷",
+    occasion: "christmas",
+    pageBg: "linear-gradient(180deg,#0e1830 0%,#243868 55%,#8aa0c8 100%)",
+    cardBg: "#fff6ea",
+    border: "#c45a48",
+    accent: "#c45a48",
+    ink: "#2a2418",
+    muted: "#6b4f36",
+    badge: "ho ho hello",
+    sparkles: ["🛷", "⭐", "🎁"],
+    vibe: "festive",
+  },
+  {
+    id: "mistletoe-kiss",
+    title: "Mistletoe Kiss",
+    blurb: "Green leaves and a soft blush",
+    emoji: "🌿",
+    occasion: "christmas",
+    pageBg: "linear-gradient(160deg,#e8f0e4 0%,#fff6f2 50%,#ffe4ea 100%)",
+    cardBg: "#fff8f6",
+    border: "#6a8a58",
+    accent: "#c45a68",
+    ink: "#3a2828",
+    muted: "#7a5860",
+    badge: "meet me under",
+    sparkles: ["🌿", "💋", "✨"],
+    vibe: "soft",
+  },
+  {
+    id: "gingerbread-house",
+    title: "Gingerbread House",
+    blurb: "Icing roofs and candy windows",
+    emoji: "🏠",
+    occasion: "christmas",
+    pageBg: "linear-gradient(165deg,#fff1dc 0%,#ffe0b8 50%,#f0c98a 100%)",
+    cardBg: "#fff8ee",
+    border: "#b87840",
+    accent: "#8b5e34",
+    ink: "#3d2a18",
+    muted: "#8a6040",
+    badge: "fresh from the oven",
+    sparkles: ["🍪", "🍬", "🏠"],
+    vibe: "festive",
+  },
+  {
+    id: "northern-lights",
+    title: "Northern Lights",
+    blurb: "Aurora ribbons over winter pines",
+    emoji: "🌌",
+    occasion: "christmas",
+    pageBg: "linear-gradient(180deg,#0c1830 0%,#1a3860 40%,#2a8868 100%)",
+    cardBg: "#f2f7f4",
+    border: "#4a8a78",
+    accent: "#5ec4a0",
+    ink: "#1e2a30",
+    muted: "#4a6070",
+    badge: "winter sky",
+    sparkles: ["🌌", "🌲", "✨"],
+    vibe: "night",
+  },
+  {
+    id: "holly-wreath",
+    title: "Holly Wreath",
+    blurb: "Red berries on a green ring",
+    emoji: "🎄",
+    occasion: "christmas",
+    pageBg: "linear-gradient(160deg,#fff5f2 0%,#e8f0e4 55%,#fff8f0 100%)",
+    cardBg: "#fffaf6",
+    border: "#c45a48",
+    accent: "#2f6b4a",
+    ink: "#3a2418",
+    muted: "#6b5040",
+    badge: "welcome, winter",
+    sparkles: ["🌿", "❤️", "🎀"],
+    vibe: "festive",
+  },
+  {
+    id: "cozy-fireplace",
+    title: "Cosy Fireplace",
+    blurb: "Stockings, glow, and quiet warmth",
+    emoji: "🔥",
+    occasion: "christmas",
+    pageBg: "linear-gradient(180deg,#2a1810 0%,#6a3820 45%,#f0a060 120%)",
+    cardBg: "#fff4e8",
+    border: "#8b5e34",
+    accent: "#c45a28",
+    ink: "#3a2418",
+    muted: "#7a5030",
+    badge: "come sit by the fire",
+    sparkles: ["🔥", "🧦", "☕"],
+    vibe: "festive",
+  },
+  {
+    id: "snowman-cheer",
+    title: "Snowman Cheer",
+    blurb: "Carrot nose and a bright scarf",
+    emoji: "⛄",
+    occasion: "christmas",
+    pageBg: "linear-gradient(165deg,#d8e8f4 0%,#f4f8fc 50%,#fff8f0 100%)",
+    cardBg: "#ffffff",
+    border: "#7aa0c4",
+    accent: "#c45a48",
+    ink: "#243448",
+    muted: "#5a7088",
+    badge: "hello, winter friend",
+    sparkles: ["⛄", "❄️", "🧣"],
+    vibe: "festive",
+  },
+  {
+    id: "gift-bow",
+    title: "Gift Bow",
+    blurb: "A present wrapped with care",
+    emoji: "🎁",
+    occasion: "christmas",
+    pageBg: "linear-gradient(160deg,#fff0f0 0%,#ffe8d4 50%,#e8f0e4 100%)",
+    cardBg: "#fff8f2",
+    border: "#c45a48",
+    accent: "#d4a84a",
+    ink: "#3a2418",
+    muted: "#7a5840",
+    badge: "for you",
+    sparkles: ["🎁", "🎀", "✨"],
+    vibe: "party",
+  },
+  {
+    id: "christmas-star",
+    title: "Christmas Star",
+    blurb: "A bright star over quiet snow",
+    emoji: "⭐",
+    occasion: "christmas",
+    pageBg: "linear-gradient(180deg,#101828 0%,#243858 50%,#d4b878 130%)",
+    cardBg: "#fff8ec",
+    border: "#d4a84a",
+    accent: "#d4a84a",
+    ink: "#2a2418",
+    muted: "#6b5a40",
+    badge: "follow the light",
+    sparkles: ["⭐", "✨", "❄️"],
+    vibe: "night",
+  },
   {
     id: "pumpkin-patch",
     title: "Pumpkin Patch",

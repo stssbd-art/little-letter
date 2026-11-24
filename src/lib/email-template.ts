@@ -343,6 +343,26 @@ const THEMES: Record<Occasion, FrameTheme> = {
     footerIcons: "🎃 👻 🦇 🍬 ✨",
     mission: "If this made them smile, the night did its job.",
   },
+  christmas: {
+    pageBg: "linear-gradient(180deg,#1a2a38 0%,#fff8f0 42%,#ffe8d4 100%)",
+    cardBg: "#fff8f0",
+    border: "#c45a48",
+    shadow: "#8a3a30",
+    headerGrad: "linear-gradient(90deg,#2f6b4a,#c45a48,#d4a84a)",
+    headerInk: "#2a2418",
+    headerSub: "#6b4f36",
+    badgeBg: "#fff1e4",
+    badgeBorder: "#2f6b4a",
+    badgeInk: "#2f6b4a",
+    titleInk: "#c45a48",
+    bodyInk: "#2a2418",
+    msgBorder: "#c45a48",
+    accent: "#c45a48",
+    badge: "merry christmas · soft winter cheer",
+    tagline: "a Christmas note with lights folded in",
+    footerIcons: "🎄 ⭐ ❄️ 🎁 ✨",
+    mission: "If this warmed their December, mission accomplished.",
+  },
 };
 
 function themeFor(occasion: Occasion): FrameTheme {
@@ -378,6 +398,16 @@ function cardOpenEmoji(designId: string): string {
     "pumpkin-patch": "🎃",
     "friendly-ghost": "👻",
     "moonlit-bats": "🦇",
+    "snowy-tree": "🎄",
+    "santa-sleigh": "🛷",
+    "mistletoe-kiss": "🌿",
+    "gingerbread-house": "🏠",
+    "northern-lights": "🌌",
+    "holly-wreath": "🎄",
+    "cozy-fireplace": "🔥",
+    "snowman-cheer": "⛄",
+    "gift-bow": "🎁",
+    "christmas-star": "⭐",
   };
   return byId[designId] ?? "💌";
 }

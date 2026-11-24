@@ -28,7 +28,11 @@ export type LetterStationeryId =
   | "moonlit-tea"
   | "halloween-lantern"
   | "halloween-ghost"
-  | "halloween-bats";
+  | "halloween-bats"
+  | "christmas-pine"
+  | "christmas-snow"
+  | "christmas-holly"
+  | "christmas-cookie";
 
 export type LetterStationeryDecor =
   | "none"
@@ -45,12 +49,16 @@ export type LetterStationeryDecor =
   | "moon"
   | "halloween"
   | "halloween-ghost"
-  | "halloween-bats";
+  | "halloween-bats"
+  | "christmas-pine"
+  | "christmas-snow"
+  | "christmas-holly"
+  | "christmas-cookie";
 
 /** Old picker IDs → current looks (saved drafts still open). */
 const LEGACY_STATIONERY_IDS: Record<string, LetterStationeryId> = {
   "nostalgia-1970s": "strawberry-cloud",
-  "christmas-vintage": "moonlit-tea",
+  "christmas-vintage": "christmas-pine",
   "victorian-romance": "cherry-blossom",
 };
 
@@ -397,6 +405,90 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     decor: "halloween-bats",
     accent: "#e08a20",
     writingStyle: "whimsical",
+  },
+  {
+    id: "christmas-pine",
+    title: "Pine & Gold",
+    blurb: "Evergreen branches, soft gold & winter light",
+    emoji: "🎄",
+    era: "Christmas",
+    occasionHints: ["christmas"],
+    paperBg: "#f7f3ea",
+    paperBorder: "#2f6b4a",
+    ink: "#243428",
+    muted: "#5a6e5e",
+    fontClass: "font-display",
+    ...CLASSIC_ENVELOPE,
+    sealEmoji: "🎄",
+    stampLabel: "NOEL",
+    stampColors: { bg: "#eef6f0", ink: "#2f6b4a", border: "#2f6b4a" },
+    postmarkColor: "rgba(47,107,74,0.45)",
+    decor: "christmas-pine",
+    accent: "#2f6b4a",
+    writingStyle: "whimsical",
+  },
+  {
+    id: "christmas-snow",
+    title: "Snowfall Post",
+    blurb: "Icy blues, soft flakes & a quiet winter sky",
+    emoji: "❄️",
+    era: "Christmas",
+    occasionHints: ["christmas"],
+    paperBg: "#f4f8fc",
+    paperBorder: "#7aa0c4",
+    ink: "#243448",
+    muted: "#5a7088",
+    fontClass: "font-script",
+    ...CLASSIC_ENVELOPE,
+    sealEmoji: "❄️",
+    stampLabel: "SNOW",
+    stampColors: { bg: "#eef5fb", ink: "#4a6e90", border: "#4a6e90" },
+    postmarkColor: "rgba(74,110,144,0.45)",
+    decor: "christmas-snow",
+    accent: "#4a6e90",
+    writingStyle: "poetic",
+  },
+  {
+    id: "christmas-holly",
+    title: "Holly Berry",
+    blurb: "Red berries, green leaves & merry ribbon",
+    emoji: "❤️",
+    era: "Christmas",
+    occasionHints: ["christmas"],
+    paperBg: "#fff5f2",
+    paperBorder: "#c45a48",
+    ink: "#3a2418",
+    muted: "#8a5848",
+    fontClass: "font-display",
+    ...CLASSIC_ENVELOPE,
+    sealEmoji: "🎀",
+    stampLabel: "JOY",
+    stampColors: { bg: "#fff0ec", ink: "#c45a48", border: "#c45a48" },
+    postmarkColor: "rgba(196,90,72,0.45)",
+    decor: "christmas-holly",
+    accent: "#c45a48",
+    writingStyle: "cute",
+  },
+  {
+    id: "christmas-cookie",
+    title: "Gingerbread Mail",
+    blurb: "Warm spice, icing sugar & bakery cheer",
+    emoji: "🍪",
+    era: "Christmas",
+    occasionHints: ["christmas"],
+    paperBg: "#fff6ea",
+    paperBorder: "#b87840",
+    ink: "#3d2a18",
+    muted: "#8a6040",
+    fontClass: "font-script",
+    ...CLASSIC_ENVELOPE,
+    sealEmoji: "🍪",
+    stampLabel: "BAKE",
+    stampColors: { bg: "#fff1dc", ink: "#8b5e34", border: "#8b5e34" },
+    postmarkColor: "rgba(139,94,52,0.45)",
+    decor: "christmas-cookie",
+    accent: "#b87840",
+    writingStyle: "funny",
   },
 ];
 

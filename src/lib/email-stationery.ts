@@ -54,6 +54,14 @@ export function stationeryPaperWash(stationery: LetterStationery): string {
       return `linear-gradient(180deg, #f8f4ff, #efe6fa 45%, #f7f2ff)`;
     case "halloween-bats":
       return `linear-gradient(180deg, #2a1840 0%, #f7f1e8 38%, #fff6ea)`;
+    case "christmas-pine":
+      return `linear-gradient(180deg, #f7f3ea, #e8f0e4 45%, #f7f3ea)`;
+    case "christmas-snow":
+      return `linear-gradient(180deg, #f4f8fc, #e8f0f8 45%, #f7fafc)`;
+    case "christmas-holly":
+      return `linear-gradient(180deg, #fff5f2, #ffe8e4 42%, #fff8f6)`;
+    case "christmas-cookie":
+      return `linear-gradient(180deg, #fff6ea, #ffe8c8 45%, #fff3dc)`;
     default:
       return `linear-gradient(180deg, ${stationery.paperBg}, #fff6df 55%, ${stationery.paperBg})`;
   }
@@ -82,6 +90,14 @@ function decorPattern(decor: LetterStationeryDecor, accent: string, border: stri
       return `radial-gradient(circle at 78% 16%, #fff 0 20px, transparent 22px), radial-gradient(circle at 20% 70%, ${accent}33 0 28px, transparent 29px)`;
     case "halloween-bats":
       return `radial-gradient(circle at 80% 18%, #ffb347 0 22px, transparent 24px)`;
+    case "christmas-pine":
+      return `radial-gradient(circle at 78% 16%, #ffe7a8 0 22px, transparent 24px), radial-gradient(circle at 18% 72%, ${accent}33 0 30px, transparent 31px)`;
+    case "christmas-snow":
+      return `radial-gradient(circle at 20% 22%, #fff 0 5px, transparent 6px), radial-gradient(circle at 70% 18%, #fff 0 4px, transparent 5px), radial-gradient(circle at 48% 58%, #fff 0 3px, transparent 4px), radial-gradient(circle at 82% 70%, #fff 0 5px, transparent 6px)`;
+    case "christmas-holly":
+      return `radial-gradient(circle at 22% 24%, #c45a48 0 6px, transparent 7px), radial-gradient(circle at 78% 20%, #2f6b4a 0 10px, transparent 11px), radial-gradient(circle at 70% 72%, #c45a48 0 5px, transparent 6px)`;
+    case "christmas-cookie":
+      return `radial-gradient(circle at 24% 28%, #f0c98a 0 18px, transparent 19px), radial-gradient(circle at 78% 22%, #fff 0 10px, transparent 11px), radial-gradient(circle at 68% 70%, #e8b86d 0 16px, transparent 17px)`;
     default:
       return "none";
   }
@@ -131,6 +147,14 @@ function decorBits(decor: LetterStationeryDecor): DecorBits {
       return { caption: "ghost post · a gentle boo", tl: "👻", tr: "🌙", bl: "💜", br: "⭐" };
     case "halloween-bats":
       return { caption: "bat moon · under the night", tl: "🦇", tr: "🌙", bl: "🎃", br: "🦇" };
+    case "christmas-pine":
+      return { caption: "pine & gold · merry christmas", tl: "🎄", tr: "⭐", bl: "🎁", br: "✨" };
+    case "christmas-snow":
+      return { caption: "snowfall post · soft winter", tl: "❄️", tr: "🌨️", bl: "⛄", br: "✨" };
+    case "christmas-holly":
+      return { caption: "holly berry · merry & bright", tl: "❤️", tr: "🌿", bl: "🎀", br: "✨" };
+    case "christmas-cookie":
+      return { caption: "gingerbread mail · warm spice", tl: "🍪", tr: "🥛", bl: "🍬", br: "✨" };
     default:
       return { caption: "a little letter for you", tl: "💌", tr: "✨", bl: "✦", br: "✦" };
   }

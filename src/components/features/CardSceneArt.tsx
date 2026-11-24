@@ -92,6 +92,26 @@ export function CardSceneArt({
       return <FriendlyGhostScene {...props} />;
     case "moonlit-bats":
       return <MoonlitBatsScene {...props} />;
+    case "snowy-tree":
+      return <SnowyTreeScene {...props} />;
+    case "santa-sleigh":
+      return <SantaSleighScene {...props} />;
+    case "mistletoe-kiss":
+      return <MistletoeScene {...props} />;
+    case "gingerbread-house":
+      return <GingerbreadHouseScene {...props} />;
+    case "northern-lights":
+      return <NorthernLightsScene {...props} />;
+    case "holly-wreath":
+      return <HollyWreathScene {...props} />;
+    case "cozy-fireplace":
+      return <CozyFireplaceScene {...props} />;
+    case "snowman-cheer":
+      return <SnowmanCheerScene {...props} />;
+    case "gift-bow":
+      return <GiftBowScene {...props} />;
+    case "christmas-star":
+      return <ChristmasStarScene {...props} />;
     default:
       return <HoneyScene {...props} />;
   }
@@ -1566,6 +1586,402 @@ function MoonlitBatsScene({ gid }: SceneProps) {
         transition={{ duration: 1.2, repeat: Infinity }}
       />
       <rect x="67" y="128" width="6" height="10" rx="2" fill="#5a8a32" />
+    </svg>
+  );
+}
+
+function SnowyTreeScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-stBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#152838" />
+          <stop offset="60%" stopColor="#2a4860" />
+          <stop offset="100%" stopColor="#dce8f0" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-stBg)`} />
+      {[20, 55, 95, 140, 190, 220].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={-6}
+          r={i % 2 === 0 ? 2 : 1.4}
+          fill="#fff"
+          animate={{ y: [0, 170], opacity: [0.2, 1, 0.2] }}
+          transition={{ duration: 4 + i * 0.4, repeat: Infinity, delay: i * 0.35 }}
+        />
+      ))}
+      <ellipse cx="120" cy="150" rx="110" ry="16" fill="#eef4f8" />
+      <path d="M120 28 L150 70 L135 70 L160 105 L140 105 L170 140 L70 140 L100 105 L80 105 L105 70 L90 70 Z" fill="#2f6b4a" />
+      <rect x="114" y="140" width="12" height="12" rx="2" fill="#6b4a28" />
+      {[
+        [112, 48],
+        [128, 62],
+        [105, 82],
+        [135, 92],
+        [118, 112],
+        [98, 120],
+        [140, 124],
+      ].map(([cx, cy], i) => (
+        <motion.circle
+          key={`${cx}-${cy}`}
+          cx={cx}
+          cy={cy}
+          r="3"
+          fill={i % 3 === 0 ? "#c45a48" : i % 3 === 1 ? "#d4a84a" : "#fff6df"}
+          animate={{ opacity: [0.45, 1, 0.45], scale: [0.9, 1.15, 0.9] }}
+          transition={{ duration: 1.6 + i * 0.15, repeat: Infinity }}
+        />
+      ))}
+      <motion.polygon
+        points="120,18 124,28 134,28 126,34 129,44 120,38 111,44 114,34 106,28 116,28"
+        fill="#ffe7a8"
+        animate={{ opacity: [0.65, 1, 0.7], scale: [0.95, 1.08, 0.95] }}
+        transition={{ duration: 2.2, repeat: Infinity }}
+        style={{ transformOrigin: "120px 30px" }}
+      />
+    </svg>
+  );
+}
+
+function SantaSleighScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-ssBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0c1428" />
+          <stop offset="70%" stopColor="#243868" />
+          <stop offset="100%" stopColor="#8aa0c8" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-ssBg)`} />
+      {[18, 48, 80, 120, 170, 210].map((x, i) => (
+        <circle key={x} cx={x} cy={14 + (i % 3) * 12} r="1.2" fill="#fff6df" opacity={0.7} />
+      ))}
+      <circle cx="190" cy="36" r="18" fill="#fff4c8" opacity="0.9" />
+      <motion.g
+        animate={{ x: [0, 8, 0], y: [0, -4, 0] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <ellipse cx="70" cy="78" rx="10" ry="6" fill="#f5f0e8" />
+        <ellipse cx="92" cy="76" rx="9" ry="5.5" fill="#f5f0e8" />
+        <ellipse cx="112" cy="78" rx="8" ry="5" fill="#f5f0e8" />
+        <path d="M120 72 L168 78 L168 96 L124 100 Z" fill="#c45a48" />
+        <rect x="124" y="80" width="18" height="12" rx="2" fill="#d4a84a" />
+        <path d="M120 100 Q145 108 168 100" fill="none" stroke="#8b5e34" strokeWidth="3" />
+        <circle cx="58" cy="78" r="3" fill="#c45a48" />
+      </motion.g>
+      <ellipse cx="120" cy="150" rx="120" ry="18" fill="#dce6f0" opacity="0.85" />
+    </svg>
+  );
+}
+
+function MistletoeScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-mtBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#eef4ea" />
+          <stop offset="55%" stopColor="#fff6f2" />
+          <stop offset="100%" stopColor="#ffe4ea" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-mtBg)`} />
+      <rect x="116" y="8" width="8" height="28" rx="2" fill="#8b5e34" />
+      <ellipse cx="100" cy="55" rx="28" ry="16" fill="#6a8a58" transform="rotate(-25 100 55)" />
+      <ellipse cx="140" cy="55" rx="28" ry="16" fill="#5a7a48" transform="rotate(25 140 55)" />
+      <ellipse cx="120" cy="70" rx="24" ry="14" fill="#6a8a58" />
+      <circle cx="112" cy="68" r="5" fill="#c45a68" />
+      <circle cx="124" cy="72" r="5" fill="#c45a68" />
+      <circle cx="118" cy="78" r="4" fill="#a84858" />
+      <motion.path
+        d="M120 88 Q120 108 120 120"
+        fill="none"
+        stroke="#c45a68"
+        strokeWidth="2"
+        strokeDasharray="3 4"
+        animate={{ opacity: [0.3, 1, 0.3] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+      <motion.text
+        x="120"
+        y="138"
+        textAnchor="middle"
+        fontSize="22"
+        animate={{ y: [138, 132, 138], opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 2.4, repeat: Infinity }}
+      >
+        💋
+      </motion.text>
+    </svg>
+  );
+}
+
+function GingerbreadHouseScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-ghBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff6df" />
+          <stop offset="100%" stopColor="#f0c98a" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-ghBg)`} />
+      <ellipse cx="120" cy="150" rx="100" ry="14" fill="#e8c078" opacity="0.55" />
+      <path d="M70 90 L120 40 L170 90 Z" fill="#fff" />
+      <rect x="78" y="90" width="84" height="50" fill="#c4894a" />
+      <rect x="108" y="108" width="24" height="32" rx="2" fill="#8b5e34" />
+      <rect x="88" y="100" width="16" height="14" rx="2" fill="#7ec8ff" />
+      <rect x="136" y="100" width="16" height="14" rx="2" fill="#7ec8ff" />
+      {[86, 100, 114, 128, 142].map((x, i) => (
+        <circle key={x} cx={x} cy="86" r="4" fill={i % 2 === 0 ? "#ff6b8a" : "#7ed957"} />
+      ))}
+      <motion.circle
+        cx="120"
+        cy="58"
+        r="5"
+        fill="#c45a48"
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 1.8, repeat: Infinity }}
+        style={{ transformOrigin: "120px 58px" }}
+      />
+      <path d="M70 90 Q120 78 170 90" fill="none" stroke="#fff" strokeWidth="5" />
+    </svg>
+  );
+}
+
+function NorthernLightsScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-nlBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0a1428" />
+          <stop offset="55%" stopColor="#1a3860" />
+          <stop offset="100%" stopColor="#1e4038" />
+        </linearGradient>
+        <linearGradient id={`${gid}-nlAur`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#5ec4a0" stopOpacity="0" />
+          <stop offset="35%" stopColor="#5ec4a0" stopOpacity="0.7" />
+          <stop offset="65%" stopColor="#7ab8ff" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-nlBg)`} />
+      {[24, 60, 100, 150, 200].map((x, i) => (
+        <circle key={x} cx={x} cy={12 + (i % 3) * 10} r="1.1" fill="#fff6df" opacity="0.8" />
+      ))}
+      <motion.path
+        d="M0 50 Q60 20 120 48 T240 40 L240 70 Q180 90 120 68 T0 80 Z"
+        fill={`url(#${gid}-nlAur)`}
+        animate={{ opacity: [0.35, 0.85, 0.4], x: [0, 10, 0] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <path d="M30 160 L45 110 L60 160 Z" fill="#1a3028" />
+      <path d="M55 160 L75 95 L95 160 Z" fill="#243c30" />
+      <path d="M150 160 L170 100 L190 160 Z" fill="#1a3028" />
+      <path d="M175 160 L200 88 L220 160 Z" fill="#243c30" />
+      <ellipse cx="120" cy="154" rx="120" ry="12" fill="#dce8f0" opacity="0.35" />
+    </svg>
+  );
+}
+
+function HollyWreathScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-hwBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff8f4" />
+          <stop offset="100%" stopColor="#e8f0e4" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-hwBg)`} />
+      <circle cx="120" cy="82" r="48" fill="none" stroke="#2f6b4a" strokeWidth="18" />
+      <circle cx="120" cy="82" r="48" fill="none" stroke="#3f7b5a" strokeWidth="8" opacity="0.5" />
+      {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => {
+        const rad = (deg * Math.PI) / 180;
+        const x = 120 + Math.cos(rad) * 48;
+        const y = 82 + Math.sin(rad) * 48;
+        return (
+          <circle
+            key={deg}
+            cx={x}
+            cy={y}
+            r={i % 2 === 0 ? 5 : 4}
+            fill="#c45a48"
+          />
+        );
+      })}
+      <motion.path
+        d="M120 34 Q132 20 144 34 Q132 28 120 34"
+        fill="#c45a48"
+        animate={{ y: [0, -3, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+      <text x="120" y="88" textAnchor="middle" fontSize="18" fill="#2f6b4a">
+        ✦
+      </text>
+    </svg>
+  );
+}
+
+function CozyFireplaceScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-cfBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#2a1810" />
+          <stop offset="55%" stopColor="#5a3020" />
+          <stop offset="100%" stopColor="#c47840" />
+        </linearGradient>
+        <radialGradient id={`${gid}-cfFire`} cx="50%" cy="70%" r="50%">
+          <stop offset="0%" stopColor="#ffe08a" />
+          <stop offset="45%" stopColor="#ff8a3c" />
+          <stop offset="100%" stopColor="#ff8a3c" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-cfBg)`} />
+      <rect x="55" y="48" width="130" height="90" rx="6" fill="#3a2418" />
+      <rect x="70" y="62" width="100" height="68" rx="4" fill="#1c100c" />
+      <motion.ellipse
+        cx="120"
+        cy="118"
+        rx="34"
+        ry="28"
+        fill={`url(#${gid}-cfFire)`}
+        animate={{ scale: [1, 1.08, 0.96, 1], opacity: [0.75, 1, 0.8, 1] }}
+        transition={{ duration: 1.1, repeat: Infinity }}
+        style={{ transformOrigin: "120px 118px" }}
+      />
+      <rect x="78" y="42" width="16" height="22" rx="2" fill="#c45a48" />
+      <rect x="112" y="42" width="16" height="22" rx="2" fill="#2f6b4a" />
+      <rect x="146" y="42" width="16" height="22" rx="2" fill="#d4a84a" />
+      <rect x="50" y="136" width="140" height="12" rx="2" fill="#5a3a22" />
+    </svg>
+  );
+}
+
+function SnowmanCheerScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-smBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#c8dcf0" />
+          <stop offset="55%" stopColor="#f4f8fc" />
+          <stop offset="100%" stopColor="#fff8f0" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-smBg)`} />
+      {[30, 70, 120, 170, 210].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={-4}
+          r="2"
+          fill="#fff"
+          animate={{ y: [0, 160] }}
+          transition={{ duration: 3.5 + i * 0.3, repeat: Infinity, delay: i * 0.4 }}
+        />
+      ))}
+      <ellipse cx="120" cy="150" rx="90" ry="12" fill="#fff" />
+      <circle cx="120" cy="118" r="28" fill="#fff" stroke="#d0d8e0" strokeWidth="1" />
+      <circle cx="120" cy="74" r="20" fill="#fff" stroke="#d0d8e0" strokeWidth="1" />
+      <circle cx="112" cy="70" r="2.2" fill="#2a2418" />
+      <circle cx="128" cy="70" r="2.2" fill="#2a2418" />
+      <path d="M120 74 L136 78 L120 80 Z" fill="#e07a18" />
+      <path d="M100 88 Q120 98 140 88" fill="none" stroke="#c45a48" strokeWidth="5" />
+      <rect x="104" y="52" width="32" height="8" rx="2" fill="#2a2418" />
+      <rect x="128" y="40" width="14" height="16" rx="2" fill="#2a2418" />
+      <circle cx="112" cy="110" r="2.5" fill="#2a2418" />
+      <circle cx="120" cy="118" r="2.5" fill="#2a2418" />
+      <circle cx="128" cy="126" r="2.5" fill="#2a2418" />
+    </svg>
+  );
+}
+
+function GiftBowScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-gbBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff0f0" />
+          <stop offset="50%" stopColor="#ffe8d4" />
+          <stop offset="100%" stopColor="#e8f0e4" />
+        </linearGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-gbBg)`} />
+      <rect x="70" y="62" width="100" height="78" rx="6" fill="#c45a48" />
+      <rect x="112" y="62" width="16" height="78" fill="#d4a84a" />
+      <rect x="70" y="92" width="100" height="16" fill="#d4a84a" />
+      <motion.g
+        animate={{ scale: [1, 1.06, 1] }}
+        transition={{ duration: 2, repeat: Infinity }}
+        style={{ transformOrigin: "120px 54px" }}
+      >
+        <path d="M120 54 Q95 28 78 54 Q100 48 120 54" fill="#d4a84a" />
+        <path d="M120 54 Q145 28 162 54 Q140 48 120 54" fill="#e8c06a" />
+        <circle cx="120" cy="54" r="8" fill="#fff6df" />
+      </motion.g>
+      {[40, 200].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={40 + i * 20}
+          r="3"
+          fill="#c45a48"
+          animate={{ y: [0, -8, 0], opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 2 + i, repeat: Infinity }}
+        />
+      ))}
+    </svg>
+  );
+}
+
+function ChristmasStarScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-csBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0c1424" />
+          <stop offset="60%" stopColor="#243858" />
+          <stop offset="100%" stopColor="#d4b878" />
+        </linearGradient>
+        <radialGradient id={`${gid}-csGlow`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fff4c8" />
+          <stop offset="40%" stopColor="#ffe08a" />
+          <stop offset="100%" stopColor="#ffe08a" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-csBg)`} />
+      {[22, 50, 90, 140, 185, 215].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={16 + (i % 4) * 14}
+          r="1.2"
+          fill="#fff6df"
+          animate={{ opacity: [0.2, 1, 0.2] }}
+          transition={{ duration: 1.8 + i * 0.2, repeat: Infinity }}
+        />
+      ))}
+      <motion.circle
+        cx="120"
+        cy="58"
+        r="42"
+        fill={`url(#${gid}-csGlow)`}
+        animate={{ opacity: [0.5, 0.95, 0.55] }}
+        transition={{ duration: 2.6, repeat: Infinity }}
+      />
+      <motion.polygon
+        points="120,24 128,48 154,48 133,64 141,90 120,74 99,90 107,64 86,48 112,48"
+        fill="#ffe7a8"
+        animate={{ scale: [0.96, 1.05, 0.96], rotate: [0, 8, 0] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "120px 58px" }}
+      />
+      <ellipse cx="120" cy="150" rx="110" ry="14" fill="#f0e8d4" opacity="0.55" />
+      <path d="M40 150 L52 118 L64 150 Z" fill="#1a3028" opacity="0.8" />
+      <path d="M180 150 L198 112 L214 150 Z" fill="#1a3028" opacity="0.75" />
     </svg>
   );
 }

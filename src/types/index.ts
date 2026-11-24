@@ -13,7 +13,8 @@ export type Occasion =
   | "valentines-day"
   | "mothers-day"
   | "fathers-day"
-  | "halloween";
+  | "halloween"
+  | "christmas";
 
 export type MessageStyle =
   | "cute"

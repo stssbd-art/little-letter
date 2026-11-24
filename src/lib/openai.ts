@@ -214,6 +214,14 @@ const MIDDLES: Record<LetterFormData["occasion"], string[]> = {
     `Sending a pumpkin-lantern kind of cheer. Happy Halloween.`,
     `A small October wish: something sweet, something silly, and someone glad you exist.`,
   ],
+  christmas: [
+    `Merry Christmas — wishing you warm lights, soft snow, and a day that feels gentle.`,
+    `A little December note: may your tree glow, your cocoa steam, and your heart feel held.`,
+    `Sending Christmas cheer across the wires — pine needles, quiet joy, and a hello from me.`,
+    `Hope your Christmas is cosy rather than busy, and kind rather than perfect.`,
+    `Merry Christmas. May there be one moment this week that feels like a soft miracle.`,
+    `A winter wish for you: peace in the morning, laughter by evening, and love in between.`,
+  ],
 };
 
 const EXTRAS: Record<LetterFormData["style"], string[]> = {
