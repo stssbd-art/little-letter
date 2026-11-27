@@ -33,6 +33,7 @@ export type CardDesignId =
   | "moonlit-bats"
   | "snowy-tree"
   | "santa-sleigh"
+  | "jolly-santa"
   | "mistletoe-kiss"
   | "gingerbread-house"
   | "northern-lights"
@@ -91,6 +92,22 @@ export const CARD_DESIGNS: CardDesign[] = [
     muted: "#6b4f36",
     badge: "ho ho hello",
     sparkles: ["🛷", "⭐", "🎁"],
+    vibe: "festive",
+  },
+  {
+    id: "jolly-santa",
+    title: "Jolly Santa",
+    blurb: "Rosy cheeks, a wink, and ho ho ho",
+    emoji: "🎅",
+    occasion: "christmas",
+    pageBg: "linear-gradient(165deg,#3a1410 0%,#8a3020 40%,#f0c090 120%)",
+    cardBg: "#fff6ea",
+    border: "#c45a48",
+    accent: "#c45a48",
+    ink: "#2a1810",
+    muted: "#7a5040",
+    badge: "ho ho ho",
+    sparkles: ["🎅", "🎁", "❄️"],
     vibe: "festive",
   },
   {

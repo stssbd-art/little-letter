@@ -400,6 +400,7 @@ function cardOpenEmoji(designId: string): string {
     "moonlit-bats": "🦇",
     "snowy-tree": "🎄",
     "santa-sleigh": "🛷",
+    "jolly-santa": "🎅",
     "mistletoe-kiss": "🌿",
     "gingerbread-house": "🏠",
     "northern-lights": "🌌",

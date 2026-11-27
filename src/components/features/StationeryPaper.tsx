@@ -457,6 +457,28 @@ function StationeryArt({
     );
   }
 
+  if (decor === "christmas-santa") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-50"
+          style={{
+            backgroundImage: `radial-gradient(circle at 78% 18%, #ffe7a8 0 20px, transparent 22px),
+              radial-gradient(circle at 20% 70%, #c45a4833 0 28px, transparent 29px),
+              radial-gradient(circle at 72% 68%, #fff 0 6px, transparent 7px)`,
+          }}
+        />
+        <span className={cn("absolute left-3 top-3", size)}>🎅</span>
+        <span className={cn("absolute right-3 top-3", size)}>🎁</span>
+        <span className={cn("absolute bottom-4 left-4", size)}>❄️</span>
+        <span className={cn("absolute bottom-4 right-3", size)}>✨</span>
+        <span className="absolute left-1/2 top-2 -translate-x-1/2 text-xs opacity-85 sm:text-sm">
+          santa&apos;s desk · ho ho ho
+        </span>
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -499,6 +521,8 @@ function paperWash(stationery: LetterStationery): string {
       return `linear-gradient(180deg, #fff5f2, #ffe8e4 42%, #fff8f6)`;
     case "christmas-cookie":
       return `linear-gradient(180deg, #fff6ea, #ffe8c8 45%, #fff3dc)`;
+    case "christmas-santa":
+      return `linear-gradient(180deg, #fff6f0, #ffe8dc 42%, #fff4e8)`;
     default:
       return `linear-gradient(180deg, ${stationery.paperBg}, #fff6df 55%, ${stationery.paperBg})`;
   }

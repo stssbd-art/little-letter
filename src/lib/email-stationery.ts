@@ -62,6 +62,8 @@ export function stationeryPaperWash(stationery: LetterStationery): string {
       return `linear-gradient(180deg, #fff5f2, #ffe8e4 42%, #fff8f6)`;
     case "christmas-cookie":
       return `linear-gradient(180deg, #fff6ea, #ffe8c8 45%, #fff3dc)`;
+    case "christmas-santa":
+      return `linear-gradient(180deg, #fff6f0, #ffe8dc 42%, #fff4e8)`;
     default:
       return `linear-gradient(180deg, ${stationery.paperBg}, #fff6df 55%, ${stationery.paperBg})`;
   }
@@ -98,6 +100,8 @@ function decorPattern(decor: LetterStationeryDecor, accent: string, border: stri
       return `radial-gradient(circle at 22% 24%, #c45a48 0 6px, transparent 7px), radial-gradient(circle at 78% 20%, #2f6b4a 0 10px, transparent 11px), radial-gradient(circle at 70% 72%, #c45a48 0 5px, transparent 6px)`;
     case "christmas-cookie":
       return `radial-gradient(circle at 24% 28%, #f0c98a 0 18px, transparent 19px), radial-gradient(circle at 78% 22%, #fff 0 10px, transparent 11px), radial-gradient(circle at 68% 70%, #e8b86d 0 16px, transparent 17px)`;
+    case "christmas-santa":
+      return `radial-gradient(circle at 78% 18%, #ffe7a8 0 20px, transparent 22px), radial-gradient(circle at 20% 70%, ${accent}33 0 28px, transparent 29px), radial-gradient(circle at 72% 68%, #fff 0 6px, transparent 7px)`;
     default:
       return "none";
   }
@@ -155,6 +159,8 @@ function decorBits(decor: LetterStationeryDecor): DecorBits {
       return { caption: "holly berry · merry & bright", tl: "❤️", tr: "🌿", bl: "🎀", br: "✨" };
     case "christmas-cookie":
       return { caption: "gingerbread mail · warm spice", tl: "🍪", tr: "🥛", bl: "🍬", br: "✨" };
+    case "christmas-santa":
+      return { caption: "santa's desk · ho ho ho", tl: "🎅", tr: "🎁", bl: "❄️", br: "✨" };
     default:
       return { caption: "a little letter for you", tl: "💌", tr: "✨", bl: "✦", br: "✦" };
   }

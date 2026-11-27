@@ -32,7 +32,8 @@ export type LetterStationeryId =
   | "christmas-pine"
   | "christmas-snow"
   | "christmas-holly"
-  | "christmas-cookie";
+  | "christmas-cookie"
+  | "christmas-santa";
 
 export type LetterStationeryDecor =
   | "none"
@@ -53,7 +54,8 @@ export type LetterStationeryDecor =
   | "christmas-pine"
   | "christmas-snow"
   | "christmas-holly"
-  | "christmas-cookie";
+  | "christmas-cookie"
+  | "christmas-santa";
 
 /** Old picker IDs → current looks (saved drafts still open). */
 const LEGACY_STATIONERY_IDS: Record<string, LetterStationeryId> = {
@@ -488,6 +490,27 @@ export const LETTER_STATIONERY: LetterStationery[] = [
     postmarkColor: "rgba(139,94,52,0.45)",
     decor: "christmas-cookie",
     accent: "#b87840",
+    writingStyle: "funny",
+  },
+  {
+    id: "christmas-santa",
+    title: "Santa's Desk",
+    blurb: "Red velvet, soft snow & a jolly wink",
+    emoji: "🎅",
+    era: "Christmas",
+    occasionHints: ["christmas"],
+    paperBg: "#fff6f0",
+    paperBorder: "#c45a48",
+    ink: "#2a1810",
+    muted: "#7a5040",
+    fontClass: "font-display",
+    ...CLASSIC_ENVELOPE,
+    sealEmoji: "🎅",
+    stampLabel: "HOHO",
+    stampColors: { bg: "#fff0e8", ink: "#c45a48", border: "#c45a48" },
+    postmarkColor: "rgba(196,90,72,0.45)",
+    decor: "christmas-santa",
+    accent: "#c45a48",
     writingStyle: "funny",
   },
 ];

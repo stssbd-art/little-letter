@@ -310,6 +310,40 @@ export function buildCardSceneSvg(designId: CardDesignId): string {
         <text x="48" y="110" font-size="22">🎃</text>
         <text x="120" y="130" font-size="18">✨</text>`
       );
+    case "santa-sleigh":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#08101f"/><stop offset="55%" stop-color="#1e3468"/><stop offset="100%" stop-color="#7a94c0"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <circle cx="198" cy="32" r="16" fill="#fff4c8"/>
+        <ellipse cx="40" cy="78" rx="9" ry="5" fill="#f5f0e8"/><ellipse cx="62" cy="76" rx="8" ry="5" fill="#f5f0e8"/><ellipse cx="84" cy="78" rx="8" ry="5" fill="#f5f0e8"/>
+        <path d="M100 70 L158 78 L158 104 L106 110 Z" fill="#b84838"/>
+        <ellipse cx="128" cy="88" rx="16" ry="12" fill="#c45a48"/>
+        <circle cx="128" cy="72" r="10" fill="#f0c8a8"/>
+        <path d="M118 66 Q128 54 138 66" fill="#c45a48"/>
+        <ellipse cx="128" cy="78" rx="10" ry="6" fill="#fff"/>
+        <ellipse cx="120" cy="150" rx="120" ry="16" fill="#c8d8ec" opacity=".6"/>`
+      );
+    case "jolly-santa":
+      return svg(
+        g,
+        `<defs><linearGradient id="${g}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a100c"/><stop offset="45%" stop-color="#6a2818"/><stop offset="100%" stop-color="#e8a878"/></linearGradient></defs>
+        <rect width="240" height="160" fill="url(#${g}bg)"/>
+        <ellipse cx="48" cy="128" rx="20" ry="14" fill="#2f6b4a"/>
+        <ellipse cx="120" cy="128" rx="40" ry="26" fill="#c45a48"/>
+        <rect x="112" y="108" width="16" height="20" fill="#fff6df"/>
+        <circle cx="120" cy="68" r="26" fill="#f0c8a8"/>
+        <path d="M94 58 Q120 12 146 58 Z" fill="#c45a48"/>
+        <ellipse cx="120" cy="58" rx="28" ry="7" fill="#fff"/>
+        <circle cx="146" cy="22" r="6" fill="#fff"/>
+        <path d="M98 72 Q102 108 120 116 Q138 108 142 72 Q132 86 120 88 Q108 86 98 72 Z" fill="#fff"/>
+        <circle cx="112" cy="62" r="2.2" fill="#2a1810"/><circle cx="128" cy="62" r="2.2" fill="#2a1810"/>
+        <circle cx="108" cy="66" r="3" fill="#f09090" opacity=".75"/><circle cx="132" cy="66" r="3" fill="#f09090" opacity=".75"/>
+        <ellipse cx="120" cy="72" rx="4.5" ry="3" fill="#e07060"/>
+        <text x="188" y="56" text-anchor="middle" font-size="11" fill="#ffe7a8" font-weight="700">HO</text>
+        <text x="200" y="74" text-anchor="middle" font-size="11" fill="#ffe7a8" font-weight="700">HO</text>
+        <rect x="188" y="118" width="20" height="18" rx="2" fill="#2f6b4a"/><rect x="194" y="118" width="8" height="18" fill="#d4a84a"/>`
+      );
     default:
       return buildCardSceneSvg("honey-classic");
   }

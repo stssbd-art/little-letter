@@ -98,6 +98,8 @@ export function CardSceneArt({
       return <SnowyTreeScene {...props} />;
     case "santa-sleigh":
       return <SantaSleighScene {...props} />;
+    case "jolly-santa":
+      return <JollySantaScene {...props} />;
     case "mistletoe-kiss":
       return <MistletoeScene {...props} />;
     case "gingerbread-house":
@@ -1768,41 +1770,230 @@ function SantaSleighScene({ gid }: SceneProps) {
       <FallingFlakes count={7} color="#e8f0ff" />
       <ellipse cx="120" cy="152" rx="130" ry="16" fill="#c8d8ec" opacity="0.55" />
       <motion.g
-        animate={{ x: [-40, 260], y: [0, -8, 4, -6, 0] }}
+        animate={{ x: [-50, 270], y: [0, -8, 4, -6, 0] }}
         transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
       >
-        <g transform="translate(0 55)">
+        <g transform="translate(0 48)">
           {[0, 22, 44].map((dx, i) => (
             <g key={dx} transform={`translate(${dx} ${i % 2})`}>
-              <ellipse cx="10" cy="18" rx="9" ry="5.5" fill="#f5f0e8" />
-              <ellipse cx="4" cy="16" rx="4" ry="3" fill="#f5f0e8" />
+              <ellipse cx="10" cy="22" rx="9" ry="5.5" fill="#f5f0e8" />
+              <ellipse cx="4" cy="20" rx="4" ry="3" fill="#f5f0e8" />
               <motion.path
-                d="M16 12 Q22 4 20 14"
+                d="M16 16 Q22 8 20 18"
                 fill="none"
                 stroke="#c45a48"
                 strokeWidth="1.5"
-                animate={{ d: ["M16 12 Q22 4 20 14", "M16 12 Q24 8 20 14", "M16 12 Q22 4 20 14"] }}
+                animate={{
+                  d: [
+                    "M16 16 Q22 8 20 18",
+                    "M16 16 Q24 12 20 18",
+                    "M16 16 Q22 8 20 18",
+                  ],
+                }}
                 transition={{ duration: 0.35, repeat: Infinity }}
               />
-              <circle cx="2" cy="16" r="1.6" fill="#c45a48" />
+              <circle cx="2" cy="20" r="1.6" fill="#c45a48" />
             </g>
           ))}
-          <path d="M68 14 L118 20 L118 40 L72 46 Z" fill="#c45a48" />
-          <rect x="76" y="22" width="16" height="12" rx="2" fill="#d4a84a" />
-          <circle cx="96" cy="18" r="7" fill="#f0e0d0" />
-          <path d="M90 14 Q96 6 102 14" fill="#c45a48" />
-          <path d="M68 46 Q94 54 118 46" fill="none" stroke="#8b5e34" strokeWidth="3" strokeLinecap="round" />
+          <path d="M68 20 L128 26 L128 52 L74 58 Z" fill="#b84838" />
+          <path d="M68 52 Q100 62 128 52" fill="none" stroke="#8b5e34" strokeWidth="3.5" strokeLinecap="round" />
+          <ellipse cx="98" cy="40" rx="18" ry="14" fill="#c45a48" />
+          <circle cx="98" cy="22" r="11" fill="#f0c8a8" />
+          <path d="M87 16 Q98 2 109 16 L109 20 L87 20 Z" fill="#c45a48" />
+          <path d="M87 20 L109 20" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" />
+          <circle cx="111" cy="10" r="3.5" fill="#fff" />
+          <ellipse cx="98" cy="30" rx="12" ry="8" fill="#fff" />
+          <circle cx="93" cy="20" r="1.4" fill="#2a1810" />
+          <circle cx="103" cy="20" r="1.4" fill="#2a1810" />
+          <circle cx="90" cy="24" r="2.2" fill="#f09090" opacity="0.7" />
+          <circle cx="106" cy="24" r="2.2" fill="#f09090" opacity="0.7" />
+          <path d="M96 24 L100 26 L96 27" fill="#c45a48" />
+          <rect x="84" y="34" width="10" height="8" rx="1" fill="#2f6b4a" />
+          <rect x="102" y="36" width="10" height="8" rx="1" fill="#d4a84a" />
           <motion.g
-            animate={{ y: [0, 10, 22], opacity: [0.8, 0.5, 0] }}
+            animate={{ y: [0, 12, 24], opacity: [0.85, 0.5, 0] }}
             transition={{ duration: 1.4, repeat: Infinity }}
           >
-            <rect x="88" y="48" width="8" height="8" rx="1" fill="#2f6b4a" />
-            <rect x="90" y="46" width="4" height="4" fill="#d4a84a" />
+            <rect x="94" y="58" width="8" height="8" rx="1" fill="#2f6b4a" />
+            <rect x="96" y="56" width="4" height="4" fill="#d4a84a" />
           </motion.g>
         </g>
       </motion.g>
       <path d="M20 140 L34 110 L48 140 Z" fill="#1a3028" opacity="0.75" />
       <path d="M200 145 L214 118 L228 145 Z" fill="#1a3028" opacity="0.7" />
+    </svg>
+  );
+}
+
+function JollySantaScene({ gid }: SceneProps) {
+  return (
+    <svg viewBox="0 0 240 160" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id={`${gid}-jsBg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#2a100c" />
+          <stop offset="45%" stopColor="#6a2818" />
+          <stop offset="100%" stopColor="#e8a878" />
+        </linearGradient>
+        <radialGradient id={`${gid}-jsGlow`} cx="50%" cy="40%" r="50%">
+          <stop offset="0%" stopColor="#ffe7a8" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#ffe7a8" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="240" height="160" fill={`url(#${gid}-jsBg)`} />
+      <ellipse cx="120" cy="70" rx="90" ry="55" fill={`url(#${gid}-jsGlow)`} />
+      {[24, 55, 90, 150, 190, 220].map((x, i) => (
+        <motion.circle
+          key={x}
+          cx={x}
+          cy={12 + (i % 3) * 10}
+          r="1.2"
+          fill="#fff6df"
+          animate={{ opacity: [0.2, 1, 0.25] }}
+          transition={{ duration: 1.7 + i * 0.2, repeat: Infinity }}
+        />
+      ))}
+      <FallingFlakes count={8} />
+      <ellipse cx="120" cy="154" rx="110" ry="14" fill="#f0d8b8" opacity="0.55" />
+
+      {/* gift sack */}
+      <motion.g
+        animate={{ y: [0, -2, 0] }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <ellipse cx="48" cy="128" rx="22" ry="16" fill="#2f6b4a" />
+        <path d="M32 118 Q48 108 64 118" fill="#3f8a58" />
+        <rect x="36" y="112" width="12" height="10" rx="1" fill="#c45a48" />
+        <rect x="50" y="114" width="10" height="9" rx="1" fill="#d4a84a" />
+      </motion.g>
+
+      <motion.g
+        animate={{ y: [0, -3, 0] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {/* body */}
+        <ellipse cx="120" cy="128" rx="42" ry="28" fill="#c45a48" />
+        <ellipse cx="120" cy="118" rx="36" ry="18" fill="#d46858" />
+        <rect x="112" y="108" width="16" height="22" fill="#fff6df" />
+        <circle cx="120" cy="118" r="4" fill="#d4a84a" />
+
+        {/* head */}
+        <circle cx="120" cy="68" r="28" fill="#f0c8a8" />
+        {/* hat */}
+        <path d="M92 58 Q120 8 148 58 Z" fill="#c45a48" />
+        <ellipse cx="120" cy="58" rx="30" ry="8" fill="#fff" />
+        <motion.circle
+          cx="148"
+          cy="22"
+          r="7"
+          fill="#fff"
+          animate={{ y: [0, 3, 0], x: [0, 2, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity }}
+        />
+        {/* beard */}
+        <path
+          d="M96 72 Q100 110 120 118 Q140 110 144 72 Q132 88 120 90 Q108 88 96 72 Z"
+          fill="#fff"
+        />
+        <ellipse cx="120" cy="78" rx="14" ry="8" fill="#f0c8a8" />
+        {/* face */}
+        <circle cx="108" cy="66" r="3.2" fill="#f09090" opacity="0.75" />
+        <circle cx="132" cy="66" r="3.2" fill="#f09090" opacity="0.75" />
+        <motion.g
+          animate={{ scaleY: [1, 0.12, 1, 1, 1] }}
+          transition={{ duration: 3.8, repeat: Infinity, times: [0, 0.08, 0.16, 0.5, 1] }}
+          style={{ transformOrigin: "112px 62px" }}
+        >
+          <circle cx="112" cy="62" r="2.4" fill="#2a1810" />
+        </motion.g>
+        <motion.path
+          d="M126 60 Q132 58 136 62"
+          fill="none"
+          stroke="#2a1810"
+          strokeWidth="2"
+          strokeLinecap="round"
+          animate={{
+            d: [
+              "M126 60 Q132 58 136 62",
+              "M126 60 Q132 62 136 60",
+              "M126 60 Q132 58 136 62",
+            ],
+          }}
+          transition={{ duration: 3.8, repeat: Infinity }}
+        />
+        <ellipse cx="120" cy="72" rx="5" ry="3.5" fill="#e07060" />
+        <path
+          d="M112 82 Q120 88 128 82"
+          fill="none"
+          stroke="#c45a48"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+
+        {/* arms + mittens */}
+        <motion.g
+          animate={{ rotate: [0, 12, 0] }}
+          transition={{ duration: 1.4, repeat: Infinity }}
+          style={{ transformOrigin: "78px 110px" }}
+        >
+          <path
+            d="M88 108 Q70 100 62 88"
+            fill="none"
+            stroke="#c45a48"
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+          <circle cx="60" cy="86" r="7" fill="#fff" />
+        </motion.g>
+        <motion.g
+          animate={{ rotate: [0, -10, 0] }}
+          transition={{ duration: 1.4, repeat: Infinity, delay: 0.2 }}
+          style={{ transformOrigin: "162px 110px" }}
+        >
+          <path
+            d="M152 108 Q170 100 178 88"
+            fill="none"
+            stroke="#c45a48"
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+          <circle cx="180" cy="86" r="7" fill="#fff" />
+        </motion.g>
+      </motion.g>
+
+      {/* ho ho ho */}
+      {[
+        { x: 178, y: 48, t: "HO", d: 0 },
+        { x: 198, y: 68, t: "HO", d: 0.35 },
+        { x: 182, y: 90, t: "HO", d: 0.7 },
+      ].map((b) => (
+        <motion.text
+          key={b.y}
+          x={b.x}
+          y={b.y}
+          textAnchor="middle"
+          fontSize="11"
+          fontWeight="700"
+          fill="#ffe7a8"
+          animate={{ opacity: [0.2, 1, 0.25], y: [b.y, b.y - 6, b.y], scale: [0.9, 1.1, 0.9] }}
+          transition={{ duration: 2.2, repeat: Infinity, delay: b.d }}
+          style={{ transformOrigin: `${b.x}px ${b.y}px` }}
+        >
+          {b.t}
+        </motion.text>
+      ))}
+
+      <motion.rect
+        x="188"
+        y="118"
+        width="22"
+        height="20"
+        rx="3"
+        fill="#2f6b4a"
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 2.4, repeat: Infinity, delay: 0.4 }}
+      />
+      <rect x="195" y="118" width="8" height="20" fill="#d4a84a" />
+      <rect x="188" y="126" width="22" height="5" fill="#d4a84a" />
     </svg>
   );
 }

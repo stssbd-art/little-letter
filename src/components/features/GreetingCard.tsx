@@ -128,6 +128,7 @@ function CardCover({
   const darkFestive =
     design.id === "snowy-tree" ||
     design.id === "santa-sleigh" ||
+    design.id === "jolly-santa" ||
     design.id === "northern-lights" ||
     design.id === "cozy-fireplace" ||
     design.id === "christmas-star";

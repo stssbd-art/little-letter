@@ -221,6 +221,8 @@ const MIDDLES: Record<LetterFormData["occasion"], string[]> = {
     `Hope your Christmas is cosy rather than busy, and kind rather than perfect.`,
     `Merry Christmas. May there be one moment this week that feels like a soft miracle.`,
     `A winter wish for you: peace in the morning, laughter by evening, and love in between.`,
+    `Ho ho hello — Santa would approve of this note. Merry Christmas from me to you.`,
+    `From one jolly heart to another: may your stockings be full and your cocoa never cold.`,
   ],
 };
 
